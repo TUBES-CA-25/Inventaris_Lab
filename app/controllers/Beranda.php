@@ -1,10 +1,19 @@
 <?php
 class Beranda extends Controller {
+
+    public function __construct()
+    {
+        // Cek apakah ada session login?
+        if (!isset($_SESSION['login'])) {
+            // Jika tidak ada, paksa pindah ke halaman Login
+            header('Location: ' . BASEURL . 'Login');
+            exit;
+        }
+    }
     
     public function index() {
 
         $data['judul'] = 'Beranda';
-        
 
          // Memanggil model untuk mendapatkan jumlah data dari setiap tabel
             $data['jumlah_jenis_barang'] = $this->model('Beranda_model')->getCount('mst_jenis_barang');

@@ -29,6 +29,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-left: 50%;
 }
 
 .form-login {
@@ -338,6 +339,7 @@ input[type="radio"] {
   align-items: center;
   width: 100%;
   margin-top: 25px;
+  color: white;
 }
 
 .data-profil img {
@@ -351,6 +353,7 @@ input[type="radio"] {
   align-items: center;
   margin-top: 10px;
   margin-bottom: 20px;
+  color: white;
 }
 
 .detail-data-profil #nama {
@@ -710,3 +713,99 @@ i {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* --- TAMBAHAN STYLE UNTUK SIDEBAR (REFACTORING) --- */
+
+.profile-name {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.profile-role {
+    color: white;
+    font-size: 13px;
+}
+
+/* Styling Icon di dalam Menu */
+.menu button i {
+    color: #ffffff;
+    margin-right: 10px; /* Menambah sedikit jarak agar rapi */
+}
+
+/* Styling khusus item menu Keluar/Pengaturan */
+.menu-item-logout {
+    margin-top: 40px;
+}
+
+/* Efek Hover untuk tombol Pengaturan (menggantikan onmouseover JS) */
+.btn-settings:hover {
+    background-color: #CAD6FF !important;
+    color: #0c1740 !important; /* Opsional: mengubah warna teks saat hover agar kontras */
+}
+
+.btn-settings:hover i {
+    color: #0c1740 !important; /* Mengubah warna icon saat hover */
+}
+
+/* Styling item Dropdown Pengaturan */
+.settings-dropdown-item {
+    color: black !important;
+}
+
+.settings-dropdown-item.first {
+    margin-top: 10px;
+}
+
+.settings-dropdown-item.last {
+    margin-top: 0;
+}
+
+/* --- STYLE  SIDEBAR --- */
+
+/* Teks Profil */
+.profile-name {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.profile-role {
+    color: white;
+    font-size: 13px;
+}
+
+/* Icon menu */
+.menu button i {
+    color: #ffffff;
+    margin-right: 10px;
+}
+
+/* Item menu logout/pengaturan */
+.menu-item-logout {
+    margin-top: 40px;
+}
+
+/* Tombol Pengaturan */
+.btn-settings:hover {
+    background-color: #CAD6FF !important;
+    color: #0c1740 !important;
+}
+
+.btn-settings:hover i {
+    color: #0c1740 !important;
+}
+
+/* Dropdown item */
+.settings-dropdown-item {
+    color: black !important;
+}
+
+.settings-dropdown-item.first {
+    margin-top: 10px;
+}
+
+.settings-dropdown-item.last {
+    margin-top: 0;
+}
+
