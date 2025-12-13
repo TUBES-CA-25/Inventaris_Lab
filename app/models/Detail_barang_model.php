@@ -248,7 +248,7 @@ class Detail_barang_model
         $pathFotoBarang = $this->db->single();
         $pathFotoBarangString = $pathFotoBarang['foto_barang'];
 
-        $lokasi_foto = "C:/xampp/htdocs/inventori/public/img/foto-barang/" . basename($pathFotoBarangString);
+        $lokasi_foto = "C:/xampp/htdocs/Inventaris_Lab/public/img/foto-barang/" . basename($pathFotoBarangString);
         unlink($lokasi_foto);
 
         $this->db->query("SELECT (qr_code) FROM trx_barang WHERE id_barang = :id_barang;");
@@ -256,7 +256,7 @@ class Detail_barang_model
         $pathQrCode = $this->db->single();
         $pathQrCodeString = $pathQrCode['qr_code'];
 
-        $lokasi_qr = "C:/xampp/htdocs/inventori/public/img/qr-code/" . basename($pathQrCodeString);
+        $lokasi_qr = "C:/xampp/htdocs/Inventaris_Lab/public/img/qr-code/" . basename($pathQrCodeString);
         unlink($lokasi_qr);
 
         $this->db->query("DELETE FROM trx_barang WHERE id_barang = :id_barang;");
@@ -283,7 +283,7 @@ class Detail_barang_model
         $pathQrCode = $this->db->single();
         $pathQrCodeString = $pathQrCode['qr_code'];
 
-        $lokasi_qr = "C:/xampp/htdocs/inventori/public/img/qr-code/" . basename($pathQrCodeString);
+        $lokasi_qr = "C:/xampp/htdocs/Inventaris_Lab/public/img/qr-code/" . basename($pathQrCodeString);
         unlink($lokasi_qr);
 
 

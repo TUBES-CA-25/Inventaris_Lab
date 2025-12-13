@@ -102,7 +102,7 @@ class User_model
         $pathProfile = $this->db->single();
         $pathProfileString = $pathProfile['foto'];
     
-        $lokasi_foto = "C:/xampp/htdocs/inventori/public/img/foto-profile/". basename($pathProfileString);
+        $lokasi_foto = "C:/xampp/htdocs/Inventaris_Lab/public/img/foto-profile/". basename($pathProfileString);
         unlink($lokasi_foto);
 
         $this->db->query("DELETE FROM trx_data_user WHERE id_user = :id_user;");

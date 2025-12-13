@@ -39,7 +39,7 @@ $(function(){
   $('.tampilModalPeminjaman').on('click', function(){
     $('#tambahPeminjaman').html('Ubah Data Peminjaman');
     $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-    $('.modal-body form').attr('action','http://localhost/inventori/public/Peminjaman/ubahPeminjaman');
+    $('.modal-body form').attr('action','http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
 
     const id_peminjaman = $(this).data('id');
     console.log(id_peminjaman);
@@ -49,7 +49,7 @@ $(function(){
     }
 
     $.ajax({
-        url: "http://localhost/inventori/public/Peminjaman/getUbah",
+        url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
         data: {id_peminjaman : id_peminjaman},
         method: 'post',
         dataType :'json',
@@ -80,7 +80,7 @@ $(document).ready(function () {
   $(document).on('click', '.tampilModalPengembalian', function () {
       $('#modalEditPengembalianLabel').html('Ubah Data Pengembalian');
       $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-      $('.modal-body form').attr('action', 'http://localhost/inventori/public/Pengembalian/ubahPengembalian');
+      $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Pengembalian/ubahPengembalian');
 
       const id_pengembalian = $(this).data('id');
       if (!id_pengembalian) {
@@ -89,7 +89,7 @@ $(document).ready(function () {
       }
 
       $.ajax({
-          url: "http://localhost/inventori/public/Pengembalian/getUbah",
+          url: "http://localhost/Inventaris_Lab/public/Pengembalian/getUbah",
           data: { id_pengembalian: id_pengembalian },
           method: 'POST',
           dataType: 'json',
@@ -151,7 +151,7 @@ $(document).ready(function () {
     $(document).on('click', '.tampilModalPeminjaman', function () {
         $('#tambahPeminjaman').html('Ubah Data Peminjaman');
         $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-        $('.modal-body form').attr('action', 'http://localhost/inventori/public/Peminjaman/ubahPeminjaman');
+        $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
 
         // Ambil ID peminjaman dari atribut data-id
         const id_peminjaman = $(this).data('id');
@@ -166,7 +166,7 @@ $(document).ready(function () {
 
         // AJAX untuk mendapatkan data peminjaman berdasarkan ID
         $.ajax({
-            url: "http://localhost/inventori/public/Peminjaman/getUbah",
+            url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
             data: { id_peminjaman: id_peminjaman },
             method: 'POST',
             dataType: 'json',
@@ -252,7 +252,7 @@ $(function () {
     $(".modal-title").html("Tambah Jenis Barang");
     $(".modal-body form").attr(
       "action",
-      "http://localhost/inventori/public/JenisBarang/tambahJenisBarang"
+      "http://localhost/Inventaris_Lab/public/JenisBarang/tambahJenisBarang"
     );
     const data = "";
     $("#sub_barang").val(data.sub_barang);
@@ -265,12 +265,12 @@ $(function () {
     $(".modal-title").html("Ubah Jenis Barang");
     $(".modal-body form").attr(
       "action",
-      "http://localhost/inventori/public/JenisBarang/ubahJenisBarang"
+      "http://localhost/Inventaris_Lab/public/JenisBarang/ubahJenisBarang"
     );
     const id = $(this).data("id");
 
     $.ajax({
-      url: "http://localhost/inventori/public/JenisBarang/getUbah",
+      url: "http://localhost/Inventaris_Lab/public/JenisBarang/getUbah",
       data: {
         id_jenis_barang: id,
       },
@@ -292,7 +292,7 @@ $(function () {
     $(".title-merek").html("Tambah Merek Barang");
     $(".body-merek form").attr(
       "action",
-      "http://localhost/inventori/public/MerekBarang/tambahMerekBarang"
+      "http://localhost/Inventaris_Lab/public/MerekBarang/tambahMerekBarang"
     );
     const data = "";
     $("#nama_merek_barang").val(data.nama_merek_barang);
@@ -304,12 +304,12 @@ $(function () {
     $(".title-merek").html("Ubah Merek Barang");
     $(".body-merek form").attr(
       "action",
-      "http://localhost/inventori/public/MerekBarang/ubahMerekBarang"
+      "http://localhost/Inventaris_Lab/public/MerekBarang/ubahMerekBarang"
     );
     const id = $(this).data("id");
 
     $.ajax({
-      url: "http://localhost/inventori/public/MerekBarang/getUbah",
+      url: "http://localhost/Inventaris_Lab/public/MerekBarang/getUbah",
       data: {
         id_merek_barang: id,
       },
@@ -465,7 +465,7 @@ $('#customSearch').on('keyup', function () {
   $(".btn-Ubah-profile").on("click", function () {
     const id = $(this).data("id");
     $.ajax({
-      url: "http://localhost/inventori/public/Profil/getUbah",
+      url: "http://localhost/Inventaris_Lab/public/Profil/getUbah",
       data: {
         id_user: id,
       },
@@ -487,7 +487,7 @@ $('#customSearch').on('keyup', function () {
     $("#title-barang").html("Tambah Barang");
     $(".body-barang form").attr(
       "action",
-      "http://localhost/inventori/public/DetailBarang/tambahBarang"
+      "http://localhost/Inventaris_Lab/public/DetailBarang/tambahBarang"
     );
     const data = "";
     $("#id_barang").val(data.id_barang);
@@ -511,12 +511,12 @@ $('#customSearch').on('keyup', function () {
     $("#title-barang").html("Ubah Data Barang");
     $(".body-barang form").attr(
       "action",
-      "http://localhost/inventori/public/DetailBarang/ubahBarang"
+      "http://localhost/Inventaris_Lab/public/DetailBarang/ubahBarang"
     );
     const id = $(this).data("id");
     console.log(id);
     $.ajax({
-      url: "http://localhost/inventori/public/DetailBarang/getUbah",
+      url: "http://localhost/Inventaris_Lab/public/DetailBarang/getUbah",
       data: {
         id_barang: id,
       },
@@ -546,7 +546,7 @@ $('#customSearch').on('keyup', function () {
   $(".btnUbahRole").on("click", function () {
     const id_user = $(this).data("user");
     $.ajax({
-      url: "http://localhost/inventori/public/KelolaAkun/getRole", // Ubah URL sesuai dengan kebutuhan Anda
+      url: "http://localhost/Inventaris_Lab/public/KelolaAkun/getRole", // Ubah URL sesuai dengan kebutuhan Anda
       data: {
         id_user: id_user,
       },

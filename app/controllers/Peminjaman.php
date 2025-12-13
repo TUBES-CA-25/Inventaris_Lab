@@ -54,8 +54,6 @@ class Peminjaman extends Controller {
         $this->view('Peminjaman/index', $data);
         $this->view('templates/footer');
     }
-
-    
     
     public function detail($id_peminjaman) {
         $data['judul'] = 'Peminjaman';

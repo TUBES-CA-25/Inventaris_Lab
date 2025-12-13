@@ -102,8 +102,8 @@ class Peminjaman_model {
 
     public function getPeminjamanById($id_peminjaman){
         
-        this->db->query('SELECT * FROM '. $this->table . 'WHERE id_peminjaman = :id_peminjaman');
-        this->db->bind('id_peminjaman', $id_peminjaman);
+        $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
+        $this->db->bind('id_peminjaman', $id_peminjaman);
         return $this->db->single();
     }
     public function getUbah($id_peminjaman) {
@@ -148,7 +148,6 @@ class Peminjaman_model {
     {
         $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
         $this->db->bind("id_peminjaman", $id_peminjaman);
-
         return $this->db->single();
     }
 }
