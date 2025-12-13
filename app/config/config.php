@@ -1,6 +1,6 @@
 <?php
 
-define('BASEURL', 'http://localhost/inventori/public/');
+define('BASEURL', 'http://localhost/Inventaris_Lab/public/');
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

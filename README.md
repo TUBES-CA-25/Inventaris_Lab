@@ -1,133 +1,234 @@
-# NAMA APLIAKSI : Sistem Inventori Barang ICLabs
+# SOP Pengerjaan Project Menggunakan Git
 
-> [!NOTE]
-> Furqon Fatahillah - 13120210005
+## Struktur Branch
 
-### Deskripsi Aplikasi
+* **main** : Branch utama (hasil akhir / stabil)
+* **ahsan** : Backend Developer
+* **rifki** : Frontend Developer
+* **farah** : Frontend Developer
 
-- saya memilih untuk membuat sistem ini untuk mempermudah pendataan barang yang sebagaimana kita ketahui dalam pendataan barang
-  yang saat ini dilakukan masih menggunakan spreadsheet dan orang yang ingin meminjam barang di Lab tidak mengetahui apakah barang yang ingin dia pinjam tersedia atau tidak.
-- tujuan sistem ini mempermudah pendataan dan pemantauan persediaan stok barang di Lab.
-- Teknologi yang digunakan : Bootstrap, Jquery, ajax, Fontawesome, LottieFiles, PHP QR Code Files, dataTables
+## Aturan Utama
 
-### Fitur MVP Aplikasi
+1. Tidak boleh mengerjakan atau commit langsung di branch `main`.
+2. Setiap developer hanya bekerja di branch masing-masing.
+3. Branch `main` hanya diisi hasil merge dari branch `ahsan`, `rifki`, dan `farah`.
+4. Selalu update dari `main` sebelum mulai mengerjakan fitur.
 
-- CRUD data barang (super admin & admin)
-- CRUD jenis barang (super admin & admin)
-- CRUD merek barang (super admin & admin)
-- CRUD Kelola akun (super admin)
-- Read data barang (user biasa)
-- Cetak data barang (All user)
+## Pembagian Tugas
 
-### Penjelasan Mengenai Arsitektur MVC
+### Backend (ahsan)
 
-MODEL
-model digunakan untuk mengelola data di database yang dimana perintah SQL dilakukan disini.
+* Controller
+* Model
+* Database
+* Logic dan validasi
 
-CONTROLLER
-controller digunakan untuk menjembatani antara MODEL dan VIEW. data yang diterima dari VIEW diteruskan ke MODEL begitupun sebaliknya.
+### Frontend (rifki & farah)
 
-VIEW
-view merupakan tempat UI nya yang dimana semua tampilan halaman disimpan disini.
+* View
+* UI / UX
+* CSS
+* JavaScript
 
-### LINK UML [Click here](https://drive.google.com/file/d/1YNiaFJN0kj_aS117fILdo9M5IgUItqhW/view?usp=sharing)
+## Alur Kerja Harian (WAJIB)
 
-### LINK ERD [Click here](https://drive.google.com/file/d/1KzM8THmWophfuogDw_sMNb5xTcOkv3TI/view?usp=sharing)
+### 1. Update Branch dari `main` (Sebelum Ngoding)
 
-### LINK UI/UX [Click here](https://www.figma.com/file/oZXus3WPSv3mKgu0U4HBsO/TUBES?type=design&node-id=0%3A1&mode=design&t=lpzNRXvjw8ZHeySR-1)
+Backend:
 
-### ScreenShoot fitur
+```bash
+git checkout ahsan
+git fetch origin
+git merge origin/main
+```
 
-Login
-![Login](image-2.png)
+Frontend:
 
-Register
-![alt text](image-3.png)
+```bash
+git checkout rifki   # atau farah
+git fetch origin
+git merge origin/main
+```
 
-Beranda
+### 2. Proses Development
 
-- Tampil data barang
-  ![Tampil data barang](image.png)
+* Kerjakan fitur di branch masing-masing.
+* Jangan mengedit file milik branch lain tanpa koordinasi.
+* Lakukan commit kecil dengan pesan yang jelas.
 
-- Tambah barang
-  ![tambah barang](image-1.png)
+Contoh commit:
 
-- Cetak data barang
-  ![alt text](image-4.png)
-  ![alt text](image-5.png)
-  ![alt text](image-6.png)
+```bash
+git add .
+git commit -m "feat: tambah fitur peminjaman"
+git commit -m "ui: perbaikan tampilan halaman"
+```
 
-- Detail barang
-  ![alt text](image-7.png)
+### 3. Push ke Branch Masing-Masing
 
-- Ubah data barang
-  ![alt text](image-8.png)
+```bash
+git push origin ahsan
+git push origin rifki
+git push origin farah
+```
 
-- Hapus data barang
-  ![alt text](image-9.png)
+## Proses Penggabungan ke `main`
 
-- Search
-  ![alt text](image-10.png)
+### 1. Pastikan Branch Sudah Update dari `main`
 
-Jenis barang
+```bash
+git checkout ahsan   # atau rifki / farah
+git fetch origin
+git merge origin/main
+```
 
-- Tampil jenis barang
-  ![alt text](image-11.png)
+### 2. Merge ke `main` (Dilakukan Bergantian)
 
-- Tambah jenis barang
-  ![alt text](image-12.png)
+```bash
+git checkout main
+git merge ahsan
+git merge rifki
+git merge farah
+```
 
-- Ubah jenis barang
-  ![alt text](image-13.png)
+### 3. Push Branch `main`
 
-- Hapus jenis barang
-  ![alt text](image-14.png)
+```bash
+git push origin main
+```
 
-- Search jenis barang
-  ![alt text](image-15.png)
+## Aturan Konflik
 
-Merek barang
+* Konflik diselesaikan oleh pemilik file.
+* Jangan asal memilih versi.
+* Jika ragu, diskusikan terlebih dahulu.
 
-- Tampil merek barang
-  ![alt text](image-16.png)
+## Larangan
 
-- Ubah merek barang
-  ![alt text](image-17.png)
+* Commit langsung ke `main`.
+* Push tanpa update dari `main`.
+* Commit besar tanpa pesan jelas.
+* Mengubah file milik developer lain tanpa izin.
 
-- Hapus merek barang
-  ![alt text](image-18.png)
+## SOP Database (WAJIB DIIKUTI)
 
-- Search merek barang
-  ![alt text](image-19.png)
+### Kesepakatan Database
 
-Kelola Akun
+* Port MySQL: **3306**
+* Nama database: **inventori_db**
+* Database dijalankan secara lokal (masing-masing developer)
 
-- Tampilkan daftar akun
-  ![alt text](image-20.png)
+### Prinsip Utama Database
 
-- Tambah akun
-  ![alt text](image-21.png)
+1. Database **tidak di-push ke GitHub**.
+2. Yang disinkronkan adalah **struktur database (schema)**, bukan isi data.
+3. Semua perubahan database harus dicatat dalam file SQL.
+4. Backend (**ahsan**) bertanggung jawab atas perubahan database.
 
-- Ubah role user
-  ![alt text](image-22.png) >
+### Folder Database (WAJIB ADA DI REPO)
 
-- Hapus akun
-  ![alt text](image-23.png)
+```
+(inventori_lab.sql berada di root repository)
+```
 
-- Search akun
-  ![alt text](image-24.png)
+database/
+├── ```
 
-Profile
-![alt text](image-25.png)
+### Aturan Perubahan Database
 
-Konfirmasi Logout
-![alt text](image-26.png)
+* Tambah tabel → **tidak perlu hapus database**
+* Tambah kolom → **tidak perlu hapus database**
+* Ubah tipe kolom → **tidak perlu hapus database**
+* Hapus tabel / kolom → **harus diskusi tim**
+* Perubahan besar (reset struktur) → **boleh drop database dengan kesepakatan**
 
-[!CAUTION]
+### Cara Sinkron Database
 
-> PHP VERSION 8.3.2
+Jika ada update database:
 
-Hiraukan saja
+1. Pull repository terbaru
+2. Import file `inventori_lab.sql` melalui phpMyAdmin
+3. Jika disepakati reset total:
 
-> [!TIP]
-> Pekerjaan yang dikerjakan secara ikhlas atau dikerjakan dari lubuk hati yang paling dalam tidak hanya dituliskan dengan kata-kata tapi aksi nyata dari kata-kata itu. Kalau hanya sekadar kata-kata setiap orang bisa melakukan itu, tapi tidak untuk aksi nyatanya.
+```sql
+DROP DATABASE IF EXISTS inventori_db;
+CREATE DATABASE inventori_db;
+USE inventori_db;
+```
+
+### File Database Utama
+
+File database utama yang digunakan adalah **satu file saja** dan berada di root repository:
+
+```
+inventori_lab.sql
+```
+
+File ini menjadi **satu-satunya sumber database** untuk project.
+
+```sqlsql
+-- RESET DATABASE (hanya jika disepakati)
+DROP DATABASE IF EXISTS inventori_db;
+CREATE DATABASE inventori_db;
+USE inventori_db;
+
+-- ======================
+-- TABEL USERS
+-- ======================
+CREATE TABLE users (
+    id_user INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role ENUM('admin','user') DEFAULT 'user'
+);
+
+-- ======================
+-- TABEL TRANSAKSI PEMINJAMAN
+-- ======================
+CREATE TABLE trx_peminjaman (
+    id_trx INT AUTO_INCREMENT PRIMARY KEY,
+    id_user INT,
+    tanggal_pinjam DATE,
+    status ENUM('dipinjam','dikembalikan') DEFAULT 'dipinjam',
+    FOREIGN KEY (id_user) REFERENCES users(id_user)
+);
+
+-- ======================
+-- DATA ADMIN (LOGIN)
+-- ======================
+-- Password sudah di-hash (bcrypt)
+INSERT INTO users (nama, email, password, role) VALUES
+('Julisa', 'julisa@gmail.com', '$2y$10$8QX5p3ZqQZJ4fM1GkZyJHu4QJZpZpQ9z7xZ6eZQ4h5xC6WJ3JvQpW', 'admin'),
+('Dewi Ernita Rahma', 'dewiernitarahma@gmail.com', '$2y$10$9FJZpKZl1p1ZK3XQvGzYHu7Fh1kQ9R8yZJkQ2kJpJ5VZ6XGZ1mZ9G', 'admin');
+```
+
+Catatan:
+
+* Login menggunakan **email + password**
+* Password di atas adalah hasil `password_hash()` PHP
+* Verifikasi login wajib menggunakan `password_verify()`
+
+### Akun Admin Sementara (UNTUK DEVELOPMENT)
+
+Untuk keperluan testing dan development, sementara dapat login sebagai **admin** menggunakan akun berikut:
+
+* Email: `julisa@gmail.com`
+  Password: `julisa123`
+
+* Email: `dewiernitarahma@gmail.com`
+  Password: `Dewicomel28`
+
+Catatan:
+
+* Akun ini **hanya untuk development**, bukan production
+* Password **boleh diganti** setelah fitur login stabil()`
+
+Aturan Penting
+
+* Jangan mengubah database langsung tanpa update `- Jangan export database penuh dari phpMyAdmin lalu push ke repo.
+* Jangan drop database tanpa kesepakatan tim.
+
+## Ringkasan Alur
+
+Pull dari `main` → kerja di branch masing-masing → commit → push → merge ke `main` → sinkron database bila ada perubahan.
