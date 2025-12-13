@@ -6,53 +6,60 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 ?>
 
 <!-- modal keluar -->
-<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-    aria-hidden="true">
+<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-body"
-                style="display: flex;justify-content: center; flex-direction: column; align-items: center;">
-
-                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                    background="##FFFFFF" speed="1" style="width: 250px; height: 250px" loop autoplay direction="1"
-                    mode="normal"></lottie-player>
-                <p style="color:#385161; opacity: 0.6; font-weight: 500; font-size: medium;">Apakah anda yakin ingin
-                    keluar?</p>
+        <div class="modal-content modal-rounded">
+            <div class="modal-body modal-body-center">
+                <lottie-player 
+                    src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
+                    background="##FFFFFF" 
+                    speed="1" 
+                    class="lottie-player-size" 
+                    loop 
+                    autoplay 
+                    direction="1"
+                    mode="normal">
+                </lottie-player>
+                <p class="modal-text-confirm">Apakah anda yakin ingin keluar?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
-                <button type="button" style="width: 100px;" class="btn btn-danger"
-                    onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
+                <button type="button" class="btn btn-light btn-modal-width" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger btn-modal-width" onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
             </div>
         </div>
     </div>
 </div>
 
-
+<!-- Content Area -->
 <div class="content">
-    <div class="content-beranda" style="overflow: hidden;">
+    <div class="content-beranda content-overflow-hidden">
+        
+        <!-- Page Title -->
         <h3 id="title">Jenis Barang</h3>
-        <div class="flash" style="width: 40%; margin-left:15px;">
+        
+        <!-- Flash Message -->
+        <div class="flash flash-width">
             <?php Flasher::flash(); ?>
         </div>
-        <div class="btn-fitur" style="display: flex; justify-content:space-between;">
-            <button data-toggle="modal" class="btn-tambah" data-target="#modalTambah"
-                style=" box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5);">
-                <i class="fa-solid fa-plus" style="color: #ffffff"></i> Tambah
+        
+        <!-- Action Buttons -->
+        <div class="jenis-barang-actions">
+            <button data-toggle="modal" class="btn-tambah btn-shadow" data-target="#modalTambah">
+                <i class="fa-solid fa-plus text-white"></i> Tambah
             </button>
-            
         </div>
-        <div
-            style="max-height: 400px; overflow-y:auto; box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5); border-radius:5px; padding: 15px ; padding-top:0;">
-            <div
-                style=" height: 80px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; position: sticky; top: 0;margin-top: 0; background-color: #fff; z-index: 10; ">
-                <!-- Dropdown datatables_length -->
-                <div class="dataTables_length"
-                    style="display: inline-block; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
-                    <label>
+        
+        <!-- Table Container -->
+        <div class="table-container">
+            
+            <!-- Table Header Controls -->
+            <div class="table-header-controls">
+                
+                <!-- Entries Length Selector -->
+                <div class="dataTables_length">
+                    <label class="entries-label">
                         Show
-                        <select name="entries_length" aria-controls="example" class="form-control form-control-sm"
-                            style="width: auto; display: inline-block; margin-left: 5px; margin-right: 5px;">
+                        <select name="entries_length" aria-controls="example" class="form-control form-control-sm entries-select">
                             <option value="10">10</option>
                             <option value="25">25</option>
                             <option value="50">50</option>
@@ -62,23 +69,19 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                     </label>
                 </div>
 
-                <!-- Div pencarian -->
-                <div style="display: flex; align-items: center; justify-content: flex-end; box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5); border-radius: 8px; overflow: hidden; width: 320px;">
-                    <!-- Tombol Pencarian -->
-                    <button
-                        style="background-color: #0d1a4a; border: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px 0 0 4px;">
+                <!-- Search Box -->
+                <div class="search-container">
+                    <button class="search-button">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
-                            <path
-                                d="M10 2a8 8 0 016.32 12.9l5.38 5.38a1 1 0 01-1.42 1.42l-5.38-5.38A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z">
-                            </path>
+                            <path d="M10 2a8 8 0 016.32 12.9l5.38 5.38a1 1 0 01-1.42 1.42l-5.38-5.38A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"></path>
                         </svg>
                     </button>
-                    <!-- Input Pencarian -->
-                    <input type="text" id="customSearch" class="form-control" placeholder="Cari"
-                        style="border: none; outline: none; padding: 10px 15px; font-size: 16px; flex-grow: 1; height: 40px;">
+                    <input type="text" id="customSearch" class="form-control search-input" placeholder="Cari">
                 </div>
             </div>
-            <table id="myTable" class="table table-hover table-sm" style="">
+            
+            <!-- Data Table -->
+            <table id="myTable" class="table table-hover table-sm">
                 <thead class="table-info">
                     <tr>
                         <th scope="col" class="p-2">No.</th>
@@ -92,44 +95,56 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                 <tbody>
                     <?php $i = 1; ?>
                     <?php foreach ($data['dataTampilJenisBarang'] as $row): ?>
-                        <tr style="font-size: 14px;">
+                        <tr class="table-row">
                             <td scope="row" class="px-2"><?= $i++; ?></td>
-                            <td class="p-2" style="text-transform: capitalize;"><?= $row['sub_barang']; ?></td>
+                            <td class="p-2 text-capitalize"><?= $row['sub_barang']; ?></td>
                             <td class="p-2"><?= $row['grup_sub']; ?></td>
                             <td class="p-2"><?= $row['kode_sub']; ?></td>
                             <td class="p-2"><?= $row['kode_jenis_barang']; ?></td>
-                            <td class="p-2" style="display: flex;">
-                                <!-- hapus -->
-                                <a class="btn d-flex align-items-center justify-content-center" data-toggle="modal"
-                                    data-target="#konfirmasiHapus<?= $row['id_jenis_barang']; ?>">
-                                    <i class="fa-solid fa-trash-can fa-lg" style="color: #cc3030;"></i>
-                                </a>
-                                <!-- ubah -->
-                                <a href="<?= BASEURL; ?>/JenisBarang/ubah/<?= $row['id_jenis_barang']; ?>"
-                                    class="btn d-flex align-items-center justify-content-center tampilJenisBarangUbah"
-                                    data-toggle="modal" data-target="#modalTambah"
-                                    data-id="<?= $row['id_jenis_barang']; ?>">
-                                    <i class="fa-solid fa-pen-to-square fa-lg" style="color: #30cc30;"></i>
-                                </a>
-                                <div class="modal fade" id="konfirmasiHapus<?= $row['id_jenis_barang']; ?>" tabindex="-1"
-                                    role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <td class="p-2">
+                                <div class="action-buttons">
+                                    <!-- Delete Button -->
+                                    <a class="btn d-flex align-items-center justify-content-center" 
+                                       data-toggle="modal"
+                                       data-target="#konfirmasiHapus<?= $row['id_jenis_barang']; ?>">
+                                        <i class="fa-solid fa-trash-can fa-lg icon-delete"></i>
+                                    </a>
+                                    
+                                    <!-- Edit Button -->
+                                    <a href="<?= BASEURL; ?>/JenisBarang/ubah/<?= $row['id_jenis_barang']; ?>"
+                                       class="btn d-flex align-items-center justify-content-center tampilJenisBarangUbah"
+                                       data-toggle="modal" 
+                                       data-target="#modalTambah"
+                                       data-id="<?= $row['id_jenis_barang']; ?>">
+                                        <i class="fa-solid fa-pen-to-square fa-lg icon-edit"></i>
+                                    </a>
+                                </div>
+                                
+                                <!-- Modal Konfirmasi Hapus -->
+                                <div class="modal fade" id="konfirmasiHapus<?= $row['id_jenis_barang']; ?>" 
+                                     tabindex="-1" 
+                                     role="dialog" 
+                                     aria-labelledby="exampleModalCenterTitle" 
+                                     aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content" style="border-radius: 15px;">
-                                            <div class="modal-body"
-                                                style="display: flex;justify-content: center; flex-direction: column; align-items: center;">
+                                        <div class="modal-content modal-rounded">
+                                            <div class="modal-body modal-body-center">
                                                 <lottie-player
                                                     src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
-                                                    background="##FFFFFF" speed="1" style="width: 250px; height: 250px" loop
-                                                    autoplay direction="1" mode="normal"></lottie-player>
-                                                <p
-                                                    style="color:#385161; opacity: 0.6; font-weight: 500; font-size: medium;">
-                                                    Apakah anda yakin ingin menghapus item ini?</p>
+                                                    background="##FFFFFF" 
+                                                    speed="1" 
+                                                    class="lottie-player-size" 
+                                                    loop
+                                                    autoplay 
+                                                    direction="1" 
+                                                    mode="normal">
+                                                </lottie-player>
+                                                <p class="modal-text-confirm">Apakah anda yakin ingin menghapus item ini?</p>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-light" style="width: 100px;"
-                                                    data-dismiss="modal">Batal</button>
-                                                <button type="button" style="width: 100px;" class="btn btn-danger"
-                                                    onclick="location.href='<?= BASEURL; ?>JenisBarang/hapus/<?= $row['id_jenis_barang']; ?>'">Hapus</button>
+                                                <button type="button" class="btn btn-light btn-modal-width" data-dismiss="modal">Batal</button>
+                                                <button type="button" class="btn btn-danger btn-modal-width" 
+                                                        onclick="location.href='<?= BASEURL; ?>JenisBarang/hapus/<?= $row['id_jenis_barang']; ?>'">Hapus</button>
                                             </div>
                                         </div>
                                     </div>
@@ -140,9 +155,11 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                 </tbody>
             </table>
         </div>
+        
+        <!-- Modal Tambah/Ubah Jenis Barang -->
         <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
-                <div class="modal-content" style="height: 550px; border-radius:15px">
+                <div class="modal-content modal-form">
                     <div class="modal-header">
                         <h5 class="modal-title">Tambah Jenis Barang</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -152,17 +169,25 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                     <div class="modal-body">
                         <form action="<?= BASEURL ?>JenisBarang/tambahJenisBarang" method="post">
                             <input type="hidden" name="id_jenis_barang" id="id_jenis_barang">
-                            <div class="sub_barang">
-                                <label for="sub_barang">Sub barang</label>
-                                <br>
-                                <input type="text" name="sub_barang" id="sub_barang" oninput="camelCase()"
-                                    style="width: 250px;" required>
+                            
+                            <!-- Sub Barang -->
+                            <div class="form-group-custom">
+                                <label for="sub_barang" class="form-label-custom">Sub barang</label>
+                                <input type="text" 
+                                       name="sub_barang" 
+                                       id="sub_barang" 
+                                       class="form-input-custom"
+                                       oninput="camelCase()" 
+                                       required>
                             </div>
-                            <br>
-                            <div class="grup_sub">
-                                <label for="grup_sub">Grup sub</label>
-                                <br>
-                                <select name="grup_sub" required id="grup_sub" style="width: 250px;">
+                            
+                            <!-- Grup Sub -->
+                            <div class="form-group-custom">
+                                <label for="grup_sub" class="form-label-custom">Grup sub</label>
+                                <select name="grup_sub" 
+                                        id="grup_sub" 
+                                        class="form-input-custom"
+                                        required>
                                     <option>-- Pilih --</option>
                                     <option value="C">C</option>
                                     <option value="S">S</option>
@@ -174,29 +199,27 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                     <option value="U">U</option>
                                 </select>
                             </div>
-                            <br>
-                            <div class="kode_sub">
-                                <label for="kode_sub">Kode sub</label>
-                                <br>
-                                <input type="text" name="kode_sub" id="kode_sub" style="width: 250px;" required
-                                    oninput="uppercaseInput(this)" maxlength="3">
+                            
+                            <!-- Kode Sub -->
+                            <div class="form-group-custom">
+                                <label for="kode_sub" class="form-label-custom">Kode sub</label>
+                                <input type="text" 
+                                       name="kode_sub" 
+                                       id="kode_sub" 
+                                       class="form-input-custom"
+                                       oninput="uppercaseInput(this)" 
+                                       maxlength="3"
+                                       required>
                             </div>
-                            <br>
-                            <br>
-                            <div class="modal-footer" style="margin-right: 30%;">
+                            
+                            <!-- Submit Button -->
+                            <div class="form-submit-container">
+                                <button type="submit" id="kirim" class="btn-submit">Kirim</button>
                             </div>
-                            <br>
-                            <div style="display: flex; width:100%; justify-content: end; align-items: end;">
-                                <button type="submit" id="kirim">Kirim</button>
-                            </div>
-
+                        </form>
                     </div>
                 </div>
-                </form>
             </div>
         </div>
-
-
-
-
     </div>
+</div>

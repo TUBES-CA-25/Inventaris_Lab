@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 
 class App{
@@ -44,14 +43,4 @@ class App{
             return $url;
         } 
     }
-    
-=======
-<?php 
-
-class App{
-    public function __construct()
-    {
-        echo 'Bsimillah';
-    }
->>>>>>> 1712172c625f182224bd38de46fbfb387fbb0f33
 }

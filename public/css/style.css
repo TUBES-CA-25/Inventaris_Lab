@@ -29,6 +29,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-left: 50%;
 }
 
 .form-login {
@@ -715,7 +716,6 @@ i {
 
 /* --- TAMBAHAN STYLE UNTUK SIDEBAR (REFACTORING) --- */
 
-/* Styling untuk Teks Profil (Nama & Role) */
 .profile-name {
     color: white;
     font-weight: 600;
@@ -761,7 +761,7 @@ i {
     margin-top: 0;
 }
 
-/* --- STYLE TAMBAHAN UNTUK SIDEBAR --- */
+/* --- STYLE  SIDEBAR --- */
 
 /* Teks Profil */
 .profile-name {

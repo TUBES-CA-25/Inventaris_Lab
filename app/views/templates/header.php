@@ -6,6 +6,9 @@
     <title><?=$data['judul']?></title>
     <link rel="shortcut icon" href="<?=BASEURL; ?>img/logo.svg" />  
     <link rel="stylesheet" href="<?=BASEURL; ?>/css/style.css">  
+    <link rel="stylesheet" href="<?=BASEURL; ?>/css/beranda.css">  
+    <link rel="stylesheet" href="<?=BASEURL; ?>/css/jenisBarang.css">  
+    <link rel="stylesheet" href="<?=BASEURL; ?>/css/KelolaAkun.css">  
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link
     rel="stylesheet"
@@ -20,5 +23,7 @@
     ">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css
     ">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
 </head>
 <body>

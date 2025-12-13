@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <?php
 
 class Controller{
@@ -9,10 +9,4 @@ class Controller{
         require_once '../app/models/' . $model . '.php';
         return new $model;
     }
-=======
-<?php 
-
-class Controller{
->>>>>>> 1712172c625f182224bd38de46fbfb387fbb0f33
-    
 }

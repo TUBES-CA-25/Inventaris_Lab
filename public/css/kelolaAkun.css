@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Modal ===== */
+.modal-card {
+  @apply rounded-2xl;
+}
+
+.modal-body-center {
+  @apply flex flex-col items-center justify-center text-center;
+}
+
+.modal-text {
+  @apply text-[#385161] opacity-60 font-medium text-base;
+}
+
+/* ===== Button ===== */
+.btn-primary-custom {
+  @apply flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white bg-blue-900 shadow-lg;
+}
+
+.btn-danger-custom {
+  @apply w-24 bg-red-600 text-white rounded-md;
+}
+
+.btn-light-custom {
+  @apply w-24 bg-gray-200 text-gray-800 rounded-md;
+}
+
+/* ===== Content ===== */
+.content-wrapper {
+  @apply overflow-hidden;
+}
+
+.page-title {
+  @apply text-xl font-semibold mb-4;
+}
+
+.flash-wrapper {
+  @apply w-2/5 ml-4;
+}
+
+.feature-bar {
+  @apply flex justify-between mb-4;
+}
+
+/* ===== Table Container ===== */
+.table-wrapper {
+  @apply max-h-[400px] overflow-y-auto shadow-lg rounded-md p-4 pt-0;
+}
+
+.table-header {
+  @apply sticky top-0 z-10 bg-white flex items-center justify-between h-20 mb-5;
+}
+
+/* ===== Search ===== */
+.search-box {
+  @apply flex items-center shadow-lg rounded-lg overflow-hidden w-80;
+}
+
+.search-button {
+  @apply bg-blue-900 w-10 h-10 flex items-center justify-center;
+}
+
+.search-input {
+  @apply flex-1 px-4 py-2 outline-none border-none;
+}
+
+/* ===== Table ===== */
+.table-text {
+  @apply text-sm;
+}
+
+.table-cell {
+  @apply p-2 whitespace-nowrap;
+}
+
+.table-action {
+  @apply flex gap-2;
+}
+
+/* ===== Image ===== */
+.profile-img {
+  @apply w-24 h-24 object-cover;
+}
+
+/* ===== Form ===== */
+.role-item {
+  @apply flex items-center gap-2;
+}
+
+.submit-wrapper {
+  @apply flex justify-end;
+}
+
+.submit-btn {
+  @apply px-6 py-2 bg-blue-900 text-white rounded-md;
+}
