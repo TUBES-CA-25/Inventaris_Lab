@@ -1,1 +1,7 @@
-Option -Indexes
+# D:\xampp\htdocs\Inventaris_Lab\app\.htaccess
+
+# Mematikan directory listing (seperti yang Anda punya)
+Options -Indexes
+
+# MEMBLOKIR semua akses langsung dari browser ke file apapun di folder ini
+Deny from all

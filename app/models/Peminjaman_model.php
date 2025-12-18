@@ -5,7 +5,6 @@ class Peminjaman_model {
     public function __construct() {
         $this->db = new Database;
     }
-
     public function postDataPeminjaman($data) {
         if (!isset($data['tanggal_pengajuan']) || empty($data['tanggal_pengajuan'])) {
             $data['tanggal_pengajuan'] = date('d-m-Y'); // Format for MySQL date
@@ -88,9 +87,6 @@ class Peminjaman_model {
         return $this->db->resultSet();
     }
     
-    
-    
-    
     public function hapusDataPeminjaman($id) {
         $query = "DELETE FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman";
         $this->db->query($query);
@@ -100,19 +96,11 @@ class Peminjaman_model {
         return $this->db->rowCount();
     }
 
-    public function getPeminjamanById($id_peminjaman){
-        
+    public function getDetailDataPeminjaman($id_peminjaman)
+    {
         $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
-        $this->db->bind('id_peminjaman', $id_peminjaman);
-        return $this->db->single();
-    }
-    public function getUbah($id_peminjaman) {
-        $tampilView = "SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman;";
-        $this->db->query($tampilView);
         $this->db->bind("id_peminjaman", $id_peminjaman);
-
         return $this->db->single();
-    
     }
 
     public function ubahDataPeminjaman($data) {
@@ -144,10 +132,5 @@ class Peminjaman_model {
     }
     
 
-    public function getDetailDataPeminjaman($id_peminjaman)
-    {
-        $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
-        $this->db->bind("id_peminjaman", $id_peminjaman);
-        return $this->db->single();
-    }
+    
 }

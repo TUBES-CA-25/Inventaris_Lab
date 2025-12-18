@@ -126,7 +126,7 @@ class Peminjaman extends Controller {
         }
         
         $id = $_POST['id_peminjaman'];
-        echo json_encode($this->model('Peminjaman_model')->getUbah($id));
+        echo json_encode($this->model('Peminjaman_model')->getDetailDataPeminjaman($id));
     }
     
     

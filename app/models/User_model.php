@@ -172,7 +172,7 @@ class User_model
         $this->db->query($queryUpdateRole);
         $this->db->bind('id_role', $data['id_role']);
         $this->db->bind('id_user', $data['id_user']);
-    
+        
         $this->db->execute();
     
         return $this->db->rowCount();
