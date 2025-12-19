@@ -1,7 +1,9 @@
 <?php
 
 class Login extends Controller {
+    
     public function index(){  
+        // Jika sudah login, lempar ke Beranda
         if (isset($_SESSION['login']) && $_SESSION['login'] === true) {
             header("Location:" . BASEURL. "Beranda");
             exit();
@@ -17,23 +19,22 @@ class Login extends Controller {
         $email = $_POST['email'];
         $password = $_POST['kata-sandi']; 
         
-        $data['cekLogin'] = $this->model("User_model")->getUser($email, $password);
-        if ($data['cekLogin'] == NULL) {
-            Flasher::setFlash('Email dan password', 'tidak', ' terdaftar', 'danger');
-            header("Location:" . BASEURL . "Login");
-            exit;
-        } else {
-            // Set id_user dalam sesi
-            $_SESSION['id_user'] = $data['cekLogin']['id_user'];
-            
-            // Set variabel sesi lainnya seperti email dan id_role jika dibutuhkan
-            $_SESSION['email'] = $email; 
-            $_SESSION['id_role'] = $data['cekLogin']['id_role'];
+        $user = $this->model("User_model")->getUser($email, $password);
+
+        if ($user) {
+            // Login Sukses
+            $_SESSION['id_user'] = $user['id_user'];
+            $_SESSION['email'] = $user['email']; 
+            $_SESSION['id_role'] = $user['id_role'];
             $_SESSION['login'] = true;
 
             header("Location:" . BASEURL . "Beranda");
             exit;
+        } else {
+            // Login Gagal
+            Flasher::setFlash('Login Gagal!', 'Email atau Password', 'salah.', 'danger');
+            header("Location:" . BASEURL . "Login");
+            exit;
         }
     }
-    
 }

@@ -2,81 +2,79 @@
 
 class KelolaAkun extends Controller {
     
+    private $userModel;
+
+    public function __construct() {
+        if (!isset($_SESSION['login'])) {
+            header('Location: ' . BASEURL . 'Login');
+            exit;
+        }
+        $this->userModel = $this->model('User_model');
+    }
+
     public function index() {
         $data['judul'] = 'Kelola Akun';
-        
-        $userModel = $this->model('User_model');
-        $data['dataTampilUser']= $userModel->tampilUser();
+        $data['dataTampilUser'] = $this->userModel->tampilUser();
         $data['id_user'] = $_SESSION['id_user'];
-        $data['profile'] = $this->model("User_model")->profile($data);
+        $data['profile'] = $this->userModel->profile($data);
         
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', data: $data);
+        $this->view('templates/sidebar', $data);
         $this->view('Kelola_akun/index', $data);
         $this->view('templates/footer');
     }
 
-
     public function hapusUser($id_user){
-        
-        if($this->model('User_model')->hapusUser($id_user) > 0){
-            Flasher::setFlash('User', 'berhasil', ' dihapus', 'success');
-            header('Location: '. BASEURL . 'KelolaAkun');
-            exit;
+        if($this->userModel->hapusUser($id_user) > 0){
+            Flasher::setFlash('User', 'berhasil', 'dihapus', 'success');
         }else{
-            Flasher::setFlash('User', 'gagal', ' dihapus', 'danger');
-            header('Location: '. BASEURL . 'KelolaAkun');
-            exit;
+            Flasher::setFlash('User', 'gagal', 'dihapus', 'danger');
         }
+        header('Location: '. BASEURL . 'KelolaAkun');
+        exit;
     }
 
     public function getUbah(){
-        echo json_encode( $this->model('User_model')->getUbah($_POST['id_user']));
+        echo json_encode($this->userModel->getUbah($_POST['id_user']));
     }
 
     public function ubahUser(){
-            if($this->model('User_model')->updateUser($_POST) > 0){
-                Flasher::setFlash('Data User', 'berhasil', ' diUbah', 'success');
-                header('Location: '. BASEURL . 'KelolaAkun');
-                exit;
-            } else {
-            Flasher::setFlash('User_model', 'gagal', ' diUbah', 'danger');
-            header('Location: '. BASEURL . 'KelolaAkun');
-            exit;
+        // Cek jika update berhasil (rowCount >= 0 karena bisa saja user simpan tanpa ubah data)
+        // Disarankan model return rowCount, tapi kadang 0 jika tidak ada perubahan
+        // Jadi logicnya: Asal tidak Error/False
+        
+        if($this->userModel->updateUser($_POST) >= 0){
+            Flasher::setFlash('Data User', 'berhasil', 'diubah', 'success');
+        } else {
+            Flasher::setFlash('Data User', 'gagal', 'diubah (Gagal Upload/DB)', 'danger');
         }
+        header('Location: '. BASEURL . 'KelolaAkun');
+        exit;
     }
 
     public function cari(){
         $data['judul'] = 'Data User';
-        
-        // Mengambil data kondisi barang dari model
-        $tampilUser = $this->model('User_model');
-        $data['dataTampilUser']= $tampilUser->cariUser();
+        $data['dataTampilUser'] = $this->userModel->cariUser();
         $data['id_user'] = $_SESSION['id_user'];
-        $data['profile'] = $this->model("User_model")->profile($data);
+        $data['profile'] = $this->userModel->profile($data);
 
-        // Memanggil view transaksi barang
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', data: $data);
+        $this->view('templates/sidebar', $data);
         $this->view('Kelola_akun/index', $data);
         $this->view('templates/footer');
     }
 
     public function getRole(){
-        echo json_encode( $this->model('User_model')->getRole($_POST['id_user']));
+        echo json_encode($this->userModel->getRole($_POST['id_user']));
     }
 
-    public function ubahRole()
-    {      
-        $ubahRole =  $this->model('User_model')->ubahRole($_POST);   
-        if($ubahRole > 0){
-        Flasher::setFlash('Role', 'berhasil', ' diUbah', 'success');
+    public function ubahRole() {      
+        if($this->userModel->ubahRole($_POST) > 0){
+            Flasher::setFlash('Role', 'berhasil', 'diubah', 'success');
+        } else {
+            Flasher::setFlash('Role', 'gagal', 'diubah', 'danger');
+        } 
         header('Location: '. BASEURL . 'KelolaAkun');
         exit;
-    } else {
-    Flasher::setFlash('Role', 'gagal', ' diUbah', 'danger');
-    header('Location: '. BASEURL . 'KelolaAkun');
-    exit;
-} 
-}
+    }
 }
