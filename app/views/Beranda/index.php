@@ -89,7 +89,7 @@ if (!isset($_SESSION['login'])) {
                             </p>
                         </div>
                         
-                        <div class="data-box beranda-stat-card" onclick="location.href='<?= BASEURL ?>Pengembalian'">
+                        <div class="data-box beranda-stat-card" onclick="location.href='<?= BASEURL ?>Pengembalian/tambah">
                             <i class="fa-solid fa-rotate-left"></i>
                             <p class="stat-content">
                                 <span class="stat-number"><?= $data['jumlah_pengembalian']; ?></span> 

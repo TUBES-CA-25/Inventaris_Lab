@@ -24,12 +24,7 @@
   padding-top: 50px;
 }
 
-.content-figure {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .form-login {
   background-color: white;
@@ -352,6 +347,15 @@ input[type="radio"] {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+.detail-data-profil p {
+  color: white;
+}
+
+.detail-data-profil h3{
+  color: black;  
+}
+
 
 .detail-data-profil #nama {
   font-size: 15px;
@@ -676,7 +680,6 @@ i {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-left: 10%;
 }
 
 #img-figure-daftar {
