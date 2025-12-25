@@ -43,7 +43,7 @@
                     </li>';
                 }
                 ?>
-                <?php
+                <!-- <?php
                 if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
                     echo '<li class="tambah-jenis-barang">
                         <button onclick="location.href=\'' . BASEURL . 'JenisBarang\'">
@@ -62,7 +62,7 @@
                         </button>
                     </li>';
                 }
-                ?>
+                ?> -->
                 <?php
                 if (isset($_SESSION['login'])) {
                     echo '<li class="tambah-peminjaman-barang">
@@ -79,6 +79,16 @@
                         <button onclick="location.href=\'' . BASEURL . 'pengembalian\'">
                             <i class="fa-solid fa-rotate-left"></i>
                             Pengembalian
+                        </button>
+                    </li>';
+                }
+                ?>
+                <?php
+                if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
+                    echo '<li class="tambah-merek-barang">
+                        <button onclick="location.href=\'' . BASEURL . 'merekBarang\'">
+                            <i class="fa-solid fa-barcode"></i>
+                            Validasi Peminjaman
                         </button>
                     </li>';
                 }
