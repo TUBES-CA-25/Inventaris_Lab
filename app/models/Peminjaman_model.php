@@ -101,11 +101,24 @@ class Peminjaman_model {
     }
 
     public function getPeminjamanById($id_peminjaman){
-        
         $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
         $this->db->bind('id_peminjaman', $id_peminjaman);
         return $this->db->single();
     }
+
+    public function getDetailValidasiDataPeminjaman($id_peminjaman)
+    {
+        // Ubah query untuk JOIN ke tabel mst_jenis_barang agar dapat nama barangnya
+        $query = "SELECT trx_peminjaman.*, mst_jenis_barang.sub_barang 
+                  FROM trx_peminjaman 
+                  JOIN mst_jenis_barang ON trx_peminjaman.id_jenis_barang = mst_jenis_barang.id_jenis_barang 
+                  WHERE trx_peminjaman.id_peminjaman = :id_peminjaman";
+                  
+        $this->db->query($query);
+        $this->db->bind("id_peminjaman", $id_peminjaman);
+        return $this->db->single();
+    }
+
     public function getUbah($id_peminjaman) {
         $tampilView = "SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman;";
         $this->db->query($tampilView);

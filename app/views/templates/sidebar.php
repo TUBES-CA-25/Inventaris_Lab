@@ -63,16 +63,6 @@
                     </li>';
                 }
                 ?> -->
-                <?php
-                if (isset($_SESSION['login'])) {
-                    echo '<li class="tambah-peminjaman-barang">
-                        <button onclick="location.href=\'' . BASEURL . 'peminjaman\'">
-                            <i class="fa-solid fa-receipt"></i>
-                            Peminjaman
-                        </button>
-                    </li>';
-                }
-                ?>
                 <!-- <?php
                 if (isset($_SESSION['login'])) {
                     echo '<li class="tambah-pengembalian-barang">
@@ -83,6 +73,17 @@
                     </li>';
                 }
                 ?> -->
+                <?php
+                if (isset($_SESSION['login'])) {
+                    echo '<li class="tambah-peminjaman-barang">
+                        <button onclick="location.href=\'' . BASEURL . 'peminjaman\'">
+                            <i class="fa-solid fa-receipt"></i>
+                            Peminjaman
+                        </button>
+                    </li>';
+                }
+                ?>
+                
                 <?php
                 if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
                     echo '<li class="tambah-merek-barang">

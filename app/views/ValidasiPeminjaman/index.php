@@ -55,67 +55,43 @@ if (!isset($_SESSION['login'])) {
                             <th>Tgl mulai peminjaman</th>
                             <th>Tgl akhir peminjaman</th>
                             <th>Status</th>
-                            <th>Keterangan</th>
                             <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button class="btn-detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button class="btn-detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button class="btn-detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button class="btn-detail">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <?php $no = 1; ?>
+                        <?php if (empty($data['peminjaman'])) : ?>
+                            <tr>
+                                <td colspan="9" class="text-center">Tidak ada data peminjaman yang perlu divalidasi.</td>
+                            </tr>
+                        <?php else : ?>
+                            <?php foreach ($data['peminjaman'] as $pinjam) : ?>
+                                <tr>
+                                    <td><?= $no++; ?></td>
+                                    <td><?= $pinjam['nama_peminjam']; ?></td>
+                                    <td><?= $pinjam['tanggal_pengajuan']; ?></td>
+                                    <td><?= date('d-m-Y', strtotime($pinjam['tanggal_peminjaman'])); ?></td>
+                                    <td><?= date('d-m-Y', strtotime($pinjam['tanggal_pengembalian'])); ?></td>
+
+                                    <td>
+                                        <?php
+                                        $badgeClass = 'badge-secondary';
+                                        if ($pinjam['status'] == 'diproses') $badgeClass = 'badge-warning';
+                                        if ($pinjam['status'] == 'disetujui') $badgeClass = 'badge-success';
+                                        if ($pinjam['status'] == 'ditolak') $badgeClass = 'badge-danger';
+                                        ?>
+                                        <span class="badge <?= $badgeClass; ?>"><?= ucfirst($pinjam['status']); ?></span>
+                                    </td>
+
+                                    <td>
+                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= $pinjam['id_peminjaman']; ?>" 
+                                            class="btn-detail btn btn-sm btn-info tampilModalValidasi">
+                                                <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

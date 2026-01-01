@@ -28,191 +28,191 @@ function validasiInput(input) {
 
 // function cetak() {
 //   window.print();
-$(function(){
+$(function () {
 
-  $('.tombolTambahData').on('click', function(){
+  $('.tombolTambahData').on('click', function () {
     $('#tambahPeminjaman').html('Tambah Data Peminjaman');
     $('.modal-footer button[type=submit]').html('Kirim');
 
   });
 
-  $('.tampilModalPeminjaman').on('click', function(){
+  $('.tampilModalPeminjaman').on('click', function () {
     $('#tambahPeminjaman').html('Ubah Data Peminjaman');
     $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-    $('.modal-body form').attr('action','http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
+    $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
 
     const id_peminjaman = $(this).data('id');
     console.log(id_peminjaman);
     if (!id_peminjaman) {
-        alert('ID peminjaman tidak ditemukan');
-        return;
+      alert('ID peminjaman tidak ditemukan');
+      return;
     }
 
     $.ajax({
-        url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
-        data: {id_peminjaman : id_peminjaman},
-        method: 'post',
-        dataType :'json',
-        success :function(data){
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
-
-            $('#judul_kegiatan').val(data.judul_kegiatan);
-            $('#tanggal_peminjaman').val(data.tanggal_peminjaman);
-            $('#tanggal_pengembalian').val(data.tanggal_pengembalian);
-            $('#id_jenis_barang').val(data.id_jenis_barang);
-            $('#jumlah_peminjaman').val(data.jumlah_peminjaman);
-            $('#keterangan_peminjaman').val(data.keterangan_peminjaman);
-            $('#id_peminjaman').val(data.id_peminjaman);
-        },
-        error: function() {
-            alert('Terjadi kesalahan saat mengambil data');
+      url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
+      data: { id_peminjaman: id_peminjaman },
+      method: 'post',
+      dataType: 'json',
+      success: function (data) {
+        if (data.error) {
+          alert(data.error);
+          return;
         }
+
+        $('#judul_kegiatan').val(data.judul_kegiatan);
+        $('#tanggal_peminjaman').val(data.tanggal_peminjaman);
+        $('#tanggal_pengembalian').val(data.tanggal_pengembalian);
+        $('#id_jenis_barang').val(data.id_jenis_barang);
+        $('#jumlah_peminjaman').val(data.jumlah_peminjaman);
+        $('#keterangan_peminjaman').val(data.keterangan_peminjaman);
+        $('#id_peminjaman').val(data.id_peminjaman);
+      },
+      error: function () {
+        alert('Terjadi kesalahan saat mengambil data');
+      }
     });
-});
+  });
 });
 
 //Modal Edit Pengembalian
 
 $(document).ready(function () {
   $(document).on('click', '.tampilModalPengembalian', function () {
-      $('#modalEditPengembalianLabel').html('Ubah Data Pengembalian');
-      $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-      $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Pengembalian/ubahPengembalian');
+    $('#modalEditPengembalianLabel').html('Ubah Data Pengembalian');
+    $('.modal-footer button[type=submit]').html('Simpan Perubahan');
+    $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Pengembalian/ubahPengembalian');
 
-      const id_pengembalian = $(this).data('id');
-      if (!id_pengembalian) {
-          alert('ID pengembalian tidak ditemukan');
-          return;
+    const id_pengembalian = $(this).data('id');
+    if (!id_pengembalian) {
+      alert('ID pengembalian tidak ditemukan');
+      return;
+    }
+
+    $.ajax({
+      url: "http://localhost/Inventaris_Lab/public/Pengembalian/getUbah",
+      data: { id_pengembalian: id_pengembalian },
+      method: 'POST',
+      dataType: 'json',
+      success: function (data) {
+        $('#status_pengembalian').val(data.status_pengembalian);
+        $('#detail_masalah').val(data.detail_masalah);
+        $('#id_pengembalian').val(data.id_pengembalian);
+        $('#nama_peminjam').val(data.nama_peminjam);
+        $('#tanggal_peminjaman').val(data.tanggal_peminjaman);
+        $('#tanggal_pengembalian').val(data.tanggal_pengembalian);
+
+        updateKeterangan();
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error);
+        alert("Terjadi kesalahan saat mengambil data pengembalian.");
       }
-
-      $.ajax({
-          url: "http://localhost/Inventaris_Lab/public/Pengembalian/getUbah",
-          data: { id_pengembalian: id_pengembalian },
-          method: 'POST',
-          dataType: 'json',
-          success: function (data) {
-              $('#status_pengembalian').val(data.status_pengembalian);
-              $('#detail_masalah').val(data.detail_masalah);
-              $('#id_pengembalian').val(data.id_pengembalian);
-              $('#nama_peminjam').val(data.nama_peminjam); 
-              $('#tanggal_peminjaman').val(data.tanggal_peminjaman); 
-              $('#tanggal_pengembalian').val(data.tanggal_pengembalian); 
-
-              updateKeterangan();
-          },
-          error: function (xhr, status, error) {
-              console.error("AJAX Error:", status, error);
-              alert("Terjadi kesalahan saat mengambil data pengembalian.");
-          }
-      });
+    });
   });
 
   $('#status_pengembalian').on('change', function () {
-      updateKeterangan();
+    updateKeterangan();
   });
 
   function updateKeterangan() {
-      const status = $('#status_pengembalian').val();
-      const tanggalPengembalian = new Date($('#tanggal_pengembalian').val());
-      const today = new Date();
-      let keterangan = '';
+    const status = $('#status_pengembalian').val();
+    const tanggalPengembalian = new Date($('#tanggal_pengembalian').val());
+    const today = new Date();
+    let keterangan = '';
 
-      if (status === 'Dikembalikan') {
-          if (today <= tanggalPengembalian) {
-              keterangan = 'Tepat Waktu';
-          } else {
-              keterangan = 'Tidak Tepat Waktu';
-          }
-      } else if (status === 'Hilang' || status === 'Rusak') {
-          keterangan = 'Bermasalah';
-          $('#detail_masalah').prop('required', true);
+    if (status === 'Dikembalikan') {
+      if (today <= tanggalPengembalian) {
+        keterangan = 'Tepat Waktu';
       } else {
-          if (today > tanggalPengembalian) {
-              keterangan = 'Tidak Tepat Waktu';
-          }
+        keterangan = 'Tidak Tepat Waktu';
       }
+    } else if (status === 'Hilang' || status === 'Rusak') {
+      keterangan = 'Bermasalah';
+      $('#detail_masalah').prop('required', true);
+    } else {
+      if (today > tanggalPengembalian) {
+        keterangan = 'Tidak Tepat Waktu';
+      }
+    }
 
-      $('#keterangan').val(keterangan);
+    $('#keterangan').val(keterangan);
   }
 });
 
 
-  $(document).ready(function () {
-    // Event untuk tombol tambah data
-    $('.tombolTambahData').on('click', function () {
-        $('#tambahPeminjaman').html('Tambah Data Peminjaman');
-        $('.modal-footer button[type=submit]').html('Kirim');
-    });
-
-    // Event delegation untuk tombol edit peminjaman
-    $(document).on('click', '.tampilModalPeminjaman', function () {
-        $('#tambahPeminjaman').html('Ubah Data Peminjaman');
-        $('.modal-footer button[type=submit]').html('Simpan Perubahan');
-        $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
-
-        // Ambil ID peminjaman dari atribut data-id
-        const id_peminjaman = $(this).data('id');
-
-        // Debugging untuk memastikan ID terbaca
-        console.log("ID Peminjaman:", id_peminjaman);
-
-        if (!id_peminjaman) {
-            alert('ID peminjaman tidak ditemukan');
-            return;
-        }
-
-        // AJAX untuk mendapatkan data peminjaman berdasarkan ID
-        $.ajax({
-            url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
-            data: { id_peminjaman: id_peminjaman },
-            method: 'POST',
-            dataType: 'json',
-            success: function (data) {
-                console.log("Data dari server:", data); // Debugging
-
-                // Mengisi data ke dalam form modal
-                $('#judul_kegiatan').val(data.judul_kegiatan);
-                $('#nama_peminjam').val(data.nama_peminjam);
-                $('#tanggal_peminjaman').val(data.tanggal_peminjaman);
-                $('#tanggal_pengembalian').val(data.tanggal_pengembalian);
-                $('#id_jenis_barang').val(data.id_jenis_barang).trigger('change');
-                $('#jumlah_peminjaman').val(data.jumlah_peminjaman);
-                $('#keterangan_peminjaman').val(data.keterangan_peminjaman);
-                $('#status').val(data.status);
-                $('#id_peminjaman').val(data.id_peminjaman);
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                alert("Terjadi kesalahan saat mengambil data peminjaman.");
-            }
-        });
-    });
+$(document).ready(function () {
+  // Event untuk tombol tambah data
+  $('.tombolTambahData').on('click', function () {
+    $('#tambahPeminjaman').html('Tambah Data Peminjaman');
+    $('.modal-footer button[type=submit]').html('Kirim');
   });
 
+  // Event delegation untuk tombol edit peminjaman
+  $(document).on('click', '.tampilModalPeminjaman', function () {
+    $('#tambahPeminjaman').html('Ubah Data Peminjaman');
+    $('.modal-footer button[type=submit]').html('Simpan Perubahan');
+    $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
 
-  function submitForm() {
-    const checkboxes = document.querySelectorAll(".checkbox"); // Mengambil semua checkbox dengan kelas 'checkbox'
-    let idbarang = [];
+    // Ambil ID peminjaman dari atribut data-id
+    const id_peminjaman = $(this).data('id');
 
-    checkboxes.forEach(function (checkbox) {
-        if (checkbox.checked) {
-            idbarang.push(checkbox.value); // Menambahkan nilai ID barang yang tercentang
-        }
-    });
-    console.log(idbarang);
-    if (idbarang.length === 0) {
-        alert("Pilih setidaknya satu barang untuk diekspor!");
-        return;
+    // Debugging untuk memastikan ID terbaca
+    console.log("ID Peminjaman:", id_peminjaman);
+
+    if (!id_peminjaman) {
+      alert('ID peminjaman tidak ditemukan');
+      return;
     }
 
-    // Mengisi nilai input hidden dengan ID barang yang dipilih
-    document.getElementById("idbarang").value = idbarang.join(","); // Gabungkan ID barang dengan koma
+    // AJAX untuk mendapatkan data peminjaman berdasarkan ID
+    $.ajax({
+      url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
+      data: { id_peminjaman: id_peminjaman },
+      method: 'POST',
+      dataType: 'json',
+      success: function (data) {
+        console.log("Data dari server:", data); // Debugging
 
-    // Mengirim form setelah mengisi input hidden
-    document.getElementById("formCheckbox").submit();
+        // Mengisi data ke dalam form modal
+        $('#judul_kegiatan').val(data.judul_kegiatan);
+        $('#nama_peminjam').val(data.nama_peminjam);
+        $('#tanggal_peminjaman').val(data.tanggal_peminjaman);
+        $('#tanggal_pengembalian').val(data.tanggal_pengembalian);
+        $('#id_jenis_barang').val(data.id_jenis_barang).trigger('change');
+        $('#jumlah_peminjaman').val(data.jumlah_peminjaman);
+        $('#keterangan_peminjaman').val(data.keterangan_peminjaman);
+        $('#status').val(data.status);
+        $('#id_peminjaman').val(data.id_peminjaman);
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error);
+        alert("Terjadi kesalahan saat mengambil data peminjaman.");
+      }
+    });
+  });
+});
+
+
+function submitForm() {
+  const checkboxes = document.querySelectorAll(".checkbox"); // Mengambil semua checkbox dengan kelas 'checkbox'
+  let idbarang = [];
+
+  checkboxes.forEach(function (checkbox) {
+    if (checkbox.checked) {
+      idbarang.push(checkbox.value); // Menambahkan nilai ID barang yang tercentang
+    }
+  });
+  console.log(idbarang);
+  if (idbarang.length === 0) {
+    alert("Pilih setidaknya satu barang untuk diekspor!");
+    return;
+  }
+
+  // Mengisi nilai input hidden dengan ID barang yang dipilih
+  document.getElementById("idbarang").value = idbarang.join(","); // Gabungkan ID barang dengan koma
+
+  // Mengirim form setelah mengisi input hidden
+  document.getElementById("formCheckbox").submit();
 }
 
 //   function tampilCetak() {
@@ -324,43 +324,43 @@ $(function () {
   });
 
 
-$(document).ready(function(){
-  $('#myTable').DataTable();
-  
-  $("form#formCheckbox").submit(function(e) {
-    const checkboxes = document.querySelectorAll(".checkbox"); // Pilih semua checkbox
-    let idbarang = [];
+  $(document).ready(function () {
+    $('#myTable').DataTable();
 
-    checkboxes.forEach(function(checkbox) {
+    $("form#formCheckbox").submit(function (e) {
+      const checkboxes = document.querySelectorAll(".checkbox"); // Pilih semua checkbox
+      let idbarang = [];
+
+      checkboxes.forEach(function (checkbox) {
         if (checkbox.checked) {
-            idbarang.push(checkbox.value); // Tambahkan nilai checkbox yang dicentang ke dalam array
+          idbarang.push(checkbox.value); // Tambahkan nilai checkbox yang dicentang ke dalam array
         }
-    });
+      });
 
-    // Jika idbarang berisi data, konversi menjadi JSON dan set nilai pada input hidden
-    if (idbarang.length > 0) {
+      // Jika idbarang berisi data, konversi menjadi JSON dan set nilai pada input hidden
+      if (idbarang.length > 0) {
         $("#idbarang").val(JSON.stringify(idbarang)); // Set nilai input tersembunyi menjadi JSON string
-    } else {
+      } else {
         // Jika tidak ada data, kirimkan string kosong
         $("#idbarang").val("");
-    }
-});
-});
+      }
+    });
+  });
 
-let myTable = $('#myTable').DataTable({
-  dom: 'lrtip', // Menghilangkan search bawaan DataTable
-  "bLengthChange": false, // Menonaktifkan opsi show entries
-  "bInfo": true // Menonaktifkan informasi total entries
-});
+  let myTable = $('#myTable').DataTable({
+    dom: 'lrtip', // Menghilangkan search bawaan DataTable
+    "bLengthChange": false, // Menonaktifkan opsi show entries
+    "bInfo": true // Menonaktifkan informasi total entries
+  });
 
-$('select[name="entries_length"]').on('change', function () {
-  myTable.page.len($(this).val()).draw(); // Atur jumlah entri per halaman
-});
+  $('select[name="entries_length"]').on('change', function () {
+    myTable.page.len($(this).val()).draw(); // Atur jumlah entri per halaman
+  });
 
-// Hubungkan search kustom ke DataTable
-$('#customSearch').on('keyup', function () {
-  myTable.search(this.value).draw(); // Cari data sesuai input
-});
+  // Hubungkan search kustom ke DataTable
+  $('#customSearch').on('keyup', function () {
+    myTable.search(this.value).draw(); // Cari data sesuai input
+  });
 
 
 
@@ -399,22 +399,22 @@ $('#customSearch').on('keyup', function () {
         },
       },
       {
-          extend: "print",
-          title: "",
-          text: '<i class="fa-solid fa-print" style="color: #ffffff;  margin-right:10px;"></i>Cetak',
-          exportOptions: {
-            columns: ":visible",
-            stripHtml: false,
-            orientation: "landscape",
-          },
+        extend: "print",
+        title: "",
+        text: '<i class="fa-solid fa-print" style="color: #ffffff;  margin-right:10px;"></i>Cetak',
+        exportOptions: {
+          columns: ":visible",
+          stripHtml: false,
+          orientation: "landscape",
+        },
         customize: function (win) {
           $(win.document.body).prepend(
             '<img src="../img/logo bg putih.svg" style="width:250px;height:250px;">'
           );
           var css =
-              "@page { size: A3 landscape; }" +
-              "table.dataTable { width: 100% !important; }" +
-              "table.dataTable th, table.dataTable td { white-space: nowrap; }",
+            "@page { size: A3 landscape; }" +
+            "table.dataTable { width: 100% !important; }" +
+            "table.dataTable th, table.dataTable td { white-space: nowrap; }",
             head =
               win.document.head || win.document.getElementsByTagName("head")[0],
             style = win.document.createElement("style");
@@ -452,7 +452,7 @@ $('#customSearch').on('keyup', function () {
 
   });
 
-//penutup datatable
+  //penutup datatable
 
   table.buttons().container().appendTo("#example_wrapper :eq(0)");
 
@@ -577,17 +577,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Seleksi semua elemen <li> sidebar
   document.querySelectorAll(".menu ul li").forEach((item) => {
-      // Ambil tombol dalam setiap <li>
-      let button = item.querySelector("button");
+    // Ambil tombol dalam setiap <li>
+    let button = item.querySelector("button");
 
-      if (button) {
-          // Ambil link dari onclick attribute
-          let targetPath = button.getAttribute("onclick").match(/'([^']+)'/)[1];
+    if (button) {
+      // Ambil link dari onclick attribute
+      let targetPath = button.getAttribute("onclick").match(/'([^']+)'/)[1];
 
-          // Bandingkan dengan URL saat ini
-          if (currentPath.includes(targetPath.replace("<?=BASEURL;?>", "").toLowerCase())) {
-              item.classList.add("active"); // Tambahkan kelas "active"
-          }
+      // Bandingkan dengan URL saat ini
+      if (currentPath.includes(targetPath.replace("<?=BASEURL;?>", "").toLowerCase())) {
+        item.classList.add("active"); // Tambahkan kelas "active"
       }
+    }
   });
 });
+
+// button detail peminjaman
+function tampilkanCatatan() {
+  var form = document.getElementById('formTolak');
+  if (form.style.display === "none") {
+    form.style.display = "block";
+    // Scroll otomatis ke bawah agar terlihat
+    form.scrollIntoView({ behavior: "smooth" });
+  } else {
+    form.style.display = "none";
+  }
+}
