@@ -1,0 +1,238 @@
+.body-register {
+  display: flex;
+  min-height: 100vh;
+  background-color: white;
+  width: 100%;
+}
+
+/* --- Bagian Gambar (Kiri) --- */
+.figure-daftar {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-daftar .logo {
+  padding-top: 30px;
+  padding-left: 30px;
+}
+
+.figure-daftar .logo img {
+  width: 150px; 
+}
+
+.content-figure {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+#img-figure-daftar {
+  width: 80%;
+  max-width: 500px;
+  animation: bounce 2s infinite ease-in-out;
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+#img-figure-daftar:hover {
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(3deg); }
+  50% { transform: rotate(-3deg); }
+  75% { transform: rotate(2deg); }
+}
+
+/* --- Form (Tengah & Kanan) --- */
+.form-daftar-kiri {
+  width: 30%;
+  margin-top: 60px;
+  padding-right: 20px;
+}
+
+.form-daftar-kiri .header h2 {
+    color: #0c1740;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.form-daftar-kanan {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 170px;
+  gap: 20px;
+  padding-right: 50px;
+}
+
+/* --- Styling Input & Label --- */
+.body-register label {
+    font-size: 15px;
+    color: #0c1740;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.body-register input[type="text"],
+.body-register input[type="email"],
+.body-register input[type="password"],
+.body-register input[type="file"] {
+  background-color: rgba(202, 214, 255, 0.4);
+  border: none;
+  height: 47px;
+  border-radius: 8px;
+  padding-left: 15px;
+  font-size: 13px;
+  margin-top: 5px;
+  font-weight: 400;
+  width: 100%;
+}
+
+/* Wrapper Input */
+.form .nama,
+.form .email,
+.form .kata-sandi,
+.form .konfirmasi-kata-sandi,
+.unit,
+.no_hp,
+.alamat {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Upload Foto --- */
+.foto {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#foto {
+  background-color: transparent;
+  padding-left: 0;
+}
+
+/* --- Radio Button (Jenis Kelamin) --- */
+.jenis-kelamin {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.laki-laki,
+.perempuan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.body-register input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  margin-top: 0;
+}
+
+/* --- Tombol Daftar --- */
+.button-daftar {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.button-daftar button {
+  border: none;
+  background-color: #0c1740;
+  color: white;
+  width: 100%;
+  max-width: 230px;
+  height: 47px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  font-size: 15px;
+}
+
+.button-daftar button:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.flash {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* --- Wrapper untuk membuat sejajar --- */
+.action-buttons {
+  display: flex;
+  width: 100%;
+  gap: 15px; /* Jarak antar tombol */
+  margin-top: 30px;
+}
+
+/* --- Style Umum untuk Kedua Tombol --- */
+.action-buttons button,
+.action-buttons .btn-kembali {
+  flex: 1; /* Membuat kedua tombol berbagi lebar yang sama (50:50) */
+  height: 47px;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* --- Spesifik Tombol Daftar (Primary) --- */
+#btn-daftar {
+  background-color: #0c1740;
+  color: white;
+  border: none;
+}
+
+#btn-daftar:hover {
+  opacity: 0.9;
+  background-color: #1e3a8a;
+}
+
+/* --- Spesifik Tombol Kembali (Secondary/Outline) --- */
+.btn-kembali {
+  background-color: transparent;
+  border: 2px solid #0c1740;
+  color: #0c1740;
+  box-sizing: border-box; /* Agar border tidak menambah ukuran total */
+}
+
+.btn-kembali:hover {
+  background-color: #0c1740;
+  color: white;
+}
+
+.p-helloText{
+    margin-left: 30%;
+}

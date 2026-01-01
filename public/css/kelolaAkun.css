@@ -1,80 +1,318 @@
-
-.table-controls {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: white;
+:root {
+    --primary-color: #0c1740; /* Biru Tua */
+    --white: #ffffff;
+    --bg-color: #f8f9fa;
+    --border-radius: 12px;
 }
 
-.entries-control label {
-  font-size: 14px;
-  color: #6c757d;
+body {
+    background-color: var(--bg-color);
+    font-family: 'Poppins', sans-serif;
 }
 
-.search-wrapper .input-group-text {
-  background-color: #0d6efd !important;
+/* --- JUDUL HALAMAN --- */
+h3#title {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 26px;
+    margin-bottom: 30px;
+    padding: 0 !important;
 }
 
-.sticky-top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #f8f9fa;
+/* --- STATS CARDS --- */
+.stats-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
 }
 
-.badge {
-  font-size: 0.85rem;
-  font-weight: 500;
+.card-stat {
+    flex: 1;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s;
 }
 
-.btn-group .btn {
-  margin: 0 2px;
+.card-stat:hover {
+    transform: translateY(-5px);
 }
 
-.modal-content {
-  border: none;
-  border-radius: 15px;
+.card-stat.dark {
+    background-color: var(--primary-color);
+    color: var(--white);
 }
 
-.custom-control-label {
-  cursor: pointer;
-  padding-left: 0.5rem;
+.card-stat.light {
+    background-color: var(--white);
+    color: var(--primary-color);
+    border: 1px solid #eee;
 }
 
-.custom-control-label:hover {
-  color: #0d6efd;
+.card-stat h5 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
-.role-selection {
-  padding: 0 1rem;
+.card-stat h2 {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0;
 }
 
-.font-weight-medium {
-  font-weight: 500;
+.card-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    font-size: 32px;
 }
 
-.font-weight-semibold {
-  font-weight: 600;
+/* --- ACTION BAR --- */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* Smooth hover effects */
-.btn-outline-success:hover,
-.btn-outline-danger:hover {
-  transform: translateY(-2px);
-  transition: all 0.2s ease;
+.btn-tambah {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.3s;
 }
 
-.table tbody tr:hover {
-  background-color: #f8f9fa;
-  transition: background-color 0.2s ease;
+.btn-tambah:hover {
+    opacity: 0.9;
+    text-decoration: none;
+    color: white;
 }
 
-/* Rounded buttons */
-.btn {
-  border-radius: 6px;
+.search-box {
+    position: relative;
+    width: 300px;
 }
 
-/* Better spacing for action buttons */
-.btn-group .btn {
-  padding: 0.375rem 0.75rem;
+.search-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+/* --- TABLE STYLING (UPDATED) --- */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    background-color: white; /* Pastikan background container putih */
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+/* Style Header Tabel */
+.custom-table thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.custom-table thead th {
+    padding: 18px 15px;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: left;
+    border: none;
+    position: relative; /* Untuk positioning icon sorting */
+}
+
+/* 1. MENGHILANGKAN HOVER HEADER
+/* Memaksa background tetap biru tua saat di-hover */
+.custom-table thead tr:hover {
+    background-color: var(--primary-color) !important;
+}
+.custom-table thead th:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+} */
+
+/* 2. MEMBUAT SORTING LEBIH CERAH (DataTables Support) */
+/* Biasanya DataTables menggunakan pseudo-element ::before dan ::after untuk panah */
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc:after {
+    opacity: 1 !important;        /* Membuat ikon tidak transparan (jelas) */
+    color: #ffffff !important;    /* Warna Putih Terang */
+    font-size: 0.9em !important;  /* Sedikit memperjelas ukuran */
+}
+
+/* Menghilangkan background image default jika ada tabrakan style */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none !important;
+}
+
+/* --- Body Table Style --- */
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+/* Efek hover HANYA pada baris isi (tbody), BUKAN header */
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Action Icons */
+.btn-action {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+}
+
+/* --- MODAL STYLING --- */
+.modal-content-custom {
+    border-radius: 20px;
+    border: none;
+    padding: 20px;
+    position: relative;
+}
+
+.btn-close-custom {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.modal-title-custom {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.modal-body-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.role-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+.radio-item input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 4px solid var(--primary-color);
+    border-radius: 50%;
+    margin-right: 15px;
+    display: grid;
+    place-content: center;
+    transition: 0.2s;
+}
+
+.radio-item input[type="radio"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.radio-item input[type="radio"]:checked {
+    background-color: var(--primary-color); 
+    border-color: var(--primary-color);
+}
+.radio-item input[type="radio"]:checked::before {
+    background: white;
+}
+
+.illustration-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn-simpan {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 40px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: opacity 0.3s;
+}
+
+.btn-simpan:hover {
+    opacity: 0.9;
+    cursor: pointer;
 }

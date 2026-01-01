@@ -1,30 +1,27 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+
 
 body {
     font-family: "Poppins", sans-serif;
-    overflow: hidden;
+    background-color: #f0f2f5;
 }
 
-/* ================= MAIN CONTAINER ================= */
+/* ================= MAIN LAYOUT ================= */
 .body-login {
     display: flex;
     min-height: 100vh;
+    width: 100%;
     overflow: hidden;
 }
 
-/* ================= LEFT SECTION - FIGURE ================= */
+/* ================= LEFT SECTION (FIGURE) ================= */
 .figure-section {
-    flex: 1;
+    flex: 1; /* Mengambil 50% lebar layar */
     background: linear-gradient(135deg, #0c1740 0%, #1e3a8a 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem;
+    padding: 2rem;
     position: relative;
 }
 
@@ -35,65 +32,53 @@ body {
 }
 
 .logo-container img {
-    max-width: 180px;
+    width: 150px; /* Ukuran logo konsisten */
     height: auto;
 }
 
 .figure-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 100%;
     max-width: 500px;
+    display: flex;
+    justify-content: center;
 }
 
 .figure-content img {
-    width: 100%;
+    width: 80%;
     height: auto;
-    animation: float 3s ease-in-out infinite;
+    animation: float 6s ease-in-out infinite;
 }
 
+/* Animasi melayang halus */
 @keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-20px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
 }
 
-/* ================= RIGHT SECTION - FORM ================= */
+/* ================= RIGHT SECTION (FORM) ================= */
 .form-section {
-    flex: 1;
+    flex: 1; /* Mengambil 50% lebar layar */
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 3rem;
-    background-color: #f8f9fa;
-    overflow: hidden;
+    justify-content: center; /* Memastikan form tepat di tengah vertikal & horizontal */
+    padding: 2rem;
+    background-color: #ffffff;
 }
 
+/* Container kotak putih form */
 .form-container {
     width: 100%;
-    max-width: 450px;
-    background: white;
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    max-width: 480px; /* Batas lebar agar simetris */
+    padding: 3.5rem; /* Padding dalam yang luas agar lega */
+    /* Opsional: Jika ingin ada bayangan kotak */
+    /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
+    /* border-radius: 20px; */
 }
 
-/* ================= FLASH MESSAGE ================= */
-.flash-wrapper {
-    width: 100%;
-    margin-bottom: 1.5rem;
-}
-
-/* ================= HEADER ================= */
+/* ================= TYPOGRAPHY & HEADER ================= */
 .form-header {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    text-align: left; /* Rata kiri agar sejajar dengan input */
 }
 
 .form-header h2 {
@@ -104,166 +89,129 @@ body {
 }
 
 .form-header p {
-    color: #6c757d;
+    color: #888;
     font-size: 0.95rem;
 }
 
-/* ================= INPUT GROUPS ================= */
-.input-wrapper {
-    margin-bottom: 2rem;
+.flash-wrapper {
+    margin-bottom: 1.5rem;
 }
 
+/* ================= INPUTS ================= */
 .form-group {
     margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
-    font-weight: 600;
-    color: #333;
     margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0c1740;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 0.95rem;
+    width: 100%; /* Kunci simetri: Lebar penuh */
+    padding: 1rem 1.2rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
     font-family: "Poppins", sans-serif;
     transition: all 0.3s ease;
-    background-color: #f8f9fa;
+    background-color: #fbfbfb;
 }
 
 .form-group input:focus {
     outline: none;
     border-color: #1e3a8a;
-    background-color: white;
+    background-color: #fff;
     box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
 }
 
 .form-group input::placeholder {
-    color: #adb5bd;
+    color: #ccc;
+    font-size: 0.9rem;
 }
 
-/* ================= FORGOT PASSWORD LINK ================= */
+/* ================= LINKS & BUTTONS ================= */
 .forgot-password-wrapper {
     display: flex;
     justify-content: flex-end;
-    margin-top: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-top: -0.5rem; /* Sedikit naik mendekati input password */
+    margin-bottom: 2rem;
 }
 
 .forgot-password-link {
-    color: #0c1740;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    color: #1e3a8a;
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: 500;
 }
 
 .forgot-password-link:hover {
-    color: #1e3a8a;
-}
-
-/* ================= BUTTON SECTION ================= */
-.button-section {
-    margin-top: 2rem;
+    text-decoration: underline;
 }
 
 .btn-login {
-    width: 100%;
-    background: linear-gradient(135deg, #0c1740 0%, #1e3a8a 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
+    width: 100%; /* Tombol selebar input */
     padding: 1rem;
+    background: #0c1740;
+    color: white;
     font-size: 1rem;
     font-weight: 600;
-    font-family: "Poppins", sans-serif;
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(12, 23, 64, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-login::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.btn-login:hover::before {
-    left: 100%;
+    transition: background 0.3s ease, transform 0.2s ease;
+    font-family: "Poppins", sans-serif;
 }
 
 .btn-login:hover {
+    background: #1e3a8a;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(12, 23, 64, 0.4);
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    box-shadow: 0 5px 15px rgba(12, 23, 64, 0.2);
 }
 
-.btn-login:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 15px rgba(12, 23, 64, 0.3);
-}
-
-/* ================= REGISTER LINK ================= */
 .register-prompt {
     margin-top: 1.5rem;
     text-align: center;
+    font-size: 0.9rem;
+    color: #666;
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-}
-
-.register-prompt p {
-    color: #6c757d;
-    font-size: 0.95rem;
-    margin: 0;
+    gap: 5px;
 }
 
 .register-link {
     color: #1e3a8a;
     font-weight: 600;
     text-decoration: none;
-    font-size: 0.95rem;
-    transition: color 0.3s ease;
 }
 
 .register-link:hover {
-    color: #0c1740;
     text-decoration: underline;
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .body-login {
-        flex-direction: column;
+        flex-direction: column; /* Ubah jadi atas-bawah di HP */
+        height: auto;
+        overflow-y: auto;
     }
 
     .figure-section {
-        min-height: 30vh;
+        display: none; /* Sembunyikan gambar di layar kecil agar fokus ke login */
+        /* Atau ganti min-height: 200px jika ingin tetap ditampilkan */
     }
 
     .form-section {
         padding: 2rem 1.5rem;
+        min-height: 100vh;
     }
 
     .form-container {
         padding: 2rem;
-    }
-
-    .logo-container {
-        position: static;
-        margin-bottom: 1rem;
+        box-shadow: none;
     }
 }
