@@ -149,153 +149,21 @@ label {
   opacity: 0.8;
 }
 
-
-/* ================= BERANDA / DASHBOARD ================= */
+/* ================= BERANDA LAYOUT ================= */
 .body-beranda {
-  background-color: #0c1740;
+  background-color: #f1f5f9; /* Update: Warna background main area lebih terang */
   display: flex;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-.body-beranda {
+  min-height: 100vh;
   width: 100%;
 }
 
-.side-bar {
-  width: 25%;
-  
-}
-
-.profil .logo {
-  padding: 10px;
-}
-
-.profil .logo img {
-  width: 200px;
-  height: 58px;
-}
-
-.side-bar hr {
-  width: 70%;
-  border: 1px solid #385161;
-}
-
-.data-profil {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin-top: 25px;
-}
-
-.data-profil img {
-  width: 50px;
-  height: 50px;
-}
-
-.detail-data-profil {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-
-.detail-data-profil p {
-  color: white;
-}
-
-.detail-data-profil h3 {
-  color: black;
-}
-
-.detail-data-profil #nama {
-  font-size: 15px;
-  font-weight: 600;
-  color: white;
-}
-
-.detail-data-profil #role {
-  font-size: 14px;
-  font-weight: 400;
-  color: white;
-}
-
-/* .menu {
-  margin-top: 20px;
-  margin-inline: 30px;
-  height: 40%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-} */
-
-ul {
-  height: 100%;
-  width: 100%;
-}
-
-/* .menu ul {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-} */
-
-ul .beranda button:hover,
-.tambah-jenis-barang button:hover,
-.tambah-merek-barang button:hover,
-.tambah-peminjaman-barang button:hover,
-.tambah-pengembalian-barang button:hover,
-.kelola-akun button:hover,
-.semua-barang button:hover,
-.fa-solid:hover {
-  opacity: 0.9;
-  cursor: pointer;
-  background-color: #cad6ff;
-  color: #0c1740;
-}
-
-ul .beranda button,
-.tambah-jenis-barang button,
-.tambah-merek-barang button,
-.tambah-peminjaman-barang button,
-.tambah-pengembalian-barang button,
-.kelola-akun button,
-.semua-barang button,
-.keluar button {
-  display: flex;
-  background-color: transparent;
-  border: none;
-  color: white;
-  font-family: "Poppins", sans-serif;
-  font-weight: 500;
-  font-size: 15px;
-  padding-left: 20px;
-  align-items: center;
-  border-radius: 8px;
-  width: 100%;
-  height: 47px;
-  gap: 20px;
-}
-
-.menu ul li {
-  list-style: none;
-}
-
-i {
-  background-color: transparent;
-}
-
+/* Styling Content Utama */
 .content {
-  padding: 15px;
-  height: 100%;
-  width: 100%;
+  padding: 30px;
+  margin-left: 280px;    /* PENTING: Harus sama dengan lebar sidebar baru */
+  width: calc(100% - 280px);
+  min-height: 100vh;
+  transition: all 0.3s ease;
 }
 
 .content-beranda {
@@ -304,6 +172,7 @@ i {
   height: 100%;
   border-radius: 15px;
   padding: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05); /* Update: Tambah shadow halus */
 }
 
 #title {
@@ -375,15 +244,8 @@ i {
 
 /* ================= ANIMATIONS ================= */
 @keyframes subtleBounce {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-5px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 .box2 {
@@ -422,10 +284,7 @@ i {
 .data-box::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: linear-gradient(135deg, #001f3f, #003366);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -433,9 +292,7 @@ i {
   border-radius: 15px;
 }
 
-.data-box:hover::before {
-  opacity: 1;
-}
+.data-box:hover::before { opacity: 1; }
 
 .data-box:hover {
   color: white;
@@ -451,25 +308,12 @@ i {
   z-index: 1;
 }
 
-.data-box:hover i {
-  transform: scale(1.2);
-}
-
-.data-box p {
-  position: relative;
-  z-index: 1;
-}
+.data-box:hover i { transform: scale(1.2); }
+.data-box p { position: relative; z-index: 1; }
 
 @keyframes fadeSlideDownScale {
-  0% {
-    opacity: 0;
-    transform: translateY(-30px) scale(0.9);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  0% { opacity: 0; transform: translateY(-30px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .kata {
@@ -492,27 +336,18 @@ i {
   transform: scale(1.02);
 }
 
-.kata h2 {
-  margin-bottom: 0;
-}
+.kata h2 { margin-bottom: 0; }
 
 .hello-text {
-  position: absolute;
-  top: 10%;
-  right: -10%;
+  position: absolute; top: 10%; right: -10%;
   background: rgba(255, 255, 255, 0.8);
-  padding: 8px 15px;
-  border-radius: 15px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #0d1a4a;
-  opacity: 0;
-  transform: translateY(-10px);
+  padding: 8px 15px; border-radius: 15px;
+  font-size: 16px; font-weight: bold; color: #0d1a4a;
+  opacity: 0; transform: translateY(-10px);
   transition: all 0.3s ease-in-out;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .content-figure:hover .hello-text {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1; transform: translateY(0);
 }

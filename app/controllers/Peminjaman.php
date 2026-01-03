@@ -155,4 +155,25 @@ class Peminjaman extends Controller
         $this->view('DetailBarang/index', $data);
         $this->view('templates/footer');
     }
+
+    public function hapusItem($id_barang)
+    {
+        if (!isset($_SESSION)) session_start();
+
+        if (isset($_SESSION['keranjang'])) {
+            // Cari posisi barang di array session
+            $key = array_search($id_barang, $_SESSION['keranjang']);
+
+            // Jika ketemu, hapus
+            if ($key !== false) {
+                unset($_SESSION['keranjang'][$key]);
+                // Rapikan index array agar tidak loncat
+                $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
+            }
+        }
+
+        // Kembali ke form
+        header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+        exit;
+    }
 }

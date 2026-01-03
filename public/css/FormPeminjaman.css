@@ -1,148 +1,241 @@
 /* --- 1. Container Utama --- */
-        .form-card {
-            background-color: white;
-            padding: 40px;
-            border-radius: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
-            font-family: 'Poppins', sans-serif;
-            min-height: 85vh;
-            position: relative;
-        }
+.form-card {
+    background-color: white;
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
+    font-family: 'Poppins', sans-serif;
+    min-height: 85vh;
+    position: relative;
+}
 
-        .form-title {
-            color: #0c1740;
-            font-weight: 700;
-            font-size: 26px;
-            margin-bottom: 30px;
-        }
+.form-title {
+    color: #0c1740;
+    font-weight: 700;
+    font-size: 26px;
+    margin-bottom: 30px;
+}
 
-        /* --- 2. Label & Input --- */
-        .lbl {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 8px;
-            display: block;
-        }
+/* --- 2. Label & Input --- */
+.lbl {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+    display: block;
+}
 
-        .inp-custom {
-            width: 100%;
-            background-color: #F2F5F9;
-            border: none;
-            border-radius: 12px;
-            padding: 0 15px;
-            font-size: 14px;
-            color: #334155;
-            height: 50px;
-            transition: 0.3s;
-        }
-        .inp-custom:focus {
-            outline: none;
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(12, 23, 64, 0.1);
-        }
+.inp-custom {
+    width: 100%;
+    background-color: #F2F5F9;
+    border: none;
+    border-radius: 12px;
+    padding: 0 15px;
+    font-size: 14px;
+    color: #334155;
+    height: 50px;
+    transition: 0.3s;
+}
 
-        /* Input Readonly (Abu-abu + Teks Gelap) */
-        .inp-readonly {
-            background-color: #e9ecef !important;
-            color: #495057;
-            font-weight: 500;
-            cursor: default;
-        }
+.inp-custom:focus {
+    outline: none;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(12, 23, 64, 0.1);
+}
 
-        /* Helper Icon */
-        .icon-wrap { position: relative; width: 100%; }
-        .icon-inside {
-            position: absolute; right: 15px; top: 50%;
-            transform: translateY(-50%); pointer-events: none;
-            font-size: 16px;
-        }
+/* Input Readonly (Abu-abu + Teks Gelap) */
+.inp-readonly {
+    background-color: #e9ecef !important;
+    color: #495057;
+    font-weight: 500;
+    cursor: default;
+}
 
-        /* Gap Antar Baris Input */
-        .gap-row { margin-bottom: 20px; }
+/* Helper Icon */
+.icon-wrap {
+    position: relative;
+    width: 100%;
+}
 
-        /* --- 3. Area Tombol Tambah (+) --- */
-        .add-more-container {
-            display: flex;
-            justify-content: flex-end; /* Rata Kanan */
-            margin-top: 10px;          /* Jarak dari barang terakhir */
-            margin-bottom: 50px;       /* JARAK BESAR KE TOMBOL KIRIM */
-        }
+.icon-inside {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 16px;
+}
 
-        .btn-add-more {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-            background-color: #0c1740;
-            color: white;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            transition: 0.2s;
-            text-decoration: none !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        .btn-add-more:hover { 
-            transform: scale(1.1); 
-            background-color: #1e3a8a; 
-            color: white;
-        }
+/* Gap Antar Baris Input */
+.gap-row {
+    margin-bottom: 20px;
+}
 
-        /* --- 4. Footer Action Buttons (Kembali & Kirim) --- */
-        .action-footer {
-            display: flex;
-            justify-content: flex-end; /* Posisi di Kanan */
-            align-items: center;
-            gap: 15px; /* Jarak antar tombol Kembali & Kirim */
-            padding-top: 20px;
-            border-top: 1px dashed #e2e8f0; /* Garis pemisah tipis */
-        }
+/* --- 3. Area Tombol Tambah (+) --- */
+.add-more-container {
+    display: flex;
+    justify-content: flex-end;
+    /* Rata Kanan */
+    margin-top: 10px;
+    /* Jarak dari barang terakhir */
+    margin-bottom: 50px;
+    /* JARAK BESAR KE TOMBOL KIRIM */
+}
 
-        .btn-back {
-            background-color: #e2e8f0;
-            color: #475569;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            border: none;
-            transition: 0.2s;
-        }
-        .btn-back:hover { background-color: #cbd5e1; color: #1e293b; text-decoration: none; }
+.btn-add-more {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: #0c1740;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
 
-        .btn-send {
-            background-color: #0c1740;
-            color: white;
-            padding: 12px 50px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-send:hover { background-color: #1e3a8a; transform: translateY(-2px); }
+.btn-add-more:hover {
+    transform: scale(1.1);
+    background-color: #1e3a8a;
+    color: white;
+}
 
-        /* --- 5. Layout Helpers --- */
-        .row-item-grid { margin-left: -10px; margin-right: -10px; }
-        .row-item-grid > [class*='col-'] { padding-left: 10px; padding-right: 10px; }
-        
-        .item-row { 
-            margin-bottom: 15px; 
-            animation: fadeIn 0.5s; 
-        }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+/* --- 4. Footer Action Buttons (Kembali & Kirim) --- */
+.action-footer {
+    display: flex;
+    justify-content: flex-end;
+    /* Posisi di Kanan */
+    align-items: center;
+    gap: 15px;
+    /* Jarak antar tombol Kembali & Kirim */
+    padding-top: 20px;
+    border-top: 1px dashed #e2e8f0;
+    /* Garis pemisah tipis */
+}
 
-        /* Robot */
-        .right-section { display: flex; justify-content: center; align-items: flex-start; padding-top: 10px; }
-        .content-figure { position: relative; }
-        .hello-text {
-            position: absolute; top: 10%; right: -10%;
-            background: rgba(255,255,255,0.9); padding: 5px 15px;
-            border-radius: 15px; font-weight: bold; color: #0c1740;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+.btn-back {
+    background-color: #e2e8f0;
+    color: #475569;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    transition: 0.2s;
+}
 
-        @media (max-width: 768px) { .right-section { display: none; } }
+.btn-back:hover {
+    background-color: #cbd5e1;
+    color: #1e293b;
+    text-decoration: none;
+}
+
+.btn-send {
+    background-color: #0c1740;
+    color: white;
+    padding: 12px 50px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-send:hover {
+    background-color: #1e3a8a;
+    transform: translateY(-2px);
+}
+
+/* --- 5. Layout Helpers --- */
+.row-item-grid {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.row-item-grid>[class*='col-'] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.item-row {
+    margin-bottom: 15px;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Robot */
+.right-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 10px;
+}
+
+.content-figure {
+    position: relative;
+}
+
+.hello-text {
+    position: absolute;
+    top: 10%;
+    right: -10%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    color: #0c1740;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .right-section {
+        display: none;
+    }
+}
+
+/* --- Container untuk Mengatur Posisi Tombol Tambah --- */
+.add-more-container {
+    display: flex;
+    justify-content: center; /* Posisi di Tengah */
+    margin-top: 20px;        /* Jarak dari barang terakhir */
+    margin-bottom: 40px;     /* Jarak ke tombol Kirim */
+}
+
+/* --- Tampilan Tombol Tambah (Tetap seperti semula) --- */
+.btn-add-more {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;      /* Ukuran standar */
+    height: 40px;
+    background-color: #0c1740;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.btn-add-more:hover { 
+    transform: scale(1.1); 
+    background-color: #1e3a8a; 
+    color: white;
+}
