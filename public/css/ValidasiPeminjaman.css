@@ -1,58 +1,45 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-
 :root {
-    --primary-dark: #0c1740;
-    --btn-green: #32d148;
-    --btn-red: #d32f2f;
-    --btn-blue: #304ffe;
     --text-label: #000000;
-    --text-value: #666666;
-    --bg-input: #f4f7fe;
+    --text-value: #6c757d;
+    --text-muted: #888888;
+    --primary-navy: #141b35;
+    
+    /* Warna Button sesuai Gambar */
+    --btn-green: #3CCF4E;  /* Hijau cerah */
+    --btn-red: #D32F2F;    /* Merah bata */
+    --btn-blue: #304FFE;   /* Biru royal */
+    
+    --bg-note: #F4F8FF;    /* Latar belakang biru sangat muda untuk input catatan */
 }
 
+body {
+    background-color: #fff;
+    font-family: 'Poppins', sans-serif; /* Disarankan menggunakan font ini jika ada */
+}
 
-
-
-
-/* --- JUDUL HALAMAN --- */
 .page-title {
-    color: var(--primary-dark);
-    font-size: 24px;
+    color: var(--primary-navy);
     font-weight: 700;
+    font-size: 1.8rem;
     margin-bottom: 40px;
 }
 
-/* --- TYPOGRAPHY LABEL & VALUE --- */
-.info-item {
-    margin-bottom: 25px;
-}
-
-.label {
-    font-size: 16px;
-    font-weight: 600;
+/* Typography untuk Label dan Value */
+.detail-label {
+    font-size: 1.1rem;
+    font-weight: 500;
     color: var(--text-label);
     margin-bottom: 5px;
 }
 
-.value {
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--text-value);
+.detail-value {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
     line-height: 1.5;
 }
 
-/* --- GRID SYSTEM (Side by Side) --- */
-.row-custom {
-    display: flex;
-    gap: 100px; /* Jarak lebar antar kolom seperti di desain */
-    margin-bottom: 25px;
-}
-
-.col-custom {
-    flex: 1;
-}
-
-/* --- LIST ITEM (Untuk Jenis Barang & Jumlah) --- */
+/* List Item Styling (Untuk Barang & Jumlah) */
 .items-list {
     list-style: none;
     padding: 0;
@@ -60,95 +47,91 @@
 }
 
 .items-list li {
-    font-size: 14px;
-    color: var(--text-value);
-    margin-bottom: 5px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
 }
 
-/* --- BUTTONS SECTION --- */
-.action-buttons {
-    display: flex;
-    gap: 20px;
-    margin-top: 50px;
+/* Button Group Container */
+.action-buttons-container {
+    margin-top: 20px;
     margin-bottom: 30px;
+    display: flex;
+    gap: 20px; /* Jarak antar tombol */
     flex-wrap: wrap;
 }
 
-.btn-custom {
+/* Base Button Style */
+.btn-action {
     border: none;
     border-radius: 8px;
     padding: 12px 0;
-    width: 200px; /* Lebar tombol fix */
-    font-family: 'Poppins', sans-serif;
+    color: white;
     font-weight: 500;
-    font-size: 15px;
-    color: white;
-    cursor: pointer;
+    font-size: 1rem;
+    width: 200px; /* Lebar fix agar tombol seragam seperti di gambar */
     text-align: center;
-    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
     display: inline-block;
-    transition: opacity 0.3s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.btn-custom:hover {
-    opacity: 0.9;
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     color: white;
     text-decoration: none;
 }
 
-.btn-terima { background-color: var(--btn-green); }
-.btn-tolak { background-color: var(--btn-red); }
-.btn-dikembalikan { background-color: var(--btn-blue); }
+/* Button Variants */
+.btn-terima {
+    background-color: var(--btn-green);
+}
 
-/* --- FORM CATATAN (Hidden by Default) --- */
+.btn-tolak {
+    background-color: var(--btn-red);
+}
+
+.btn-dikembalikan {
+    background-color: var(--btn-blue);
+}
+
+/* Form Catatan Section */
 .catatan-section {
     margin-top: 20px;
-    animation: fadeIn 0.5s;
 }
 
 .catatan-box {
-    width: 100%;
-    max-width: 500px; /* Lebar max text area */
-    height: 150px;
-    background-color: var(--bg-input);
+    width: 100%; /* Sesuai gambar kotak biru lebar */
+    max-width: 500px; /* Batasi lebar agar estetik */
+    height: 120px;
+    background-color: var(--bg-note);
     border: none;
-    border-radius: 10px;
-    padding: 20px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    border-radius: 12px;
+    padding: 15px;
+    font-size: 0.95rem;
     color: #333;
-    outline: none;
-    resize: none;
+    resize: none; /* Mencegah user mengubah ukuran textarea */
+}
+
+.catatan-box:focus {
+    outline: 2px solid #dae5ff;
+}
+
+/* Tombol Kirim di Kanan Bawah */
+.btn-kirim-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end; /* Memposisikan tombol di kanan */
+    max-width: 100%; 
 }
 
 .btn-kirim {
-    background-color: var(--primary-dark);
+    background-color: var(--primary-navy);
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 12px 60px;
-    font-family: 'Poppins', sans-serif;
+    padding: 10px 40px;
     font-weight: 500;
-    font-size: 15px;
-    cursor: pointer;
-    margin-top: 20px;
-    float: right; /* Tombol kirim di kanan */
-    box-shadow: 0 4px 10px rgba(12, 23, 64, 0.3);
-}
-
-.btn-kirim:hover {
-    opacity: 0.9;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Clearfix for float */
-.clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
 }

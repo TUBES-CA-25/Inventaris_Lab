@@ -4,102 +4,109 @@ if (!isset($_SESSION['login'])) {
     exit;
 }
 ?>
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2>Peminjaman</h2>
-                </div>
-                <div class="col-md-4 robot-container d-none d-md-block">
-                    <svg class="robot-img" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Robot Body -->
-                        <ellipse cx="100" cy="140" rx="60" ry="70" fill="#e2e8f0" />
-                        <!-- Robot Head -->
-                        <rect x="70" y="40" width="60" height="60" rx="15" fill="#2d3748" />
-                        <!-- Eyes -->
-                        <rect x="80" y="60" width="15" height="10" rx="2" fill="#4fd1c5" />
-                        <rect x="105" y="60" width="15" height="10" rx="2" fill="#4fd1c5" />
-                        <!-- Antenna -->
-                        <circle cx="85" cy="35" r="8" fill="#e2e8f0" />
-                        <line x1="85" y1="40" x2="85" y2="43" stroke="#cbd5e0" stroke-width="3" />
-                        <circle cx="115" cy="35" r="8" fill="#e2e8f0" />
-                        <line x1="115" y1="40" x2="115" y2="43" stroke="#cbd5e0" stroke-width="3" />
-                        <!-- Arms -->
-                        <rect x="35" y="120" width="15" height="40" rx="7" fill="#cbd5e0" />
-                        <rect x="150" y="120" width="15" height="40" rx="7" fill="#cbd5e0" />
-                        <!-- Power Button -->
-                        <circle cx="100" cy="145" r="12" fill="white" />
-                        <path d="M 100 138 L 100 145 M 97 142 A 5 5 0 0 1 103 142" stroke="#667eea" stroke-width="2" fill="none" />
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <form method="POST" action="process_peminjaman.php">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <label for="judul_kegiatan">Judul kegiatan</label>
-                        <input type="text" class="form-control" id="judul_kegiatan" name="judul_kegiatan" required>
-                    </div>
-                </div>
+<div class="content">
+    <style>
+        
+    </style>
 
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <label for="tanggal_pengajuan">Tanggal pengajuan</label>
-                        <div class="date-wrapper">
-                            <input type="date" class="form-control" id="tanggal_pengajuan" name="tanggal_pengajuan" required>
+    <div class="container-fluid">
+        <div class="form-card">
+            <form action="<?= BASEURL ?>Peminjaman/prosesTambahPeminjaman" method="post">
+                
+                <div class="row">
+                    <div class="col-md-7">
+                        <h2 class="form-title">Peminjaman</h2>
+
+                        <div class="gap-row">
+                            <label class="lbl">Judul kegiatan</label>
+                            <input type="text" name="judul_kegiatan" class="inp-custom" required>
+                        </div>
+
+                        <div class="gap-row">
+                            <label class="lbl">Tanggal pengajuan</label>
+                            <div class="icon-wrap">
+                                <input type="date" name="tanggal_pengajuan" class="inp-custom" value="<?= date('Y-m-d'); ?>" required>
+                                <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                            </div>
+                        </div>
+
+                        <div class="row row-item-grid gap-row">
+                            <div class="col-md-6">
+                                <label class="lbl">Mulai dari tanggal</label>
+                                <div class="icon-wrap">
+                                    <input type="date" name="tanggal_peminjaman" class="inp-custom" required>
+                                    <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="lbl">Sampai tanggal</label>
+                                <div class="icon-wrap">
+                                    <input type="date" name="tanggal_pengembalian" class="inp-custom" required>
+                                    <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 right-section">
+                        <div class="content-figure">
+                            <img id="img-figure-daftar" src="<?= BASEURL ?>img/happy robot assistant.svg" alt="figure" />
+                            <div class="hello-text">Hello! 👋</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label for="mulai_tanggal">Mulai dari tanggal</label>
-                        <div class="date-wrapper">
-                            <input type="date" class="form-control" id="mulai_tanggal" name="mulai_tanggal" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="sampai_tanggal">Sampai tanggal</label>
-                        <div class="date-wrapper">
-                            <input type="date" class="form-control" id="sampai_tanggal" name="sampai_tanggal" required>
-                        </div>
-                    </div>
-                </div>
+                <hr style="border-top: 2px dashed #e2e8f0; margin: 30px 0;">
 
-                <div class="row mb-3">
+                <div class="row">
                     <div class="col-12">
-                        <label for="jenis_barang">Jenis barang</label>
-                        <select name="sub_barang" id="sub_barang" onchange="this.form.submit()" class="dropdown-filter">
-                            <option value="">Pilih Jenis Barang</option>
-                            <?php foreach ($data['sub_barang'] ?? [] as $sub): ?>
-                                <option value="<?= $sub['id_jenis_barang'] ?>"
-                                    <?= isset($_SESSION['selected_sub_barang']) && $_SESSION['selected_sub_barang'] == $sub['id_jenis_barang'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($sub['sub_barang']) ?>
-                                </option>
+                        <?php if(!empty($data['barang_selected'])): ?>
+                            
+                            <?php foreach($data['barang_selected'] as $idx => $item): ?>
+                                <div class="item-row">
+                                    <div class="row row-item-grid align-items-end">
+                                        <div class="col-md-5">
+                                            <label class="lbl">Jenis Barang</label>
+                                            <div class="icon-wrap">
+                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
+                                                <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
+                                                <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="lbl">Jumlah</label>
+                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1" value="1" required style="text-align: center;">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="lbl">Keterangan</label>
+                                            <input type="text" name="keterangan_peminjaman[]" class="inp-custom" placeholder="-">
+                                        </div>
+                                    </div>
+                                </div>
                             <?php endforeach; ?>
-                        </select>
+
+                            <div class="add-more-container">
+                                <a href="<?= BASEURL; ?>Peminjaman" class="btn-add-more" title="Tambah Barang Lain">
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </div>
+
+                        <?php else: ?>
+                            <div class="alert alert-warning">
+                                Keranjang kosong. <a href="<?= BASEURL; ?>Peminjaman" class="alert-link">Pilih Barang Dulu</a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                        <label for="jumlah">Jumlah</label>
-                        <input type="number" class="form-control" id="jumlah" name="jumlah" min="1" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="keterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Informasi tambahan">
-                    </div>
+                <div class="action-footer">
+                    <a href="<?= BASEURL; ?>Peminjaman" class="btn-back">Kembali</a>
+                    
+                    <?php if(!empty($data['barang_selected'])): ?>
+                        <button type="submit" class="btn-send">Kirim</button>
+                    <?php endif; ?>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="info-icon">
-                        <i class="bi bi-info-lg"></i>
-                    </div>
-                    <button type="submit" class="btn btn-submit" style="width: auto; padding: 0.75rem 3rem;">Kirim</button>
-                </div>
             </form>
         </div>
     </div>

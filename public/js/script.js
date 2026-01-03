@@ -603,3 +603,16 @@ function tampilkanCatatan() {
     form.style.display = "none";
   }
 }
+
+function toggleFormTolak() {
+  var formContainer = document.getElementById("formTolakContainer");
+  if (formContainer.style.display === "none") {
+    formContainer.style.display = "block";
+    // Scroll halus ke area form
+    setTimeout(() => {
+      formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  } else {
+    formContainer.style.display = "none";
+  }
+}
