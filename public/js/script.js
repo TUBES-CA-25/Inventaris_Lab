@@ -431,10 +431,7 @@ $(function () {
           head.appendChild(style);
         },
 
-        //   // Lakukan hal lain yang diperlukan dengan dokumen PDF
-        // },
-        // });
-        // },
+        
       },
       {//edit search
 
@@ -560,7 +557,6 @@ $(function () {
   });
 });
 
-//pilih semua
 const selectAllCheckbox = document.getElementById("selectAllCheckbox");
 const checkboxes = document.querySelectorAll(".checkbox");
 selectAllCheckbox.addEventListener("change", function () {
@@ -569,35 +565,26 @@ selectAllCheckbox.addEventListener("change", function () {
   });
 });
 
-//hover custom untuk halaman active
-
 document.addEventListener("DOMContentLoaded", function () {
-  // Ambil path URL saat ini tanpa parameter GET
-  let currentPath = window.location.pathname.replace(/^\/|\/$/g, ""); // Hilangkan garis miring di awal & akhir
+  let currentPath = window.location.pathname.replace(/^\/|\/$/g, "");
 
-  // Seleksi semua elemen <li> sidebar
   document.querySelectorAll(".menu ul li").forEach((item) => {
-    // Ambil tombol dalam setiap <li>
     let button = item.querySelector("button");
 
     if (button) {
-      // Ambil link dari onclick attribute
       let targetPath = button.getAttribute("onclick").match(/'([^']+)'/)[1];
 
-      // Bandingkan dengan URL saat ini
       if (currentPath.includes(targetPath.replace("<?=BASEURL;?>", "").toLowerCase())) {
-        item.classList.add("active"); // Tambahkan kelas "active"
+        item.classList.add("active");
       }
     }
   });
 });
 
-// button detail peminjaman
 function tampilkanCatatan() {
   var form = document.getElementById('formTolak');
   if (form.style.display === "none") {
     form.style.display = "block";
-    // Scroll otomatis ke bawah agar terlihat
     form.scrollIntoView({ behavior: "smooth" });
   } else {
     form.style.display = "none";
@@ -608,7 +595,6 @@ function toggleFormTolak() {
   var formContainer = document.getElementById("formTolakContainer");
   if (formContainer.style.display === "none") {
     formContainer.style.display = "block";
-    // Scroll halus ke area form
     setTimeout(() => {
       formContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
@@ -616,3 +602,105 @@ function toggleFormTolak() {
     formContainer.style.display = "none";
   }
 }
+
+$(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+
+  var table = $('#tableRiwayat').DataTable({
+    "dom": 'rtp',
+    "pageLength": 10,
+    "ordering": true,
+    "columnDefs": [
+      { "orderable": false, "targets": 0 },
+      { "orderable": false, "targets": 5 },
+      { "orderable": false, "targets": 6 }
+    ],
+    "language": {
+      "emptyTable": "Tidak ada data tersedia",
+      "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+      "infoEmpty": "Menampilkan 0 data",
+      "infoFiltered": "(difilter dari _MAX_ total data)",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "Selanjutnya",
+        "previous": "Sebelumnya"
+      }
+    }
+  });
+
+  $('#customSearch').on('keyup', function () {
+    table.search(this.value).draw();
+  });
+
+  var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
+  var currentIndex = 0;
+
+  $('#th-status').on('click', function () {
+    if (currentIndex >= statusCycle.length) {
+      table.column(5).search('').draw();
+      $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
+      currentIndex = 0;
+    } else {
+      var currentStatus = statusCycle[currentIndex];
+      table.column(5).search(currentStatus).draw();
+      $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
+      currentIndex++;
+    }
+  });
+
+  table.on('draw', function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+});
+
+$(document).ready(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+
+  var table = $('#tableRiwayat').DataTable({
+    "dom": 'rtp',
+    "pageLength": 10,
+    "ordering": true,
+    "columnDefs": [
+      { "orderable": false, "targets": 0 },
+      { "orderable": false, "targets": 5 },
+      { "orderable": false, "targets": 6 }
+    ],
+    "language": {
+      "emptyTable": "Tidak ada data tersedia",
+      "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+      "infoEmpty": "Menampilkan 0 data",
+      "infoFiltered": "(difilter dari _MAX_ total data)",
+      "paginate": {
+        "first": "Pertama",
+        "last": "Terakhir",
+        "next": "Selanjutnya",
+        "previous": "Sebelumnya"
+      }
+    }
+  });
+
+  $('#customSearch').on('keyup', function () {
+    table.search(this.value).draw();
+  });
+
+  var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
+  var currentIndex = 0;
+
+  $('#th-status').on('click', function () {
+    if (currentIndex >= statusCycle.length) {
+      table.column(5).search('').draw();
+      $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
+      currentIndex = 0;
+    } else {
+      var currentStatus = statusCycle[currentIndex];
+      table.column(5).search(currentStatus).draw();
+      $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
+      currentIndex++;
+    }
+  });
+
+  table.on('draw', function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+});
