@@ -793,3 +793,32 @@ document.addEventListener("DOMContentLoaded", function () {
   window.tutupModal = function () { if (modal) modal.classList.remove('show'); };
   window.onclick = function (event) { if (event.target == modal) tutupModal(); };
 });
+
+function toggleFilter() {
+    var x = document.getElementById("filterSection");
+    if (x.style.display === "none" || x.style.display === "") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+
+document.getElementById('selectAll').addEventListener('click', function(e) {
+    var checkboxes = document.querySelectorAll('.item-checkbox');
+    for (var i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = e.target.checked;
+    }
+});
+
+function submitExport() {
+    var form = document.getElementById('formCetak');
+    var checkboxes = document.querySelectorAll('.item-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        if (confirm("Tidak ada barang yang dipilih. Apakah Anda ingin mengekspor SEMUA data?")) {
+            form.submit();
+        }
+    } else {
+        form.submit();
+    }
+}
