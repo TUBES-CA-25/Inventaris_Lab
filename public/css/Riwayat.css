@@ -1,0 +1,204 @@
+.btn-navy-dark {
+    background-color: #0c1740;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-navy-dark:hover {
+    background-color: #1a2b6b;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(12, 23, 64, 0.3);
+}
+
+.search-container {
+    width: 250px;
+}
+
+.input-group-text {
+    background: white;
+}
+
+#customSearch:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.badge-custom {
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 100px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.badge-diterima {
+    background-color: #32CD32;
+}
+
+.badge-diproses {
+    background-color: #FFC107;
+    color: white !important;
+}
+
+.badge-ditolak {
+    background-color: #DC3545;
+}
+
+.badge-dikembalikan {
+    background-color: #2b45d4;
+}
+
+.badge-lengkapi {
+    background-color: #fd7e14;
+}
+
+.action-buttons-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+.btn-action i {
+    font-size: 14px;
+}
+
+.btn-action .btn-text {
+    display: inline;
+}
+
+.btn-detail {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+}
+
+.btn-detail:hover {
+    background: linear-gradient(135deg, #138496, #117a8b);
+    color: white;
+}
+
+.btn-upload {
+    background: linear-gradient(135deg, #fd7e14, #e8590c);
+    color: white;
+}
+
+.btn-upload:hover {
+    background: linear-gradient(135deg, #e8590c, #dc5002);
+    color: white;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btn-add:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .btn-action .btn-text {
+        display: none;
+    }
+
+    .btn-action {
+        padding: 8px 12px;
+        min-width: 40px;
+        justify-content: center;
+    }
+
+    .action-buttons-group {
+        gap: 6px;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-action {
+        padding: 6px 10px;
+    }
+
+    .btn-action i {
+        font-size: 12px;
+    }
+}
+
+.dataTables_filter,
+.dataTables_length {
+    display: none;
+}
+
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting:after {
+    color: white !important;
+    opacity: 0.7;
+}
+
+th#th-status.sorting::before,
+th#th-status.sorting::after {
+    display: none !important;
+}
+
+.page-item.active .page-link {
+    background-color: #0c1740 !important;
+    border-color: #0c1740 !important;
+}
+
+.page-link {
+    color: #0c1740;
+}
+
+.page-link:hover {
+    background-color: #f0f0f0;
+    color: #0c1740;
+}
+
+#tableRiwayat tbody tr:hover {
+    background-color: #f8f9fc;
+    transition: background-color 0.2s ease;
+}
+
+.tooltip-inner {
+    background-color: #0c1740;
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.tooltip.bs-tooltip-top .arrow::before {
+    border-top-color: #0c1740;
+}
+
+.tooltip.bs-tooltip-bottom .arrow::before {
+    border-bottom-color: #0c1740;
+}

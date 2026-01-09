@@ -1,0 +1,310 @@
+:root {
+    --navy-primary: #0c1740;
+    --navy-hover: #152763;
+    --soft-bg: #f4f6f9;
+    --border-color: #e3e6f0;
+}
+
+body {
+    background-color: var(--soft-bg);
+}
+
+.text-navy {
+    color: var(--navy-primary) !important;
+}
+
+.card-modern {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card-header-custom {
+    background: linear-gradient(135deg, #f8f9fc 0%, #fff 100%);
+    padding: 25px;
+    border-bottom: 3px solid var(--navy-primary);
+}
+
+.status-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.badge-status {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.badge-melengkapi,
+.badge-melengkapi.surat {
+    background: linear-gradient(135deg, #fd7e14, #ff922b);
+    color: white;
+}
+
+.badge-disetujui,
+.badge-diterima {
+    background: linear-gradient(135deg, #32CD32, #28a745);
+    color: white;
+}
+
+.badge-ditolak {
+    background: linear-gradient(135deg, #DC3545, #c82333);
+    color: white;
+}
+
+.badge-diproses {
+    background: linear-gradient(135deg, #FFC107, #ffb300);
+    color: white;
+}
+
+.info-box-full,
+.info-box {
+    background: #fff;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.info-box-full:hover,
+.info-box:hover {
+    border-color: var(--navy-primary);
+    box-shadow: 0 5px 15px rgba(12, 23, 64, 0.1);
+    transform: translateY(-2px);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #858796;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+}
+
+.bg-primary-light {
+    background-color: rgba(78, 115, 223, 0.1);
+}
+
+.bg-info-light {
+    background-color: rgba(54, 185, 204, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(246, 194, 62, 0.1);
+}
+
+.bg-success-light {
+    background-color: rgba(28, 200, 138, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(231, 74, 59, 0.1);
+}
+
+.duration-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+}
+
+.duration-box i {
+    color: white;
+}
+
+.duration-box .info-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.duration-box h5 {
+    color: white;
+}
+
+.bg-gradient-navy {
+    background: linear-gradient(135deg, var(--navy-primary) 0%, var(--navy-hover) 100%);
+}
+
+.badge-light-navy {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 600;
+}
+
+.thead-light th {
+    background-color: #f8f9fc;
+    color: #5a5c69;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.item-row {
+    transition: all 0.2s ease;
+}
+
+.item-row:hover {
+    background-color: #f8f9fc;
+    transform: scale(1.01);
+}
+
+.number-badge {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--navy-primary), var(--navy-hover));
+    color: white;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.img-wrapper-table {
+    width: 70px;
+    height: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.img-wrapper-table img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.item-name h6 {
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.code-badge {
+    background-color: #f8f9fc;
+    border: 2px solid var(--border-color);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--navy-primary);
+    display: inline-block;
+}
+
+.quantity-badge {
+    background: linear-gradient(135deg, var(--navy-primary), var(--navy-hover));
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 16px;
+    display: inline-block;
+    box-shadow: 0 3px 10px rgba(12, 23, 64, 0.3);
+}
+
+.quantity-badge small {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.badge-kondisi {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    border: 1px solid #c3e6cb;
+}
+
+.empty-state i {
+    opacity: 0.3;
+}
+
+.btn-outline-navy {
+    color: var(--navy-primary);
+    border: 2px solid var(--navy-primary);
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-navy:hover {
+    background-color: var(--navy-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(12, 23, 64, 0.3);
+}
+
+@media (max-width: 768px) {
+    .card-header-custom {
+        padding: 20px 15px;
+    }
+
+    .status-icon-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .info-box,
+    .info-box-full {
+        padding: 15px;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .badge-status {
+        font-size: 12px;
+        padding: 6px 12px !important;
+    }
+}
