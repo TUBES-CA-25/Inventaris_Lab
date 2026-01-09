@@ -1,0 +1,123 @@
+:root {
+    --primary-dark: #0c1740;
+    --input-bg: #f5f8fa;
+    /* Warna background input sesuai gambar */
+    --text-label: #000000;
+    --border-radius: 10px;
+}
+
+body {
+    background-color: #f4f6f9;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* CARD UTAMA */
+.form-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin: 20px auto;
+    max-width: 1200px;
+    position: relative;
+}
+
+/* JUDUL */
+.form-title {
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 24px;
+    margin-bottom: 40px;
+}
+
+/* GRID FORM */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* 2 Kolom Seimbang */
+    column-gap: 50px;
+    row-gap: 25px;
+}
+
+/* FORM GROUP */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-label);
+    margin-bottom: 10px;
+}
+
+/* STYLE INPUT & SELECT */
+.form-input,
+.form-select {
+    background-color: var(--input-bg);
+    border: 1px solid transparent;
+    /* Border transparan agar rapi */
+    border-radius: var(--border-radius);
+    padding: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    background-color: #fff;
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 3px rgba(12, 23, 64, 0.1);
+}
+
+/* Custom Input File */
+.form-input[type="file"] {
+    padding: 12px;
+    background-color: var(--input-bg);
+}
+
+/* BUTTON KIRIM */
+.btn-submit-container {
+    display: flex;
+    justify-content: flex-end;
+    /* Rata Kanan */
+    margin-top: 40px;
+}
+
+.btn-submit {
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 15px 60px;
+    /* Lebar tombol */
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-submit:hover {
+    background-color: #1a2b6d;
+    transform: translateY(-2px);
+}
+
+/* Tombol Kembali */
+.btn-close-absolute {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    font-size: 20px;
+    color: #aaa;
+    text-decoration: none;
+}
+
+.btn-close-absolute:hover {
+    color: var(--primary-dark);
+}
