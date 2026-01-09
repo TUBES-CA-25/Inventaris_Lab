@@ -324,17 +324,17 @@ $(function () {
     $('#myTable').DataTable();
 
     $("form#formCheckbox").submit(function (e) {
-      const checkboxes = document.querySelectorAll(".checkbox"); 
+      const checkboxes = document.querySelectorAll(".checkbox");
       let idbarang = [];
 
       checkboxes.forEach(function (checkbox) {
         if (checkbox.checked) {
-          idbarang.push(checkbox.value); 
+          idbarang.push(checkbox.value);
         }
       });
 
       if (idbarang.length > 0) {
-        $("#idbarang").val(JSON.stringify(idbarang)); 
+        $("#idbarang").val(JSON.stringify(idbarang));
       } else {
         $("#idbarang").val("");
       }
@@ -778,4 +778,18 @@ dropZone.addEventListener('drop', function (e) {
 
   const event = new Event('change', { bubbles: true });
   fileInput.dispatchEvent(event);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById('modalHapus');
+  const btnLinkHapus = document.getElementById('btnLinkHapus');
+
+  window.konfirmasiHapus = function (url) {
+    if (modal && btnLinkHapus) {
+      btnLinkHapus.setAttribute('href', url);
+      modal.classList.add('show');
+    }
+  };
+  window.tutupModal = function () { if (modal) modal.classList.remove('show'); };
+  window.onclick = function (event) { if (event.target == modal) tutupModal(); };
 });
