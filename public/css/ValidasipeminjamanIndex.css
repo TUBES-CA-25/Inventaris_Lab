@@ -1,9 +1,8 @@
 :root {
-    --primary-navy: #141b35; /* Warna biru gelap sesuai gambar */
+    --primary-navy: #141b35;
     --icon-bg-light: #f4f6f9;
 }
 
-/* --- Global Utilities --- */
 body {
     background-color: #f8f9fa;
 }
@@ -15,21 +14,19 @@ body {
     font-size: 1.5rem;
 }
 
-/* --- Stats Cards --- */
 .stat-card {
     border: none;
     border-radius: 16px;
     padding: 20px;
     height: 100%;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 140px;
 }
 
-/* Varian Warna Kartu */
 .stat-card.bg-navy {
     background-color: var(--primary-navy);
     color: white;
@@ -40,7 +37,6 @@ body {
     color: #333;
 }
 
-/* Typography dalam Kartu */
 .stat-label {
     font-size: 0.9rem;
     font-weight: 500;
@@ -52,7 +48,6 @@ body {
     font-weight: 600;
 }
 
-/* Ikon Pojok Kanan Bawah */
 .stat-icon {
     position: absolute;
     bottom: 20px;
@@ -76,18 +71,16 @@ body {
     color: white;
 }
 
-/* Helper untuk ikon gelap khusus */
 .icon-dark {
     background-color: var(--primary-navy) !important;
     color: white !important;
 }
 
-/* --- Custom Table --- */
 .custom-table-container {
     background-color: white;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
     margin-top: 30px;
 }
 
@@ -118,4 +111,72 @@ body {
 
 .btn-detail:hover {
     color: var(--primary-navy);
+}
+
+.action-buttons-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.bottom-nav-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-action,
+.btn-nav-kembali {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-action:hover,
+.btn-nav-kembali:hover {
+    opacity: 0.9;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+.btn-terima {
+    background-color: #22c55e;
+}
+
+.btn-tolak {
+    background-color: #ef4444;
+}
+
+.btn-kembali-barang {
+    background-color: #2563eb;
+}
+
+.btn-nav-kembali {
+    background-color: #475569;
+}
+
+.dataTables_filter input {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 5px 10px;
+    margin-left: 5px;
+}
+
+.dataTables_length select {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 5px;
 }
