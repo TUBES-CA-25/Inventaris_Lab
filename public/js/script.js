@@ -141,19 +141,16 @@ $(document).ready(function () {
 
 
 $(document).ready(function () {
-  // Event untuk tombol tambah data
   $('.tombolTambahData').on('click', function () {
     $('#tambahPeminjaman').html('Tambah Data Peminjaman');
     $('.modal-footer button[type=submit]').html('Kirim');
   });
 
-  // Event delegation untuk tombol edit peminjaman
   $(document).on('click', '.tampilModalPeminjaman', function () {
     $('#tambahPeminjaman').html('Ubah Data Peminjaman');
     $('.modal-footer button[type=submit]').html('Simpan Perubahan');
     $('.modal-body form').attr('action', 'http://localhost/Inventaris_Lab/public/Peminjaman/ubahPeminjaman');
 
-    // Ambil ID peminjaman dari atribut data-id
     const id_peminjaman = $(this).data('id');
 
     // Debugging untuk memastikan ID terbaca
@@ -164,7 +161,6 @@ $(document).ready(function () {
       return;
     }
 
-    // AJAX untuk mendapatkan data peminjaman berdasarkan ID
     $.ajax({
       url: "http://localhost/Inventaris_Lab/public/Peminjaman/getUbah",
       data: { id_peminjaman: id_peminjaman },
@@ -328,20 +324,18 @@ $(function () {
     $('#myTable').DataTable();
 
     $("form#formCheckbox").submit(function (e) {
-      const checkboxes = document.querySelectorAll(".checkbox"); // Pilih semua checkbox
+      const checkboxes = document.querySelectorAll(".checkbox"); 
       let idbarang = [];
 
       checkboxes.forEach(function (checkbox) {
         if (checkbox.checked) {
-          idbarang.push(checkbox.value); // Tambahkan nilai checkbox yang dicentang ke dalam array
+          idbarang.push(checkbox.value); 
         }
       });
 
-      // Jika idbarang berisi data, konversi menjadi JSON dan set nilai pada input hidden
       if (idbarang.length > 0) {
-        $("#idbarang").val(JSON.stringify(idbarang)); // Set nilai input tersembunyi menjadi JSON string
+        $("#idbarang").val(JSON.stringify(idbarang)); 
       } else {
-        // Jika tidak ada data, kirimkan string kosong
         $("#idbarang").val("");
       }
     });
@@ -357,14 +351,10 @@ $(function () {
     myTable.page.len($(this).val()).draw(); // Atur jumlah entri per halaman
   });
 
-  // Hubungkan search kustom ke DataTable
   $('#customSearch').on('keyup', function () {
     myTable.search(this.value).draw(); // Cari data sesuai input
   });
 
-
-
-  //data tables
   let table = $("#example").DataTable({
     lengthChange: false,
     searching: true,
@@ -431,7 +421,7 @@ $(function () {
           head.appendChild(style);
         },
 
-        
+
       },
       {//edit search
 
@@ -703,4 +693,89 @@ $(document).ready(function () {
   table.on('draw', function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
+});
+
+$(document).ready(function () {
+  $('#tableValidasi').DataTable({
+    // Konfigurasi Bahasa Indonesia
+    language: {
+      search: "Cari:",
+      lengthMenu: "Tampilkan _MENU_ data",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      infoEmpty: "Tidak ada data",
+      infoFiltered: "(difilter dari _MAX_ total data)",
+      zeroRecords: "Data tidak ditemukan",
+      paginate: {
+        first: "<<",
+        last: ">>",
+        next: ">",
+        previous: "<"
+      }
+    },
+    order: [[2, 'desc']],
+    columnDefs: [
+      { orderable: false, targets: [0, 7] }
+    ]
+  });
+});
+
+const fileInput = document.getElementById('file_surat');
+const fileLabel = document.getElementById('file-label');
+const dropZone = document.getElementById('drop-zone');
+const btnSubmit = document.getElementById('btn-submit');
+
+fileInput.addEventListener('change', function (e) {
+  if (this.files && this.files.length > 0) {
+    const file = this.files[0];
+    const fileName = file.name;
+    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+
+    fileLabel.innerHTML = `
+                <i class="fas fa-check-circle mr-2" style="color: var(--success-green);"></i>
+                ${fileName}
+            `;
+
+    dropZone.classList.add('success');
+
+    const subtitle = dropZone.querySelector('.upload-subtitle');
+    subtitle.innerHTML = `
+                <i class="fas fa-file-alt mr-2"></i>
+                Ukuran: ${fileSize} MB
+            `;
+
+    const icon = dropZone.querySelector('.upload-icon-wrapper i');
+    icon.className = 'fas fa-check-circle';
+
+    btnSubmit.disabled = false;
+  }
+});
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => {
+    dropZone.classList.add('dragover');
+  }, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => {
+    dropZone.classList.remove('dragover');
+  }, false);
+});
+
+dropZone.addEventListener('drop', function (e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  fileInput.files = files;
+
+  const event = new Event('change', { bubbles: true });
+  fileInput.dispatchEvent(event);
 });
