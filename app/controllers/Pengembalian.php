@@ -11,7 +11,7 @@ class Pengembalian extends Controller
         if (!isset($_SESSION)) {
             session_start();
         }
-
+    }
     public function __construct()
     {
         // 1. Gatekeeper: Cek Login
