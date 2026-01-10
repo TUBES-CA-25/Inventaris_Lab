@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * Controller Pengembalian
+ * * Mengelola proses pengembalian barang dan pemantauan status (Tepat waktu/Terlambat).
+ */
 class Pengembalian extends Controller
 {
     private function auth()
@@ -7,7 +12,10 @@ class Pengembalian extends Controller
             session_start();
         }
 
-        if (!isset($_SESSION['id_user'])) {
+    public function __construct()
+    {
+        // 1. Gatekeeper: Cek Login
+        if (!isset($_SESSION['login'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
@@ -20,6 +28,7 @@ class Pengembalian extends Controller
         $data['judul'] = 'Pengembalian Barang';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
+        $data['pengembalian'] = $this->pengembalianModel->getAllPengembalian();
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);

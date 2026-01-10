@@ -1,16 +1,25 @@
 <?php
+
+/**
+ * Model Pengembalian_model
+ * * Menangani logika database untuk tabel 'trx_pengembalian' dan relasinya dengan 'trx_peminjaman'.
+ */
 class Pengembalian_model
 {
     private $db;
-    private $table = "trx_pengembalian";
 
     public function __construct()
     {
         $this->db = new Database;
     }
 
+    /**
+     * Mengambil daftar peminjaman yang statusnya 'Disetujui'.
+     * Menggunakan LEFT JOIN agar transaksi yang belum masuk tabel pengembalian tetap muncul.
+     */
     public function getAllPengembalian()
     {
+        // COALESCE digunakan untuk mengisi nilai default jika NULL (belum ada record di tabel pengembalian)
         $query = "SELECT 
                     k.id_pengembalian, 
                     p.nama_peminjam, 
@@ -24,12 +33,15 @@ class Pengembalian_model
                   LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
                   JOIN mst_jenis_barang jb ON p.id_jenis_barang = jb.id_jenis_barang
                   WHERE p.status = 'disetujui'
-                  ORDER BY p.nama_peminjam";
+                  ORDER BY p.tanggal_pengembalian ASC"; // Diurutkan berdasarkan tenggat waktu
 
         $this->db->query($query);
         return $this->db->resultSet();
     }
 
+    /**
+     * Mengambil satu data spesifik untuk proses edit.
+     */
     public function getUbahPengembalian($id_pengembalian)
     {
         $query = "SELECT 
@@ -49,19 +61,40 @@ class Pengembalian_model
         return $this->db->single();
     }
 
+    /**
+     * Update data pengembalian.
+     * * Logika Bisnis:
+     * 1. Jika Status 'Dikembalikan': Cek tanggal hari ini vs tanggal janji kembali.
+     * 2. Jika Status 'Hilang/Rusak': Set keterangan 'Bermasalah'.
+     */
     public function updatePengembalian($data)
     {
         $status = $data['status_pengembalian'];
-        $tanggal_pengembalian = $data['tanggal_pengembalian'];
+        $tanggal_janji_kembali = $data['tanggal_pengembalian']; // Dari DB/Hidden Input
+        
+        // Gunakan Y-m-d untuk perbandingan tanggal yang aman
         $today = date('Y-m-d');
         $keterangan = '';
 
+        // --- Logika Penentuan Keterangan ---
         if ($status === 'Dikembalikan') {
-            $keterangan = ($today <= $tanggal_pengembalian) ? 'Tepat Waktu' : 'Tidak Tepat Waktu';
-        } elseif ($status === 'Hilang' || $status === 'Rusak') {
+            // Cek apakah pengembalian melebihi tanggal janji
+            if ($today <= $tanggal_janji_kembali) {
+                $keterangan = 'Tepat Waktu';
+            } else {
+                $keterangan = 'Tidak Tepat Waktu';
+            }
+        } 
+        elseif ($status === 'Hilang' || $status === 'Rusak') {
             $keterangan = 'Bermasalah';
-        } elseif ($status === 'Belum Dikembalikan' && $today > $tanggal_pengembalian) {
-            $keterangan = 'Tidak Tepat Waktu';
+        } 
+        elseif ($status === 'Belum Dikembalikan') {
+            // Jika status masih belum dikembalikan tapi sudah lewat tanggal
+            if ($today > $tanggal_janji_kembali) {
+                $keterangan = 'Tidak Tepat Waktu';
+            } else {
+                $keterangan = ''; // Masih dalam masa peminjaman
+            }
         }
 
         $query = "UPDATE trx_pengembalian SET 
@@ -78,7 +111,6 @@ class Pengembalian_model
 
         $this->db->execute();
 
-        // Mengecek apakah ada baris yang diubah
-        return $this->db->rowCount() > 0;
+        return $this->db->rowCount();
     }
 }

@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Mencegah akses directory listing (agar orang tidak bisa melihat daftar file)
+    Options -Indexes
+
+    # Mengarahkan request root (kosong) ke folder public
+    RewriteRule ^$ public/ [L]
+
+    # Mengarahkan semua request lainnya ke folder public
+    RewriteRule (.*) public/$1 [L]
+</IfModule>

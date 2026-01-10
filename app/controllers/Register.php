@@ -1,6 +1,7 @@
 <?php
 
 class Register extends Controller {
+    
     public function index(){
         $data['judul'] = 'Register';
         $this->view('templates/header', $data);
@@ -9,15 +10,22 @@ class Register extends Controller {
     }
 
     public function tambah(){
-        if($this->model('User_model')->tambahUser($_POST) > 0){
-            Flasher::setFlash('Akun', 'berhasil', ' ditambahkan', 'success');
-            header('Location: '. BASEURL . '/');
-            exit;
-        } else{
-            Flasher::setFlash('Akun', 'gagal', ' ditambahkan', 'danger');
+        // Model sekarang mengembalikan kode status (-1, -2, -3, 1)
+        $status = $this->model('User_model')->tambahUser($_POST);
+
+        if($status === 1){
+            Flasher::setFlash('Akun', 'berhasil', 'ditambahkan. Silakan Login.', 'success');
+            header('Location: '. BASEURL . 'Login'); // Redirect ke Login, bukan Root
+        } elseif ($status === -1) {
+            Flasher::setFlash('Gagal', 'Email sudah digunakan.', 'Gunakan email lain.', 'danger');
             header('Location: '. BASEURL . 'Register');
-            exit;
+        } elseif ($status === -2) {
+            Flasher::setFlash('Gagal', 'Password tidak cocok.', 'Cek konfirmasi password.', 'danger');
+            header('Location: '. BASEURL . 'Register');
+        } else {
+            Flasher::setFlash('Gagal', 'Kesalahan Sistem/Upload Foto.', '', 'danger');
+            header('Location: '. BASEURL . 'Register');
         }
+        exit;
     }
-        
 }

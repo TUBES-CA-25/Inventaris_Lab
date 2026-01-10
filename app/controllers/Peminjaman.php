@@ -105,45 +105,39 @@ class Peminjaman extends Controller
 
     public function prosesTambahPeminjaman()
     {
-        // Validasi Keranjang Kosong
+        // 1. Validasi Keranjang Kosong
+        // (Sesuai name di from.php: id_jenis_barang[])
         if (empty($_POST['id_jenis_barang'])) {
             Flasher::setFlash('Tidak ada barang yang dipilih.', 'gagal', '', 'danger');
-            header('Location: ' . BASEURL . 'Peminjaman');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
             exit;
         }
 
-        $successCount = 0;
-        $totalItems = count($_POST['id_jenis_barang']);
+        // 2. Ambil Nama User dari Session/Database (Security)
+        $dataUser['id_user'] = $_SESSION['id_user'];
+        $userProfile = $this->model('User_model')->profile($dataUser);
+        
+        // 3. Gabungkan Data Input dengan Nama Peminjam
+        $dataPayload = $_POST;
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user']; 
 
-        // Looping Insert untuk setiap barang
-        for ($i = 0; $i < $totalItems; $i++) {
-            $dataInsert = [
-                'nama_peminjam'         => $_SESSION['nama_user'] ?? 'Mahasiswa',
-                'judul_kegiatan'        => $_POST['judul_kegiatan'],
-                'tanggal_pengajuan'     => $_POST['tanggal_pengajuan'],
-                'tanggal_peminjaman'    => $_POST['tanggal_peminjaman'],
-                'tanggal_pengembalian'  => $_POST['tanggal_pengembalian'],
-                'id_jenis_barang'       => $_POST['id_jenis_barang'][$i],
-                'jumlah_peminjaman'     => $_POST['jumlah_peminjaman'][$i],
-                'keterangan_peminjaman' => $_POST['keterangan_peminjaman'][$i],
-                'status'                => 'diproses'
-            ];
-
-            if ($this->model('Peminjaman_model')->postDataPeminjaman($dataInsert) > 0) {
-                $successCount++;
-            }
-        }
-
-        if ($successCount > 0) {
-            unset($_SESSION['keranjang']); // Kosongkan keranjang setelah sukses
-            Flasher::setFlash($successCount . ' barang berhasil diajukan.', 'success', '', 'success');
-            header('Location: ' . BASEURL . 'Peminjaman');
+        // 4. Panggil Model SEKALI SAJA (HAPUS LOOPING DI SINI)
+        if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
+            
+            // Hapus session keranjang jika sukses
+            unset($_SESSION['keranjang']); 
+            
+            Flasher::setFlash('Pengajuan berhasil! Silakan lengkapi surat.', 'berhasil', '', 'success');
+            header('Location: ' . BASEURL . 'Riwayat'); 
+            exit;
+            
         } else {
-            Flasher::setFlash('Gagal mengajukan peminjaman.', 'danger', '', 'danger');
+            Flasher::setFlash('Gagal mengajukan peminjaman.', 'gagal', '', 'danger');
             header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
         }
-        exit;
     }
+    
 
     // Method detail (Opsional, jika ingin melihat detail riwayat, mungkin perlu controller terpisah atau method lain)
     public function detail($id_peminjaman)
@@ -156,24 +150,89 @@ class Peminjaman extends Controller
         $this->view('templates/footer');
     }
 
-    public function hapusItem($id_barang)
+    // --- FITUR EDIT / TAMBAH BARANG (LOAD DATA LAMA) ---
+    public function tambahBarang($id_peminjaman)
     {
-        if (!isset($_SESSION)) session_start();
+        // 1. Ambil Data Header & Detail dari Database
+        $header = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
+        $details = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman); // Pastikan function ini mengembalikan id_jenis_barang
 
-        if (isset($_SESSION['keranjang'])) {
-            // Cari posisi barang di array session
-            $key = array_search($id_barang, $_SESSION['keranjang']);
-
-            // Jika ketemu, hapus
-            if ($key !== false) {
-                unset($_SESSION['keranjang'][$key]);
-                // Rapikan index array agar tidak loncat
-                $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
-            }
+        if (!$header) {
+            Flasher::setFlash('Data transaksi tidak ditemukan.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
         }
 
-        // Kembali ke form
+        // 2. Reset Keranjang Lama
+        $_SESSION['keranjang'] = [];
+        
+        // 3. Siapkan Array Data Edit untuk View
+        // Kita butuh mapping ID Barang -> Jumlah & Keterangan untuk pre-fill input
+        $edit_details_map = []; 
+
+        foreach ($details as $item) {
+            // Masukkan ID ke Keranjang agar muncul di list view
+            // Perhatikan: Model getDetailBarangByPeminjamanId harus select id_jenis_barang juga
+            // Jika model Anda belum return id_jenis_barang, update modelnya dulu (lihat langkah 3 di bawah).
+            $_SESSION['keranjang'][] = $item['id_jenis_barang'];
+
+            // Simpan detail (jumlah/ket) ke map
+            $edit_details_map[$item['id_jenis_barang']] = [
+                'jumlah' => $item['jumlah'],
+                'keterangan' => $item['keterangan_barang'] ?? '-'
+            ];
+        }
+
+        // 4. Simpan Data Edit ke Session
+        $_SESSION['edit_mode'] = true;
+        $_SESSION['edit_id_peminjaman'] = $id_peminjaman;
+        $_SESSION['edit_header'] = $header;         // Untuk Judul, Tanggal, dll
+        $_SESSION['edit_details_map'] = $edit_details_map; // Untuk Jumlah & Ket per barang
+
+        // 5. Redirect ke Form
         header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
         exit;
+    }
+
+    // --- PROSES SIMPAN PERUBAHAN (UPDATE) ---
+    public function prosesUpdatePeminjaman()
+    {
+        // Cek apakah ini mode edit
+        if (!isset($_SESSION['edit_id_peminjaman'])) {
+            header('Location: ' . BASEURL . 'Peminjaman');
+            exit;
+        }
+
+        // 1. Ambil Data User (Sama seperti Tambah)
+        $dataUser['id_user'] = $_SESSION['id_user'];
+        $userProfile = $this->model('User_model')->profile($dataUser);
+
+        // 2. Siapkan Data Payload
+        $dataPayload = $_POST;
+        $dataPayload['id_peminjaman'] = $_SESSION['edit_id_peminjaman']; // ID Transaksi yg mau diedit
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
+        // Status tetap sama atau direset ke 'Melengkapi Surat' tergantung kebijakan. 
+        // Di sini kita reset agar admin cek ulang jika ada perubahan item.
+        $dataPayload['status'] = 'Melengkapi Surat'; 
+
+        // 3. Panggil Model Update
+        // Pastikan Model Peminjaman_model punya method ubahDataPeminjaman()
+        if ($this->model('Peminjaman_model')->ubahDataPeminjaman($dataPayload) >= 0) {
+            
+            // Bersihkan Session Edit & Keranjang
+            unset($_SESSION['keranjang']);
+            unset($_SESSION['edit_mode']);
+            unset($_SESSION['edit_id_peminjaman']);
+            unset($_SESSION['edit_header']);
+            unset($_SESSION['edit_details_map']);
+
+            Flasher::setFlash('Data peminjaman berhasil diperbarui.', 'berhasil', '', 'success');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        } else {
+            Flasher::setFlash('Gagal memperbarui data.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
     }
 }

@@ -55,8 +55,8 @@ if (!isset($_SESSION['login'])) {
                     </div>
 
                     <div class="data-item">
-                        <span class="label">Deskripsi Barang</span>
-                        <span class="value"><?= !empty($item['deskripsi_barang']) ? $item['deskripsi_barang'] : '-'; ?></span>
+                        <span class="label">Spesifikasi Barang</span>
+                        <span class="value"><?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?></span>
                     </div>
                     <div class="data-item">
                         <span class="label">Keterangan Label</span>
