@@ -7,21 +7,33 @@ class Riwayat_model {
         $this->db = new Database;
     }
 
-    public function getAllRiwayat()
+    public function getAllRiwayat($nama_user_login = null)
     {
         $query = "SELECT p.*, k.status_pengembalian 
                   FROM trx_peminjaman p
                   LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
-                  ORDER BY p.tanggal_pengajuan DESC";
-        
+                  WHERE 1=1";
+
+        if ($nama_user_login != null) {
+            $query .= " AND NOT (LOWER(p.status) = 'melengkapi surat' AND p.nama_peminjam != :nama)";
+        }
+
+        $query .= " ORDER BY p.tanggal_pengajuan DESC";
+    
         $this->db->query($query);
+
+        if ($nama_user_login != null) {
+            $this->db->bind('nama', $nama_user_login);
+        }
+
         $results = $this->db->resultSet();
 
         foreach ($results as &$row) {
             if (!empty($row['status_pengembalian']) && $row['status_pengembalian'] == 'Dikembalikan') {
-                $row['status'] = 'dikembalikan'; 
+                $row['status'] = 'dikembalikan';
             }
         }
+
         return $results;
     }
 
