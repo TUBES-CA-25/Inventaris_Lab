@@ -35,4 +35,5 @@ class Profil extends Controller {
         header('Location: '. BASEURL . 'Profil');
         exit;
     }
+    
 }
