@@ -6,14 +6,14 @@ if (!isset($_SESSION['login'])) {
 
 $isEdit = isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true;
 $headerData = $isEdit ? $_SESSION['edit_header'] : [];
-$detailMap = $isEdit ? $_SESSION['edit_details_map'] : [];
+$detailMap  = $isEdit ? $_SESSION['edit_details_map'] : [];
 
 $formAction = $isEdit ? BASEURL . 'Peminjaman/prosesUpdatePeminjaman' : BASEURL . 'Peminjaman/prosesTambahPeminjaman';
 
-$val_judul = $isEdit ? $headerData['judul_kegiatan'] : '';
-$val_tgl_aju = $isEdit ? $headerData['tanggal_pengajuan'] : date('Y-m-d');
-$val_tgl_mulai = $isEdit ? $headerData['tanggal_peminjaman'] : '';
-$val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
+$val_judul      = $isEdit ? $headerData['judul_kegiatan'] : '';
+$val_tgl_aju    = $isEdit ? $headerData['tanggal_pengajuan'] : date('Y-m-d');
+$val_tgl_mulai  = $isEdit ? $headerData['tanggal_peminjaman'] : '';
+$val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 ?>
 
 <div class="content">
@@ -23,42 +23,47 @@ $val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                 <div class="row">
                     <div class="col-md-7">
                         <h2 class="form-title"><?= $isEdit ? 'Edit Peminjaman' : 'Peminjaman'; ?></h2>
+
                         <div class="gap-row">
                             <label class="lbl">Judul kegiatan</label>
-                            <input type="text" name="judul_kegiatan" class="inp-custom" value="<?= $val_judul; ?>"
-                                required>
+                            <input type="text" name="judul_kegiatan" class="inp-custom" value="<?= $val_judul; ?>" required>
                         </div>
+
                         <div class="gap-row">
                             <label class="lbl">Tanggal pengajuan</label>
                             <div class="icon-wrap">
-                                <input type="date" name="tanggal_pengajuan" class="inp-custom"
-                                    value="<?= $val_tgl_aju; ?>" required>
+                                <input type="date" name="tanggal_pengajuan" class="inp-custom" value="<?= $val_tgl_aju; ?>" required>
                                 <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
                             </div>
                         </div>
+
                         <div class="row row-item-grid gap-row">
                             <div class="col-md-6">
                                 <label class="lbl">Mulai dari tanggal</label>
                                 <div class="icon-wrap">
-                                    <input type="date" name="tanggal_peminjaman" class="inp-custom"
-                                        value="<?= $val_tgl_mulai; ?>" required>
+                                    <input type="date" name="tanggal_peminjaman" class="inp-custom" value="<?= $val_tgl_mulai; ?>" required>
                                     <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="lbl">Sampai tanggal</label>
                                 <div class="icon-wrap">
-                                    <input type="date" name="tanggal_pengembalian" class="inp-custom"
-                                        value="<?= $val_tgl_akhir; ?>" required>
+                                    <input type="date" name="tanggal_pengembalian" class="inp-custom" value="<?= $val_tgl_akhir; ?>" required>
                                     <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="gap-row">
+                            <label class="lbl">Komentar / Keterangan Peminjaman</label>
+                            <textarea name="keterangan_peminjaman" class="inp-custom" rows="3" placeholder="Contoh: Untuk keperluan praktikum..."><?= $isEdit && isset($headerData['keterangan_peminjaman']) ? $headerData['keterangan_peminjaman'] : ''; ?></textarea>
+                        </div>
+
                     </div>
+
                     <div class="col-md-5 right-section">
                         <div class="content-figure">
-                            <img id="img-figure-daftar" src="<?= BASEURL ?>img/happy robot assistant.svg"
-                                alt="figure" />
+                            <img id="img-figure-daftar" src="<?= BASEURL ?>img/happy robot assistant.svg" alt="figure" />
                             <div class="hello-text">Hello! 👋</div>
                         </div>
                     </div>
@@ -71,18 +76,18 @@ $val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                         <?php if (!empty($data['barang_selected'])): ?>
 
                             <?php foreach ($data['barang_selected'] as $item):
-                                // LOGIKA PENGISIAN VALUE BARANG (EDIT)
                                 $id = $item['id_jenis_barang'];
                                 $curr_jml = 1;
-                                $curr_ket = '';
+                                $curr_unit = ''; 
 
                                 if ($isEdit && isset($detailMap[$id])) {
                                     $curr_jml = $detailMap[$id]['jumlah'];
-                                    $curr_ket = $detailMap[$id]['keterangan'];
+                                    $curr_unit = $detailMap[$id]['keterangan'];
                                 }
                             ?>
                                 <div class="item-row">
                                     <div class="row row-item-grid align-items-end">
+
                                         <div class="col-md-5">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="lbl mb-0">Jenis Barang</label>
@@ -92,24 +97,40 @@ $val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                                 </button>
                                             </div>
                                             <div class="icon-wrap">
-                                                <input type="hidden" name="id_jenis_barang[]"
-                                                    value="<?= $item['id_jenis_barang']; ?>">
-                                                <input type="text" class="inp-custom inp-readonly"
-                                                    value="<?= $item['sub_barang']; ?>" readonly>
-                                                <i class="fa-solid fa-check icon-inside"
-                                                    style="color: #22c55e; font-size: 18px;"></i>
+                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
+                                                <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
+                                                <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
                                             </div>
                                         </div>
+
                                         <div class="col-md-2">
                                             <label class="lbl">Jumlah</label>
-                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1"
-                                                value="<?= $curr_jml; ?>" required style="text-align: center;">
+                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1" value="<?= $curr_jml; ?>" required style="text-align: center;">
                                         </div>
+
                                         <div class="col-md-5">
-                                            <label class="lbl">Keterangan</label>
-                                            <input type="text" name="keterangan_peminjaman[]" class="inp-custom"
-                                                value="<?= $curr_ket; ?>" placeholder="-">
+                                            <label class="lbl">Pilih Spesifikasi Unit</label>
+                                            <div class="icon-wrap">
+                                                <select name="unit_selected[]" class="inp-custom" required>
+                                                    <option value="">-- Pilih Unit --</option>
+
+                                                    <?php if (!empty($item['list_unit'])) : ?>
+                                                        <?php foreach ($item['list_unit'] as $unit) : ?>
+                                                            <option value="<?= $unit['id_barang']; ?>"
+                                                                <?= ($curr_unit == $unit['id_barang']) ? 'selected' : ''; ?>>
+                                                                <?= $unit['spesifikasi_barang']; ?> (<?= $unit['kondisi_barang']; ?>) - [<?= $unit['kode_barang']; ?>]
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    <?php else : ?>
+                                                        <option value="" disabled>Tidak ada unit tersedia</option>
+                                                    <?php endif; ?>
+
+                                                    <option value="Lainnya" <?= ($curr_unit == 'Lainnya') ? 'selected' : ''; ?>>Lainnya</option>
+                                                </select>
+                                                <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
+                                            </div>
                                         </div>
+
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -136,7 +157,7 @@ $val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                     <?php endif; ?>
 
                     <?php if (!empty($data['barang_selected'])): ?>
-                        <button type="submit" class="btn-send">
+                        <button type="submit" class="btn-send" id="btnSubmitPeminjaman">
                             <?= $isEdit ? 'Simpan Perubahan' : 'Kirim'; ?>
                         </button>
                     <?php endif; ?>
@@ -157,3 +178,14 @@ $val_tgl_akhir = $isEdit ? $headerData['tanggal_pengembalian'] : '';
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var btn = document.getElementById('btnSubmitPeminjaman');
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none'; 
+        }
+    });
+</script>
