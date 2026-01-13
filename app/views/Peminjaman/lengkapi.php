@@ -8,7 +8,6 @@ if (!isset($_SESSION['login'])) {
 <div class="content">
     <div class="container-fluid p-4">
 
-        <!-- Page Header -->
         <div class="page-header">
             <div class="row align-items-center">
                 <div class="col-md-9">
@@ -23,14 +22,12 @@ if (!isset($_SESSION['login'])) {
             </div>
         </div>
 
-        <!-- Flash Message -->
         <div class="row">
             <div class="col-12">
                 <?php Flasher::flash(); ?>
             </div>
         </div>
 
-        <!-- STEP 1: DOWNLOAD -->
         <div class="step-card">
             <div class="step-header">
                 <div class="step-number-circle">1</div>
@@ -41,9 +38,7 @@ if (!isset($_SESSION['login'])) {
             </div>
             
             <div class="step-body">
-                <!-- Info Grid -->
                 <div class="info-grid">
-                    <!-- Nama Peminjam -->
                     <div class="info-box">
                         <div class="info-box-header">
                             <div class="info-icon-circle">
@@ -58,7 +53,6 @@ if (!isset($_SESSION['login'])) {
                         </div>
                     </div>
 
-                    <!-- Kegiatan -->
                     <div class="info-box">
                         <div class="info-box-header">
                             <div class="info-icon-circle">
@@ -73,25 +67,6 @@ if (!isset($_SESSION['login'])) {
                         </div>
                     </div>
 
-                    <!-- Barang -->
-                    <div class="info-box">
-                        <div class="info-box-header">
-                            <div class="info-icon-circle">
-                                <i class="fas fa-box-open"></i>
-                            </div>
-                            <div>
-                                <div class="info-label">Barang Dipinjam</div>
-                            </div>
-                        </div>
-                        <div class="info-value">
-                            <?= isset($data['peminjaman']['nama_barang']) ? $data['peminjaman']['nama_barang'] : 'Tidak ditemukan'; ?>
-                            <span class="badge badge-primary ml-2" style="background-color: var(--primary-navy);">
-                                <?= isset($data['peminjaman']['jumlah_peminjaman']) ? $data['peminjaman']['jumlah_peminjaman'] : 0; ?> Unit
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Tanggal -->
                     <div class="info-box">
                         <div class="info-box-header">
                             <div class="info-icon-circle">
@@ -107,9 +82,36 @@ if (!isset($_SESSION['login'])) {
                             <?= isset($data['peminjaman']['tanggal_pengembalian']) ? date('d M Y', strtotime($data['peminjaman']['tanggal_pengembalian'])) : '-'; ?>
                         </div>
                     </div>
+
+                    <div class="info-box1">
+                        <div class="info-box-header">
+                            <div class="info-icon-circle">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div>
+                                <div class="info-label">Barang Dipinjam</div>
+                            </div>
+                        </div>
+                        <div class="info-value">
+                            <?php if (!empty($data['detail_barang'])) : ?>
+                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                    <?php foreach ($data['detail_barang'] as $item) : ?>
+                                        <li style="margin-bottom: 4px;">
+                                            • <?= $item['nama_barang']; ?> 
+                                            <span style="font-weight: bold; color: var(--primary-navy);">
+                                                (<?= $item['jumlah']; ?> Unit)
+                                            </span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php else : ?>
+                                <?= isset($data['peminjaman']['nama_barang']) ? $data['peminjaman']['nama_barang'] : '-'; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Download Section -->
                 <div class="download-section">
                     <div class="download-icon-wrapper">
                         <i class="fas fa-file-pdf"></i>
@@ -128,9 +130,8 @@ if (!isset($_SESSION['login'])) {
             </div>
         </div>
 
-        <!-- STEP 2: UPLOAD -->
         <div class="step-card">
-            <div class="step-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="step-header">
                 <div class="step-number-circle">2</div>
                 <div>
                     <h5 class="step-title">Upload Surat Bertanda Tangan</h5>
@@ -139,7 +140,6 @@ if (!isset($_SESSION['login'])) {
             </div>
             
             <div class="step-body">
-                <!-- Alert Warning -->
                 <div class="alert-custom">
                     <i class="fas fa-exclamation-triangle"></i>
                     <div class="alert-custom-content">
@@ -148,11 +148,9 @@ if (!isset($_SESSION['login'])) {
                     </div>
                 </div>
 
-                <!-- Upload Form -->
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id_peminjaman" value="<?= $data['peminjaman']['id_peminjaman']; ?>">
                     
-                    <!-- Upload Zone -->
                     <div class="upload-section" id="drop-zone">
                         <input type="file" 
                                class="file-input-hidden" 
@@ -183,7 +181,6 @@ if (!isset($_SESSION['login'])) {
                         </small>
                     </div>
 
-                    <!-- Submit Button -->
                     <button type="submit" name="submit_upload" class="btn-submit" id="btn-submit">
                         <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
                     </button>
