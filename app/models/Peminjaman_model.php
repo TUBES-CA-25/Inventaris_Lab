@@ -14,9 +14,7 @@ class Peminjaman_model
             $data['tanggal_pengajuan'] = date('Y-m-d');
         }
 
-        $ket_header = isset($data['keterangan_peminjaman']) && is_array($data['keterangan_peminjaman'])
-            ? implode(", ", $data['keterangan_peminjaman'])
-            : "-";
+        $ket_header = !empty($data['keterangan_peminjaman']) ? $data['keterangan_peminjaman'] : "-";
 
         $queryHeader = "INSERT INTO trx_peminjaman
                   (nama_peminjam, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, 
@@ -26,9 +24,7 @@ class Peminjaman_model
                    :tanggal_pengembalian, :ket, :status, :file_surat)";
 
         $this->db->query($queryHeader);
-
         $this->db->bind('nama_peminjam', $data['nama_peminjam']);
-
         $this->db->bind('judul_kegiatan', $data['judul_kegiatan']);
         $this->db->bind('tanggal_pengajuan', $data['tanggal_pengajuan']);
         $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
@@ -45,7 +41,9 @@ class Peminjaman_model
         }
 
         $jumlah_data = count($data['id_jenis_barang']);
-        $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, jumlah) VALUES (:id_p, :id_b, :jml)";
+
+        $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah) 
+                        VALUES (:id_p, :id_b, :id_unit, :jml)";
 
         $barang_tersimpan = 0;
 
@@ -54,6 +52,16 @@ class Peminjaman_model
                 $this->db->query($queryDetail);
                 $this->db->bind('id_p', $id_peminjaman_baru);
                 $this->db->bind('id_b', $data['id_jenis_barang'][$i]);
+
+                $raw_unit = !empty($data['unit_selected'][$i]) ? $data['unit_selected'][$i] : null;
+
+                if (is_numeric($raw_unit) && $raw_unit > 0) {
+                    $id_unit = $raw_unit;
+                } else {
+                    $id_unit = null;
+                }
+
+                $this->db->bind('id_unit', $id_unit);
 
                 $jumlah = !empty($data['jumlah_peminjaman'][$i]) ? $data['jumlah_peminjaman'][$i] : 1;
                 $this->db->bind('jml', $jumlah);
@@ -142,10 +150,12 @@ class Peminjaman_model
     {
         $query = "SELECT tp.*, 
                           GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
-                          SUM(tdp.jumlah) as jumlah_peminjaman
+                          SUM(tdp.jumlah) as jumlah_peminjaman,
+                          tpt.alasan_penolakan
                   FROM trx_peminjaman tp
                   LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
-                  LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang 
+                  LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                  LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman 
                   WHERE tp.id_peminjaman = :id_peminjaman
                   GROUP BY tp.id_peminjaman";
 
@@ -196,7 +206,8 @@ class Peminjaman_model
         $detail_inserted = 0;
 
         if (isset($data['id_jenis_barang']) && is_array($data['id_jenis_barang'])) {
-            $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, jumlah) VALUES (:id_p, :id_b, :jml)";
+            $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah) 
+                            VALUES (:id_p, :id_b, :id_unit, :jml)";
 
             $jumlah_data = count($data['id_jenis_barang']);
             for ($i = 0; $i < $jumlah_data; $i++) {
@@ -204,6 +215,15 @@ class Peminjaman_model
                     $this->db->query($queryDetail);
                     $this->db->bind('id_p', $data['id_peminjaman']);
                     $this->db->bind('id_b', $data['id_jenis_barang'][$i]);
+
+                    $raw_unit = !empty($data['unit_selected'][$i]) ? $data['unit_selected'][$i] : null;
+
+                    if (is_numeric($raw_unit) && $raw_unit > 0) {
+                        $id_unit = $raw_unit;
+                    } else {
+                        $id_unit = null;
+                    }
+                    $this->db->bind('id_unit', $id_unit);
 
                     $jml = !empty($data['jumlah_peminjaman'][$i]) ? $data['jumlah_peminjaman'][$i] : 1;
                     $this->db->bind('jml', $jml);
@@ -226,13 +246,31 @@ class Peminjaman_model
 
     public function getAllBarang()
     {
-        $this->db->query("SELECT * FROM mst_jenis_barang ORDER BY sub_barang ASC");
+        $query = "SELECT 
+                mjb.*, 
+                (SELECT tb.foto_barang 
+                 FROM trx_barang tb 
+                 WHERE tb.id_jenis_barang = mjb.id_jenis_barang 
+                 LIMIT 1) as foto_barang
+              FROM mst_jenis_barang mjb
+              ORDER BY mjb.sub_barang ASC";
+
+        $this->db->query($query);
         return $this->db->resultSet();
     }
 
     public function cariBarang($keyword)
     {
-        $this->db->query("SELECT * FROM mst_jenis_barang WHERE sub_barang LIKE :keyword");
+        $query = "SELECT 
+                mjb.*, 
+                (SELECT tb.foto_barang 
+                 FROM trx_barang tb 
+                 WHERE tb.id_jenis_barang = mjb.id_jenis_barang 
+                 LIMIT 1) as foto_barang
+              FROM mst_jenis_barang mjb
+              WHERE mjb.sub_barang LIKE :keyword";
+
+        $this->db->query($query);
         $this->db->bind('keyword', "%$keyword%");
         return $this->db->resultSet();
     }
@@ -283,8 +321,12 @@ class Peminjaman_model
                   FROM trx_peminjaman tp
                   LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                   LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                  LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
                   
-                  WHERE tp.status IN ('diproses', 'disetujui', 'ditolak') 
+                  WHERE 
+                    tp.status IN ('diproses', 'disetujui') 
+                    OR 
+                    (tp.status = 'ditolak' AND tpt.id_peminjaman IS NOT NULL)
                   
                   GROUP BY tp.id_peminjaman
                   
@@ -365,11 +407,10 @@ class Peminjaman_model
         $query = "SELECT 
                 d.id_jenis_barang, 
                 d.jumlah, 
-                d.keterangan_barang, 
+                d.id_barang, 
                 mjb.sub_barang as nama_barang, 
                 mjb.kode_sub as kode_barang,
-                mjb.grup_sub, 
-                'Baik' as kondisi 
+                mjb.grup_sub
               FROM trx_detail_peminjaman d 
               JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
               WHERE d.id_peminjaman = :id";
@@ -377,6 +418,57 @@ class Peminjaman_model
         $this->db->query($query);
         $this->db->bind('id', $id);
 
+        return $this->db->resultSet();
+    }
+
+    public function simpanTolakPengembalian($id_peminjaman, $alasan)
+    {
+        try {
+            $this->db->query("SELECT id_pengembalian_tolak FROM trx_pengembalian_tolak WHERE id_peminjaman = :id");
+            $this->db->bind('id', $id_peminjaman);
+            $existing = $this->db->single();
+
+            if ($existing) {
+                $queryTolak = "UPDATE trx_pengembalian_tolak SET 
+                               alasan_penolakan = :alasan, 
+                               tanggal_penolakan = CURRENT_TIMESTAMP 
+                               WHERE id_peminjaman = :id";
+            } else {
+                $queryTolak = "INSERT INTO trx_pengembalian_tolak (id_peminjaman, alasan_penolakan) 
+                               VALUES (:id, :alasan)";
+            }
+
+            $this->db->query($queryTolak);
+            $this->db->bind('id', $id_peminjaman);
+            $this->db->bind('alasan', $alasan);
+            $this->db->execute();
+
+            $queryUpdate = "UPDATE trx_peminjaman SET 
+                            status = 'ditolak',
+                            keterangan_peminjaman = CONCAT(IFNULL(keterangan_peminjaman, ''), ' [Tolak Kembali] ', :alasan) 
+                            WHERE id_peminjaman = :id";
+
+            $this->db->query($queryUpdate);
+            $this->db->bind('alasan', $alasan);
+            $this->db->bind('id', $id_peminjaman);
+            $this->db->execute();
+
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    public function getUnitBarangTersedia($id_jenis_barang)
+    {
+        $query = "SELECT trx_barang.id_barang, kode_barang, kondisi_barang, spesifikasi_barang 
+              FROM trx_barang 
+              JOIN mst_kondisi_barang ON trx_barang.id_kondisi_barang = mst_kondisi_barang.id_kondisi_barang
+              WHERE id_jenis_barang = :id 
+              AND status_peminjaman = 'Bisa'";
+
+        $this->db->query($query);
+        $this->db->bind('id', $id_jenis_barang);
         return $this->db->resultSet();
     }
 }
