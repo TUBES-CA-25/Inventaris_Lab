@@ -23,7 +23,7 @@ class Riwayat extends Controller
         $nama_user = $data['profile']['nama_user'];
 
         if (in_array($role, ['1', '2', '3', '4'])) {
-            $data['riwayat'] = $this->model('Riwayat_model')->getAllRiwayat();
+            $data['riwayat'] = $this->model('Riwayat_model')->getAllRiwayat($nama_user);
         } else {
             $data['riwayat'] = $this->model('Riwayat_model')->getRiwayatByUser($nama_user);
         }

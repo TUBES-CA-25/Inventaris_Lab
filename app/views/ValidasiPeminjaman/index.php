@@ -7,7 +7,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 ?>
 
 <div class="content">
-    <div class="container-fluid p-4">
+    <div class="container-fluid p-4 content-beranda">
         <h1 class="page-title">Validasi Peminjaman</h1>
 
         <div class="row g-4">

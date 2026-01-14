@@ -1,25 +1,27 @@
 <?php
 
-class Riwayat_model {
+class Riwayat_model
+{
     private $db;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = new Database;
     }
 
     public function getAllRiwayat($nama_user_login = null)
     {
         $query = "SELECT p.*, k.status_pengembalian 
-                  FROM trx_peminjaman p
-                  LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
-                  WHERE 1=1";
+              FROM trx_peminjaman p
+              LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
+              WHERE 1=1";
 
         if ($nama_user_login != null) {
             $query .= " AND NOT (LOWER(p.status) = 'melengkapi surat' AND p.nama_peminjam != :nama)";
         }
 
         $query .= " ORDER BY p.tanggal_pengajuan DESC";
-    
+
         $this->db->query($query);
 
         if ($nama_user_login != null) {
@@ -44,7 +46,7 @@ class Riwayat_model {
                   LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
                   WHERE p.nama_peminjam = :nama
                   ORDER BY p.tanggal_pengajuan DESC";
-        
+
         $this->db->query($query);
         $this->db->bind('nama', $nama_user);
         $results = $this->db->resultSet();

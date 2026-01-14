@@ -5,59 +5,52 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-
-
 <div class="content">
-    <div class="container-fluid p-4">
+    <div class="container-fluid content-beranda p-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 style="font-weight: 700; color: #1e293b;">Barang Laboratorium</h3>
+        <div class="header-section mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h3 class="page-title">Barang Laboratorium</h3>
 
-            <div class="search-wrapper" style="position: relative; width: 300px;">
-                <form action="<?= BASEURL; ?>Peminjaman/cari" method="post">
-                    <input type="text" class="form-control"
-                        placeholder="Search..."
-                        name="keyword"
-                        style="border-radius: 8px; padding-right: 40px;">
-                    <i class="fas fa-filter" style="position: absolute; right: 15px; top: 12px; color: #94a3b8;"></i>
-                </form>
-            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="customSearch" placeholder="Search...">
+            </div> 
         </div>
 
         <div class="row">
             <?php if (!empty($data['barang'])) : ?>
                 <?php foreach ($data['barang'] as $brg) : ?>
-                    <div class="col-12 col-sm-6 col-md-4 col-xl-3 mb-4">
-                        <div class="h-100 shadow-sm" style="border-radius: 12px; border: none; overflow: hidden;">
+                    <?php
+                    $fotoPath = 'default_tools.png'; 
 
-                            <div class="card-img-wrapper d-flex align-items-center justify-content-center p-3" style="height: 180px; background: #fff;">
-                                <?php
-                                $gambar = !empty($brg['gambar']) ? $brg['gambar'] : 'default_tools.png';
-                                ?>
-                                <img src="<?= BASEURL; ?>img/<?= $gambar; ?>"
+                    if (!empty($brg['foto_barang'])) {
+                        $cleanPath = str_replace('../public/img/', '', $brg['foto_barang']);
+                        $fotoPath = $cleanPath;
+                    }
+                    ?>
+
+                    <div class="col-12 col-sm-6 col-md-4 col-xl-3 mb-4">
+                        <div class="card-item">
+                            <div class="card-img-container">
+                                <img src="<?= BASEURL; ?>img/<?= $fotoPath; ?>"
                                     alt="<?= $brg['sub_barang']; ?>"
-                                    style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                                    onerror="this.src='<?= BASEURL; ?>img/default_tools.png';">
                             </div>
 
-                            <div class="card-body d-flex flex-column justify-content-between bg-light">
-                                <h6 class="card-title font-weight-bold mb-3 text-dark">
-                                    <?= $brg['sub_barang']; ?>
-                                </h6>
-
-                                <div class="card-barang">
-                                    <a href="<?= BASEURL; ?>Peminjaman/tambahItem/<?= $brg['id_jenis_barang']; ?>"
-                                        class="btn btn-block text-white btnPinjam"
-                                        style="background-color: #0f1429; border-radius: 8px; text-decoration:none;">
-                                        Pinjam
-                                    </a>
-                                </div>
+                            <div class="card-desc">
+                                <h6 class="barang-title"><?= $brg['sub_barang']; ?></h6>
+                                <a href="<?= BASEURL; ?>Peminjaman/tambahItem/<?= $brg['id_jenis_barang']; ?>"
+                                    class="btn-pinjam-now">
+                                    Pinjam
+                                </a>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php else : ?>
                 <div class="col-12 text-center py-5">
-                    <h5 class="text-muted">Tidak ada data barang ditemukan.</h5>
+                    <img src="<?= BASEURL; ?>img/empty_state.svg" width="200" style="opacity: 0.5;">
+                    <h5 class="text-muted mt-3">Barang tidak ditemukan.</h5>
                 </div>
             <?php endif; ?>
         </div>
