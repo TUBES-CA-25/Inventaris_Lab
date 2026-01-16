@@ -1,3 +1,4 @@
+/* Color Variables */
 :root {
     --navy-primary: #0c1740;
     --navy-hover: #152763;
@@ -13,6 +14,7 @@ body {
     color: var(--navy-primary) !important;
 }
 
+/* Modern Card */
 .card-modern {
     border: none;
     border-radius: 12px;
@@ -21,12 +23,14 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Custom Card Header */
 .card-header-custom {
     background: linear-gradient(135deg, #f8f9fc 0%, #fff 100%);
     padding: 25px;
     border-bottom: 3px solid var(--navy-primary);
 }
 
+/* Status Icon Circle */
 .status-icon-circle {
     width: 60px;
     height: 60px;
@@ -37,6 +41,7 @@ body {
     font-size: 24px;
 }
 
+/* Badge Status */
 .badge-status {
     font-size: 14px;
     font-weight: 600;
@@ -66,6 +71,7 @@ body {
     color: white;
 }
 
+/* Info Box Styles */
 .info-box-full,
 .info-box {
     background: #fff;
@@ -117,6 +123,7 @@ body {
     color: #333;
 }
 
+/* Background Colors for Icons */
 .bg-primary-light {
     background-color: rgba(78, 115, 223, 0.1);
 }
@@ -137,6 +144,7 @@ body {
     background-color: rgba(231, 74, 59, 0.1);
 }
 
+/* Duration Box */
 .duration-box {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 10px;
@@ -156,6 +164,7 @@ body {
     color: white;
 }
 
+/* Table Header */
 .bg-gradient-navy {
     background: linear-gradient(135deg, var(--navy-primary) 0%, var(--navy-hover) 100%);
 }
@@ -166,6 +175,7 @@ body {
     font-weight: 600;
 }
 
+/* Table Styles */
 .thead-light th {
     background-color: #f8f9fc;
     color: #5a5c69;
@@ -185,6 +195,7 @@ body {
     transform: scale(1.01);
 }
 
+/* Number Badge */
 .number-badge {
     width: 32px;
     height: 32px;
@@ -198,6 +209,7 @@ body {
     font-size: 14px;
 }
 
+/* Image Wrapper */
 .img-wrapper-table {
     width: 70px;
     height: 70px;
@@ -217,11 +229,13 @@ body {
     height: 100%;
 }
 
+/* Item Name */
 .item-name h6 {
     font-size: 15px;
     line-height: 1.4;
 }
 
+/* Code Badge */
 .code-badge {
     background-color: #f8f9fc;
     border: 2px solid var(--border-color);
@@ -234,6 +248,7 @@ body {
     display: inline-block;
 }
 
+/* Quantity Badge */
 .quantity-badge {
     background: linear-gradient(135deg, var(--navy-primary), var(--navy-hover));
     color: white;
@@ -251,6 +266,7 @@ body {
     opacity: 0.9;
 }
 
+/* Kondisi Badge */
 .badge-kondisi {
     background-color: #d4edda;
     color: #155724;
@@ -261,10 +277,12 @@ body {
     border: 1px solid #c3e6cb;
 }
 
+/* Empty State */
 .empty-state i {
     opacity: 0.3;
 }
 
+/* Button */
 .btn-outline-navy {
     color: var(--navy-primary);
     border: 2px solid var(--navy-primary);
@@ -281,6 +299,7 @@ body {
     box-shadow: 0 5px 15px rgba(12, 23, 64, 0.3);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .card-header-custom {
         padding: 20px 15px;

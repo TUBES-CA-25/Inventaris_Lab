@@ -29,6 +29,17 @@
             name="nama_user"
             required />
         </div>
+        <div class="nim_nip">
+          <label for="nim_nip">NIM / NIP</label>
+          <input
+            type="text"
+            id="nim_nip"
+            name="nim_nip"
+            placeholder="Masukkan NIM atau NIP anda"
+            maxlength="30"
+            required
+            oninput="validasiInput(this)" />
+        </div>
         <div class="email">
           <label for="email">Email</label>
           <input

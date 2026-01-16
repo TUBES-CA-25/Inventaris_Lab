@@ -405,15 +405,18 @@ class Peminjaman_model
     public function getDetailBarangByPeminjamanId($id)
     {
         $query = "SELECT 
-                d.id_jenis_barang, 
-                d.jumlah, 
-                d.id_barang, 
-                mjb.sub_barang as nama_barang, 
-                mjb.kode_sub as kode_barang,
-                mjb.grup_sub
-              FROM trx_detail_peminjaman d 
-              JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
-              WHERE d.id_peminjaman = :id";
+            d.id_jenis_barang, 
+            d.jumlah, 
+            d.id_barang,
+            mjb.sub_barang as nama_barang, 
+            mjb.kode_sub as kode_barang,
+            mjb.grup_sub,
+            tb.spesifikasi_barang  -- Ambil kolom spesifikasi
+          FROM trx_detail_peminjaman d 
+          JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
+          -- Join ke tabel unit barang berdasarkan ID yang disimpan
+          LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
+          WHERE d.id_peminjaman = :id";
 
         $this->db->query($query);
         $this->db->bind('id', $id);
