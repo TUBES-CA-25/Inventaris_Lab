@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Controller Beranda (Dashboard Utama)
- * * Menampilkan statistik ringkasan sistem dan informasi profil pengguna.
- * * Mengimplementasikan optimasi performa dengan meminimalisir pemanggilan database.
- */
 class Beranda extends Controller {
 
     public function __construct()
@@ -17,23 +12,36 @@ class Beranda extends Controller {
     
     public function index() {
         $data['judul'] = 'Beranda';
-
         $berandaModel = $this->model('Beranda_model');
         $stats = $berandaModel->getAllCounts();
 
+        // Data Cards Statistik
         $data['jumlah_jenis_barang']  = $stats['jml_jenis'];
         $data['jumlah_peminjaman']    = $stats['jml_peminjaman'];
         $data['jumlah_merek_barang']  = $stats['jml_merek'];
         $data['jumlah_detail_barang'] = $stats['jml_barang']; 
-        
         $data['jumlah_pengembalian']  = $stats['jml_pengembalian'];
+        
         $data['id_user'] = $_SESSION['id_user'];
-
         $data['profile'] = $this->model("User_model")->profile($data);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Beranda/index', $data);
         $this->view('templates/footer');
+    }
+
+    public function getAjaxStats() {
+        // Ambil data dari POST JS
+        $json = file_get_contents('php://input');
+        $input = json_decode($json, true);
+
+        $mode = $input['mode'] ?? 'bulanan';
+        $tahun = $input['tahun'] ?? date('Y');
+        $bulan = $input['bulan'] ?? date('m');
+
+        $data = $this->model('Beranda_model')->getChartDataFiltered($mode, $tahun, $bulan);
+        
+        echo json_encode($data);
     }
 }
