@@ -9,11 +9,12 @@
         </div>
 
         <!-- Flash Message -->
-        <div class="row">
-            <div class="col-12">
-                <?php Flasher::flash(); ?>
+        <?php if (isset($_SESSION['flash'])): ?>
+            <div class="flash-message flash-<?= $_SESSION['flash']['type']; ?>">
+                <?= $_SESSION['flash']['message']; ?>
             </div>
-        </div>
+            <?php unset($_SESSION['flash']); ?>
+        <?php endif; ?>
 
         <div class="profile-content">
             <!-- Photo Section -->
@@ -88,9 +89,6 @@
             <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
                 
-                <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
-                <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
-
                 <div class="modal-form-group">
                     <label>Nama Lengkap</label>
                     <input type="text" name="nama_user" 
@@ -103,16 +101,15 @@
                     <label>Email</label>
                     <input type="email" name="email" 
                            value="<?= htmlspecialchars($profile_data['email']); ?>" 
-                           placeholder="Masukkan email" readonly style="background-color: #f0f0f0;">
-                    <small style="color: #888;">Email tidak dapat diubah di sini.</small>
+                           placeholder="Masukkan email" required>
                 </div>
 
                 <div class="modal-form-group">
-                    <label>NIM/NIP</label>
-                    <input type="text" name="nim_nip" 
-                           value="<?= htmlspecialchars($profile_data['nim_nip'] ?? ''); ?>" 
-                           placeholder="Masukkan NIM/NIP" 
-                           maxlength="30">
+                    <label>NIM/NIPS</label>
+                    <input type="text" name="nim_nips" 
+                           value="<?= htmlspecialchars($profile_data['nim_nips'] ?? ''); ?>" 
+                           placeholder="Masukkan NIM/NIPS" 
+                           maxlength="50">
                 </div>
 
                 <div class="modal-form-group">
