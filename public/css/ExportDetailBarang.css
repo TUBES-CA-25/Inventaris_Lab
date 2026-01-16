@@ -1,0 +1,167 @@
+:root {
+    --primary: #0c1740;
+    --bg: #f4f6f9;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg);
+    padding: 20px;
+    color: #333;
+    margin: 0;
+}
+
+.container-box {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    min-width: 1000px;
+}
+
+/* HEADER LAPORAN (TAMPILAN WEB) */
+.header-laporan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+/* Logo di Web diperbesar sedikit */
+.header-laporan img {
+    height: 100px;
+    width: auto;
+}
+
+.header-text h2 {
+    margin: 0;
+    color: var(--primary);
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: right;
+}
+
+.header-text p {
+    margin: 5px 0 0;
+    font-size: 12px;
+    color: #666;
+    text-align: right;
+}
+
+/* TOOLBAR */
+.toolbar-container {
+    display: flex;
+    justify-content: space-between;
+    background: #f1f3f5;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back {
+    background-color: #6c757d;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+}
+
+.btn-excel {
+    background-color: #198754;
+}
+
+.btn-pdf {
+    background-color: #dc3545;
+}
+
+.btn-print {
+    background-color: var(--primary);
+}
+
+/* TABEL */
+table.dataTable {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+table.dataTable thead th {
+    background-color: var(--primary) !important;
+    color: white !important;
+    font-size: 11px;
+    padding: 12px 10px;
+    border: 1px solid var(--primary);
+}
+
+table.dataTable tbody td {
+    font-size: 11px;
+    padding: 8px;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+}
+
+.img-preview {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+}
+
+.dataTables_filter,
+.dataTables_info,
+.dt-buttons {
+    display: none !important;
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .toolbar-container,
+    .no-print {
+        display: none !important;
+    }
+
+    .container-box {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .header-laporan {
+        display: none;
+    }
+}
