@@ -68,9 +68,9 @@
     <table class="table-barang">
         <thead>
             <tr>
-                <th width="10%">No.</th>
-                <th width="35%">Nama Alat</th>
-                <th width="35%">Spesifikasi</th>
+                <th width="5%">No.</th>
+                <th width="30%">Nama Alat</th>
+                <th width="45%">Spesifikasi</th>
                 <th width="20%">Jumlah</th>
             </tr>
         </thead>
@@ -80,7 +80,11 @@
                 <tr>
                     <td class="text-center"><?= $no++ ?></td>
                     <td style="text-align: left;"><?= $item['nama_barang'] ?></td>
-                    <td style="text-align: left;">-</td>
+                    
+                    <td style="text-align: left;">
+                        <?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?>
+                    </td>
+                    
                     <td class="text-center"><?= $item['jumlah'] ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -96,29 +100,29 @@
         Demikian surat permohonan peminjaman ini saya buat. Atas perhatian dan bantuannya saya ucapkan terima kasih.
     </div>
 
-    <div class="signature-wrapper">
-        <table class="signature-table">
-            <tr>
-                <td class="col-left" style="vertical-align: bottom;">
-                    <b>Yang Menyerahkan,</b>
-                    <div class="ttd-space"></div>
-                    <span class="underline-name">Fatimah A.R Tuasamu, S.Kom., MTA., MOS</span>
-                </td>
-                <td class="col-right">
-                    Makassar, <?= date('d F Y'); ?><br>
-                    <b>Yang Menyatakan,</b>
-                    <div class="ttd-space"></div>
-                    <span class="underline-name">( <?= $user['nama_user']; ?> )</span>
-                </td>
-            </tr>
-        </table>
-        <div class="approval-section">
-            Menyetujui,<br><br>
-            <b>Kepala Laboratorium Terpadu,</b>
-            <div class="ttd-space"></div>
-            <span class="underline-name">Ir. Huzain Azis, S.Kom., M.Cs., MTA</span><br>
-            NIDN : 0920098801
-        </div>
+    <div style="margin-top: 30px;"></div>
+
+    <table class="signature-table">
+        <tr>
+            <td class="ttd-col">
+                <br> <b>Yang Menyerahkan,</b>
+                <br><br><br><br> <span class="underline-name">Fatimah A.R Tuasamu, S.Kom., MTA., MOS</span>
+            </td>
+
+            <td class="ttd-col">
+                Makassar, <?= date('d F Y'); ?><br>
+                <b>Yang Menyatakan,</b>
+                <br><br><br><br> <span class="underline-name">( <?= $user['nama_user']; ?> )</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="approval-section">
+        Menyetujui,<br>
+        <b>Kepala Laboratorium Terpadu,</b>
+        <br><br><br><br> <span class="underline-name">Ir. Huzain Azis, S.Kom., M.Cs., MTA</span><br>
+        NIDN : 0920098801
     </div>
+
 </body>
 </html>

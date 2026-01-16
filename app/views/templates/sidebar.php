@@ -109,10 +109,12 @@
         const sidebarMenu = document.getElementById('sidebarMenu');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
+        // Fungsi buka/tutup
         function toggleSidebar() {
             sidebarMenu.classList.toggle('active');
             sidebarOverlay.classList.toggle('active');
             
+            // Ubah icon hamburger jadi X (opsional)
             const icon = hamburgerBtn.querySelector('i');
             if (sidebarMenu.classList.contains('active')) {
                 icon.classList.remove('fa-bars');
@@ -123,12 +125,13 @@
             }
         }
 
+        // Event Listeners
         if(hamburgerBtn) {
             hamburgerBtn.addEventListener('click', toggleSidebar);
         }
 
         if(sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', toggleSidebar); 
+            sidebarOverlay.addEventListener('click', toggleSidebar); // Tutup saat klik luar
         }
     });
 </script>
