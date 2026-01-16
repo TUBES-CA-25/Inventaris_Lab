@@ -34,6 +34,7 @@ class TemplateSurat extends Controller
         $data['judul'] = 'Pelengkapan Berkas'; 
         $data['id_peminjaman'] = $id_peminjaman;
         
+        $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
         $data['peminjaman'] = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
         $data['details'] = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
 
