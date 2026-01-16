@@ -5,99 +5,6 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-<style>
-    .beranda-container {
-        padding: 30px;
-        background: #f5f7fa;
-        min-height: 100vh;
-    }
-
-    .beranda-header {
-        background: #0C1740;
-        color: white;
-        padding: 25px 40px;
-        border-radius: 15px;
-        margin-bottom: 40px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .beranda-header h2 {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .chart-card {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .chart-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    }
-
-    .chart-header {
-        background: #0C1740;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    .chart-header h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .chart-container {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        height: 300px;
-    }
-
-    .flash-message-container {
-        margin-bottom: 20px;
-    }
-
-    @media (max-width: 1024px) {
-        .charts-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .beranda-container {
-            padding: 15px;
-        }
-
-        .beranda-header {
-            padding: 20px;
-        }
-
-        .beranda-header h2 {
-            font-size: 22px;
-        }
-
-        .chart-card {
-            padding: 20px;
-        }
-    }
-</style>
-
 <!-- Modal keluar -->
 <div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -127,258 +34,164 @@ if (!isset($_SESSION['login'])) {
 <div class="content">
     <div class="beranda-container">
         
-        <!-- Flash Message -->
-        <div class="flash flash-message-container">
-            <?php Flasher::flash(); ?>
-        </div>
-        
-        <!-- Header -->
         <div class="beranda-header">
             <h2>Beranda</h2>
         </div>
+
+        <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <div class="card-body d-flex align-items-center flex-wrap" style="gap: 15px;">
+                <h5 class="mb-0 mr-3">Filter Grafik:</h5>
+                
+                <select id="filterMode" class="form-control" style="width: 150px;">
+                    <option value="harian">Harian</option>
+                    <option value="bulanan" selected>Bulanan</option>
+                    <option value="tahunan">Tahunan</option>
+                </select>
+
+                <select id="filterTahun" class="form-control" style="width: 120px;">
+                    <?php 
+                    $currentYear = date('Y');
+                    for($i = $currentYear; $i >= $currentYear - 4; $i--): ?>
+                        <option value="<?= $i; ?>"><?= $i; ?></option>
+                    <?php endfor; ?>
+                </select>
+
+                <select id="filterBulan" class="form-control" style="width: 150px; display: none;">
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+
+                <button class="btn btn-primary" onclick="updateCharts()">Tampilkan</button>
+            </div>
+        </div>
         
-        <!-- Charts Grid -->
         <div class="charts-grid">
-            
-            <!-- Chart 1: Total Peminjaman -->
             <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Total Peminjaman</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartPeminjaman"></canvas>
-                </div>
+                <div class="chart-header"><h3>Total Peminjaman</h3></div>
+                <div class="chart-container"><canvas id="chartPeminjaman"></canvas></div>
             </div>
-            
-            <!-- Chart 2: Total Pengembalian -->
             <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Total Pengembalian</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartPengembalian"></canvas>
-                </div>
+                <div class="chart-header"><h3>Total Pengembalian</h3></div>
+                <div class="chart-container"><canvas id="chartPengembalian"></canvas></div>
             </div>
-            
-            <!-- Chart 3: Total Barang Bagus -->
             <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Total Barang Bagus</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartBarangBagus"></canvas>
-                </div>
+                <div class="chart-header"><h3>Total Barang Bagus</h3></div>
+                <div class="chart-container"><canvas id="chartBarangBagus"></canvas></div>
             </div>
-            
-            <!-- Chart 4: Total Barang Rusak -->
             <div class="chart-card">
-                <div class="chart-header">
-                    <h3>Total Barang Rusak</h3>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chartBarangRusak"></canvas>
-                </div>
+                <div class="chart-header"><h3>Total Barang Rusak</h3></div>
+                <div class="chart-container"><canvas id="chartBarangRusak"></canvas></div>
             </div>
-            
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Konfigurasi warna untuk grafik
-    const colors = {
-        purple: 'rgb(147, 112, 219)',
-        orange: 'rgb(255, 159, 64)',
-        cyan: 'rgb(75, 192, 192)',
-        purpleTransparent: 'rgba(147, 112, 219, 0.2)',
-        orangeTransparent: 'rgba(255, 159, 64, 0.2)',
-        cyanTransparent: 'rgba(75, 192, 192, 0.2)'
-    };
+    const filterMode = document.getElementById('filterMode');
+    const filterBulan = document.getElementById('filterBulan');
+    const filterTahun = document.getElementById('filterTahun');
 
-    // Data bulan
-    const months = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'aug', 'sept', 'oct', 'nov', 'dec'];
+    // Tampilkan/Sembunyikan dropdown bulan berdasarkan mode
+    filterMode.addEventListener('change', function() {
+        if (this.value === 'harian') {
+            filterBulan.style.display = 'block';
+            filterTahun.style.display = 'block';
+        } else if (this.value === 'bulanan') {
+            filterBulan.style.display = 'none';
+            filterTahun.style.display = 'block';
+        } else { // tahunan
+            filterBulan.style.display = 'none';
+            // filterTahun.style.display = 'none'; // Bisa dihide jika tahunan otomatis ambil range 5 tahun
+        }
+    });
 
-    // Fungsi untuk generate data random (simulasi)
-    function generateRandomData(min, max, count) {
-        return Array.from({length: count}, () => Math.floor(Math.random() * (max - min + 1)) + min);
-    }
+    let charts = {}; 
 
-    // Konfigurasi umum untuk semua chart
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    padding: 15,
-                    font: {
-                        size: 11
-                    }
-                }
-            }
-        },
+        plugins: { legend: { display: false } }, // Hide legend karena cuma 1 dataset per grafik
         scales: {
-            y: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                    stepSize: 20
-                }
-            },
-            x: {
-                ticks: {
-                    font: {
-                        size: 10
-                    }
-                }
-            }
+            y: { beginAtZero: true, ticks: { precision: 0 } }
         }
     };
 
-    // Chart 1: Total Peminjaman
-    const ctxPeminjaman = document.getElementById('chartPeminjaman').getContext('2d');
-    new Chart(ctxPeminjaman, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: '2025',
-                    data: generateRandomData(20, 80, 12),
-                    borderColor: colors.purple,
-                    backgroundColor: colors.purpleTransparent,
+    function initChart(id, label, color) {
+        const ctx = document.getElementById(id).getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: label,
+                    data: [],
+                    borderColor: color,
+                    backgroundColor: color.replace(')', ', 0.2)').replace('rgb', 'rgba'),
                     tension: 0.4,
                     fill: true
-                },
-                {
-                    label: '2024',
-                    data: generateRandomData(30, 70, 12),
-                    borderColor: colors.orange,
-                    backgroundColor: colors.orangeTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2023',
-                    data: generateRandomData(25, 65, 12),
-                    borderColor: colors.cyan,
-                    backgroundColor: colors.cyanTransparent,
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        },
-        options: commonOptions
-    });
+                }]
+            },
+            options: commonOptions
+        });
+    }
 
-    // Chart 2: Total Pengembalian
-    const ctxPengembalian = document.getElementById('chartPengembalian').getContext('2d');
-    new Chart(ctxPengembalian, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: '2025',
-                    data: generateRandomData(15, 90, 12),
-                    borderColor: colors.purple,
-                    backgroundColor: colors.purpleTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2024',
-                    data: generateRandomData(20, 75, 12),
-                    borderColor: colors.orange,
-                    backgroundColor: colors.orangeTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2023',
-                    data: generateRandomData(10, 70, 12),
-                    borderColor: colors.cyan,
-                    backgroundColor: colors.cyanTransparent,
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        },
-        options: commonOptions
-    });
+    charts.peminjaman = initChart('chartPeminjaman', 'Peminjaman', 'rgb(147, 112, 219)');
+    charts.pengembalian = initChart('chartPengembalian', 'Pengembalian', 'rgb(255, 159, 64)');
+    charts.bagus = initChart('chartBarangBagus', 'Barang Bagus', 'rgb(75, 192, 192)');
+    charts.rusak = initChart('chartBarangRusak', 'Barang Rusak', 'rgb(255, 99, 132)');
 
-    // Chart 3: Total Barang Bagus
-    const ctxBarangBagus = document.getElementById('chartBarangBagus').getContext('2d');
-    new Chart(ctxBarangBagus, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: '2025',
-                    data: generateRandomData(60, 100, 12),
-                    borderColor: colors.purple,
-                    backgroundColor: colors.purpleTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2024',
-                    data: generateRandomData(40, 90, 12),
-                    borderColor: colors.orange,
-                    backgroundColor: colors.orangeTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2023',
-                    data: generateRandomData(10, 60, 12),
-                    borderColor: colors.cyan,
-                    backgroundColor: colors.cyanTransparent,
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        },
-        options: commonOptions
-    });
+    function updateCharts() {
+        const payload = {
+            mode: filterMode.value,
+            tahun: filterTahun.value,
+            bulan: filterBulan.value
+        };
 
-    // Chart 4: Total Barang Rusak
-    const ctxBarangRusak = document.getElementById('chartBarangRusak').getContext('2d');
-    new Chart(ctxBarangRusak, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: '2025',
-                    data: generateRandomData(10, 50, 12),
-                    borderColor: colors.purple,
-                    backgroundColor: colors.purpleTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2024',
-                    data: generateRandomData(20, 70, 12),
-                    borderColor: colors.orange,
-                    backgroundColor: colors.orangeTransparent,
-                    tension: 0.4,
-                    fill: true
-                },
-                {
-                    label: '2023',
-                    data: generateRandomData(40, 70, 12),
-                    borderColor: colors.cyan,
-                    backgroundColor: colors.cyanTransparent,
-                    tension: 0.4,
-                    fill: true
-                }
-            ]
-        },
-        options: commonOptions
-    });
+        // Fetch ke Controller
+        fetch('<?= BASEURL; ?>Beranda/getAjaxStats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update Labels (Sumbu X) untuk semua chart
+            const labels = data.labels;
+
+            // Update Data Chart 1
+            charts.peminjaman.data.labels = labels;
+            charts.peminjaman.data.datasets[0].data = data.peminjaman;
+            charts.peminjaman.update();
+
+            // Update Data Chart 2
+            charts.pengembalian.data.labels = labels;
+            charts.pengembalian.data.datasets[0].data = data.pengembalian;
+            charts.pengembalian.update();
+
+            // Update Data Chart 3
+            charts.bagus.data.labels = labels;
+            charts.bagus.data.datasets[0].data = data.bagus;
+            charts.bagus.update();
+
+            // Update Data Chart 4
+            charts.rusak.data.labels = labels;
+            charts.rusak.data.datasets[0].data = data.rusak;
+            charts.rusak.update();
+        })
+        .catch(err => console.error('Gagal mengambil data:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCharts);
+
 </script>
