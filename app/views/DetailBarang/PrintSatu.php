@@ -5,121 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Downloading...</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f0f0; /* Background abu agar terlihat beda saat loading */
-            padding: 20px;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        /* Container Utama dengan Border Biru */
-        .card-export {
-            width: 100%;
-            max-width: 900px; /* Lebar konten PDF */
-            border: 2px solid #0C1740; /* Warna Navy */
-            border-radius: 12px;
-            padding: 40px;
-            background: white;
-            /* Penting untuk html2pdf agar background putih ter-render */
-            background-color: #ffffff; 
-        }
-
-        /* Judul */
-        .header-title {
-            text-align: center;
-            color: #0C1740;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 50px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Layout Grid */
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr 250px; /* Area gambar disesuaikan */
-            gap: 20px;
-            align-items: start;
-        }
-
-        /* Styling Item Data */
-        .data-item {
-            margin-bottom: 20px;
-        }
-
-        .label {
-            display: block;
-            font-size: 12px; /* Diperkecil sedikit agar muat di PDF */
-            font-weight: 600;
-            color: #000;
-            margin-bottom: 4px;
-        }
-
-        .value {
-            display: block;
-            font-size: 12px;
-            color: #666;
-            font-weight: 400;
-            line-height: 1.4;
-        }
-
-        /* Area Gambar */
-        .image-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #eee;
-            padding: 10px;
-            border-radius: 8px;
-            height: 200px; /* Tinggi fix agar rapi */
-            overflow: hidden;
-        }
-
-        .image-area img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* Loading Indicator Styles */
-        #loadingMsg {
-            margin-bottom: 20px;
-            font-size: 18px;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0C1740;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-    </style>
+    <link rel="stylesheet" href="<?= BASEURL; ?>/css/PrintSatuDetailPeminjaman.css?v=<?= time(); ?>">
 </head>
 <body>
 
@@ -223,19 +109,16 @@
 
     <script>
         window.onload = function() {
-            // Pilih elemen yang akan dijadikan PDF
-            const element = document.getElementById('contentToPrint');
             
-            // Nama file custom sesuai kode barang
+            const element = document.getElementById('contentToPrint');
             const fileName = 'Detail_<?= str_replace(['/','\\'], '_', $item['kode_barang']); ?>.pdf';
 
-            // Konfigurasi PDF
             const opt = {
-                margin:       [10, 10, 10, 10], // Margin (Atas, Kiri, Bawah, Kanan) dalam mm
+                margin:       [10, 10, 10, 10], 
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // Scale 2 agar teks tajam
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // Landscape agar layout 3 kolom muat
+                html2canvas:  { scale: 2, useCORS: true }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } 
             };
         };
     </script>

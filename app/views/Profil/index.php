@@ -9,12 +9,11 @@
         </div>
 
         <!-- Flash Message -->
-        <?php if (isset($_SESSION['flash'])): ?>
-            <div class="flash-message flash-<?= $_SESSION['flash']['type']; ?>">
-                <?= $_SESSION['flash']['message']; ?>
+        <div class="row">
+            <div class="col-12">
+                <?php Flasher::flash(); ?>
             </div>
-            <?php unset($_SESSION['flash']); ?>
-        <?php endif; ?>
+        </div>
 
         <div class="profile-content">
             <!-- Photo Section -->
@@ -45,7 +44,7 @@
 
                 <div class="info-group">
                     <label class="info-label">NIM/NIPS</label>
-                    <div class="info-value"><?= htmlspecialchars($profile_data['nim_nips'] ?? '-'); ?></div>
+                    <div class="info-value"><?= htmlspecialchars($profile_data['nim_nip'] ?? '-'); ?></div>
                 </div>
 
                 <div class="info-group">
@@ -89,6 +88,9 @@
             <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
                 
+                <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
+                <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
+
                 <div class="modal-form-group">
                     <label>Nama Lengkap</label>
                     <input type="text" name="nama_user" 
@@ -101,15 +103,16 @@
                     <label>Email</label>
                     <input type="email" name="email" 
                            value="<?= htmlspecialchars($profile_data['email']); ?>" 
-                           placeholder="Masukkan email" required>
+                           placeholder="Masukkan email" readonly style="background-color: #f0f0f0;">
+                    <small style="color: #888;">Email tidak dapat diubah di sini.</small>
                 </div>
 
                 <div class="modal-form-group">
-                    <label>NIM/NIPS</label>
-                    <input type="text" name="nim_nips" 
-                           value="<?= htmlspecialchars($profile_data['nim_nips'] ?? ''); ?>" 
-                           placeholder="Masukkan NIM/NIPS" 
-                           maxlength="50">
+                    <label>NIM/NIP</label>
+                    <input type="text" name="nim_nip" 
+                           value="<?= htmlspecialchars($profile_data['nim_nip'] ?? ''); ?>" 
+                           placeholder="Masukkan NIM/NIP" 
+                           maxlength="30">
                 </div>
 
                 <div class="modal-form-group">
@@ -165,21 +168,18 @@ function closeEditModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Close modal when clicking outside
 document.getElementById('editModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeEditModal();
     }
 });
 
-// Close modal with ESC key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeEditModal();
     }
 });
 
-// Auto hide flash message
 setTimeout(function() {
     const flashMessage = document.querySelector('.flash-message');
     if (flashMessage) {
