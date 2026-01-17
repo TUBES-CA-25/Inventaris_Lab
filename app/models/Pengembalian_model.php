@@ -70,33 +70,22 @@ class Pengembalian_model
     public function updatePengembalian($data)
     {
         $status = $data['status_pengembalian'];
-        $tanggal_janji_kembali = $data['tanggal_pengembalian']; // Dari DB/Hidden Input
+        $id_pengembalian = $data['id_pengembalian'];
+        $tanggal_janji_kembali = $data['tanggal_pengembalian'];
         
-        // Gunakan Y-m-d untuk perbandingan tanggal yang aman
         $today = date('Y-m-d');
         $keterangan = '';
 
-        // --- Logika Penentuan Keterangan ---
+        // --- Logika Keterangan ---
         if ($status === 'Dikembalikan') {
-            // Cek apakah pengembalian melebihi tanggal janji
-            if ($today <= $tanggal_janji_kembali) {
-                $keterangan = 'Tepat Waktu';
-            } else {
-                $keterangan = 'Tidak Tepat Waktu';
-            }
-        } 
-        elseif ($status === 'Hilang' || $status === 'Rusak') {
+            $keterangan = ($today <= $tanggal_janji_kembali) ? 'Tepat Waktu' : 'Tidak Tepat Waktu';
+        } elseif ($status === 'Hilang' || $status === 'Rusak') {
             $keterangan = 'Bermasalah';
-        } 
-        elseif ($status === 'Belum Dikembalikan') {
-            // Jika status masih belum dikembalikan tapi sudah lewat tanggal
-            if ($today > $tanggal_janji_kembali) {
-                $keterangan = 'Tidak Tepat Waktu';
-            } else {
-                $keterangan = ''; // Masih dalam masa peminjaman
-            }
+        } elseif ($status === 'Belum Dikembalikan') {
+            if ($today > $tanggal_janji_kembali) $keterangan = 'Tidak Tepat Waktu';
         }
 
+        // --- UPDATE STATUS PENGEMBALIAN ---
         $query = "UPDATE trx_pengembalian SET 
                     status_pengembalian = :status_pengembalian, 
                     keterangan = :keterangan, 
@@ -107,10 +96,38 @@ class Pengembalian_model
         $this->db->bind('status_pengembalian', $status);
         $this->db->bind('keterangan', $keterangan);
         $this->db->bind('detail_masalah', $data['detail_masalah']);
-        $this->db->bind('id_pengembalian', $data['id_pengembalian']);
-
+        $this->db->bind('id_pengembalian', $id_pengembalian);
         $this->db->execute();
+
+        // --- LOGIKA KEMBALIKAN STOK KE trx_barang ---
+        // Hanya jika status 'Dikembalikan'
+        if ($status === 'Dikembalikan') {
+            
+            // 1. Cari data barang dari tabel peminjaman
+            $cariData = "SELECT p.id_jenis_barang, p.jumlah_peminjaman 
+                         FROM trx_pengembalian k
+                         JOIN trx_peminjaman p ON k.id_peminjaman = p.id_peminjaman
+                         WHERE k.id_pengembalian = :id";
+            
+            $this->db->query($cariData);
+            $this->db->bind('id', $id_pengembalian);
+            $pinjam = $this->db->single();
+
+            if ($pinjam) {
+                // 2. Tambah Stok Kembali (jumlah_barang + jumlah_peminjaman)
+                $balikinStok = "UPDATE trx_barang 
+                                SET jumlah_barang = jumlah_barang + :jml 
+                                WHERE id_jenis_barang = :id_brg";
+                
+                $this->db->query($balikinStok);
+                $this->db->bind('jml', $pinjam['jumlah_peminjaman']);
+                $this->db->bind('id_brg', $pinjam['id_jenis_barang']);
+                $this->db->execute();
+            }
+        }
 
         return $this->db->rowCount();
     }
+
+    
 }

@@ -155,4 +155,36 @@ class Peminjaman_model {
     
         return $this->db->rowCount();
     }
+
+    /**
+     * FUNGSI BARU: Setuju Peminjaman & kurangi stok di trx barang
+     */
+    public function terimaPeminjaman($id_peminjaman)
+    {
+        // 1. Ambil data: Berapa yang dipinjam & Barang apa (pakai id_jenis_barang sesuai foreign key Anda)
+        $this->db->query("SELECT id_jenis_barang, jumlah_peminjaman FROM trx_peminjaman WHERE id_peminjaman = :id");
+        $this->db->bind('id', $id_peminjaman);
+        $dataPinjam = $this->db->single();
+
+        if(!$dataPinjam) return 0;
+
+        // 2. Update Status Peminjaman jadi 'Disetujui'
+        $queryStatus = "UPDATE trx_peminjaman SET status = 'Disetujui' WHERE id_peminjaman = :id";
+        $this->db->query($queryStatus);
+        $this->db->bind('id', $id_peminjaman);
+        $this->db->execute();
+
+        // 3. UPDATE STOK DI trx_barang (Logika Inti)
+        // Kita kurangi kolom 'jumlah_barang' berdasarkan 'id_jenis_barang'
+        $queryStok = "UPDATE trx_barang 
+                      SET jumlah_barang = jumlah_barang - :jml 
+                      WHERE id_jenis_barang = :id_brg";
+        
+        $this->db->query($queryStok);
+        $this->db->bind('jml', $dataPinjam['jumlah_peminjaman']);
+        $this->db->bind('id_brg', $dataPinjam['id_jenis_barang']);
+        $this->db->execute();
+
+        return $this->db->rowCount();
+    }
 }
