@@ -82,7 +82,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                 <tr>
                                     <td><?= $no++; ?></td>
                                     
-                                    <td class="font-weight-bold"><?= htmlspecialchars($pinjam['nama_peminjam']); ?></td> 
+                                    <td class="font-weight-bold"><?= htmlspecialchars($pinjam['nama_user']); ?></td> 
                                     
                                     <td><?= date('d/m/Y', strtotime($pinjam['tanggal_pengajuan'])); ?></td>
                                     <td><?= date('d/m/Y', strtotime($pinjam['tanggal_peminjaman'])); ?></td>
@@ -116,7 +116,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
-                </table>
+                </table>    
             </div>
         </div>
     </div>

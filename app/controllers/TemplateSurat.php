@@ -91,8 +91,8 @@ class TemplateSurat extends Controller
 
         if (ob_get_length()) { ob_end_clean(); }
 
-        $filename = 'Surat_Peminjaman_' . $id_peminjaman . '.pdf';
-        $dompdf->stream($filename, ["Attachment" => 0]);
+        $filename = 'Surat_Peminjaman_' . '.pdf';
+        $dompdf->stream($filename, ["Attachment" => 1]);
         exit;
     }
 
