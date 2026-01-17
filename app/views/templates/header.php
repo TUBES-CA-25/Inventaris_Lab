@@ -8,7 +8,7 @@
   <link rel="shortcut icon" href="<?= BASEURL; ?>img/logo.svg" />
 
   <link rel="stylesheet" href="<?= BASEURL; ?>/css/style.css">
-  <link rel="stylesheet" href="<?= BASEURL; ?>/css/beranda.css">
+  <link rel="stylesheet" href="<?= BASEURL; ?>/css/beranda.css?v=<?= time(); ?>">
   <!-- <link rel="stylesheet" href="<?= BASEURL; ?>/css/jenisBarang.css?v=<?= time(); ?>"> -->
   <link rel="stylesheet" href="<?= BASEURL; ?>/css/kelolaAkun.css?v=<?= time(); ?>">
   <link rel="stylesheet" href="<?= BASEURL; ?>css/sidebar.css?v=<?= time(); ?>">
