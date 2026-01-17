@@ -1,0 +1,283 @@
+body {
+    font-family: "Poppins", sans-serif;
+    background-color: #f0f2f5;
+}
+
+/* ================= MAIN LAYOUT ================= */
+.body-login {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* ================= LEFT SECTION (FIGURE) ================= */
+.figure-section {
+    flex: 1;
+    background: linear-gradient(135deg, #0c1740 0%, #1e3a8a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+.logo-container {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+}
+
+.logo-container img {
+    width: 150px;
+    height: auto;
+}
+
+.figure-content {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+}
+
+.figure-content img {
+    width: 80%;
+    height: auto;
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Animasi melayang halus */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* ================= RIGHT SECTION (FORM) ================= */
+.form-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #ffffff;
+}
+
+/* Container kotak putih form */
+.form-container {
+    width: 100%;
+    max-width: 480px;
+    padding: 3.5rem;
+}
+
+/* ================= TYPOGRAPHY & HEADER ================= */
+.form-header {
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0c1740;
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    color: #888;
+    font-size: 0.95rem;
+}
+
+.flash-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+/* ================= INPUTS ================= */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0c1740;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.3s ease;
+    background-color: #fbfbfb;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1e3a8a;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+/* ================= LINKS & BUTTONS ================= */
+.forgot-password-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -0.5rem;
+    margin-bottom: 2rem;
+}
+
+.forgot-password-link {
+    font-size: 0.85rem;
+    color: #1e3a8a;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 1rem;
+    background: #0c1740;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    font-family: "Poppins", sans-serif;
+}
+
+.btn-login:hover {
+    background: #1e3a8a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(12, 23, 64, 0.2);
+}
+
+.register-prompt {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.register-link {
+    color: #1e3a8a;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+/* Logo mobile - hidden by default */
+.mobile-logo {
+    display: none;
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1000;
+}
+
+.mobile-logo img {
+    width: 140px;
+    height: auto;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+    .body-login {
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
+        background-color: #ffffff; /* Background putih untuk mobile */
+    }
+
+    /* Sembunyikan figure section di mobile */
+    .figure-section {
+        display: none;
+    }
+
+    /* Tampilkan logo mobile */
+    .mobile-logo {
+        display: block;
+    }
+
+    .form-section {
+        padding: 6rem 1.5rem 2rem; /* Tambah padding top agar tidak tertutup logo */
+        min-height: 100vh;
+        background-color: transparent; /* Hilangkan background */
+    }
+
+    .form-container {
+        padding: 2rem 1.5rem;
+        box-shadow: none;
+    }
+
+    .form-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .form-header p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .mobile-logo {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .mobile-logo img {
+        width: 110px;
+    }
+
+    .form-section {
+        padding: 5rem 1rem 2rem;
+    }
+
+    .form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-group input {
+        padding: 0.9rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-login {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+
+    .register-prompt {
+        font-size: 0.85rem;
+        flex-direction: row;
+    }
+}

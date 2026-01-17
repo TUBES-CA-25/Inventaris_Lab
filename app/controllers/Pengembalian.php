@@ -6,11 +6,12 @@
  */
 class Pengembalian extends Controller
 {
-    /**
-     * @var Pengembalian_model Instance model agar hemat memori.
-     */
-    private $pengembalianModel;
-
+    private function auth()
+    {
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+    }
     public function __construct()
     {
         // 1. Gatekeeper: Cek Login
@@ -18,25 +19,32 @@ class Pengembalian extends Controller
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
-
-        // 2. Load Model
-        $this->pengembalianModel = $this->model('Pengembalian_model');
     }
 
-    /**
-     * Menampilkan daftar transaksi yang perlu dikembalikan atau sudah dikembalikan.
-     */
     public function index()
     {
-        $data['judul'] = 'Pengembalian';
+        $this->auth();
+
+        $data['judul'] = 'Pengembalian Barang';
         $data['id_user'] = $_SESSION['id_user'];
-        
-        // Load data profil user & daftar pengembalian
         $data['profile'] = $this->model("User_model")->profile($data);
         $data['pengembalian'] = $this->pengembalianModel->getAllPengembalian();
 
-        // Tidak perlu logic session flash manual di sini, 
-        // karena Flasher::flash() di View akan menanganinya otomatis.
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data);
+        $this->view('Pengembalian/from', $data);
+        $this->view('templates/footer');
+    }
+
+    public function Riwayat()
+    {
+        $this->auth();
+
+        $data['judul'] = 'Riwayat Pengembalian';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['pengembalian'] =
+            $this->model('Pengembalian_model')->getAllPengembalian();
+        $data['profile'] = $this->model("User_model")->profile($data);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -44,33 +52,64 @@ class Pengembalian extends Controller
         $this->view('templates/footer');
     }
 
-    /**
-     * Mengambil data untuk modal Edit (AJAX).
-     */
-    public function getUbah()
+    public function simpan()
     {
-        // Validasi input ID
-        if (empty($_POST['id_pengembalian'])) {
-            echo json_encode(['error' => 'ID tidak ditemukan']);
-            return;
+        $this->auth();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
         }
-        
-        echo json_encode($this->pengembalianModel->getUbahPengembalian($_POST['id_pengembalian']));
+
+        if (isset($_FILES['bukti_pengembalian']) && $_FILES['bukti_pengembalian']['error'] === 0) {
+            $uploadDir = '../public/uploads/pengembalian/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $ext = strtolower(pathinfo($_FILES['bukti_pengembalian']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'pdf'];
+
+            if (in_array($ext, $allowed)) {
+                $_POST['bukti_pengembalian'] =
+                    uniqid() . '_' . $_FILES['bukti_pengembalian']['name'];
+
+                move_uploaded_file(
+                    $_FILES['bukti_pengembalian']['tmp_name'],
+                    $uploadDir . $_POST['bukti_pengembalian']
+                );
+            }
+        }
+
+        $_POST['id_user'] = $_SESSION['id_user'];
+
+        if ($this->model('Pengembalian_model')->tambahPengembalian($_POST) > 0) {
+            Flasher::setFlash('Data pengembalian berhasil disimpan!', 'success');
+        } else {
+            Flasher::setFlash('Data pengembalian gagal disimpan!', 'danger');
+        }
+
+        header('Location: ' . BASEURL . 'Pengembalian');
+        exit;
     }
 
-    /**
-     * Memproses update status pengembalian.
-     * Sistem akan otomatis menentukan apakah 'Tepat Waktu' atau 'Bermasalah'.
-     */
-    public function ubahPengembalian() {
-        if ($this->pengembalianModel->updatePengembalian($_POST) > 0) {
-            Flasher::setFlash('Data Pengembalian', 'berhasil', 'diperbarui', 'success');
+    public function getUbah()
+    {
+        echo json_encode(
+            $this->model('Pengembalian_model')
+                 ->getUbahPengembalian($_POST['id_pengembalian'])
+        );
+    }
+
+    public function ubahPengembalian()
+    {
+        if ($this->model('Pengembalian_model')->updatePengembalian($_POST) > 0) {
+            Flasher::setFlash('Data berhasil diubah.', 'success');
         } else {
-            // Bisa jadi gagal query atau tidak ada perubahan data
-            Flasher::setFlash('Data Pengembalian', 'tidak ada', 'yang diubah', 'warning');
+            Flasher::setFlash('Data gagal diubah.', 'danger');
         }
-        
-        header('Location: ' . BASEURL . 'Pengembalian');
+
+        header('Location: ' . BASEURL . 'Pengembalian/index');
         exit;
     }
 }

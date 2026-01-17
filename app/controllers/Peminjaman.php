@@ -1,178 +1,231 @@
 <?php
+class Peminjaman extends Controller
+{
+    public function index()
+    {
+        if (!isset($_SESSION)) {
+            session_start();
+        }
 
-/**
- * Controller Peminjaman
- * * Mengelola transaksi peminjaman barang.
- * * Fitur: List, Filter, Tambah, Hapus, Ubah, Detail.
- */
-class Peminjaman extends Controller {
-
-    /**
-     * @var Peminjaman_model Instance model untuk efisiensi memori.
-     */
-    private $peminjamanModel;
-
-    public function __construct() {
-        // 1. Gatekeeper: Cek Login
-        if (!isset($_SESSION['login'])) {
+        if (!isset($_SESSION['id_user'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
 
-        // 2. Load Model Utama Sekali Saja
-        $this->peminjamanModel = $this->model('Peminjaman_model');
-    }
-    
-    /**
-     * Menampilkan daftar peminjaman dengan fitur Filter (Jenis & Status).
-     */
-    public function index() {
-        $data['judul'] = 'Peminjaman';
+        $data['judul'] = 'Barang Laboratorium';
         $data['id_user'] = $_SESSION['id_user'];
-        
-        // Load Profile User
         $data['profile'] = $this->model("User_model")->profile($data);
-    
-        // Ambil daftar sub_barang untuk Dropdown Filter
-        $data['sub_barang'] = $this->peminjamanModel->getSubBarang();
-    
-        // -----------------------------------------------------------
-        // LOGIKA FILTER (Disimpan dalam SESSION)
-        // -----------------------------------------------------------
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Set Filter Sub Barang
-            if (!empty($_POST['sub_barang'])) {
-                $_SESSION['filter_sub_barang'] = $_POST['sub_barang'];
-            } else {
-                unset($_SESSION['filter_sub_barang']); // Reset jika kosong
-            }
 
-            // Set Filter Status
-            if (!empty($_POST['status'])) {
-                $_SESSION['filter_status'] = $_POST['status'];
-            } else {
-                unset($_SESSION['filter_status']); // Reset jika kosong
-            }
-        }
-    
-        // Ambil data berdasarkan Filter yang tersimpan di Session
-        // Menggunakan Null Coalescing Operator (??) untuk nilai default string kosong
-        $filterBarang = $_SESSION['filter_sub_barang'] ?? '';
-        $filterStatus = $_SESSION['filter_status'] ?? '';
+        $PeminjamanModel = $this->model('Peminjaman_model');
 
-        $data['peminjaman'] = $this->peminjamanModel->getPeminjamanByFilters($filterBarang, $filterStatus);
-    
-        // Format tanggal agar enak dibaca user (d-m-Y)
-        // Menggunakan reference (&) untuk memodifikasi array asli secara langsung
-        foreach ($data['peminjaman'] as &$row) {
-            $row['tanggal_pengajuan'] = date('d-m-Y', strtotime($row['tanggal_pengajuan']));
-        }
-    
+        $data['barang'] = $PeminjamanModel->getAllBarang();
+        $data['sub_barang'] = $PeminjamanModel->getSubBarang();
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Peminjaman/index', $data);
         $this->view('templates/footer');
     }
-    
-    /**
-     * Menampilkan detail peminjaman spesifik.
-     */
-    public function detail($id_peminjaman) {
-        $data['judul'] = 'Detail Peminjaman';
-        $data['dataTampilPeminjaman'] = $this->peminjamanModel->getDetailDataPeminjaman($id_peminjaman);
 
-        // Pastikan view yang dipanggil benar (di kode asli Anda memanggil DetailBarang/index, 
-        // pastikan ini disengaja atau seharusnya Peminjaman/detail)
+    public function cari()
+    {
+        if (!isset($_SESSION)) session_start();
+
+        $data['judul'] = 'Pencarian Barang';
+        $data['profile'] = $this->model("User_model")->profile(['id_user' => $_SESSION['id_user']]);
+        $PeminjamanModel = $this->model('Peminjaman_model');
+
+        if (isset($_POST['keyword'])) {
+            $data['barang'] = $PeminjamanModel->cariBarang($_POST['keyword']);
+        } else {
+            $data['barang'] = $PeminjamanModel->getAllBarang();
+        }
+
+        $data['sub_barang'] = $PeminjamanModel->getSubBarang();
+
         $this->view('templates/header', $data);
-        $this->view('DetailBarang/index', $data); 
+        $this->view('templates/sidebar', $data);
+        $this->view('Peminjaman/index', $data);
         $this->view('templates/footer');
     }
 
-    /**
-     * Proses tambah peminjaman baru.
-     */
-    public function tambahPeminjaman() {
-        // Validasi Field Wajib
-        $requiredKeys = ['nama_peminjam','judul_kegiatan', 'tanggal_peminjaman', 'tanggal_pengembalian', 'id_jenis_barang', 'jumlah_peminjaman', 'keterangan_peminjaman'];
+    public function tambahItem($id_barang)
+    {
+        if (!isset($_SESSION)) session_start();
 
-        foreach ($requiredKeys as $key) {
-            if (empty($_POST[$key])) {
-                Flasher::setFlash('Gagal', 'Input data tidak lengkap.', ' Pastikan semua field terisi.', 'danger');
-                header('Location: ' . BASEURL . 'Peminjaman');
-                exit;
+        if (!isset($_SESSION['keranjang'])) {
+            $_SESSION['keranjang'] = [];
+        }
+
+        if (!in_array($id_barang, $_SESSION['keranjang'])) {
+            $_SESSION['keranjang'][] = $id_barang;
+        }
+
+        header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+        exit;
+    }
+
+    public function formPeminjaman()
+    {
+        $data['judul'] = 'Form Pengajuan Peminjaman';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['profile'] = $this->model("User_model")->profile($data);
+
+        if (isset($_SESSION['keranjang']) && !empty($_SESSION['keranjang'])) {
+            $barang_selected = $this->model('Peminjaman_model')->getBarangWhereIn($_SESSION['keranjang']);
+
+            foreach ($barang_selected as $key => $item) {
+                $units = $this->model('Peminjaman_model')->getUnitBarangTersedia($item['id_jenis_barang']);
+                $barang_selected[$key]['list_unit'] = $units;
+            }
+
+            $data['barang_selected'] = $barang_selected;
+        } else {
+            $data['barang_selected'] = [];
+        }
+
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data);
+        $this->view('Peminjaman/from', $data);
+        $this->view('templates/footer');
+    }
+
+    public function prosesTambahPeminjaman()
+    {
+        if (empty($_POST['id_jenis_barang'])) {
+            Flasher::setFlash('Tidak ada barang yang dipilih.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+
+        $dataUser['id_user'] = $_SESSION['id_user'];
+        $userProfile = $this->model('User_model')->profile($dataUser);
+        
+        $dataPayload = $_POST;
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user']; 
+
+        if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
+            unset($_SESSION['keranjang']); 
+            Flasher::setFlash('Pengajuan berhasil! Silakan lengkapi surat.', 'berhasil', '', 'success');
+            header('Location: ' . BASEURL . 'Riwayat'); 
+            exit;
+        } else {
+            Flasher::setFlash('Gagal mengajukan peminjaman.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+    }
+
+    public function hapusItem($id_barang)
+    {
+        if (!isset($_SESSION)) session_start();
+
+        if (isset($_SESSION['keranjang'])) {
+            $key = array_search($id_barang, $_SESSION['keranjang']);
+            
+            if ($key !== false) {
+                unset($_SESSION['keranjang'][$key]);
+                $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
             }
         }
 
-        // Validasi Logika Tanggal
-        if (strtotime($_POST['tanggal_pengembalian']) < strtotime($_POST['tanggal_peminjaman'])) {
-            Flasher::setFlash('Gagal', 'Tanggal Invalid.', ' Tanggal pengembalian tidak boleh lebih awal dari peminjaman.', 'danger');
-            header('Location: ' . BASEURL . 'Peminjaman');
-            exit;
-        }
-
-        // Set Default Status jika kosong
-        if (empty($_POST['status'])) {
-            $_POST['status'] = 'Diproses';
-        }
-
-        // Proses Insert
-        if ($this->peminjamanModel->postDataPeminjaman($_POST) > 0) {
-            Flasher::setFlash('Peminjaman', 'berhasil', 'diajukan/ditambahkan', 'success');
-        } else {
-            Flasher::setFlash('Peminjaman', 'gagal', 'ditambahkan', 'danger');
-        }
-
-        header('Location: ' . BASEURL . 'Peminjaman');
+        header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
         exit;
-    }
-
-    /**
-     * Proses hapus peminjaman.
-     * Dilengkapi penanganan error Foreign Key.
-     */
-    public function hapusPeminjaman($id_peminjaman) {
-        if (empty($id_peminjaman)) {
-            Flasher::setFlash('Error', 'ID tidak valid.', '', 'danger');
-            header('Location: ' . BASEURL . 'Peminjaman');
-            exit;
-        }
-
-        $status = $this->peminjamanModel->hapusDataPeminjaman($id_peminjaman);
-
-        if ($status > 0) {
-            Flasher::setFlash('Data Peminjaman', 'berhasil', 'dihapus', 'success');
-        } elseif ($status == -1) {
-            // Pesan Khusus jika data sudah masuk transaksi Pengembalian
-            Flasher::setFlash('Gagal Dihapus!', 'Data Terkunci.', ' Transaksi ini mungkin sudah memiliki data pengembalian.', 'danger');
-        } else {
-            Flasher::setFlash('Data Peminjaman', 'gagal', 'dihapus', 'danger');
-        }
-
-        header('Location: ' . BASEURL . 'Peminjaman');
-        exit;
-    }
-
-    /**
-     * Mengambil data untuk Modal Edit (AJAX).
-     */
-    public function getUbah() {
-        if (empty($_POST['id_peminjaman'])) {
-            echo json_encode(['error' => 'ID tidak ditemukan']);
-            return;
-        }
-        echo json_encode($this->peminjamanModel->getDetailDataPeminjaman($_POST['id_peminjaman']));
     }
     
-    /**
-     * Proses simpan perubahan data.
-     */
-    public function ubahPeminjaman() {
-        if ($this->peminjamanModel->ubahDataPeminjaman($_POST) > 0) {
-            Flasher::setFlash('Data Peminjaman', 'berhasil', 'diubah', 'success');
-        } else {
-            Flasher::setFlash('Data Peminjaman', 'tidak ada', 'yang diubah', 'warning');
+    public function detail($id_peminjaman)
+    {
+        $data['judul'] = 'Detail Peminjaman';
+        $data['dataTampilPeminjaman'] = $this->model('Peminjaman_model')->getDetailDataPeminjaman($id_peminjaman);
+
+        $this->view('templates/header', $data);
+        $this->view('templates/DetailBarang/index', $data);
+        $this->view('templates/footer');
+    }
+
+    public function tambahBarang($id_peminjaman)
+    {
+        $header = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
+        $details = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
+
+        if (!$header) {
+            Flasher::setFlash('Data transaksi tidak ditemukan.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
         }
-        header('Location: ' . BASEURL . 'Peminjaman');
+
+        $_SESSION['keranjang'] = [];
+        $edit_details_map = []; 
+
+        foreach ($details as $item) {
+            $_SESSION['keranjang'][] = $item['id_jenis_barang'];
+
+            $edit_details_map[$item['id_jenis_barang']] = [
+                'jumlah'     => $item['jumlah'],
+                'keterangan' => $item['id_barang'] 
+            ];
+        }
+
+        $_SESSION['edit_mode'] = true;
+        $_SESSION['edit_id_peminjaman'] = $id_peminjaman;
+        $_SESSION['edit_header'] = $header;
+        $_SESSION['edit_details_map'] = $edit_details_map;
+
+        header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
         exit;
+    }
+
+    public function prosesUpdatePeminjaman()
+    {
+        if (!isset($_SESSION['edit_id_peminjaman'])) {
+            header('Location: ' . BASEURL . 'Peminjaman');
+            exit;
+        }
+
+        $dataUser['id_user'] = $_SESSION['id_user'];
+        $userProfile = $this->model('User_model')->profile($dataUser);
+
+        $dataPayload = $_POST;
+        $dataPayload['id_peminjaman'] = $_SESSION['edit_id_peminjaman']; 
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
+        $dataPayload['status'] = 'Melengkapi Surat'; 
+
+        if ($this->model('Peminjaman_model')->ubahDataPeminjaman($dataPayload) >= 0) {
+            unset($_SESSION['keranjang']);
+            unset($_SESSION['edit_mode']);
+            unset($_SESSION['edit_id_peminjaman']);
+            unset($_SESSION['edit_header']);
+            unset($_SESSION['edit_details_map']);
+
+            Flasher::setFlash('Data peminjaman berhasil diperbarui.', 'berhasil', '', 'success');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        } else {
+            Flasher::setFlash('Gagal memperbarui data.', 'gagal', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+    }
+
+    public function tolakPengembalian()
+    {
+        if (!isset($_SESSION['login'])) {
+            header("Location:" . BASEURL . "Login");
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id_peminjaman = $_POST['id_peminjaman'];
+            $alasan        = $_POST['alasan_penolakan'];
+
+            if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
+                Flasher::setFlash('Berhasil', 'Pengembalian ditolak. Alasan tersimpan.', '', 'warning');
+            } else {
+                Flasher::setFlash('Gagal', 'Gagal menyimpan penolakan.', '', 'danger');
+            }
+
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            exit;
+        }
     }
 }

@@ -1,250 +1,184 @@
 <?php
-if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
-    header("Location:" . BASEURL . "Login");
-    exit;
-}
+    if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
+        header("Location:" . BASEURL . "Login");
+        exit;
+    }
 ?>
 
-<!-- ================= MODAL KELUAR ================= -->
-<div class="modal fade" id="konfirmasiKeluar" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content modal-card">
-      <div class="modal-body modal-body-center">
-
-        <lottie-player
-          src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-          class="w-[250px] h-[250px]"
-          loop autoplay>
-        </lottie-player>
-
-        <p class="modal-text">
-          Apakah anda yakin ingin keluar?
-        </p>
-
-      </div>
-      <div class="modal-footer">
-        <button class="btn-light-custom" data-dismiss="modal">Batal</button>
-        <button class="btn-danger-custom"
-          onclick="location.href='<?= BASEURL; ?>Logout'">
-          Keluar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= CONTENT ================= -->
 <div class="content">
-  <div class="content-wrapper">
+    <div class="content-beranda">
+        
+        <h3 id="title">Kelola akun</h3>
 
-    <h3 class="page-title">Kelola Akun</h3>
-
-    <div class="flash-wrapper">
-      <?php Flasher::flash(); ?>
-    </div>
-
-    <div class="feature-bar">
-      <button
-        onclick="location.href='<?= BASEURL; ?>Register'"
-        class="btn-primary-custom">
-        <i class="fa-solid fa-plus text-white"></i>
-        Tambah
-      </button>
-    </div>
-
-    <!-- ================= TABLE WRAPPER ================= -->
-    <div class="table-wrapper">
-
-      <!-- HEADER TABLE -->
-      <div class="table-header">
-
-        <!-- Show Entries -->
-        <div class="flex items-center text-sm gap-2">
-          <label>
-            Show
-            <select class="form-control form-control-sm inline-block mx-2 w-auto">
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-            </select>
-            entries
-          </label>
+        <div class="flash" style="width: 100%; margin-bottom: 20px;">
+            <?php Flasher::flash();?>
         </div>
 
-        <!-- Search -->
-        <div class="search-box">
-          <button class="search-button">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-              fill="white" width="20" height="20">
-              <path
-                d="M10 2a8 8 0 016.32 12.9l5.38 5.38a1 1 0 01-1.42 1.42l-5.38-5.38A8 8 0 1110 2z"/>
-            </svg>
-          </button>
-          <input
-            type="text"
-            id="customSearch"
-            class="search-input"
-            placeholder="Cari">
+        <div class="stats-container">
+            <div class="card-stat dark">
+                <div>
+                    <h5>Total admin</h5>
+                    <h2>1</h2>
+                </div>
+                <div class="card-icon">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+            </div>
+
+            <div class="card-stat light">
+                <div>
+                    <h5>Total asisten</h5>
+                    <h2>3</h2>
+                </div>
+                <div class="card-icon">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+            </div>
+
+            <div class="card-stat light">
+                <div>
+                    <h5>Total user</h5>
+                    <h2>10</h2>
+                </div>
+                <div class="card-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
         </div>
 
-      </div>
-
-      <!-- ================= TABLE ================= -->
-      <table id="myTable" class="table table-hover table-sm table-text">
-        <thead class="table-info">
-          <tr>
-            <th class="table-cell">No</th>
-            <th class="table-cell">Foto</th>
-            <th class="table-cell">Nama User</th>
-            <th class="table-cell">Email</th>
-            <th class="table-cell">No HP</th>
-            <th class="table-cell">Jenis Kelamin</th>
-            <th class="table-cell">Alamat</th>
-            <th class="table-cell">Role</th>
-            <th class="table-cell">Aksi</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <?php $i = 1; foreach ($data['dataTampilUser'] as $row): ?>
-          <tr>
-
-            <td class="table-cell"><?= $i++; ?></td>
-
-            <td class="table-cell">
-              <?php if ($row['foto'] == "../public/img/foto-profile/"): ?>
-                <img src="<?= BASEURL . $row['foto']; ?>/user.svg" class="profile-img">
-              <?php else: ?>
-                <img src="<?= BASEURL . $row['foto']; ?>" class="profile-img">
-              <?php endif; ?>
-            </td>
-
-            <td class="table-cell"><?= $row['nama_user']; ?></td>
-            <td class="table-cell"><?= $row['email']; ?></td>
-            <td class="table-cell"><?= $row['no_hp_user']; ?></td>
-            <td class="table-cell"><?= $row['jenis_kelamin']; ?></td>
-            <td class="table-cell"><?= $row['alamat']; ?></td>
-            <td class="table-cell"><?= $row['role']; ?></td>
-
-            <td class="table-cell table-action">
-
-              <!-- HAPUS -->
-              <a data-toggle="modal"
-                 data-target="#konfirmasiHapus<?= $row['id_user']; ?>">
-                <i class="fa-solid fa-trash-can text-red-600 text-lg"></i>
-              </a>
-
-              <!-- UBAH -->
-              <a href="<?= BASEURL; ?>KelolaAkun/ubahRole/<?= $row['id_user']; ?>"
-                 data-toggle="modal"
-                 data-target="#modalTambah">
-                <i class="fa-solid fa-pen-to-square text-green-600 text-lg"></i>
-              </a>
-
-            </td>
-          </tr>
-
-          <!-- MODAL HAPUS -->
-          <div class="modal fade"
-               id="konfirmasiHapus<?= $row['id_user']; ?>"
-               tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content modal-card">
-                <div class="modal-body modal-body-center">
-
-                  <lottie-player
-                    src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
-                    class="w-[250px] h-[250px]"
-                    loop autoplay>
-                  </lottie-player>
-
-                  <p class="modal-text">
-                    Apakah anda yakin ingin menghapus item ini?
-                  </p>
-
-                </div>
-                <div class="modal-footer">
-                  <button class="btn-light-custom" data-dismiss="modal">Batal</button>
-                  <button class="btn-danger-custom"
-                    onclick="location.href='<?= BASEURL; ?>KelolaAkun/hapusUser/<?= $row['id_user']; ?>'">
-                    Hapus
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-
-    </div>
-  </div>
-</div>
-
-<!-- ================= MODAL UBAH ROLE ================= -->
-<div class="modal fade" id="modalTambah" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content modal-card">
-      <div class="modal-header">
-        <h5 class="modal-title">Ubah Role User</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-
-      <div class="modal-body">
-        <form action="<?= BASEURL; ?>KelolaAkun/ubahRole" method="post">
-          <input type="hidden" name="id_user" id="id_user">
-
-          <div class="space-y-3">
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="1" required>
-              <label>KEPALA LAB</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="2">
-              <label>LABORAN</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="3">
-              <label>KOORDINATOR LAB</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="4">
-              <label>ASISTEN</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="5">
-              <label>CALON ASISTEN</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="6">
-              <label>CALON CALON ASISTEN</label>
-            </div>
-
-            <div class="role-item">
-              <input type="radio" name="id_role" value="7">
-              <label>MAHASISWA</label>
-            </div>
-
-          </div>
-
-          <div class="submit-wrapper mt-6">
-            <button type="submit"
-              class="submit-btn"
-              onclick="return confirm('yakin');">
-              Kirim
+        <div class="action-bar">
+            <button onclick="location.href='<?=BASEURL;?>Register'" class="btn-tambah">
+                <i class="fa-solid fa-plus"></i> Tambah
             </button>
-          </div>
 
-        </form>
-      </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="customSearch" placeholder="Search...">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table id="myTable" class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">No</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Role</th> <th>No Hp</th>
+                        <th>Alamat</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $i = 1; ?>
+                    <?php foreach ($data['dataTampilUser'] as $row): ?>
+                    <tr>
+                        <td><?= $i++; ?></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span><?= $row['nama_user']; ?></span>
+                            </div>
+                        </td>
+                        <td><?= $row['email']; ?></td>
+                        <td><?= $row['role']; ?></td>
+                        <td><?= $row['no_hp_user']; ?></td>
+                        <td><?= $row['alamat']; ?></td>
+                        <td style="text-align: center;">
+                            <button class="btn-action btnUbahRole" 
+                                    data-toggle="modal" 
+                                    data-target="#modalRole"
+                                    onclick="setModalData('<?=$row['id_user']?>', '<?=$row['id_role'] //Asumsi ada id_role di row?>')"> 
+                                <i class="fa-regular fa-pen-to-square" style="color: #30cc30;"></i>
+                            </button>
+                            
+                            <button class="btn-action" data-toggle="modal" data-target="#konfirmasiHapus<?=$row['id_user']?>">
+                                <i class="fa-regular fa-trash-can" style="color: #cc3030;"></i>
+                            </button>
+
+                            <div class="modal fade" id="konfirmasiHapus<?=$row['id_user']?>" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content" style="border-radius: 15px;">
+                                        <div class="modal-body d-flex flex-column align-items-center">
+                                            <lottie-player src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
+                                                background="##FFFFFF" speed="1" style="width: 250px; height: 250px" loop autoplay direction="1" mode="normal"></lottie-player>
+                                            <p style="color:#385161; opacity: 0.6; font-weight: 500;">Yakin ingin menghapus data ini?</p>
+                                        </div>
+                                        <div class="modal-footer border-0">
+                                            <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
+                                            <button type="button" class="btn btn-danger"
+                                                onclick="location.href='<?=BASEURL;?>KelolaAkun/hapusUser/<?= $row['id_user']; ?>'">Hapus</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
     </div>
-  </div>
 </div>
+
+<div class="modal fade" id="modalRole" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 700px;">
+        <div class="modal-content modal-content-custom">
+            
+            <button type="button" class="close btn-close-custom" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+
+            <h2 class="modal-title-custom">Ubah role user</h2>
+
+            <form action="<?=BASEURL?>KelolaAkun/ubahRole" method="post">
+                <input type="hidden" name="id_user" id="id_user_modal">
+                
+                <div class="modal-body-layout">
+                    <div class="role-list">
+                        <?php 
+                        // Daftar Role Lengkap Anda
+                        $roles = [
+                            1 => 'Kepala Lab', 
+                            2 => 'Laboran', 
+                            3 => 'Koordinator Lab', 
+                            4 => 'Asisten', 
+                            5 => 'Calon Asisten', 
+                            6 => 'Calon Calon Asisten', 
+                            7 => 'Mahasiswa'
+                        ];
+                        ?>
+                        <?php foreach($roles as $val => $label): ?>
+                        <label class="radio-item">
+                            <input type="radio" name="id_role" value="<?=$val?>" required>
+                            <?=$label?>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="illustration-container">
+                        <i class="fa-solid fa-stairs" style="font-size: 150px; color: black;"></i>
+                    </div>
+                </div>
+
+                <div class="modal-footer-custom">
+                    <button type="submit" class="btn-simpan">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fungsi ini dipanggil saat tombol edit diklik
+    // Pastikan Anda memanggil ini di tombol edit tabel: onclick="setModalData('ID_USER_DISINI')"
+    function setModalData(id) {
+        document.getElementById('id_user_modal').value = id;
+    }
+    
+    // Opsional: Jika ingin jQuery untuk bootstrap modal events
+    $('.btnUbahRole').on('click', function() {
+        var id = $(this).data('user');
+        $('#id_user_modal').val(id);
+    });
+</script>

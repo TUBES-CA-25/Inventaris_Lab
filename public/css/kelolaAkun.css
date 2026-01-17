@@ -1,99 +1,318 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* ===== Modal ===== */
-.modal-card {
-  @apply rounded-2xl;
+:root {
+    --primary-color: #0c1740; /* Biru Tua */
+    --white: #ffffff;
+    --bg-color: #f8f9fa;
+    --border-radius: 12px;
 }
 
-.modal-body-center {
-  @apply flex flex-col items-center justify-center text-center;
+body {
+    background-color: var(--bg-color);
+    font-family: 'Poppins', sans-serif;
 }
 
-.modal-text {
-  @apply text-[#385161] opacity-60 font-medium text-base;
+/* --- JUDUL HALAMAN --- */
+h3#title {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 26px;
+    margin-bottom: 30px;
+    padding: 0 !important;
 }
 
-/* ===== Button ===== */
-.btn-primary-custom {
-  @apply flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white bg-blue-900 shadow-lg;
+/* --- STATS CARDS --- */
+.stats-container {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
 }
 
-.btn-danger-custom {
-  @apply w-24 bg-red-600 text-white rounded-md;
+.card-stat {
+    flex: 1;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s;
 }
 
-.btn-light-custom {
-  @apply w-24 bg-gray-200 text-gray-800 rounded-md;
+.card-stat:hover {
+    transform: translateY(-5px);
 }
 
-/* ===== Content ===== */
-.content-wrapper {
-  @apply overflow-hidden;
+.card-stat.dark {
+    background-color: var(--primary-color);
+    color: var(--white);
 }
 
-.page-title {
-  @apply text-xl font-semibold mb-4;
+.card-stat.light {
+    background-color: var(--white);
+    color: var(--primary-color);
+    border: 1px solid #eee;
 }
 
-.flash-wrapper {
-  @apply w-2/5 ml-4;
+.card-stat h5 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
-.feature-bar {
-  @apply flex justify-between mb-4;
+.card-stat h2 {
+    font-size: 42px;
+    font-weight: 700;
+    margin: 0;
 }
 
-/* ===== Table Container ===== */
-.table-wrapper {
-  @apply max-h-[400px] overflow-y-auto shadow-lg rounded-md p-4 pt-0;
+.card-icon {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    font-size: 32px;
 }
 
-.table-header {
-  @apply sticky top-0 z-10 bg-white flex items-center justify-between h-20 mb-5;
+/* --- ACTION BAR --- */
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* ===== Search ===== */
+.btn-tambah {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: opacity 0.3s;
+}
+
+.btn-tambah:hover {
+    opacity: 0.9;
+    text-decoration: none;
+    color: white;
+}
+
 .search-box {
-  @apply flex items-center shadow-lg rounded-lg overflow-hidden w-80;
+    position: relative;
+    width: 300px;
 }
 
-.search-button {
-  @apply bg-blue-900 w-10 h-10 flex items-center justify-center;
+.search-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
 }
 
-.search-input {
-  @apply flex-1 px-4 py-2 outline-none border-none;
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
 }
 
-/* ===== Table ===== */
-.table-text {
-  @apply text-sm;
+/* --- TABLE STYLING (UPDATED) --- */
+.table-responsive {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    background-color: white; /* Pastikan background container putih */
 }
 
-.table-cell {
-  @apply p-2 whitespace-nowrap;
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
 }
 
-.table-action {
-  @apply flex gap-2;
+/* Style Header Tabel */
+.custom-table thead {
+    background-color: var(--primary-color);
+    color: white;
 }
 
-/* ===== Image ===== */
-.profile-img {
-  @apply w-24 h-24 object-cover;
+.custom-table thead th {
+    padding: 18px 15px;
+    font-weight: 500;
+    font-size: 14px;
+    text-align: left;
+    border: none;
+    position: relative; /* Untuk positioning icon sorting */
 }
 
-/* ===== Form ===== */
-.role-item {
-  @apply flex items-center gap-2;
+/* 1. MENGHILANGKAN HOVER HEADER
+/* Memaksa background tetap biru tua saat di-hover */
+.custom-table thead tr:hover {
+    background-color: var(--primary-color) !important;
+}
+.custom-table thead th:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+} */
+
+/* 2. MEMBUAT SORTING LEBIH CERAH (DataTables Support) */
+/* Biasanya DataTables menggunakan pseudo-element ::before dan ::after untuk panah */
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc:after {
+    opacity: 1 !important;        /* Membuat ikon tidak transparan (jelas) */
+    color: #ffffff !important;    /* Warna Putih Terang */
+    font-size: 0.9em !important;  /* Sedikit memperjelas ukuran */
 }
 
-.submit-wrapper {
-  @apply flex justify-end;
+/* Menghilangkan background image default jika ada tabrakan style */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none !important;
 }
 
-.submit-btn {
-  @apply px-6 py-2 bg-blue-900 text-white rounded-md;
+/* --- Body Table Style --- */
+.custom-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+/* Efek hover HANYA pada baris isi (tbody), BUKAN header */
+.custom-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Action Icons */
+.btn-action {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+}
+
+/* --- MODAL STYLING --- */
+.modal-content-custom {
+    border-radius: 20px;
+    border: none;
+    padding: 20px;
+    position: relative;
+}
+
+.btn-close-custom {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+.modal-title-custom {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    margin-top: 10px;
+}
+
+.modal-body-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.role-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+.radio-item input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 4px solid var(--primary-color);
+    border-radius: 50%;
+    margin-right: 15px;
+    display: grid;
+    place-content: center;
+    transition: 0.2s;
+}
+
+.radio-item input[type="radio"]::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.radio-item input[type="radio"]:checked {
+    background-color: var(--primary-color); 
+    border-color: var(--primary-color);
+}
+.radio-item input[type="radio"]:checked::before {
+    background: white;
+}
+
+.illustration-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.btn-simpan {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 40px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    font-size: 16px;
+    transition: opacity 0.3s;
+}
+
+.btn-simpan:hover {
+    opacity: 0.9;
+    cursor: pointer;
 }

@@ -1,114 +1,103 @@
-<style>
-    /* @media print {
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Inventaris Barang</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="<?= BASEURL; ?>/css/ExportDetailBarang.css">
+    
+</head>
+<body>
 
-        button,
-        img {
-            display: none;
-        }
-
-        
-    } */
-
-
-    button:hover {
-        cursor: pointer;
-        opacity: 0.9;
-    }
-
-    button {
-        width: 150px;
-        height: 47px;
-        border-radius: 8px;
-        background-color: #0c1740;
-        color: white;
-        font-family: "Poppins", sans-serif;
-        font-weight: 500;
-        font-size: 15px;
-        border: none;
-    }
-
-    .buttons-excel,
-    .buttons-print,
-    .buttons-copy,
-    .buttons-csv,
-    .buttons-colvis{
-        box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5);
-        border-radius: 8px;
-        background-color: #0c1740;
-        width: 170px;
-        border: none;
-    }
-
-    .buttons-excel:hover,
-    .buttons-print:hover,
-    .buttons-csv:hover,
-    .buttons-copy:hover,
-    .buttons-colvis:hover{
-        background-color: #0c1740;
-    }
-
-</style>
-
-<div class="card-body p-3">
-    <div class="header" style="display: flex; padding:20px;">
-        <img src="<?=BASEURL;?>img/logo bg putih.svg" alt="logo" />
-        <div class="button"
-            style="padding-top:10px; width:100%; display:flex; align-items:end; gap:10px; flex-direction:column;">
-            <button style="box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5); font-weight:600;"
-            onclick="location.href='<?=BASEURL?>DetailBarang'"><i class="fa-solid fa-arrow-left" style="color: #ffffff; margin-right:10px;"></i>Kembali</button>
+<div class="container-box">
+    <div class="header-laporan">
+        <img id="logoImage" src="<?=BASEURL;?>img/logo bg putih.svg" alt="Logo" crossorigin="anonymous">
+        <div class="header-text">
+            <h2>Laporan Inventaris Barang</h2>
+            <p>Dicetak pada: <?= date('d F Y, H:i'); ?></p>
+            <p>User: <?= $_SESSION['nama_user'] ?? 'Admin'; ?></p>
         </div>
     </div>
-    <div style="height:100%; padding:20px;box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.5); border-radius:10px;">
-    <table id="example" class="table display nowrap" style="font-size:14px;">
-        <thead class="table-info">
+
+    <div class="toolbar-container">
+        <a href="<?= BASEURL ?>DetailBarang" class="btn-action btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+        <div class="btn-group">
+            <button id="triggerExcel" class="btn-action btn-excel"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button id="triggerPdf" class="btn-action btn-pdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button id="triggerPrint" class="btn-action btn-print"><i class="fa-solid fa-print"></i> Print</button>
+        </div>
+    </div>
+
+    <table id="tableExport" class="display nowrap" style="width:100%">
+        <thead>
             <tr>
-                <th scope="col" class="p-3">No.</th>
-                <th scope="col" class="p-3">Qr code</th>
-                <th scope="col" class="p-3">Foto</th>
-                <th scope="col" class="p-3">Kode barang</th>
-                <th scope="col" class="p-3">Sub barang</th>
-                <th scope="col" class="p-3">Nama merek</th>
-                <th scope="col" class="p-3">Deskripsi barang</th>
-                <th scope="col" class="p-3">Jumlah barang</th>
-                <th scope="col" class="p-3">Nama satuan</th>
-                <th scope="col" class="p-3">Tgl pengadaan</th>
-                <th scope="col" class="p-3">Lokasi penyimpanan</th>
-                <th scope="col" class="p-3">Detail lokasi</th>
-                <th scope="col" class="p-3">Keterangan label</th>
-                <th scope="col" class="p-3">Kondisi barang</th>
-                <th scope="col" class="p-3">Status</th>
-                <th scope="col" class="p-3">Status peminjaman</th>
+                <th width="3%">No</th> 
+                <th>Kode</th> 
+                <th>Nama Barang</th> 
+                <th>Merek</th> 
+                <th>Jml</th> 
+                <th>Satuan</th>
+                <th>Kondisi</th> 
+                <th>Lokasi</th> 
+                <th>Status</th> 
+                <th>Spesifikasi</th> 
+                <th>Tgl Ada</th>
+                <th>Pinjam</th> 
+                <th>QR</th> 
+                <th>Foto</th>
             </tr>
         </thead>
         <tbody>
-            
-        <?php $i = 1; 
-    ?>
-    <?php foreach ($data['dataCetak'] as $row): ?>
-
+            <?php $i = 1; if (!empty($data['dataCetak'])) : foreach ($data['dataCetak'] as $row): $item = isset($row[0]) ? $row[0] : $row; ?>
             <tr>
-                <td scope="row" class="p-3"><?= $i++; ?></td>
-                <td class="p-3"><img class="qr" src="<?=BASEURL . $row[0]['qr_code']; ?>" style="width:100px;height:100px;" alt=""></td>
-                <td class="p-3"><img src="<?=BASEURL . $row[0]['foto_barang']; ?>" style="width:100px;height:100px;" alt=""></td>
-                <td class="p-3"><?= $row[0]['kode_barang']; ?></td>
-                <td class="p-3" style="text-transform: capitalize;"><?= $row[0]['sub_barang']; ?></td>
-                <td class="p-3" style="text-transform: capitalize;"><?= $row[0]['nama_merek_barang']; ?></td>
-                <td class="p-3" style="text-transform: capitalize;"><?= $row[0]['deskripsi_barang']; ?></td>
-                <td class="p-3"><?= $row[0]['jumlah_barang']; ?></td>
-                <td class="p-3"><?= $row[0]['nama_satuan']; ?></td>
-                <td class="p-3"><?= $row[0]['tgl_pengadaan_barang']; ?></td>
-                <td class="p-3"><?= $row[0]['nama_lokasi_penyimpanan']; ?></td>
-                <td class="p-3" style="text-transform: capitalize;"><?= $row[0]['deskripsi_detail_lokasi']; ?></td>
-                <td class="p-3"><?= $row[0]['keterangan_label']; ?></td>
-                <td class="p-3"><?= $row[0]['kondisi_barang']; ?></td>
-                <td class="p-3"><?= $row[0]['status']; ?></td>
-                <td class="p-3"><?= $row[0]['status_peminjaman']; ?></td>
+                <td class="text-center"><?= $i++; ?></td>
+                <td><strong><?= $item['kode_barang']; ?></strong></td>
+                <td><?= $item['sub_barang']; ?></td>
+                <td><?= $item['nama_merek_barang']; ?></td>
+                <td class="text-center"><?= $item['jumlah_barang']; ?></td>
+                <td><?= $item['nama_satuan']; ?></td>
+                <td><?= $item['kondisi_barang']; ?></td>
+                <td><?= $item['nama_lokasi_penyimpanan']; ?></td>
+                <td><?= $item['status']; ?></td>
+                <td><?= $item['spesifikasi_barang']; ?></td> 
+                <td><?= $item['tgl_pengadaan_barang']; ?></td>
+                <td><?= $item['status_peminjaman']; ?></td>
+                
+                <td class="text-center">
+                    <?php if(!empty($item['qr_code'])): ?>
+                        <img src="<?=BASEURL . $item['qr_code']; ?>" class="img-preview" crossorigin="anonymous">
+                    <?php endif; ?>
+                </td>
+                
+                <td class="text-center">
+                    <?php if(!empty($item['foto_barang'])): ?>
+                        <img src="<?=BASEURL . $item['foto_barang']; ?>" class="img-preview" crossorigin="anonymous">
+                    <?php endif; ?>
+                </td>
             </tr>
-        
-    <?php endforeach; ?>
-</tbody>
-
+            <?php endforeach; endif; ?>
+        </tbody>
     </table>
-    </div>
-
 </div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<script src="<?= BASEURL; ?>/js/export.js"></script>
+
+</body>
+</html>
+
+
+
