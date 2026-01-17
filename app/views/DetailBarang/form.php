@@ -4,8 +4,6 @@ if (!isset($_SESSION['login'])) {
     exit;
 }
 
-// LOGIKA DETEKSI MODE (TAMBAH / UBAH)
-// Jika ada data['barang'], berarti mode UBAH.
 $isEdit = isset($data['barang']);
 $barang = $isEdit ? $data['barang'] : [];
 $title = $isEdit ? "Ubah Data Barang" : "Tambah Barang Baru";
@@ -33,128 +31,140 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 
                     <div class="left-column">
 
-                        <div class="form-group mb-4 input-group-custom" id="group-jenis">
+                        <div class="form-group mb-4" id="group-jenis">
                             <label class="form-label">Jenis Barang</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="sub_barang" id="select-jenis" class="form-select"
+                                    onfocus="this.dataset.prev = this.value;"
+                                    onchange="checkSelection('jenis')" required>
+                                    <option value="">-- Pilih Jenis --</option>
+                                    <?php foreach ($data['sub_barang'] as $opt) : ?>
+                                        <option value="<?= $opt['id_jenis_barang'] ?>"
+                                            <?= ($isEdit && $barang['id_jenis_barang'] == $opt['id_jenis_barang']) ? 'selected' : '' ?>>
+                                            <?= $opt['sub_barang'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Jenis Baru</option>
+                                </select>
 
-                            <select name="sub_barang" id="select-jenis" class="form-select" onchange="toggleInput('jenis')" required>
-                                <option value="">-- Pilih Jenis --</option>
-                                <?php foreach ($data['sub_barang'] as $opt) : ?>
-                                    <option value="<?= $opt['id_jenis_barang'] ?>"
-                                        <?= ($isEdit && $barang['id_jenis_barang'] == $opt['id_jenis_barang']) ? 'selected' : '' ?>>
-                                        <?= $opt['sub_barang'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Jenis Baru</option>
-                            </select>
-
-                            <div id="input-container-jenis" style="display:none; width: 100%;">
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" name="sub_barang_baru" id="input-jenis" class="form-input"
-                                        placeholder="Nama Jenis (Ex: Mouse)" style="flex: 2;" disabled>
-                                    <input type="text" name="grup_sub_baru" id="input-grup-jenis" class="form-input"
-                                        placeholder="Grup (Ex: C)" style="flex: 1;" maxlength="1"
-                                        style="text-transform:uppercase" disabled title="Kode Grup">
-                                </div>
+                                <button type="button" id="btn-delete-jenis" class="btn-delete-master" onclick="hapusMaster('jenis')" title="Hapus Data Ini" style="display:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
 
-                            <button type="button" id="btn-cancel-jenis" class="btn-cancel-input" onclick="cancelInput('jenis')" title="Batal">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                            <div id="input-container-jenis" style="display:none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="sub_barang_baru" id="input-jenis" class="form-input" placeholder="Nama Jenis" disabled style="flex: 2;">
+                                    <input type="text" name="grup_sub_baru" id="input-grup-jenis" class="form-input" placeholder="Grup (A-Z)" maxlength="1" disabled style="flex: 1;">
+                                    <button type="button" class="btn-cancel-input" onclick="cancelInput('jenis')" title="Batal"><i class="fa-solid fa-times"></i></button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mb-4">
                             <label class="form-label">Spesifikasi</label>
-                            <input type="text" name="spesifikasi_barang" class="form-input"
-                                placeholder="Contoh: RAM 8GB, Core i5..." required
-                                value="<?= $isEdit ? $barang['spesifikasi_barang'] : '' ?>">
+                            <input type="text" name="spesifikasi_barang" class="form-input" placeholder="Contoh: RAM 8GB..." required value="<?= $isEdit ? $barang['spesifikasi_barang'] : '' ?>">
                         </div>
 
                         <div class="form-group mb-4">
                             <label class="form-label">Jumlah</label>
-                            <input type="number" name="jumlah_barang" class="form-input" min="1" required
-                                value="<?= $isEdit ? $barang['jumlah_barang'] : '1' ?>">
+                            <input type="number" name="jumlah_barang" class="form-input" min="1" required value="<?= $isEdit ? $barang['jumlah_barang'] : '1' ?>">
                         </div>
 
                         <div class="form-group mb-4">
                             <label class="form-label">Tgl Pengadaan</label>
-                            <input type="date" name="tgl_pengadaan_barang" class="form-input" required
-                                value="<?= $isEdit ? $barang['tgl_pengadaan_barang'] : '' ?>">
+                            <input type="date" name="tgl_pengadaan_barang" class="form-input" required value="<?= $isEdit ? $barang['tgl_pengadaan_barang'] : '' ?>">
                         </div>
 
-                        <div class="form-group mb-4 input-group-custom" id="group-lokasi">
+                        <div class="form-group mb-4" id="group-lokasi">
                             <label class="form-label">Lokasi Penyimpanan</label>
-                            <select name="lokasi_penyimpanan" id="select-lokasi" class="form-select" onchange="toggleInput('lokasi')" required>
-                                <option value="">-- Pilih Lokasi --</option>
-                                <?php foreach ($data['lokasiPenyimpanan'] as $opt) : ?>
-                                    <option value="<?= $opt['id_lokasi_penyimpanan'] ?>"
-                                        <?= ($isEdit && $barang['id_lokasi_penyimpanan'] == $opt['id_lokasi_penyimpanan']) ? 'selected' : '' ?>>
-                                        <?= $opt['nama_lokasi_penyimpanan'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Lokasi Baru</option>
-                            </select>
-
-                            <div id="input-container-lokasi" style="display:none; width: 100%;">
-                                <input type="text" name="lokasi_baru" id="input-lokasi" class="form-input" placeholder="Nama Lokasi Baru..." disabled>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="lokasi_penyimpanan" id="select-lokasi" class="form-select"
+                                    onfocus="this.dataset.prev = this.value;"
+                                    onchange="checkSelection('lokasi')" required>
+                                    <option value="">-- Pilih Lokasi --</option>
+                                    <?php foreach ($data['lokasiPenyimpanan'] as $opt) : ?>
+                                        <option value="<?= $opt['id_lokasi_penyimpanan'] ?>"
+                                            <?= ($isEdit && $barang['id_lokasi_penyimpanan'] == $opt['id_lokasi_penyimpanan']) ? 'selected' : '' ?>>
+                                            <?= $opt['nama_lokasi_penyimpanan'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Lokasi Baru</option>
+                                </select>
+                                <button type="button" id="btn-delete-lokasi" class="btn-delete-master" onclick="hapusMaster('lokasi')" title="Hapus Data Ini" style="display:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
 
-                            <button type="button" id="btn-cancel-lokasi" class="btn-cancel-input" onclick="cancelInput('lokasi')" title="Batal">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                            <div id="input-container-lokasi" style="display:none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="lokasi_baru" id="input-lokasi" class="form-input" placeholder="Nama Lokasi Baru..." disabled style="flex: 1;">
+                                    <button type="button" class="btn-cancel-input" onclick="cancelInput('lokasi')" title="Batal"><i class="fa-solid fa-times"></i></button>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group mb-4 input-group-custom" id="group-status">
+                        <div class="form-group mb-4" id="group-status">
                             <label class="form-label">Status</label>
-                            <select name="status" id="select-status" class="form-select" onchange="toggleInput('status')" required>
-                                <option value="">-- Pilih Status --</option>
-                                <?php foreach ($data['status'] as $opt) : ?>
-                                    <option value="<?= $opt['id_status'] ?>"
-                                        <?= ($isEdit && $barang['id_status'] == $opt['id_status']) ? 'selected' : '' ?>>
-                                        <?= $opt['status'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Status Baru</option>
-                            </select>
-
-                            <div id="input-container-status" style="display:none; width: 100%;">
-                                <input type="text" name="status_baru" id="input-status" class="form-input" placeholder="Status Baru..." disabled>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="status" id="select-status" class="form-select"
+                                    onfocus="this.dataset.prev = this.value;"
+                                    onchange="checkSelection('status')" required>
+                                    <option value="">-- Pilih Status --</option>
+                                    <?php foreach ($data['status'] as $opt) : ?>
+                                        <option value="<?= $opt['id_status'] ?>"
+                                            <?= ($isEdit && $barang['id_status'] == $opt['id_status']) ? 'selected' : '' ?>>
+                                            <?= $opt['status'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Status Baru</option>
+                                </select>
+                                <button type="button" id="btn-delete-status" class="btn-delete-master" onclick="hapusMaster('status')" title="Hapus Data Ini" style="display:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
 
-                            <button type="button" id="btn-cancel-status" class="btn-cancel-input" onclick="cancelInput('status')" title="Batal">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                            <div id="input-container-status" style="display:none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="status_baru" id="input-status" class="form-input" placeholder="Status Baru..." disabled style="flex: 1;">
+                                    <button type="button" class="btn-cancel-input" onclick="event.preventDefault(); cancelInput('jenis');" title="Batal">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
 
                     <div class="right-column">
-
-                        <div class="form-group mb-4 input-group-custom" id="group-merek">
+                        <div class="form-group mb-4" id="group-merek">
                             <label class="form-label">Merek Barang</label>
-
-                            <select name="nama_merek_barang" id="select-merek" class="form-select" onchange="toggleInput('merek')" required>
-                                <option value="">-- Pilih Merek --</option>
-                                <?php foreach ($data['nama_merek_barang'] as $opt) : ?>
-                                    <option value="<?= $opt['id_merek_barang'] ?>"
-                                        <?= ($isEdit && $barang['id_merek_barang'] == $opt['id_merek_barang']) ? 'selected' : '' ?>>
-                                        <?= $opt['nama_merek_barang'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Merek Baru</option>
-                            </select>
-
-                            <div id="input-container-merek" style="display:none; width: 100%;">
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" name="nama_merek_baru" id="input-merek" class="form-input"
-                                        placeholder="Nama Merek (Ex: Lenovo)" style="flex: 2;" disabled>
-                                    <input type="text" name="kode_merek_baru" id="input-kode-merek" class="form-input"
-                                        placeholder="Kode (Ex: 009)" style="flex: 1;" maxlength="3" disabled title="Kode Merek">
-                                </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="nama_merek_barang" id="select-merek" class="form-select"
+                                    onfocus="this.dataset.prev = this.value;"
+                                    onchange="checkSelection('merek')" required>
+                                    <option value="">-- Pilih Merek --</option>
+                                    <?php foreach ($data['nama_merek_barang'] as $opt) : ?>
+                                        <option value="<?= $opt['id_merek_barang'] ?>"
+                                            <?= ($isEdit && $barang['id_merek_barang'] == $opt['id_merek_barang']) ? 'selected' : '' ?>>
+                                            <?= $opt['nama_merek_barang'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Merek Baru</option>
+                                </select>
+                                <button type="button" id="btn-delete-merek" class="btn-delete-master" onclick="hapusMaster('merek')" title="Hapus Data Ini" style="display:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
 
-                            <button type="button" id="btn-cancel-merek" class="btn-cancel-input" onclick="cancelInput('merek')" title="Batal">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                            <div id="input-container-merek" style="display:none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="nama_merek_baru" id="input-merek" class="form-input" placeholder="Nama Merek" disabled style="flex: 2;">
+                                    <input type="text" name="kode_merek_baru" id="input-kode-merek" class="form-input" placeholder="Kode (001)" maxlength="3" disabled style="flex: 1;">
+                                    <button type="button" class="btn-cancel-input" onclick="cancelInput('merek'); return false;" title="Batal">
+                                        <i class="fa-solid fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mb-4">
@@ -170,26 +180,32 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             </select>
                         </div>
 
-                        <div class="form-group mb-4 input-group-custom" id="group-satuan">
+                        <div class="form-group mb-4" id="group-satuan">
                             <label class="form-label">Satuan</label>
-                            <select name="satuan" id="select-satuan" class="form-select" onchange="toggleInput('satuan')" required>
-                                <option value="">-- Pilih Satuan --</option>
-                                <?php foreach ($data['satuan'] as $opt) : ?>
-                                    <option value="<?= $opt['id_satuan'] ?>"
-                                        <?= ($isEdit && $barang['id_satuan'] == $opt['id_satuan']) ? 'selected' : '' ?>>
-                                        <?= $opt['nama_satuan'] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                                <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Satuan Baru</option>
-                            </select>
-
-                            <div id="input-container-satuan" style="display:none; width: 100%;">
-                                <input type="text" name="satuan_baru" id="input-satuan" class="form-input" placeholder="Satuan Baru..." disabled>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select name="satuan" id="select-satuan" class="form-select"
+                                    onfocus="this.dataset.prev = this.value;"
+                                    onchange="checkSelection('satuan')" required>
+                                    <option value="">-- Pilih Satuan --</option>
+                                    <?php foreach ($data['satuan'] as $opt) : ?>
+                                        <option value="<?= $opt['id_satuan'] ?>"
+                                            <?= ($isEdit && $barang['id_satuan'] == $opt['id_satuan']) ? 'selected' : '' ?>>
+                                            <?= $opt['nama_satuan'] ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                    <option value="NEW" style="font-weight:bold; color:blue;">+ Tambah Satuan Baru</option>
+                                </select>
+                                <button type="button" id="btn-delete-satuan" class="btn-delete-master" onclick="hapusMaster('satuan')" title="Hapus Data Ini" style="display:none;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
 
-                            <button type="button" id="btn-cancel-satuan" class="btn-cancel-input" onclick="cancelInput('satuan')" title="Batal">
-                                <i class="fa-solid fa-times"></i>
-                            </button>
+                            <div id="input-container-satuan" style="display:none; margin-top: 10px;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="satuan_baru" id="input-satuan" class="form-input" placeholder="Satuan Baru..." disabled style="flex: 1;">
+                                    <button type="button" class="btn-cancel-input" onclick="cancelInput('satuan')" title="Batal"><i class="fa-solid fa-times"></i></button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group mb-4">
@@ -203,25 +219,22 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 
                         <div class="form-group mb-4">
                             <label class="form-label">Detail Penyimpanan</label>
-                            <input type="text" name="deskripsi_detail_lokasi" class="form-input" placeholder="Contoh: Rak 2..."
-                                value="<?= $isEdit ? $barang['deskripsi_detail_lokasi'] : '' ?>">
+                            <input type="text" name="deskripsi_detail_lokasi" class="form-input" placeholder="Rak 2..." value="<?= $isEdit ? $barang['deskripsi_detail_lokasi'] : '' ?>">
                         </div>
 
                         <div class="form-group mb-4">
-                            <label class="form-label">Upload Foto <?= $isEdit ? '(Biarkan kosong jika tidak diganti)' : '' ?></label>
+                            <label class="form-label">Upload Foto <?= $isEdit ? '(Opsional)' : '' ?></label>
                             <input type="file" name="foto_barang" class="form-input" accept="image/*">
                             <?php if ($isEdit && !empty($barang['foto_barang'])): ?>
-                                <small style="display:block; margin-top:5px; color:#666;">File saat ini: <?= basename($barang['foto_barang']) ?></small>
+                                <small style="display:block; margin-top:5px;">File: <?= basename($barang['foto_barang']) ?></small>
                             <?php endif; ?>
                         </div>
-
                     </div>
-
                 </div>
 
                 <?php if (!$isEdit): ?>
                     <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <p style="font-size: 13px; font-weight: 600; color: #888; margin-bottom: 15px;">Data Penomoran (Untuk Generate Kode Barang)</p>
+                        <p style="font-size: 13px; font-weight: 600; color: #888;">Data Penomoran</p>
                         <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                             <div class="form-group">
                                 <label class="form-label" style="font-size: 13px;">Barang Ke-</label>
@@ -255,9 +268,8 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                 <div class="btn-submit-container">
                     <button type="submit" class="btn-submit"><?= $isEdit ? 'Simpan Perubahan' : 'Kirim Data' ?></button>
                 </div>
-
             </form>
-
         </div>
     </div>
 </div>
+

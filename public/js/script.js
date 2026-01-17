@@ -780,45 +780,118 @@ dropZone.addEventListener('drop', function (e) {
   fileInput.dispatchEvent(event);
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  const modal = document.getElementById('modalHapus');
-  const btnLinkHapus = document.getElementById('btnLinkHapus');
+// document.addEventListener("DOMContentLoaded", function () {
+//   const modal = document.getElementById('modalHapus');
+//   const btnLinkHapus = document.getElementById('btnLinkHapus');
 
-  window.konfirmasiHapus = function (url) {
+//   window.konfirmasiHapus = function (url) {
+//     if (modal && btnLinkHapus) {
+//       btnLinkHapus.setAttribute('href', url);
+//       modal.classList.add('show');
+//     }
+//   };
+//   window.tutupModal = function () { if (modal) modal.classList.remove('show'); };
+//   window.onclick = function (event) { if (event.target == modal) tutupModal(); };
+// });
+
+/* --- FILE: public/js/script.js --- */
+
+// 1. Fungsi Konfirmasi Hapus
+// Kita mendefinisikan fungsi ini secara global agar bisa dipanggil oleh onclick="..." di HTML
+function konfirmasiHapus(url) {
+    // Kita cari elemennya SAAT fungsi ini dipanggil (Lazy Fetching)
+    // Ini menjamin elemen sudah ada saat tombol diklik
+    const modal = document.getElementById('modalHapus');
+    const btnLinkHapus = document.getElementById('btnLinkHapus');
+
     if (modal && btnLinkHapus) {
-      btnLinkHapus.setAttribute('href', url);
-      modal.classList.add('show');
+        btnLinkHapus.setAttribute('href', url);
+        modal.classList.add('show');
+    } else {
+        console.error("Modal atau Tombol Hapus tidak ditemukan ID-nya!");
     }
-  };
-  window.tutupModal = function () { if (modal) modal.classList.remove('show'); };
-  window.onclick = function (event) { if (event.target == modal) tutupModal(); };
+}
+
+// 2. Fungsi Tutup Modal
+function tutupModal() {
+    const modal = document.getElementById('modalHapus');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// 3. Event Listener untuk menutup modal saat klik di luar area (Window Click)
+// Kita pasang event ini saat window meload agar tidak menimpa event lain
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalHapus');
+    if (modal && event.target === modal) {
+        tutupModal();
+    }
 });
 
 function toggleFilter() {
-    var x = document.getElementById("filterSection");
-    if (x.style.display === "none" || x.style.display === "") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-    }
+  var x = document.getElementById("filterSection");
+  if (x.style.display === "none" || x.style.display === "") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
 }
 
-document.getElementById('selectAll').addEventListener('click', function(e) {
-    var checkboxes = document.querySelectorAll('.item-checkbox');
-    for (var i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = e.target.checked;
-    }
+document.getElementById('selectAll').addEventListener('click', function (e) {
+  var checkboxes = document.querySelectorAll('.item-checkbox');
+  for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].checked = e.target.checked;
+  }
 });
 
 function submitExport() {
-    var form = document.getElementById('formCetak');
-    var checkboxes = document.querySelectorAll('.item-checkbox:checked');
+  var form = document.getElementById('formCetak');
+  var checkboxes = document.querySelectorAll('.item-checkbox:checked');
 
-    if (checkboxes.length === 0) {
-        if (confirm("Tidak ada barang yang dipilih. Apakah Anda ingin mengekspor SEMUA data?")) {
-            form.submit();
-        }
-    } else {
-        form.submit();
+  if (checkboxes.length === 0) {
+    if (confirm("Tidak ada barang yang dipilih. Apakah Anda ingin mengekspor SEMUA data?")) {
+      form.submit();
     }
+  } else {
+    form.submit();
+  }
 }
+
+function toggleInput(type) {
+  var select = document.getElementById('select-' + type);
+  var btnCancel = document.getElementById('btn-cancel-' + type);
+
+  if (select.value === 'NEW') {
+    select.style.display = 'none';
+    btnCancel.style.display = 'block';
+
+    var container = document.getElementById('input-container-' + type);
+    var inputNama = document.getElementById('input-' + type);
+
+    var inputExtra = null;
+    if (type === 'jenis') inputExtra = document.getElementById('input-grup-jenis');
+    if (type === 'merek') inputExtra = document.getElementById('input-kode-merek');
+
+    container.style.display = 'block';
+    inputNama.disabled = false;
+
+    if (inputExtra) inputExtra.disabled = false;
+
+    inputNama.focus();
+  }
+}
+
+
+function toggleFormTolakPengembalian() {
+  var x = document.getElementById("formTolakPengembalianContainer");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    // Sembunyikan form tolak biasa jika terbuka
+    document.getElementById("formTolakContainer").style.display = "none";
+    x.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    x.style.display = "none";
+  }
+}
+
