@@ -347,7 +347,7 @@ CREATE TABLE `trx_detail_peminjaman` (
   CONSTRAINT `fk_detail_barang_unit` FOREIGN KEY (`id_barang`) REFERENCES `trx_barang` (`id_barang`) ON DELETE SET NULL,
   CONSTRAINT `trx_detail_peminjaman_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE,
   CONSTRAINT `trx_detail_peminjaman_ibfk_2` FOREIGN KEY (`id_jenis_barang`) REFERENCES `mst_jenis_barang` (`id_jenis_barang`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,7 +356,6 @@ CREATE TABLE `trx_detail_peminjaman` (
 
 LOCK TABLES `trx_detail_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_detail_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_detail_peminjaman` VALUES (5,1,1,NULL,1,NULL),(6,1,2,NULL,1,NULL);
 /*!40000 ALTER TABLE `trx_detail_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -369,7 +368,7 @@ DROP TABLE IF EXISTS `trx_peminjaman`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trx_peminjaman` (
   `id_peminjaman` int(11) NOT NULL AUTO_INCREMENT,
-  `nama_peminjam` varchar(255) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `judul_kegiatan` varchar(255) NOT NULL,
   `tanggal_pengajuan` date NOT NULL,
   `tanggal_peminjaman` date NOT NULL,
@@ -377,8 +376,10 @@ CREATE TABLE `trx_peminjaman` (
   `keterangan_peminjaman` text DEFAULT NULL,
   `status` enum('Diproses','Disetujui','Ditolak','Dikembalikan','Melengkapi Surat') DEFAULT 'Melengkapi Surat',
   `file_surat` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id_peminjaman`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  PRIMARY KEY (`id_peminjaman`),
+  KEY `fk_peminjaman_user` (`id_user`),
+  CONSTRAINT `fk_peminjaman_user` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -387,7 +388,6 @@ CREATE TABLE `trx_peminjaman` (
 
 LOCK TABLES `trx_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_peminjaman` VALUES (1,'Julisa','COBA AJA Admin','2026-01-13','2026-01-10','2026-01-21','-','Melengkapi Surat',NULL);
 /*!40000 ALTER TABLE `trx_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -501,4 +501,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-13 13:13:54
+-- Dump completed on 2026-01-17 17:08:06
