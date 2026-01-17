@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 lastSelectValue[type] = select.value;
                 console.log('Nilai awal ' + type + ':', select.value);
             }
-
+ 
             if (inputContainer) {
                 inputContainer.style.display = 'none';
             }
