@@ -1,6 +1,6 @@
 <form action="<?= BASEURL; ?>/Register/tambah" method="post" enctype="multipart/form-data">
   <div class="body-register">
-    <div class="figure-daftar">
+    <div class="figure-daftar col-12 col-lg-5">
       <div class="logo">
         <img src="<?= BASEURL ?>img/logo bg putih.svg" alt="logo" />
       </div>
@@ -11,15 +11,15 @@
           alt="figure" />
       </div>
     </div>
-    <div class="form-daftar-kiri">
+    <div class="form-daftar-kiri col-12 col-lg-3">
       <div class="flash" style="width: 80%;">
         <?php Flasher::flash(); ?>
       </div>
       <div class="header">
         <h2>Daftar</h2>
       </div>
-      <div class="form">
-        <div class="nama">
+      <div class="form row">
+        <div class="nama col-12">
           <label for="nama_user">Nama Lengkap</label>
           <input
             type="text"
@@ -29,7 +29,7 @@
             name="nama_user"
             required />
         </div>
-        <div class="nim_nip">
+        <div class="nim_nip col-12">
           <label for="nim_nip">NIM / NIP</label>
           <input
             type="text"
@@ -40,7 +40,7 @@
             required
             oninput="validasiInput(this)" />
         </div>
-        <div class="email">
+        <div class="email col-12">
           <label for="email">Email</label>
           <input
             type="email"
@@ -48,7 +48,7 @@
             placeholder="Masukkan email anda"
             required />
         </div>
-        <div class="kata-sandi">
+        <div class="kata-sandi col-12">
           <label for="password">Kata sandi</label>
           <input
             type="password"
@@ -58,7 +58,7 @@
             placeholder="Masukkan kata sandi anda"
             required />
         </div>
-        <div class="konfirmasi-kata-sandi">
+        <div class="konfirmasi-kata-sandi col-12">
           <label for="konfirmasi-password">Konfirmasi kata sandi</label>
           <input
             type="password"
@@ -71,7 +71,7 @@
         </div>
       </div>
     </div>
-    <div class="form-daftar-kanan">
+    <div class="form-daftar-kanan col-12 col-lg-4">
       <div class="foto">
         <input
           type="file"
