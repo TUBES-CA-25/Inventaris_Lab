@@ -80,11 +80,11 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                     <td>
                                         <?php if ($data['active_tab'] == 'all') : ?>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar-circle bg-navy-light text-navy mr-3 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 14px;">
-                                                    <?= substr($row['nama_peminjam'], 0, 1); ?>
-                                                </div>
+                                                <!-- <div class="avatar-circle bg-navy-light text-navy mr-3 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 14px;">
+                                                    <?= substr($row['nama_user'], 0, 1); ?>
+                                                </div> -->
                                                 <div>
-                                                    <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 14px;"><?= $row['nama_peminjam']; ?></h6>
+                                                    <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 14px;"><?= $row['nama_user']; ?></h6>
                                                 </div>
                                             </div>
                                         <?php else : ?>

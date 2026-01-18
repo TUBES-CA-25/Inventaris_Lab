@@ -9,53 +9,27 @@ class Riwayat_model
         $this->db = new Database;
     }
 
-    public function getAllRiwayat($nama_user_login = null)
-    {
-        $query = "SELECT p.*, k.status_pengembalian 
+    public function getAllRiwayat() {
+        $query = "SELECT p.*, d.nama_user, d.nim_nip 
               FROM trx_peminjaman p
-              LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
-              WHERE 1=1";
-
-        if ($nama_user_login != null) {
-            $query .= " AND NOT (LOWER(p.status) = 'melengkapi surat' AND p.nama_peminjam != :nama)";
-        }
-
-        $query .= " ORDER BY p.tanggal_pengajuan DESC";
-
+              JOIN trx_data_user d ON p.id_user = d.id_user
+              WHERE p.status != :status_exclude
+              ORDER BY p.tanggal_pengajuan DESC";
+        
         $this->db->query($query);
-
-        if ($nama_user_login != null) {
-            $this->db->bind('nama', $nama_user_login);
-        }
-
-        $results = $this->db->resultSet();
-
-        foreach ($results as &$row) {
-            if (!empty($row['status_pengembalian']) && $row['status_pengembalian'] == 'Dikembalikan') {
-                $row['status'] = 'dikembalikan';
-            }
-        }
-
-        return $results;
+        $this->db->bind('status_exclude', 'Melengkapi Surat');
+        return $this->db->resultSet();
     }
 
-    public function getRiwayatByUser($nama_user)
-    {
-        $query = "SELECT p.*, k.status_pengembalian 
-                  FROM trx_peminjaman p
-                  LEFT JOIN trx_pengembalian k ON p.id_peminjaman = k.id_peminjaman
-                  WHERE p.nama_peminjam = :nama
-                  ORDER BY p.tanggal_pengajuan DESC";
-
+    public function getRiwayatByUser($id_user) {
+        $query = "SELECT p.*, d.nama_user 
+              FROM trx_peminjaman p
+              JOIN trx_data_user d ON p.id_user = d.id_user
+              WHERE p.id_user = :id_user 
+              ORDER BY p.tanggal_pengajuan DESC";
+                  
         $this->db->query($query);
-        $this->db->bind('nama', $nama_user);
-        $results = $this->db->resultSet();
-
-        foreach ($results as &$row) {
-            if (!empty($row['status_pengembalian']) && $row['status_pengembalian'] == 'Dikembalikan') {
-                $row['status'] = 'dikembalikan';
-            }
-        }
-        return $results;
+        $this->db->bind('id_user', $id_user);
+        return $this->db->resultSet();
     }
 }
