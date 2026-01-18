@@ -64,12 +64,8 @@ class ValidasiPeminjaman extends Controller
         // $this->view('templates/footer');
     }
 
-    // --- [BARU] FITUR VALIDASI BERTINGKAT ---
-
-    // 1. Aksi untuk Kepala Lab (Huzain) - Hanya centang database
     public function accKalab()
     {
-        // Cek Role: Hanya Kepala Lab (Role ID 1) yang boleh
         if ($_SESSION['id_role'] != '1') {
             Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
@@ -89,10 +85,8 @@ class ValidasiPeminjaman extends Controller
         }
     }
 
-    // 2. Halaman Drag & Drop Tanda Tangan (Untuk Laboran)
     public function viewValidasiPosisi($id_peminjaman)
     {
-        // ... (Kode pengecekan Role dan Logika Warna Box TETAP SAMA seperti sebelumnya) ...
         $role = $_SESSION['id_role'];
 
         if ($role != '1' && $role != '2') {
@@ -103,11 +97,11 @@ class ValidasiPeminjaman extends Controller
 
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
-        if ($role == '1') { // HUZAIN
+        if ($role == '1') {
             $label_box = "TTD Kepala Lab (Huzain)";
             $warna_box = "rgba(78, 115, 223, 0.6)";
             $border_box = "#4e73df";
-        } else { // FATIMAH
+        } else {
             $label_box = "TTD Laboran (Fatimah)";
             $warna_box = "rgba(28, 200, 138, 0.6)";
             $border_box = "#1cc88a";
@@ -127,8 +121,6 @@ class ValidasiPeminjaman extends Controller
         $this->view('ValidasiPeminjaman/TandaTangan', $data);
     }
 
-    // 3. Proses Final Validasi Laboran (Menerima Koordinat & Stempel PDF)
-    // Update method ini (Redirect-nya diubah)
     public function prosesAccLaboran()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -141,20 +133,15 @@ class ValidasiPeminjaman extends Controller
                 'huzain_y'      => $_POST['huzain_y']
             ];
 
-            // Panggil Model (Stempel PDF)
             $this->model('Peminjaman_model')->validasiLaboranDouble($dataPost);
 
-
-            // JANGAN langsung ke Detail, tapi ke halaman PREVIEW dulu
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/previewHasil/' . $dataPost['id_peminjaman']);
             exit;
         }
     }
 
-    // --- [BARU] HALAMAN PREVIEW HASIL ---
     public function previewHasil($id_peminjaman)
     {
-        // Cek Role (Hanya Laboran/Kalab)
         if (!in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
@@ -163,18 +150,15 @@ class ValidasiPeminjaman extends Controller
         $data['judul'] = 'Preview Hasil Tanda Tangan';
         $data['peminjaman'] = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
-        // Jika data tidak ada
         if (!$data['peminjaman']) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
 
         $this->view('templates/header', $data);
-        $this->view('ValidasiPeminjaman/preview_hasil', $data); // View Baru
+        $this->view('ValidasiPeminjaman/preview_hasil', $data);
         $this->view('templates/footer');
     }
-
-    // --- FITUR LAMA (Update Status Manual & Tolak) ---
 
     public function updateStatus()
     {
@@ -195,7 +179,6 @@ class ValidasiPeminjaman extends Controller
                 Flasher::setFlash('Info', 'Tidak ada perubahan status', '', 'info');
             }
 
-            // Redirect balik ke detail agar user melihat perubahannya
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
         }
@@ -221,5 +204,23 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
         }
+    }
+
+    public function selesaiValidasi($id_peminjaman)
+    {
+        $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
+
+        if ($peminjaman) {
+            $fileName = $peminjaman['file_surat'];
+            $pathBackup = __DIR__ . '/../../public/files/surat-peminjaman/backup_' . $fileName;
+
+            if (file_exists($pathBackup)) {
+                unlink($pathBackup);
+            }
+        }
+
+        Flasher::setFlash('Berhasil', 'Proses validasi selesai. Dokumen telah disimpan.', '', 'success');
+        header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+        exit;
     }
 }
