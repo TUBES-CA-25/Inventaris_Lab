@@ -38,44 +38,55 @@ if (!isset($_SESSION['login'])) {
                 <button type="button" onclick="submitExport()" class="btn-custom-export">
                     <i class="fa-solid fa-file-export"></i> Ekspor
                 </button>
+
+                <button type="button" class="btn-custom-filter" onclick="toggleFilter()" title="Buka Filter">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
             </div>
 
             <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <i class="fa-solid fa-magnifying-glass search-icon d-none d-md-flex"></i>
                 <input type="text" id="customSearch" class="search-input" placeholder="Cari barang...">
-                <i class="fa-solid fa-filter filter-trigger" onclick="toggleFilter()" title="Buka Filter"></i>
             </div>
         </div>
 
-        <div id="filterSection">
+        <div id="filterSection" class="card p-3 mb-3" style="border-radius: 10px;">
             <h6 style="color: var(--primary-blue); margin-bottom: 10px; font-weight: 600;">Filter Data</h6>
             <form method="POST" action="">
-                <select name="lokasi" onchange="this.form.submit()" class="custom-select">
-                    <option value="">Semua Lokasi</option>
-                    <?php foreach ($data['lokasiPenyimpanan'] ?? [] as $lokasi): ?>
-                        <option value="<?= $lokasi['id_lokasi_penyimpanan'] ?>" <?= isset($_POST['lokasi']) && $_POST['lokasi'] == $lokasi['id_lokasi_penyimpanan'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($lokasi['nama_lokasi_penyimpanan']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <div class="row g-2">
+                    <div class="col-12 col-md-4">
+                        <select name="lokasi" onchange="this.form.submit()" class="form-select form-select-sm">
+                            <option value="">Semua Lokasi</option>
+                            <?php foreach ($data['lokasiPenyimpanan'] ?? [] as $lokasi): ?>
+                                <option value="<?= $lokasi['id_lokasi_penyimpanan'] ?>" <?= isset($_POST['lokasi']) && $_POST['lokasi'] == $lokasi['id_lokasi_penyimpanan'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($lokasi['nama_lokasi_penyimpanan']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <select name="sub_barang" onchange="this.form.submit()" class="custom-select">
-                    <option value="">Semua Jenis</option>
-                    <?php foreach ($data['sub_barang'] ?? [] as $sub): ?>
-                        <option value="<?= $sub['id_jenis_barang'] ?>" <?= isset($_POST['sub_barang']) && $_POST['sub_barang'] == $sub['id_jenis_barang'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($sub['sub_barang']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                    <div class="col-12 col-md-4">
+                        <select name="sub_barang" onchange="this.form.submit()" class="form-select form-select-sm">
+                            <option value="">Semua Jenis</option>
+                            <?php foreach ($data['sub_barang'] ?? [] as $sub): ?>
+                                <option value="<?= $sub['id_jenis_barang'] ?>" <?= isset($_POST['sub_barang']) && $_POST['sub_barang'] == $sub['id_jenis_barang'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($sub['sub_barang']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <select name="merek_barang" onchange="this.form.submit()" class="custom-select">
-                    <option value="">Semua Merek</option>
-                    <?php foreach ($data['nama_merek_barang'] ?? [] as $merek): ?>
-                        <option value="<?= $merek['id_merek_barang'] ?>" <?= isset($_POST['merek_barang']) && $_POST['merek_barang'] == $merek['id_merek_barang'] ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($merek['nama_merek_barang']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                    <div class="col-12 col-md-4">
+                        <select name="merek_barang" onchange="this.form.submit()" class="form-select form-select-sm">
+                            <option value="">Semua Merek</option>
+                            <?php foreach ($data['nama_merek_barang'] ?? [] as $merek): ?>
+                                <option value="<?= $merek['id_merek_barang'] ?>" <?= isset($_POST['merek_barang']) && $_POST['merek_barang'] == $merek['id_merek_barang'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($merek['nama_merek_barang']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
             </form>
         </div>
 
@@ -159,20 +170,20 @@ if (!isset($_SESSION['login'])) {
                                     </div>
 
                                     <div class="modal fade" id="modalDetail<?= $row['id_barang']; ?>" tabindex="-1" role="dialog">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content" style="width: 700px; padding: 20px;">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content" style="border-radius: 15px;">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Detail Barang</h5>
                                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <img src="<?= BASEURL . $row['foto_barang']; ?>" style="width:150px; height:150px; object-fit:cover; margin-bottom:10px;">
+                                                    <div class="row g-3">
+                                                        <div class="col-12 col-sm-6">
+                                                            <img src="<?= BASEURL . $row['foto_barang']; ?>" class="img-fluid" style="width:150px; height:150px; object-fit:cover; margin-bottom:10px;">
                                                             <p><strong>Kode:</strong> <?= $row['kode_barang']; ?></p>
                                                             <p><strong>Merek:</strong> <?= $row['nama_merek_barang']; ?></p>
                                                         </div>
-                                                        <div class="col-md-6">
+                                                        <div class="col-12 col-sm-6">
                                                             <img src="<?= BASEURL . $row['qr_code'] ?>" style="width:150px; height:150px;">
                                                             <p><strong>Kondisi:</strong> <?= $row['kondisi_barang']; ?></p>
                                                             <p><strong>Lokasi:</strong> <?= $row['nama_lokasi_penyimpanan']; ?></p>
