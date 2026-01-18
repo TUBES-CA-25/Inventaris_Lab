@@ -8,6 +8,7 @@
             </div>
         </div>
 
+        <!-- Flash Message -->
         <div class="row">
             <div class="col-12">
                 <?php Flasher::flash(); ?>
@@ -39,7 +40,7 @@
                     <div class="info-value"><?= htmlspecialchars($profile_data['email']); ?></div>
                 </div>
                 <div class="info-group">
-                    <label class="info-label">NIM/NIP</label>
+                    <label class="info-label">NIM/NIPS</label>
                     <div class="info-value"><?= htmlspecialchars($profile_data['nim_nip'] ?? '-'); ?></div>
                 </div>
                 <div class="info-group">
@@ -148,6 +149,8 @@
         <div class="modal-body">
             <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
+                
+                <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
                 <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
 
                 <div class="modal-form-group">
@@ -157,12 +160,18 @@
 
                 <div class="modal-form-group">
                     <label>Email</label>
-                    <input type="email" name="email" value="<?= htmlspecialchars($profile_data['email']); ?>" readonly style="background-color: #f0f0f0;">
+                    <input type="email" name="email" 
+                           value="<?= htmlspecialchars($profile_data['email']); ?>" 
+                           placeholder="Masukkan email" readonly style="background-color: #f0f0f0;">
+                    <small style="color: #888;">Email tidak dapat diubah di sini.</small>
                 </div>
 
                 <div class="modal-form-group">
                     <label>NIM/NIP</label>
-                    <input type="text" name="nim_nip" value="<?= htmlspecialchars($profile_data['nim_nip'] ?? ''); ?>" maxlength="30">
+                    <input type="text" name="nim_nip" 
+                           value="<?= htmlspecialchars($profile_data['nim_nip'] ?? ''); ?>" 
+                           placeholder="Masukkan NIM/NIP" 
+                           maxlength="30">
                 </div>
 
                 <div class="modal-form-group">
@@ -198,16 +207,34 @@
 </div>
 
 <script>
-    // FUNGSI MODAL
-    function openEditModal() { document.getElementById('editModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-    function closeEditModal() { document.getElementById('editModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
-    function openTTDModal() { document.getElementById('ttdModal').classList.add('active'); document.body.style.overflow = 'hidden'; }
-    function closeTTDModal() { document.getElementById('ttdModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+function openEditModal() {
+    document.getElementById('editModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
 
-    // KLIK DI LUAR MODAL
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('editModal')) closeEditModal();
-        if (event.target == document.getElementById('ttdModal')) closeTTDModal();
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditModal();
+    }
+});
+
+setTimeout(function() {
+    const flashMessage = document.querySelector('.flash-message');
+    if (flashMessage) {
+        flashMessage.style.opacity = '0';
+        flashMessage.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => flashMessage.remove(), 500);
     }
     
     // AUTO HIDE FLASH

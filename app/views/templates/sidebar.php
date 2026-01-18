@@ -64,7 +64,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) : ?>
+            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3'])) : ?>
                 <a href="<?= BASEURL; ?>KelolaAkun" class="menu-item <?= ($data['judul'] == 'Kelola Akun') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-users-gear"></i>
                     <span>Kelola Akun</span>

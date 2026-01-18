@@ -169,4 +169,12 @@ class DetailBarang extends Controller
         $this->view('DetailBarang/form', $data);
         $this->view('templates/footer');
     }
+
+    public function cetakSatuan($id_barang)
+    {
+        $data['judul'] = 'Laporan Detail Barang';
+        $DetailBarangModel = $this->model('Detail_barang_model');
+        $data['item'] = $DetailBarangModel->getDetailDataBarang($id_barang);
+        $this->view('DetailBarang/PrintSatu', $data);
+    }
 }
