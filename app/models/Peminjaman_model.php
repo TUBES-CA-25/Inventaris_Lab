@@ -141,15 +141,20 @@ class Peminjaman_model
 
     public function getPeminjamanById($id_peminjaman)
     {
-        $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
+        $query = "SELECT tp.*, tdu.nama_user AS nama_peminjam, tdu.nim_nip
+                  FROM trx_peminjaman tp
+                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  WHERE tp.id_peminjaman = :id_peminjaman";
+
+        $this->db->query($query);
         $this->db->bind('id_peminjaman', $id_peminjaman);
         return $this->db->single();
     }
 
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
-{
-    // Tambahkan tdu.nama_user dan tdu.nim_nip
-    $query = "SELECT tp.*, 
+    {
+        // Tambahkan tdu.nama_user dan tdu.nim_nip
+        $query = "SELECT tp.*, 
                       tdu.nama_user, 
                       tdu.nim_nip,
                       GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
@@ -163,10 +168,10 @@ class Peminjaman_model
               WHERE tp.id_peminjaman = :id_peminjaman
               GROUP BY tp.id_peminjaman";
 
-    $this->db->query($query);
-    $this->db->bind("id_peminjaman", $id_peminjaman);
-    return $this->db->single();
-}
+        $this->db->query($query);
+        $this->db->bind("id_peminjaman", $id_peminjaman);
+        return $this->db->single();
+    }
 
     public function getUbah($id_peminjaman)
     {
@@ -200,46 +205,45 @@ class Peminjaman_model
         $this->db->bind('status', $data['status']);
         $this->db->bind('id_peminjaman', $data['id_peminjaman']);
 
-        
-            $this->db->execute();
 
-            $this->db->query("DELETE FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
-            $this->db->bind('id', $data['id_peminjaman']);
-            $this->db->execute();
+        $this->db->execute();
 
-            $detail_inserted = 0;
+        $this->db->query("DELETE FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
+        $this->db->bind('id', $data['id_peminjaman']);
+        $this->db->execute();
 
-            if (isset($data['id_jenis_barang']) && is_array($data['id_jenis_barang'])) {
-                $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah) 
+        $detail_inserted = 0;
+
+        if (isset($data['id_jenis_barang']) && is_array($data['id_jenis_barang'])) {
+            $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah) 
                             VALUES (:id_p, :id_b, :id_unit, :jml)";
 
-                $jumlah_data = count($data['id_jenis_barang']);
-                for ($i = 0; $i < $jumlah_data; $i++) {
-                    if (!empty($data['id_jenis_barang'][$i])) {
-                        $this->db->query($queryDetail);
-                        $this->db->bind('id_p', $data['id_peminjaman']);
-                        $this->db->bind('id_b', $data['id_jenis_barang'][$i]);
+            $jumlah_data = count($data['id_jenis_barang']);
+            for ($i = 0; $i < $jumlah_data; $i++) {
+                if (!empty($data['id_jenis_barang'][$i])) {
+                    $this->db->query($queryDetail);
+                    $this->db->bind('id_p', $data['id_peminjaman']);
+                    $this->db->bind('id_b', $data['id_jenis_barang'][$i]);
 
-                        $raw_unit = !empty($data['unit_selected'][$i]) ? $data['unit_selected'][$i] : null;
+                    $raw_unit = !empty($data['unit_selected'][$i]) ? $data['unit_selected'][$i] : null;
 
-                        if (is_numeric($raw_unit) && $raw_unit > 0) {
-                            $id_unit = $raw_unit;
-                        } else {
-                            $id_unit = null;
-                        }
-                        $this->db->bind('id_unit', $id_unit);
-
-                        $jml = !empty($data['jumlah_peminjaman'][$i]) ? $data['jumlah_peminjaman'][$i] : 1;
-                        $this->db->bind('jml', $jml);
-
-                        $this->db->execute();
-                        $detail_inserted++;
+                    if (is_numeric($raw_unit) && $raw_unit > 0) {
+                        $id_unit = $raw_unit;
+                    } else {
+                        $id_unit = null;
                     }
+                    $this->db->bind('id_unit', $id_unit);
+
+                    $jml = !empty($data['jumlah_peminjaman'][$i]) ? $data['jumlah_peminjaman'][$i] : 1;
+                    $this->db->bind('jml', $jml);
+
+                    $this->db->execute();
+                    $detail_inserted++;
                 }
             }
+        }
 
-            return $this->db->rowCount() + $detail_inserted;
-        
+        return $this->db->rowCount() + $detail_inserted;
     }
 
     public function getDetailDataPeminjaman($id_peminjaman)
@@ -345,7 +349,7 @@ class Peminjaman_model
                 END ASC,
                 tp.tanggal_pengajuan DESC";
 
-    $this->db->query($query);
+        $this->db->query($query);
         return $this->db->resultSet();
     }
 
@@ -411,6 +415,7 @@ class Peminjaman_model
 
     public function getDetailBarangByPeminjamanId($id)
     {
+        // PERBAIKAN: Tambahkan 'tb.foto_barang' di baris SELECT
         $query = "SELECT 
             d.id_jenis_barang, 
             d.jumlah, 
@@ -418,10 +423,10 @@ class Peminjaman_model
             mjb.sub_barang as nama_barang, 
             mjb.kode_sub as kode_barang,
             mjb.grup_sub,
-            tb.spesifikasi_barang  -- Ambil kolom spesifikasi
+            tb.spesifikasi_barang,
+            tb.foto_barang  -- <--- INI WAJIB DITAMBAHKAN
           FROM trx_detail_peminjaman d 
           JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
-          -- Join ke tabel unit barang berdasarkan ID yang disimpan
           LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
           WHERE d.id_peminjaman = :id";
 
@@ -482,19 +487,14 @@ class Peminjaman_model
         return $this->db->resultSet();
     }
 
-    // --- FITUR VALIDASI BERTINGKAT & TANDA TANGAN DIGITAL ---
-
-    // 1. Cek Status Validasi Kalab (Helper)
-    // Digunakan untuk memastikan Laboran tidak bisa validasi sebelum Kalab setuju
-    public function getCekValidasiKalab($id) {
+public function getCekValidasiKalab($id)
+    {
         $this->db->query("SELECT validasi_kalab FROM trx_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $id);
         $res = $this->db->single();
         return $res['validasi_kalab'] ?? '0';
     }
 
-    // 2. Proses Validasi Tahap 1: Kepala Lab (Huzain Aziz)
-    // Hanya update database, belum ada tanda tangan yang ditempel
     public function validasiKalab($id_peminjaman)
     {
         $query = "UPDATE trx_peminjaman SET validasi_kalab = '1' WHERE id_peminjaman = :id";
@@ -504,117 +504,89 @@ class Peminjaman_model
         return $this->db->rowCount();
     }
 
-    // 3. Proses Validasi Tahap 2: Laboran (Fatimah Azzahrah)
-    // Menerima koordinat, menempel tanda tangan, dan update status final
     public function validasiLaboranCustom($data)
     {
         $id_peminjaman = $data['id_peminjaman'];
-        
-        // Ambil nama file surat dari database
+
         $this->db->query("SELECT file_surat FROM trx_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $id_peminjaman);
         $dbData = $this->db->single();
-        
-        // Path File PDF yang diupload user
+
         $fullPath = '../public/files/surat-peminjaman/' . $dbData['file_surat'];
 
         try {
-            // Panggil fungsi privat untuk menempel tanda tangan (FPDI)
             $this->prosesStempelDinamis(
-                $fullPath, 
-                $data['pos_x'],     // Posisi X (Persentase 0.0 - 1.0)
-                $data['pos_y'],     // Posisi Y (Persentase 0.0 - 1.0)
-                $data['page']       // Halaman Target
+                $fullPath,
+                $data['pos_x'],
+                $data['pos_y'],
+                $data['page']
             );
-            
-            // Jika sukses stempel, update status validasi & status peminjaman jadi 'disetujui'
+
             $query = "UPDATE trx_peminjaman SET 
                       validasi_laboran = '1', 
                       status = 'disetujui' 
                       WHERE id_peminjaman = :id";
-            
+
             $this->db->query($query);
             $this->db->bind('id', $id_peminjaman);
             $this->db->execute();
 
-            return 1; // Berhasil
+            return 1;
         } catch (Exception $e) {
-            return 0; // Gagal (Mungkin file tidak ketemu atau error FPDI)
+            return 0;
         }
     }
 
-    // 4. LOGIKA INTI: Menempel Tanda Tangan dengan FPDI
     private function prosesStempelDinamis($filePath, $percX, $percY, $targetPage)
     {
-        // TARGET: folder vendor di root (sejajar readme.md)
-        // Dari: app/models/Peminjaman_model.php
-        // Ke:   vendor/autoload.php
-        
         $pathAutoload = __DIR__ . '/../../vendor/autoload.php';
 
         if (file_exists($pathAutoload)) {
             require_once $pathAutoload;
         } else {
-            // Fallback (Jaga-jaga jika path salah, coba path manual fpdf/fpdi di core)
             if (file_exists(__DIR__ . '/../core/fpdi/src/autoload.php')) {
-                require_once __DIR__ . '/../core/fpdf/fpdf.php'; 
+                require_once __DIR__ . '/../core/fpdf/fpdf.php';
                 require_once __DIR__ . '/../core/fpdi/src/autoload.php';
             } else {
                 die("Error: Library FPDI tidak ditemukan di " . $pathAutoload);
             }
         }
 
-        // Inisialisasi FPDI
-        // Pastikan namespace sesuai dengan library yang diinstall composer
         $pdf = new \setasign\Fpdi\Fpdi();
 
-        // Import file PDF asli user sebagai template
         try {
             $pageCount = $pdf->setSourceFile($filePath);
         } catch (Exception $e) {
-            return 0; // Gagal baca file (mungkin file rusak/versi PDF ketinggian)
+            return 0;
         }
 
-        // Loop untuk menyalin setiap halaman
         for ($i = 1; $i <= $pageCount; $i++) {
             $tplIdx = $pdf->importPage($i);
             $size = $pdf->getTemplateSize($tplIdx);
-            
-            // Tambah halaman baru
+
             $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $pdf->useTemplate($tplIdx);
 
-            // Cek: Apakah ini halaman target?
             if ($i == $targetPage) {
-                
-                // --- KONVERSI KOORDINAT ---
                 $widthMM = $size['width'];
                 $heightMM = $size['height'];
 
                 $absX = $widthMM * $percX;
                 $absY = $heightMM * $percY;
 
-                // Ukuran Tanda Tangan (Lebar 35mm)
-                $ttdWidth = 35; 
+                $ttdWidth = 35;
 
-                // --- TEMPEL GAMBAR ---
-                
-                // 1. Tanda Tangan FATIMAH (Laboran)
-                // Gunakan __DIR__ untuk memastikan path gambar benar dari root public
-                // Asumsi: folder public ada di ../../public dari file model ini
                 $pathTTD_Fatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
-                
+
                 if (file_exists($pathTTD_Fatimah)) {
                     $pdf->Image($pathTTD_Fatimah, $absX, $absY, $ttdWidth);
                 }
 
-                // 2. Tanda Tangan HUZAIN (Kepala Lab)
                 $pathTTD_Huzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
-                $posX_Huzain = $absX + 45; 
+                $posX_Huzain = $absX + 45;
 
-                // Cek agar tidak keluar kertas
                 if (($posX_Huzain + $ttdWidth) > $widthMM) {
-                    $posX_Huzain = $widthMM - $ttdWidth - 10; 
+                    $posX_Huzain = $widthMM - $ttdWidth - 10;
                 }
 
                 if (file_exists($pathTTD_Huzain)) {
@@ -623,57 +595,28 @@ class Peminjaman_model
             }
         }
 
-        // Simpan File
         $pdf->Output($filePath, 'F');
     }
 
     public function validasiLaboranDouble($data)
     {
         $id = $data['id_peminjaman'];
-        
-        // Ambil info file
+
         $this->db->query("SELECT file_surat FROM trx_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $id);
         $res = $this->db->single();
-        
+
         $fileName = $res['file_surat'];
-        // Pastikan path ini benar sesuai struktur folder Anda di XAMPP
-        $pathFolder = __DIR__ . '/../../public/files/surat-peminjaman/'; 
-        
+        $pathFolder = __DIR__ . '/../../public/files/surat-peminjaman/';
+
         $pathAsli = $pathFolder . $fileName;
         $pathBackup = $pathFolder . 'backup_' . $fileName;
 
-        // --- DEBUGGING START (Hapus bagian ini nanti jika sudah fix) ---
-        echo "<h1>MODE DEBUGGING</h1>";
-        echo "ID Peminjaman: " . $id . "<br>";
-        echo "File Asli: " . $pathAsli . "<br>";
-        echo "Status File Asli: " . (file_exists($pathAsli) ? "ADA" : "TIDAK ADA") . "<br>";
-        echo "File Backup: " . $pathBackup . "<br>";
-        
-        echo "<hr>";
-        echo "<h3>Koordinat dari User:</h3>";
-        echo "Fatimah X: " . $data['fatimah_x'] . "<br>";
-        echo "Fatimah Y: " . $data['fatimah_y'] . "<br>";
-        echo "Huzain X: " . $data['huzain_x'] . "<br>";
-        echo "Huzain Y: " . $data['huzain_y'] . "<br>";
-        echo "Halaman Target: " . $data['page'] . "<br>";
-
         $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
         $pathHuzain  = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
-        
-        echo "<hr>";
-        echo "<h3>Status Gambar Tanda Tangan:</h3>";
-        echo "Gambar Fatimah: " . $pathFatimah . " -> " . (file_exists($pathFatimah) ? "✅ DITEMUKAN" : "❌ HILANG") . "<br>";
-        echo "Gambar Huzain: " . $pathHuzain . " -> " . (file_exists($pathHuzain) ? "✅ DITEMUKAN" : "❌ HILANG") . "<br>";
-        
-        // Matikan script di sini untuk melihat laporan di atas
-        // Jika semua data muncul dan benar, hapus baris die() ini untuk lanjut proses
-        // die(); 
-        // --- DEBUGGING END ---
 
-        // Logika Backup (Sama seperti sebelumnya)
         if (!file_exists($pathBackup)) {
-            if(!copy($pathAsli, $pathBackup)) {
+            if (!copy($pathAsli, $pathBackup)) {
                 die("Gagal membuat backup. Cek permission folder.");
             }
         }
@@ -681,8 +624,7 @@ class Peminjaman_model
         require_once __DIR__ . '/../../vendor/autoload.php';
 
         $pdf = new \setasign\Fpdi\Fpdi();
-        
-        // GUNAKAN SOURCE DARI BACKUP (PENTING!)
+
         $pageCount = $pdf->setSourceFile($pathBackup);
 
         for ($i = 1; $i <= $pageCount; $i++) {
@@ -694,15 +636,13 @@ class Peminjaman_model
             if ($i == $data['page']) {
                 $widthMM = $size['width'];
                 $heightMM = $size['height'];
-                $ttdWidth = 35; // Ukuran TTD 35mm
+                $ttdWidth = 35;
 
-                // Hitung posisi absolut (mm)
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
                 $hx = $widthMM * $data['huzain_x'];
                 $hy = $heightMM * $data['huzain_y'];
 
-                // Tempel Gambar
                 if (file_exists($pathFatimah)) {
                     $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
                 }
@@ -712,10 +652,8 @@ class Peminjaman_model
             }
         }
 
-        // Simpan Hasil (Overwrite File Asli)
         $pdf->Output($pathAsli, 'F');
 
-        // Update DB
         $query = "UPDATE trx_peminjaman SET validasi_kalab='1', validasi_laboran='1', status='disetujui' WHERE id_peminjaman=:id";
         $this->db->query($query);
         $this->db->bind('id', $id);
