@@ -9,12 +9,15 @@ if (!isset($_SESSION['login'])) {
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-body" style="text-align: center;">
-                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json" background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop autoplay></lottie-player>
+                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
+                    background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop
+                    autoplay></lottie-player>
                 <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" style="width: 100px;" onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
+                <button type="button" class="btn btn-danger" style="width: 100px;"
+                    onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
             </div>
         </div>
     </div>
@@ -90,7 +93,7 @@ if (!isset($_SESSION['login'])) {
             </form>
         </div>
 
-        <div class="table-container">
+        <div class="table-responsive">
             <form id="formCetak" action="<?= BASEURL ?>DetailBarang/cetak" method="post" target="_blank">
                 <table id="myTable" class="table table-hover" style="width:100%; margin-bottom: 0;">
                     <thead class="table-custom-header">
@@ -114,7 +117,9 @@ if (!isset($_SESSION['login'])) {
                         <?php foreach ($data['dataTampilBarang'] as $row): ?>
                             <tr>
                                 <td class="text-center">
-                                    <input type="checkbox" name="id_barang[]" value="<?= IdObfuscator::encode($row['id_barang']) ?>" class="custom-checkbox item-checkbox">
+                                    <input type="checkbox" name="id_barang[]"
+                                        value="<?= IdObfuscator::encode($row['id_barang']) ?>"
+                                        class="custom-checkbox item-checkbox">
                                 </td>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td style="font-weight:600;"><?= $row['kode_barang']; ?></td>
@@ -142,51 +147,70 @@ if (!isset($_SESSION['login'])) {
                                     <div style="display: flex; justify-content: center; gap: 10px;">
                                         <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
                                             <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
-                                                data-toggle="modal" data-target="#modalTambah" data-id="<?= IdObfuscator::encode($row['id_barang']); ?>">
-                                                <i class="fa-regular fa-pen-to-square fa-lg" style="color: var(--accent-green);"></i>
+                                                data-toggle="modal" data-target="#modalTambah"
+                                                data-id="<?= IdObfuscator::encode($row['id_barang']); ?>">
+                                                <i class="fa-regular fa-pen-to-square fa-lg"
+                                                    style="color: var(--accent-green);"></i>
                                             </a>
-                                            <a data-toggle="modal" data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" style="cursor: pointer;">
+                                            <a data-toggle="modal"
+                                                data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>"
+                                                style="cursor: pointer;">
                                                 <i class="fa-regular fa-trash-can fa-lg" style="color: var(--accent-red);"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="<?= BASEURL; ?>DetailBarang/detail/<?= IdObfuscator::encode($row['id_barang']); ?>" title="Lihat Detail">
+                                        <a href="<?= BASEURL; ?>DetailBarang/detail/<?= IdObfuscator::encode($row['id_barang']); ?>"
+                                            title="Lihat Detail">
                                             <i class="fa-solid fa-circle-info fa-lg" style="color: #1250ba;"></i>
                                         </a>
                                     </div>
 
-                                    <div class="modal fade" id="konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" tabindex="-1" role="dialog">
+                                    <div class="modal fade"
+                                        id="konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" tabindex="-1"
+                                        role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content" style="border-radius: 15px;">
                                                 <div class="modal-body" style="text-align: center;">
-                                                    <lottie-player src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json" background="transparent" speed="1" style="width: 200px; height: 200px; margin: 0 auto;" loop autoplay></lottie-player>
+                                                    <lottie-player
+                                                        src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
+                                                        background="transparent" speed="1"
+                                                        style="width: 200px; height: 200px; margin: 0 auto;" loop
+                                                        autoplay></lottie-player>
                                                     <p>Apakah anda yakin ingin menghapus item ini?</p>
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
-                                                    <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
-                                                    <button type="button" class="btn btn-danger" onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= IdObfuscator::encode($row['id_barang']) ?>'">Hapus</button>
+                                                    <button type="button" class="btn btn-light"
+                                                        data-dismiss="modal">Batal</button>
+                                                    <button type="button" class="btn btn-danger"
+                                                        onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= IdObfuscator::encode($row['id_barang']) ?>'">Hapus</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="modal fade" id="modalDetail<?= IdObfuscator::encode($row['id_barang']); ?>" tabindex="-1" role="dialog">
+                                    <div class="modal fade" id="modalDetail<?= IdObfuscator::encode($row['id_barang']); ?>"
+                                        tabindex="-1" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content" style="border-radius: 15px;">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Detail Barang</h5>
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                    <button type="button" class="close"
+                                                        data-dismiss="modal">&times;</button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="row g-3">
                                                         <div class="col-12 col-sm-6">
-                                                            <img src="<?= BASEURL . $row['foto_barang']; ?>" class="img-fluid" style="width:150px; height:150px; object-fit:cover; margin-bottom:10px;">
+                                                            <img src="<?= BASEURL . $row['foto_barang']; ?>"
+                                                                class="img-fluid"
+                                                                style="width:150px; height:150px; object-fit:cover; margin-bottom:10px;">
                                                             <p><strong>Kode:</strong> <?= $row['kode_barang']; ?></p>
                                                             <p><strong>Merek:</strong> <?= $row['nama_merek_barang']; ?></p>
                                                         </div>
                                                         <div class="col-12 col-sm-6">
-                                                            <img src="<?= BASEURL . $row['qr_code'] ?>" style="width:150px; height:150px;">
+                                                            <img src="<?= BASEURL . $row['qr_code'] ?>"
+                                                                style="width:150px; height:150px;">
                                                             <p><strong>Kondisi:</strong> <?= $row['kondisi_barang']; ?></p>
-                                                            <p><strong>Lokasi:</strong> <?= $row['nama_lokasi_penyimpanan']; ?></p>
+                                                            <p><strong>Lokasi:</strong>
+                                                                <?= $row['nama_lokasi_penyimpanan']; ?></p>
                                                         </div>
                                                     </div>
                                                 </div>

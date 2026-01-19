@@ -116,6 +116,7 @@
     overflow: hidden;
     width: 320px;
 }
+
 .search-box {
     position: relative;
     width: 100%;
@@ -190,6 +191,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -233,6 +235,10 @@
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    overflow-x: auto;
+    /* ← Horizontal scroll */
+    -webkit-overflow-scrolling: touch;
+    /* ← Smooth scroll di mobile */
 }
 
 .table {
@@ -311,17 +317,17 @@
     .content {
         padding: 25px;
     }
-    
+
     .content-beranda h1 {
         font-size: 1.75rem;
     }
-    
+
     .btn-custom-tambah,
     .btn-custom-export {
         min-width: 110px;
         padding: 10px 18px;
     }
-    
+
     .search-container {
         max-width: 280px;
     }
@@ -332,44 +338,45 @@
     .content {
         margin-left: 0;
         width: 100%;
-        padding: 80px 20px 20px; /* Extra padding top untuk hamburger */
+        padding: 80px 20px 20px;
+        /* Extra padding top untuk hamburger */
     }
-    
+
     .content-beranda h1 {
         font-size: 1.6rem;
         margin-top: 10px;
     }
-    
+
     .top-action-bar {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
-    
+
     .left-buttons {
         width: 100%;
         justify-content: flex-start;
     }
-    
+
     .search-container {
         max-width: 100%;
         width: 100%;
     }
-    
+
     #filterSection form {
         flex-direction: column;
     }
-    
+
     .custom-select {
         width: 100%;
         min-width: auto;
     }
-    
+
     /* Table scroll horizontal */
     .table-container {
         overflow-x: auto;
     }
-    
+
     .table {
         min-width: 900px;
     }
@@ -380,12 +387,12 @@
     .content {
         padding: 70px 15px 15px;
     }
-    
+
     .content-beranda h1 {
         font-size: 1.4rem;
         margin-bottom: 15px;
     }
-    
+
     .btn-custom-tambah,
     .btn-custom-export {
         padding: 10px 16px;
@@ -393,35 +400,35 @@
         gap: 6px;
         min-width: 100px;
     }
-    
+
     .btn-custom-tambah i,
     .btn-custom-export i {
         font-size: 14px;
     }
-    
+
     #filterSection {
         padding: 15px;
     }
-    
+
     #filterSection h6 {
         font-size: 14px;
     }
-    
+
     .custom-select {
         padding: 8px 12px;
         font-size: 13px;
     }
-    
+
     .table-custom-header th {
         padding: 12px;
         font-size: 13px;
     }
-    
+
     .table td {
         padding: 10px 12px;
         font-size: 13px;
     }
-    
+
     .badge-status {
         padding: 5px 10px;
         font-size: 11px;
@@ -434,21 +441,21 @@
     .content {
         padding: 65px 12px 12px;
     }
-    
+
     .content-beranda h1 {
         font-size: 1.25rem;
         margin-bottom: 12px;
     }
-    
+
     .top-action-bar {
         gap: 10px;
     }
-    
+
     .left-buttons {
         width: 100%;
         gap: 8px;
     }
-    
+
     .btn-custom-tambah,
     .btn-custom-export {
         flex: 1;
@@ -456,56 +463,56 @@
         padding: 10px 14px;
         font-size: 12px;
     }
-    
+
     .search-input {
         padding: 10px 40px 10px 40px;
         font-size: 13px;
     }
-    
+
     .search-icon,
     .filter-trigger {
         font-size: 14px;
     }
-    
+
     #filterSection {
         padding: 12px;
     }
-    
+
     #filterSection h6 {
         font-size: 13px;
         margin-bottom: 10px;
     }
-    
+
     .custom-select {
         padding: 8px 10px;
         font-size: 12px;
     }
-    
+
     .table {
         min-width: 800px;
     }
-    
+
     .table-custom-header th {
         padding: 10px 8px;
         font-size: 12px;
     }
-    
+
     .table td {
         padding: 8px;
         font-size: 12px;
     }
-    
+
     .badge-status {
         padding: 4px 8px;
         font-size: 10px;
         min-width: 60px;
     }
-    
+
     .custom-checkbox {
         width: 16px;
         height: 16px;
     }
-    
+
     /* Icon actions lebih kecil */
     .table td i {
         font-size: 1rem !important;
@@ -517,27 +524,27 @@
     .content {
         padding: 60px 10px 10px;
     }
-    
+
     .content-beranda h1 {
         font-size: 1.15rem;
     }
-    
+
     .btn-custom-tambah,
     .btn-custom-export {
         padding: 9px 12px;
         font-size: 11px;
     }
-    
+
     .search-input {
         padding: 9px 38px 9px 38px;
         font-size: 12px;
     }
-    
+
     .table-custom-header th {
         padding: 8px 6px;
         font-size: 11px;
     }
-    
+
     .table td {
         padding: 7px 6px;
         font-size: 11px;
@@ -550,22 +557,22 @@
         max-width: 95%;
         margin: 1.75rem auto;
     }
-    
+
     .modal-content {
         width: 100% !important;
     }
 }
 
 @media screen and (max-width: 768px) {
-    .modal-body.body-barang form > div {
+    .modal-body.body-barang form>div {
         flex-direction: column !important;
         gap: 0 !important;
     }
-    
-    .modal-body.body-barang form > div > div {
+
+    .modal-body.body-barang form>div>div {
         width: 100% !important;
     }
-    
+
     .modal-body.body-barang input[type="text"],
     .modal-body.body-barang input[type="number"],
     .modal-body.body-barang input[type="date"],
