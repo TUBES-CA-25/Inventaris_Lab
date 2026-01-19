@@ -30,12 +30,12 @@
         <tr>
             <td class="col-label">Nama</td>
             <td class="col-sep">:</td>
-            <td><b><?= $user['nama_user']; ?></b></td>
+            <td><?= $user['nama_user']; ?></td>
         </tr>
         <tr>
             <td>No Identitas (Stambuk/NIPS)</td>
             <td>:</td>
-            <td><?= isset($user['nim']) ? $user['nim'] : '-'; ?></td>
+            <td><?= isset($user['nim_nip']) ? $user['nim_nip'] : '-'; ?></td>
         </tr>
         <tr>
             <td>No Telp</td>
@@ -112,7 +112,7 @@
             <td class="ttd-col">
                 Makassar, <?= date('d F Y'); ?><br>
                 <b>Yang Menyatakan,</b>
-                <br><br><br><br> <span class="underline-name">( <?= $user['nama_user']; ?> )</span>
+                <br><br><br><br> <span class="underline-name"><?= $user['nama_user']; ?></span>
             </td>
         </tr>
     </table>

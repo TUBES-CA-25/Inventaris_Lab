@@ -1,201 +1,295 @@
 <?php
-// Cek sesi login & role
-if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
+// CEK KEAMANAN AKSES
+if (!isset($_SESSION['login'])) {
     header("Location:" . BASEURL . "Login");
     exit;
 }
 
-// Ambil data & standarkan status jadi huruf kecil
 $p = $data['peminjaman'];
 $status_sekarang = strtolower($p['status']);
+$role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
 ?>
 
-<link rel="stylesheet" href="<?= BASEURL; ?>css/validasi-peminjaman.css">
 <style>
-    /* Styling Tambahan untuk Form Tolak */
-    .form-container-custom { display: none; margin-top: 20px; padding: 20px; border-radius: 8px; animation: fadeIn 0.3s ease-in-out; }
-    .form-tolak-normal { background-color: #f8f9fa; border: 1px solid #dee2e6; }
-    .form-tolak-danger { background-color: #fff5f5; border: 1px solid #ef4444; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .step-card {
+        border: 1px solid #e3e6f0;
+        border-radius: 0.5rem;
+        background-color: #fff;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    .step-card:hover { box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); transform: translateY(-2px); }
+    
+    .step-icon {
+        width: 45px; height: 45px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 1.2rem;
+        margin-right: 15px; flex-shrink: 0;
+    }
+    .step-pending { background-color: #eaecf4; color: #858796; border: 2px solid #d1d3e2; }
+    .step-active  { background-color: #4e73df; color: white; border: 2px solid #4e73df; box-shadow: 0 0 10px rgba(78, 115, 223, 0.5); }
+    .step-success { background-color: #1cc88a; color: white; border: 2px solid #1cc88a; }
+    
+    /* Form Tolak Animasi */
+    .form-section-hidden { display: none; margin-top: 20px; animation: slideDown 0.3s ease-out; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <div class="content">
     <div class="container-fluid p-4">
-        <h1 class="page-title mb-4">Detail Peminjaman</h1>
-
-        <div class="d-flex justify-content-between align-items-start">
-            <div class="w-100 me-3">
-                <div class="row mb-3">
-                    <div class="col-12"><div class="detail-label">Judul kegiatan</div><div class="detail-value"><?= $p['judul_kegiatan'] ? $p['judul_kegiatan'] : '-'; ?></div></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-12"><div class="detail-label">Tanggal pengajuan</div><div class="detail-value"><?= date('d F Y', strtotime($p['tanggal_pengajuan'])); ?></div></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6"><div class="detail-label">Mulai tanggal</div><div class="detail-value"><?= date('d F Y', strtotime($p['tanggal_peminjaman'])); ?></div></div>
-                    <div class="col-md-6"><div class="detail-label">Sampai tanggal</div><div class="detail-value"><?= date('d F Y', strtotime($p['tanggal_pengembalian'])); ?></div></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="detail-label">Barang</div>
-                        <ul class="items-list" style="padding-left:15px; margin:0;">
-                            <?php if (!empty($data['detail_barang'])) : foreach ($data['detail_barang'] as $item) : ?>
-                                <li><?= htmlspecialchars($item['nama_barang']); ?></li>
-                            <?php endforeach; else : ?><li>-</li><?php endif; ?>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="detail-label">Jumlah</div>
-                        <ul class="items-list" style="list-style:none; padding:0; margin:0;">
-                            <?php if (!empty($data['detail_barang'])) : foreach ($data['detail_barang'] as $item) : ?>
-                                <li><?= $item['jumlah']; ?> Unit</li>
-                            <?php endforeach; ?>
-                            <li style="margin-top:5px; border-top:1px dashed #ccc;"><strong>Total: <?= $p['jumlah_peminjaman']; ?> Unit</strong></li>
-                        <?php else : ?><li>0 Unit</li><?php endif; ?>
-                        </ul>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-12"><div class="detail-label">Keterangan / Alasan</div><div class="detail-value"><?= $p['keterangan_peminjaman'] ? $p['keterangan_peminjaman'] : '-'; ?></div></div>
-                </div>
-            </div>
-
-            <div class="flex-shrink-0">
-                <?php if (!empty($p['file_surat'])) : ?>
-                    <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" class="btn-pdf">
-                        <i class="fas fa-file-pdf" style="font-size:30px; display:block; margin-bottom:5px;"></i><span>Lihat PDF</span>
-                    </a>
-                <?php else : ?>
-                    <div class="btn-pdf-disabled"><i class="fas fa-file-pdf" style="font-size:30px; display:block; margin-bottom:5px;"></i><span>No File</span></div>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="action-buttons-container mt-5 pt-3 border-top">
-
-            <?php if ($status_sekarang == 'diproses') : ?>
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" style="display:inline;">
-                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
-                    <input type="hidden" name="status" value="disetujui">
-                    <button type="submit" class="btn-action btn-terima" onclick="return confirm('Yakin ingin menyetujui?')">
-                        <i class="fas fa-check"></i> Setujui
-                    </button>
-                </form>
-                <button type="button" class="btn-action btn-tolak" onclick="toggleFormTolak()">
-                    <i class="fas fa-times"></i> Tolak
-                </button>
-
-            <?php elseif ($status_sekarang == 'disetujui') : ?>
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" style="display:inline;">
-                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
-                    <input type="hidden" name="status" value="dikembalikan">
-                    <button type="submit" class="btn-action btn-kembali-barang" onclick="return confirm('Barang sudah dikembalikan lengkap?')">
-                        <i class="fas fa-box-open"></i> Terima Barang
-                    </button>
-                </form>
-                <button type="button" class="btn-action btn-tolak" onclick="toggleFormTolakPengembalian()">
-                    <i class="fas fa-exclamation-triangle"></i> Tolak Pengembalian
-                </button>
-
-            <?php elseif ($status_sekarang == 'ditolak') : ?>
-                <div class="alert alert-danger w-100 d-flex align-items-center" role="alert">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <div>
-                        <strong>Pengembalian Ditolak.</strong><br>
-                        Alasan: "<?= !empty($p['alasan_penolakan']) ? $p['alasan_penolakan'] : '-'; ?>"
-                    </div>
-                </div>
-
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" style="display:inline;">
-                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
-                    <input type="hidden" name="status" value="dikembalikan">
-                    <button type="submit" class="btn-action btn-kembali-barang" onclick="return confirm('Ubah status menjadi Diterima/Dikembalikan?')">
-                        <i class="fas fa-undo"></i> Ubah jadi Diterima
-                    </button>
-                </form>
-
-                <button type="button" class="btn-action btn-tolak" onclick="toggleFormTolakPengembalian()">
-                    <i class="fas fa-edit"></i> Edit Penolakan
-                </button>
-
-            <?php else: ?>
-                <div class="alert alert-secondary w-100">
-                    Status saat ini: <strong><?= ucfirst($status_sekarang); ?></strong>
-                </div>
-            <?php endif; ?>
-
-        </div>
-
-        <div id="formTolakContainer" class="form-container-custom form-tolak-normal">
-            <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
-                <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
-                <input type="hidden" name="status" value="ditolak">
-                <div class="catatan-section">
-                    <div class="detail-label" style="color:var(--btn-red)">Alasan Penolakan:</div>
-                    <textarea class="catatan-box form-control mt-2" name="pesan_penolakan" required placeholder="Tulis alasan..." rows="3"></textarea>
-                </div>
-                <div class="mt-3">
-                    <button type="submit" class="btn-action btn-tolak">Kirim</button>
-                    <button type="button" class="btn btn-secondary ms-2" onclick="toggleFormTolak()">Batal</button>
-                </div>
-            </form>
-        </div>
-
-        <div id="formTolakPengembalianContainer" class="form-container-custom form-tolak-danger">
-            <h5 style="color:#ef4444; font-weight:bold;">
-                <?= ($status_sekarang == 'ditolak') ? 'Edit Alasan Penolakan' : 'Tolak Pengembalian Barang'; ?>
-            </h5>
-            <p style="font-size:13px; color:#666;">Data ini akan disimpan di tabel Penolakan Pengembalian.</p>
+        
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Detail Peminjaman</h1>
             
-            <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
-                <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
-                <div class="catatan-section">
-                    <div class="detail-label" style="color:#ef4444">Alasan / Masalah:</div>
-                    <textarea class="catatan-box form-control mt-2" name="alasan_penolakan" required placeholder="Contoh: Barang lecet, kabel hilang..." rows="3"><?= !empty($p['alasan_penolakan']) ? $p['alasan_penolakan'] : ''; ?></textarea>
-                </div>
-                <div class="mt-3">
-                    <button type="submit" class="btn-action btn-tolak">
-                        <?= ($status_sekarang == 'ditolak') ? 'Simpan Perubahan' : 'Kirim Penolakan'; ?>
-                    </button>
-                    <button type="button" class="btn btn-secondary ms-2" onclick="toggleFormTolakPengembalian()">Batal</button>
-                </div>
-            </form>
+            <?php 
+                $badgeColor = 'secondary';
+                if($status_sekarang == 'disetujui') $badgeColor = 'success';
+                if($status_sekarang == 'ditolak') $badgeColor = 'danger';
+                if($status_sekarang == 'diproses') $badgeColor = 'warning';
+            ?>
+            <span class="badge badge-<?= $badgeColor; ?> px-3 py-2" style="font-size: 1rem;">
+                Status: <?= ucfirst($status_sekarang); ?>
+            </span>
         </div>
 
-        <div class="bottom-nav-container mt-4">
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn-nav-kembali text-decoration-none"><i class="fas fa-arrow-left"></i> Kembali</a>
+        <div class="row">
+            <div class="col-xl-7 col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Peminjam</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-borderless" width="100%" cellspacing="0">
+                                <tr>
+                                    <th width="35%">Nama Peminjam</th>
+                                    <td>: <strong><?= $p['nama_user']; ?></strong> (<?= $p['nim_nip']; ?>)</td>
+                                </tr>
+                                <tr>
+                                    <th>Judul Kegiatan</th>
+                                    <td>: <?= $p['judul_kegiatan']; ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Tanggal Pengajuan</th>
+                                    <td>: <?= date('d F Y', strtotime($p['tanggal_pengajuan'])); ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Waktu Peminjaman</th>
+                                    <td>: <span class="text-primary"><?= date('d M Y', strtotime($p['tanggal_peminjaman'])); ?></span> s/d <span class="text-primary"><?= date('d M Y', strtotime($p['tanggal_pengembalian'])); ?></span></td>
+                                </tr>
+                                <tr>
+                                    <th>Keterangan</th>
+                                    <td>: <?= $p['keterangan_peminjaman'] ? $p['keterangan_peminjaman'] : '-'; ?></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <hr>
+                        <h6 class="font-weight-bold text-gray-800 ml-2">Barang yang Dipinjam:</h6>
+                        <ul class="list-group list-group-flush mt-2">
+                            <?php if (!empty($data['detail_barang'])) : foreach ($data['detail_barang'] as $item) : ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-box mr-2 text-gray-400"></i> <?= htmlspecialchars($item['nama_barang']); ?></span>
+                                    <span class="badge badge-primary badge-pill"><?= $item['jumlah']; ?> Unit</span>
+                                </li>
+                            <?php endforeach; else : ?><li class="list-group-item text-muted">Tidak ada data barang.</li><?php endif; ?>
+                            <li class="list-group-item active text-center font-weight-bold">Total: <?= $p['jumlah_peminjaman']; ?> Unit</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-5 col-lg-6">
+                
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Surat Permohonan</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <?php if (!empty($p['file_surat'])) : ?>
+                            <div class="mb-3">
+                                <i class="fas fa-file-pdf text-danger" style="font-size: 50px;"></i>
+                                <p class="mt-2 small text-muted"><?= $p['file_surat']; ?></p>
+                            </div>
+                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" class="btn btn-danger btn-icon-split btn-sm">
+                                <span class="icon text-white-50"><i class="fas fa-download"></i></span>
+                                <span class="text">Download / Lihat Surat</span>
+                            </a>
+                        <?php else : ?>
+                            <div class="alert alert-warning">File surat belum diupload.</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php if ($status_sekarang == 'diproses') : ?>
+                <div class="card shadow mb-4 border-bottom-warning">
+                    <div class="card-header py-3 bg-warning text-white">
+                        <h6 class="m-0 font-weight-bold">Proses Validasi</h6>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="step-card">
+                            <div class="step-icon <?= ($p['validasi_kalab'] == '1') ? 'step-success' : 'step-pending'; ?>">
+                                <?= ($p['validasi_kalab'] == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="font-weight-bold mb-0 text-gray-800">Kepala Lab</h6>
+                                <small>Huzain Aziz</small>
+                            </div>
+                            
+                            <div>
+                                <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
+                                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= $p['id_peminjaman']; ?>" 
+                                       class="btn btn-primary btn-sm shadow-sm">
+                                        <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
+                                    </a>
+                                <?php elseif ($p['validasi_kalab'] == '1') : ?>
+                                    <span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span>
+                                <?php else : ?>
+                                    <span class="badge badge-light text-muted">Menunggu</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="step-card">
+                            <div class="step-icon <?= ($p['validasi_laboran'] == '1') ? 'step-success' : (($p['validasi_kalab'] == '1') ? 'step-active' : 'step-pending'); ?>">
+                                <?= ($p['validasi_laboran'] == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="font-weight-bold mb-0 text-gray-800">Laboran</h6>
+                                <small>Fatimah Azzahrah</small>
+                            </div>
+
+                            <div>
+                                <?php if ($role_login == '2' && $p['validasi_laboran'] == '0') : ?>
+                                    
+                                    <?php if ($p['validasi_kalab'] == '1') : ?>
+                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= $p['id_peminjaman']; ?>" 
+                                           class="btn btn-success btn-sm shadow-sm">
+                                            <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
+                                        </a>
+                                    <?php else : ?>
+                                        <button class="btn btn-secondary btn-sm" disabled style="cursor: not-allowed; opacity: 0.7;">
+                                            <i class="fas fa-lock"></i> Terkunci
+                                        </button>
+                                    <?php endif; ?>
+
+                                <?php elseif ($p['validasi_laboran'] == '1') : ?>
+                                    <span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <button type="button" class="btn btn-danger btn-block" onclick="bukaFormTolak('formTolakContainer')">
+                            <i class="fas fa-times mr-2"></i>Tolak Peminjaman
+                        </button>
+
+                    </div>
+                </div>
+
+                <?php elseif ($status_sekarang == 'disetujui') : ?>
+                    <div class="card shadow mb-4 border-left-success">
+                        <div class="card-body">
+                            <h5 class="text-success font-weight-bold"><i class="fas fa-check-circle"></i> Sedang Dipinjam</h5>
+                            <p class="mb-3">Barang sudah diambil. Tunggu pengembalian.</p>
+                            
+                            <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
+                                <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                                <input type="hidden" name="status" value="dikembalikan">
+                                <button type="submit" class="btn btn-primary btn-block shadow-sm" onclick="return confirm('Yakin barang sudah dikembalikan lengkap?')">
+                                    <i class="fas fa-box-open mr-2"></i>Terima Pengembalian
+                                </button>
+                            </form>
+
+                            <button type="button" class="btn btn-outline-danger btn-block btn-sm" onclick="bukaFormTolak('formTolakPengembalianContainer')">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Lapor Masalah
+                            </button>
+                        </div>
+                    </div>
+
+                <?php elseif ($status_sekarang == 'ditolak') : ?>
+                    <div class="card shadow mb-4 border-left-danger">
+                        <div class="card-body">
+                            <h5 class="text-danger font-weight-bold"><i class="fas fa-times-circle"></i> Ditolak</h5>
+                            <p class="mb-0"><strong>Alasan:</strong> <?= !empty($p['alasan_penolakan']) ? $p['alasan_penolakan'] : '-'; ?></p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+            </div>
         </div>
+
+        <div id="formTolakContainer" class="card shadow mb-4 border-bottom-danger form-section-hidden">
+            <div class="card-header py-3 bg-danger text-white">
+                <h6 class="m-0 font-weight-bold">Form Penolakan</h6>
+            </div>
+            <div class="card-body">
+                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
+                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                    <input type="hidden" name="status" value="ditolak">
+                    <div class="form-group">
+                        <label>Alasan Penolakan:</label>
+                        <textarea class="form-control" name="pesan_penolakan" required rows="3" placeholder="Contoh: Jadwal bentrok..."></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakContainer')">Batal</button>
+                        <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="formTolakPengembalianContainer" class="card shadow mb-4 border-bottom-danger form-section-hidden">
+            <div class="card-header py-3 bg-danger text-white">
+                <h6 class="m-0 font-weight-bold">Lapor Masalah Pengembalian</h6>
+            </div>
+            <div class="card-body">
+                <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
+                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                    <div class="form-group">
+                        <label>Detail Masalah (Rusak/Hilang):</label>
+                        <textarea class="form-control" name="alasan_penolakan" required rows="3"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakPengembalianContainer')">Batal</button>
+                        <button type="submit" class="btn btn-danger">Simpan Laporan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn btn-secondary btn-icon-split">
+                <span class="icon text-white-50"><i class="fas fa-arrow-left"></i></span>
+                <span class="text">Kembali ke Daftar</span>
+            </a>
+        </div>
+
     </div>
 </div>
 
 <script>
-    // 1. Toggle Form Tolak Biasa
-    function toggleFormTolak() {
-        var formTolak = document.getElementById("formTolakContainer");
-        var formPengembalian = document.getElementById("formTolakPengembalianContainer");
+    // Fungsi ini dibuat di Global Scope agar tidak terpengaruh error library lain
+    function bukaFormTolak(id) {
+        // Tutup semua form dulu
+        document.getElementById('formTolakContainer').style.display = 'none';
+        document.getElementById('formTolakPengembalianContainer').style.display = 'none';
         
-        if(formPengembalian) formPengembalian.style.display = "none"; // Tutup yang lain
-
-        if (formTolak.style.display === "none" || formTolak.style.display === "") {
-            formTolak.style.display = "block";
-            formTolak.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            formTolak.style.display = "none";
+        // Buka yang diminta
+        var el = document.getElementById(id);
+        if(el) {
+            el.style.display = 'block';
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 
-    // 2. Toggle Form Tolak Pengembalian (YANG HILANG SEBELUMNYA)
-    function toggleFormTolakPengembalian() {
-        var formTolak = document.getElementById("formTolakContainer");
-        var formPengembalian = document.getElementById("formTolakPengembalianContainer");
-
-        if(formTolak) formTolak.style.display = "none"; // Tutup yang lain
-
-        if (formPengembalian.style.display === "none" || formPengembalian.style.display === "") {
-            formPengembalian.style.display = "block";
-            formPengembalian.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            formPengembalian.style.display = "none";
-        }
+    function tutupForm(id) {
+        var el = document.getElementById(id);
+        if(el) el.style.display = 'none';
     }
 </script>

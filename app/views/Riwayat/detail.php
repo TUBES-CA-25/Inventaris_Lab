@@ -3,217 +3,174 @@ if (!isset($_SESSION['login'])) {
     header("Location: " . BASEURL . "Login");
     exit;
 }
+
+// Helper untuk status
+$st = strtolower($data['info_peminjaman']['status']);
+$statusClass = 'status-info';
+$statusIcon = 'fa-clock';
+
+if (in_array($st, ['disetujui', 'diterima'])) {
+    $statusClass = 'status-success';
+    $statusIcon = 'fa-check-circle';
+} elseif ($st === 'ditolak') {
+    $statusClass = 'status-danger';
+    $statusIcon = 'fa-times-circle';
+} elseif (in_array($st, ['melengkapi surat', 'melengkapi'])) {
+    $statusClass = 'status-warning';
+    $statusIcon = 'fa-file-signature';
+}
 ?>
+
 <div class="container-fluid p-4">
-    
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="page-header">
         <div>
-            <h4 class="mb-0 font-weight-bold text-dark">Detail Peminjaman</h4>
-            <small class="text-muted">Kelola dan pantau detail item yang dipinjam.</small>
+            <h2 class="page-title">Detail Peminjaman</h2>
         </div>
-        <a href="<?= BASEURL; ?>Riwayat/index" class="btn btn-outline-navy shadow-sm">
-            <i class="fas fa-arrow-left mr-2"></i>Kembali
-        </a>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="<?= BASEURL ?>Riwayat/index" class="btn-modern btn-back">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+            <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= $data['info_peminjaman']['id_peminjaman'] ?>"
+                target="_blank" class="btn-modern btn-pdf">
+                <i class="fas fa-file-pdf"></i> Cetak Bukti
+            </a>
+        </div>
     </div>
 
-    <div class="card card-modern mb-4">
-        <div class="card-header-custom">
-            <?php 
-                $st = strtolower($data['info_peminjaman']['status']);
-                if ($st == 'disetujui' || $st == 'diterima') { 
-                    $icon = 'fa-check-circle'; $color = 'text-success'; $bg = 'bg-success-light';
-                } elseif ($st == 'ditolak') { 
-                    $icon = 'fa-times-circle'; $color = 'text-danger'; $bg = 'bg-danger-light';
-                } elseif ($st == 'melengkapi surat') {
-                    $icon = 'fa-file-signature'; $color = 'text-warning'; $bg = 'bg-warning-light';
-                } else { 
-                    $icon = 'fa-hourglass-half'; $color = 'text-info'; $bg = 'bg-info-light';
-                }
-            ?>
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <div class="status-icon-circle <?= $bg; ?> mr-3">
-                        <i class="fas <?= $icon; ?> <?= $color; ?>"></i>
-                    </div>
-                    <div>
-                        <h5 class="mb-1 font-weight-bold">Peminjaman #<?= $data['info_peminjaman']['id_peminjaman']; ?></h5>
-                        <p class="mb-0 text-muted small">ID Transaksi</p>
-                    </div>
+    <div class="card-clean mb-4">
+        <div class="status-banner">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-info-circle fa-lg"></i>
+                <div>
+                    <h6 class="mb-0 text-white">Status Pengajuan</h6>
+                    <small class="text-white-75">Terakhir diperbarui <?= date('d M Y H:i') ?></small>
                 </div>
-                <span class="badge badge-pill badge-status px-4 py-2 <?= 'badge-'.$st; ?>">
-                    <i class="fas <?= $icon; ?> mr-1"></i><?= ucfirst($st); ?>
-                </span>
             </div>
+
+            <span class="status-pill <?= $statusClass ?>">
+                <i class="fas <?= $statusIcon ?>"></i>
+                <?= ucwords($data['info_peminjaman']['status']) ?>
+            </span>
         </div>
 
-        <div class="card-body p-4">
-            <div class="row">
-                <div class="col-md-12 mb-4">
-                    <div class="info-box-full">
-                        <div class="info-icon bg-primary-light">
-                            <i class="fas fa-clipboard-list text-primary"></i>
-                        </div>
-                        <div class="info-content">
-                            <label class="info-label">Judul Kegiatan</label>
-                            <h6 class="info-value mb-0"><?= $data['info_peminjaman']['judul_kegiatan']; ?></h6>
-                        </div>
+        <div class="card-body-clean">
+            <div class="detail-cards-grid">
+
+                <div class="detail-card">
+                    <div class="detail-card-label">Judul Kegiatan</div>
+                    <div class="detail-card-value">
+                        <?= htmlspecialchars($data['info_peminjaman']['judul_kegiatan'] ?? '-') ?>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="info-box">
-                        <div class="info-icon bg-info-light">
-                            <i class="fas fa-user text-info"></i>
-                        </div>
-                        <div class="info-content">
-                            <label class="info-label">Nama Peminjam</label>
-                            <h6 class="info-value mb-0"><?= $data['info_peminjaman']['nama_peminjam']; ?></h6>
-                        </div>
+                <div class="detail-card">
+                    <div class="detail-card-label">Peminjam</div>
+                    <div class="detail-card-value">
+                        <?= htmlspecialchars($data['info_peminjaman']['nama_peminjam'] ?? '-') ?>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="info-box">
-                        <div class="info-icon bg-warning-light">
-                            <i class="fas fa-calendar-plus text-warning"></i>
-                        </div>
-                        <div class="info-content">
-                            <label class="info-label">Tanggal Pengajuan</label>
-                            <h6 class="info-value mb-0"><?= date('d M Y', strtotime($data['info_peminjaman']['tanggal_pengajuan'])); ?></h6>
-                        </div>
+                <div class="detail-card">
+                    <div class="detail-card-label">Tanggal Pengajuan</div>
+                    <div class="detail-card-value">
+                        <?= date('d M Y', strtotime($data['info_peminjaman']['tanggal_pengajuan'] ?? 'now')) ?>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="info-box">
-                        <div class="info-icon bg-success-light">
-                            <i class="fas fa-calendar-check text-success"></i>
-                        </div>
-                        <div class="info-content">
-                            <label class="info-label">Tanggal Peminjaman</label>
-                            <h6 class="info-value mb-0"><?= date('d M Y', strtotime($data['info_peminjaman']['tanggal_peminjaman'])); ?></h6>
-                        </div>
+                <div class="detail-card">
+                    <div class="detail-card-label">Durasi Peminjaman</div>
+                    <?php
+                    $start = new DateTime($data['info_peminjaman']['tanggal_peminjaman'] ?? 'now');
+                    $end   = new DateTime($data['info_peminjaman']['tanggal_pengembalian'] ?? 'now');
+                    $diff  = $start->diff($end);
+                    ?>
+                    <div class="detail-card-value duration-highlight">
+                        <?= $diff->days ?> Hari
+                    </div>
+                    <div class="detail-card-range">
+                        <small class="text-muted">
+                            <?= date('d/m/Y', $start->getTimestamp()) ?> →
+                            <?= date('d/m/Y', $end->getTimestamp()) ?>
+                        </small>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <div class="info-box">
-                        <div class="info-icon bg-danger-light">
-                            <i class="fas fa-calendar-times text-danger"></i>
-                        </div>
-                        <div class="info-content">
-                            <label class="info-label">Tanggal Pengembalian</label>
-                            <h6 class="info-value mb-0"><?= date('d M Y', strtotime($data['info_peminjaman']['tanggal_pengembalian'])); ?></h6>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12 mt-2">
-                    <div class="duration-box">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-clock text-navy fa-2x mr-3"></i>
-                            <div>
-                                <label class="info-label mb-1">Durasi Peminjaman</label>
-                                <h5 class="mb-0 text-navy font-weight-bold">
-                                    <?php
-                                        $start = new DateTime($data['info_peminjaman']['tanggal_peminjaman']);
-                                        $end = new DateTime($data['info_peminjaman']['tanggal_pengembalian']);
-                                        $diff = $start->diff($end);
-                                        echo $diff->days . ' Hari';
-                                    ?>
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <div class="card card-modern">
-        <div class="card-header bg-gradient-navy text-white py-3">
+    <div class="card-clean">
+        <div class="item-header-navy">
             <div class="d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold">
-                    <i class="fas fa-boxes mr-2"></i>Daftar Barang Dipinjam
+                <h6 class="m-0 text-white">
+                    <i class="fas fa-box-open me-2"></i>
+                    Item yang Dipinjam
                 </h6>
-                <span class="badge badge-light-navy px-3 py-2">
-                    <i class="fas fa-cube mr-1"></i>Total: <?= count($data['detail_barang']); ?> Item
+                <span class="badge bg-white text-dark border-0 px-3 py-2 fw-medium">
+                    Total: <?= count($data['detail_barang'] ?? []) ?> item
                 </span>
             </div>
         </div>
-        
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="thead-light">
+
+        <div class="table-container">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="10%">Foto</th>
+                        <th width="20%">Nama Barang</th>
+                        <th width="20%">Spesifikasi</th>
+                        <th width="15%">Kode</th>
+                        <th width="10%" class="text-center">Jml</th>
+                        <th width="15%">Kondisi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($data['detail_barang'])): ?>
                         <tr>
-                            <th class="pl-4 py-3" width="5%">No</th>
-                            <th class="py-3" width="12%">Gambar</th>
-                            <th class="py-3" width="35%">Detail Barang</th>
-                            <th class="text-center py-3" width="15%">Kode Barang</th>
-                            <th class="text-center py-3" width="13%">Jumlah</th>
-                            <th class="text-center py-3" width="15%">Kondisi</th>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fas fa-box-open fa-2x mb-3 d-block opacity-50"></i>
+                                Tidak ada data barang
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        $no = 1;
-                        if (empty($data['detail_barang'])) : ?>
+                    <?php else: ?>
+                        <?php $no = 1;
+                        foreach ($data['detail_barang'] as $item): ?>
                             <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="empty-state">
-                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="text-muted mb-0">Tidak ada barang dalam transaksi ini.</p>
+                                <td><?= $no++ ?></td>
+                                <td>
+                                    <div class="img-zoom-container" onclick="showImageModal('<?= $item['foto_url_ready'] ?>', '<?= htmlspecialchars($item['nama_barang'] ?? '-') ?>')">
+                                        <img src="<?= $item['foto_url_ready'] ?>" alt="Foto" class="item-thumb">
+                                        <div class="zoom-overlay"><i class="fas fa-search-plus"></i></div>
                                     </div>
                                 </td>
+                                <td>
+                                    <div class="fw-bold"><?= htmlspecialchars($item['nama_barang'] ?? '-') ?></div>
+                                    <small class="text-muted">Inventaris Lab</small>
+                                </td>
+                                <td>
+                                    <span class="text-dark">
+                                        <?= htmlspecialchars($item['spesifikasi_barang']) ?>
+                                    </span>
+                                </td>
+                                <td><span class="item-code"><?= htmlspecialchars($item['kode_barang'] ?? '-') ?></span></td>
+                                <td class="text-center"><span class="item-qty"><?= $item['jumlah'] ?? 0 ?></span></td>
+                                <td>
+                                    <span class="badge bg-light border text-dark px-3 py-2">
+                                        <?= htmlspecialchars($item['kondisi'] ?? 'Baik') ?>
+                                    </span>
+                                </td>
                             </tr>
-                        <?php else : ?>
-                            <?php foreach ($data['detail_barang'] as $item) : ?>
-                                <tr class="item-row">
-                                    <td class="pl-4">
-                                        <div class="number-badge"><?= $no++; ?></div>
-                                    </td>
-                                    
-                                    <td>
-                                        <div class="img-wrapper-table">
-                                            <?php 
-                                                $foto = !empty($item['foto_barang']) ? BASEURL . '../public/img/foto-barang/' . $item['foto_barang'] : 'https://via.placeholder.com/80?text=No+Image';
-                                            ?>
-                                            <img src="<?= $foto; ?>" alt="Foto" class="img-fluid">
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <div class="item-name">
-                                            <h6 class="mb-1 font-weight-bold text-dark"><?= $item['nama_barang']; ?></h6>
-                                            <small class="text-muted">Barang Inventaris</small>
-                                        </div>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <span class="code-badge">
-                                            <i class="fas fa-barcode mr-1"></i><?= $item['kode_barang']; ?>
-                                        </span>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <span class="quantity-badge">
-                                            <?= $item['jumlah']; ?> <small>Unit</small>
-                                        </span>
-                                    </td>
-                                    
-                                    <td class="text-center">
-                                        <span class="badge badge-kondisi">
-                                            <i class="fas fa-check-circle mr-1"></i><?= $item['kondisi'] ?? 'Baik'; ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
-
 </div>
+<div id="imageModal" class="modal-overlay" onclick="closeImageModal()">
+    <span class="close-btn">&times;</span>
+    <img id="fullImage" class="modal-content-img" src="">
+    <div id="imageCaption" class="image-caption"></div>
+</div>
+

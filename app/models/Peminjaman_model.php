@@ -17,14 +17,14 @@ class Peminjaman_model
         $ket_header = !empty($data['keterangan_peminjaman']) ? $data['keterangan_peminjaman'] : "-";
 
         $queryHeader = "INSERT INTO trx_peminjaman
-                  (nama_peminjam, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, 
+                  (id_user, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, 
                    tanggal_pengembalian, keterangan_peminjaman, status, file_surat) 
                   VALUES 
-                  (:nama_peminjam, :judul_kegiatan, :tanggal_pengajuan, :tanggal_peminjaman, 
+                  (:id_user, :judul_kegiatan, :tanggal_pengajuan, :tanggal_peminjaman, 
                    :tanggal_pengembalian, :ket, :status, :file_surat)";
 
         $this->db->query($queryHeader);
-        $this->db->bind('nama_peminjam', $data['nama_peminjam']);
+        $this->db->bind('id_user', $_SESSION['id_user']);
         $this->db->bind('judul_kegiatan', $data['judul_kegiatan']);
         $this->db->bind('tanggal_pengajuan', $data['tanggal_pengajuan']);
         $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
@@ -141,23 +141,32 @@ class Peminjaman_model
 
     public function getPeminjamanById($id_peminjaman)
     {
-        $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
+        $query = "SELECT tp.*, tdu.nama_user AS nama_peminjam, tdu.nim_nip
+                  FROM trx_peminjaman tp
+                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  WHERE tp.id_peminjaman = :id_peminjaman";
+
+        $this->db->query($query);
         $this->db->bind('id_peminjaman', $id_peminjaman);
         return $this->db->single();
     }
 
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
     {
+        // Tambahkan tdu.nama_user dan tdu.nim_nip
         $query = "SELECT tp.*, 
-                          GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
-                          SUM(tdp.jumlah) as jumlah_peminjaman,
-                          tpt.alasan_penolakan
-                  FROM trx_peminjaman tp
-                  LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
-                  LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-                  LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman 
-                  WHERE tp.id_peminjaman = :id_peminjaman
-                  GROUP BY tp.id_peminjaman";
+                      tdu.nama_user, 
+                      tdu.nim_nip,
+                      GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
+                      SUM(tdp.jumlah) as jumlah_peminjaman,
+                      tpt.alasan_penolakan
+              FROM trx_peminjaman tp
+              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  -- JOIN ke tabel user
+              LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+              LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman 
+              WHERE tp.id_peminjaman = :id_peminjaman
+              GROUP BY tp.id_peminjaman";
 
         $this->db->query($query);
         $this->db->bind("id_peminjaman", $id_peminjaman);
@@ -180,7 +189,7 @@ class Peminjaman_model
             : (isset($data['keterangan_peminjaman']) ? $data['keterangan_peminjaman'] : "-");
 
         $queryPeminjaman = "UPDATE trx_peminjaman 
-                            SET nama_peminjam = :nama_peminjam, 
+                            SET 
                                 judul_kegiatan = :judul_kegiatan, 
                                 tanggal_peminjaman = :tanggal_peminjaman, 
                                 tanggal_pengembalian = :tanggal_pengembalian, 
@@ -189,13 +198,13 @@ class Peminjaman_model
                             WHERE id_peminjaman = :id_peminjaman";
 
         $this->db->query($queryPeminjaman);
-        $this->db->bind('nama_peminjam', $data['nama_peminjam']);
         $this->db->bind('judul_kegiatan', $data['judul_kegiatan']);
         $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
         $this->db->bind('tanggal_pengembalian', $data['tanggal_pengembalian']);
         $this->db->bind('keterangan_peminjaman', $ket_header);
         $this->db->bind('status', $data['status']);
         $this->db->bind('id_peminjaman', $data['id_peminjaman']);
+
 
         $this->db->execute();
 
@@ -317,26 +326,28 @@ class Peminjaman_model
     public function getValidasiGabungan()
     {
         $query = "SELECT tp.*, 
-                          GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
-                  FROM trx_peminjaman tp
-                  LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
-                  LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-                  LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
-                  
-                  WHERE 
-                    tp.status IN ('diproses', 'disetujui') 
-                    OR 
-                    (tp.status = 'ditolak' AND tpt.id_peminjaman IS NOT NULL)
-                  
-                  GROUP BY tp.id_peminjaman
-                  
-                  ORDER BY 
-                    CASE 
-                        WHEN tp.status = 'diproses' THEN 1 
-                        WHEN tp.status = 'disetujui' THEN 2 
-                        ELSE 3
-                    END ASC,
-                    tp.tanggal_pengajuan DESC";
+                      tdu.nama_user, 
+                      GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
+              FROM trx_peminjaman tp
+              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+              LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+              LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
+              
+              WHERE 
+                tp.status IN ('diproses', 'disetujui') 
+                OR 
+                (tp.status = 'ditolak' AND tpt.id_peminjaman IS NOT NULL)
+              
+              GROUP BY tp.id_peminjaman
+              
+              ORDER BY 
+                CASE 
+                    WHEN tp.status = 'diproses' THEN 1 
+                    WHEN tp.status = 'disetujui' THEN 2 
+                    ELSE 3
+                END ASC,
+                tp.tanggal_pengajuan DESC";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -404,6 +415,7 @@ class Peminjaman_model
 
     public function getDetailBarangByPeminjamanId($id)
     {
+        // PERBAIKAN: Tambahkan 'tb.foto_barang' di baris SELECT
         $query = "SELECT 
             d.id_jenis_barang, 
             d.jumlah, 
@@ -411,10 +423,10 @@ class Peminjaman_model
             mjb.sub_barang as nama_barang, 
             mjb.kode_sub as kode_barang,
             mjb.grup_sub,
-            tb.spesifikasi_barang  -- Ambil kolom spesifikasi
+            tb.spesifikasi_barang,
+            tb.foto_barang  -- <--- INI WAJIB DITAMBAHKAN
           FROM trx_detail_peminjaman d 
           JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
-          -- Join ke tabel unit barang berdasarkan ID yang disimpan
           LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
           WHERE d.id_peminjaman = :id";
 
@@ -473,5 +485,180 @@ class Peminjaman_model
         $this->db->query($query);
         $this->db->bind('id', $id_jenis_barang);
         return $this->db->resultSet();
+    }
+
+public function getCekValidasiKalab($id)
+    {
+        $this->db->query("SELECT validasi_kalab FROM trx_peminjaman WHERE id_peminjaman = :id");
+        $this->db->bind('id', $id);
+        $res = $this->db->single();
+        return $res['validasi_kalab'] ?? '0';
+    }
+
+    public function validasiKalab($id_peminjaman)
+    {
+        $query = "UPDATE trx_peminjaman SET validasi_kalab = '1' WHERE id_peminjaman = :id";
+        $this->db->query($query);
+        $this->db->bind('id', $id_peminjaman);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function validasiLaboranCustom($data)
+    {
+        $id_peminjaman = $data['id_peminjaman'];
+
+        $this->db->query("SELECT file_surat FROM trx_peminjaman WHERE id_peminjaman = :id");
+        $this->db->bind('id', $id_peminjaman);
+        $dbData = $this->db->single();
+
+        $fullPath = '../public/files/surat-peminjaman/' . $dbData['file_surat'];
+
+        try {
+            $this->prosesStempelDinamis(
+                $fullPath,
+                $data['pos_x'],
+                $data['pos_y'],
+                $data['page']
+            );
+
+            $query = "UPDATE trx_peminjaman SET 
+                      validasi_laboran = '1', 
+                      status = 'disetujui' 
+                      WHERE id_peminjaman = :id";
+
+            $this->db->query($query);
+            $this->db->bind('id', $id_peminjaman);
+            $this->db->execute();
+
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
+
+    private function prosesStempelDinamis($filePath, $percX, $percY, $targetPage)
+    {
+        $pathAutoload = __DIR__ . '/../../vendor/autoload.php';
+
+        if (file_exists($pathAutoload)) {
+            require_once $pathAutoload;
+        } else {
+            if (file_exists(__DIR__ . '/../core/fpdi/src/autoload.php')) {
+                require_once __DIR__ . '/../core/fpdf/fpdf.php';
+                require_once __DIR__ . '/../core/fpdi/src/autoload.php';
+            } else {
+                die("Error: Library FPDI tidak ditemukan di " . $pathAutoload);
+            }
+        }
+
+        $pdf = new \setasign\Fpdi\Fpdi();
+
+        try {
+            $pageCount = $pdf->setSourceFile($filePath);
+        } catch (Exception $e) {
+            return 0;
+        }
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $tplIdx = $pdf->importPage($i);
+            $size = $pdf->getTemplateSize($tplIdx);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($tplIdx);
+
+            if ($i == $targetPage) {
+                $widthMM = $size['width'];
+                $heightMM = $size['height'];
+
+                $absX = $widthMM * $percX;
+                $absY = $heightMM * $percY;
+
+                $ttdWidth = 35;
+
+                $pathTTD_Fatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
+
+                if (file_exists($pathTTD_Fatimah)) {
+                    $pdf->Image($pathTTD_Fatimah, $absX, $absY, $ttdWidth);
+                }
+
+                $pathTTD_Huzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
+                $posX_Huzain = $absX + 45;
+
+                if (($posX_Huzain + $ttdWidth) > $widthMM) {
+                    $posX_Huzain = $widthMM - $ttdWidth - 10;
+                }
+
+                if (file_exists($pathTTD_Huzain)) {
+                    $pdf->Image($pathTTD_Huzain, $posX_Huzain, $absY, $ttdWidth);
+                }
+            }
+        }
+
+        $pdf->Output($filePath, 'F');
+    }
+
+    public function validasiLaboranDouble($data)
+    {
+        $id = $data['id_peminjaman'];
+
+        $this->db->query("SELECT file_surat FROM trx_peminjaman WHERE id_peminjaman = :id");
+        $this->db->bind('id', $id);
+        $res = $this->db->single();
+
+        $fileName = $res['file_surat'];
+        $pathFolder = __DIR__ . '/../../public/files/surat-peminjaman/';
+
+        $pathAsli = $pathFolder . $fileName;
+        $pathBackup = $pathFolder . 'backup_' . $fileName;
+
+        $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
+        $pathHuzain  = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
+
+        if (!file_exists($pathBackup)) {
+            if (!copy($pathAsli, $pathBackup)) {
+                die("Gagal membuat backup. Cek permission folder.");
+            }
+        }
+
+        require_once __DIR__ . '/../../vendor/autoload.php';
+
+        $pdf = new \setasign\Fpdi\Fpdi();
+
+        $pageCount = $pdf->setSourceFile($pathBackup);
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $tplIdx = $pdf->importPage($i);
+            $size = $pdf->getTemplateSize($tplIdx);
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($tplIdx);
+
+            if ($i == $data['page']) {
+                $widthMM = $size['width'];
+                $heightMM = $size['height'];
+                $ttdWidth = 35;
+
+                $fx = $widthMM * $data['fatimah_x'];
+                $fy = $heightMM * $data['fatimah_y'];
+                $hx = $widthMM * $data['huzain_x'];
+                $hy = $heightMM * $data['huzain_y'];
+
+                if (file_exists($pathFatimah)) {
+                    $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
+                }
+                if (file_exists($pathHuzain)) {
+                    $pdf->Image($pathHuzain, $hx, $hy, $ttdWidth);
+                }
+            }
+        }
+
+        $pdf->Output($pathAsli, 'F');
+
+        $query = "UPDATE trx_peminjaman SET validasi_kalab='1', validasi_laboran='1', status='disetujui' WHERE id_peminjaman=:id";
+        $this->db->query($query);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+
+        return 1;
     }
 }
