@@ -107,7 +107,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                     <td><?= !empty($pinjam['keterangan_peminjaman']) ? $pinjam['keterangan_peminjaman'] : '-'; ?></td> 
 
                                     <td class="text-center">
-                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= $pinjam['id_peminjaman']; ?>" 
+                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($pinjam['id_peminjaman']); ?>" 
                                             class="btn-detail" title="Lihat Detail">
                                                 <i class="fas fa-eye"></i>
                                         </a>

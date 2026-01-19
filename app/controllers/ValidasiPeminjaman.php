@@ -43,6 +43,12 @@ class ValidasiPeminjaman extends Controller
 
     public function detail($id)
     {
+        $id = IdObfuscator::decode($id);
+        if (!$id) {
+            Flasher::setFlash('Gagal', 'ID tidak valid', '', 'danger');
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
         $data['judul'] = 'Detail Validasi Peminjaman';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -73,7 +79,7 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id = $_POST['id_peminjaman'];
+            $id = IdObfuscator::decode($_POST['id_peminjaman']);
 
             if ($this->model('Peminjaman_model')->validasiKalab($id) > 0) {
                 Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
@@ -87,6 +93,11 @@ class ValidasiPeminjaman extends Controller
 
     public function viewValidasiPosisi($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
         $role = $_SESSION['id_role'];
 
         if ($role != '1' && $role != '2') {
@@ -125,7 +136,7 @@ class ValidasiPeminjaman extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $dataPost = [
-                'id_peminjaman' => $_POST['id_peminjaman'],
+                'id_peminjaman' => IdObfuscator::decode($_POST['id_peminjaman']),
                 'page'          => $_POST['page_target'],
                 'fatimah_x'     => $_POST['fatimah_x'],
                 'fatimah_y'     => $_POST['fatimah_y'],
@@ -142,6 +153,11 @@ class ValidasiPeminjaman extends Controller
 
     public function previewHasil($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
         if (!in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
@@ -208,6 +224,11 @@ class ValidasiPeminjaman extends Controller
 
     public function selesaiValidasi($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
         if ($peminjaman) {

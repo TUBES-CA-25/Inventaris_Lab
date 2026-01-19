@@ -30,7 +30,7 @@ if (in_array($st, ['disetujui', 'diterima'])) {
             <a href="<?= BASEURL ?>Riwayat/index" class="btn-modern btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= $data['info_peminjaman']['id_peminjaman'] ?>"
+            <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= IdObfuscator::encode($data['info_peminjaman']['id_peminjaman']) ?>"
                 target="_blank" class="btn-modern btn-pdf">
                 <i class="fas fa-file-pdf"></i> Cetak Bukti
             </a>

@@ -85,7 +85,7 @@ if (!isset($_SESSION['login'])) {
                     $no = 1;
                     if (!empty($data['pengembalian'])):
                         foreach ($data['pengembalian'] as $pengembalian): ?>
-                            <tr data-id="<?= $pengembalian['id_pengembalian'] ?? '' ?>" style="cursor: pointer;">
+                            <tr data-id="<?= IdObfuscator::encode($pengembalian['id_pengembalian'] ?? '') ?>" style="cursor: pointer;">
                                 <td><?= $no++ ?></td>
                                 <td><?= $pengembalian['nama_peminjam'] ?></td>
                                 <td><?= date('d-m-Y', strtotime($pengembalian['tanggal_peminjaman'])) ?></td>
@@ -96,16 +96,16 @@ if (!isset($_SESSION['login'])) {
                                 <td><?= $pengembalian['detail_masalah'] ?? '-' ?></td>
                                 <td style="display: flex; justify-content: center; align-items: center; gap: 10px;">
                                 <?php if (isset($_SESSION['login']) && ($_SESSION['id_role'] == '1' || $_SESSION['id_role'] == '2' || $_SESSION['id_role'] == '3' || $_SESSION['id_role'] == '4')): ?>
-                                    <a href="<?= BASEURL; ?>/Pengembalian/ubahPengembalian/<?= $pengembalian['id_pengembalian']; ?>"
+                                    <a href="<?= BASEURL; ?>/Pengembalian/ubahPengembalian/<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
                                         class="btn d-flex align-items-center justify-content-center tampilModalPengembalian"
                                         data-toggle="modal" data-target="#modalEditPengembalian"
-                                        data-id="<?= $pengembalian['id_pengembalian']; ?>">
+                                        data-id="<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>">
                                         <i class="fa-solid fa-pen-to-square fa-lg" style="color: #30cc30;"></i>
                                     </a>
                                     <?php endif; ?>
-                                    <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $pengembalian['id_pengembalian']; ?>"
+                                    <a href="<?= BASEURL; ?>Pengembalian/detail/<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
                                         data-toggle="modal"
-                                        data-target="#modalPengembalian<?= $pengembalian['id_pengembalian']; ?>"
+                                        data-target="#modalPengembalian<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
                                         class="btn d-flex align-items-center justify-content-center">
                                         <i class="fa-solid fa-circle-info fa-lg " style="color: #1250ba;"></i>
                                     </a>
@@ -114,7 +114,7 @@ if (!isset($_SESSION['login'])) {
 
 
                             <!-- Modal Detail Pengembalian -->
-                            <div class="modal fade" id="modalPengembalian<?= $pengembalian['id_pengembalian']; ?>" tabindex="-1"
+                            <div class="modal fade" id="modalPengembalian<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>" tabindex="-1"
                                 role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content" style="width: 700px;">

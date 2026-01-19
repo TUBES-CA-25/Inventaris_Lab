@@ -63,13 +63,13 @@
                     <div class="card-footer bg-white py-4">
                         <div class="row justify-content-center">
                             <div class="col-md-4 mb-2">
-                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= $data['peminjaman']['id_peminjaman']; ?>"
+                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
                                     class="btn btn-warning btn-block font-weight-bold shadow-sm">
                                     <i class="fas fa-undo-alt mr-2"></i> Edit Posisi Lagi
                                 </a>
                             </div>
                             <div class="col-md-4 mb-2">
-                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/selesaiValidasi/<?= $data['peminjaman']['id_peminjaman']; ?>"
+                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/selesaiValidasi/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
                                     class="btn btn-success btn-block font-weight-bold shadow py-2">
                                     <i class="fas fa-check-circle mr-2"></i> Selesai
                                 </a>

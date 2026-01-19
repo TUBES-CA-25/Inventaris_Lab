@@ -87,15 +87,15 @@
                             <button class="btn-action btnUbahRole" 
                                     data-toggle="modal" 
                                     data-target="#modalRole"
-                                    onclick="setModalData('<?=$row['id_user']?>', '<?=$row['id_role'] //Asumsi ada id_role di row?>')"> 
+                                    onclick="setModalData('<?=IdObfuscator::encode($row['id_user'])?>', '<?=$row['id_role'] //Asumsi ada id_role di row?>')"> 
                                 <i class="fa-regular fa-pen-to-square" style="color: #30cc30;"></i>
                             </button>
                             
-                            <button class="btn-action" data-toggle="modal" data-target="#konfirmasiHapus<?=$row['id_user']?>">
+                            <button class="btn-action" data-toggle="modal" data-target="#konfirmasiHapus<?=IdObfuscator::encode($row['id_user'])?>">
                                 <i class="fa-regular fa-trash-can" style="color: #cc3030;"></i>
                             </button>
 
-                            <div class="modal fade" id="konfirmasiHapus<?=$row['id_user']?>" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal fade" id="konfirmasiHapus<?=IdObfuscator::encode($row['id_user'])?>" tabindex="-1" role="dialog" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content" style="border-radius: 15px;">
                                         <div class="modal-body d-flex flex-column align-items-center">
@@ -106,7 +106,7 @@
                                         <div class="modal-footer border-0">
                                             <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
                                             <button type="button" class="btn btn-danger"
-                                                onclick="location.href='<?=BASEURL;?>KelolaAkun/hapusUser/<?= $row['id_user']; ?>'">Hapus</button>
+                                                onclick="location.href='<?=BASEURL;?>KelolaAkun/hapusUser/<?= IdObfuscator::encode($row['id_user']); ?>'">Hapus</button>
                                         </div>
                                     </div>
                                 </div>

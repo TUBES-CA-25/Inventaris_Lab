@@ -127,7 +127,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                     <td class="text-center">
                                         <?php if ($st == 'melengkapi surat') : ?>
                                         <div class="action-buttons-group">
-                                            <a href="<?= BASEURL; ?>TemplateSurat/lengkapi/<?= $row['id_peminjaman']; ?>" 
+                                            <a href="<?= BASEURL; ?>TemplateSurat/lengkapi/<?= IdObfuscator::encode($row['id_peminjaman']); ?>" 
                                                class="btn-action btn-upload"
                                                data-toggle="tooltip" 
                                                data-placement="top"
@@ -136,7 +136,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                                 <span class="btn-text">Upload Surat</span>
                                             </a>
                                             
-                                            <a href="<?= BASEURL; ?>Peminjaman/tambahBarang/<?= $row['id_peminjaman']; ?>" 
+                                            <a href="<?= BASEURL; ?>Peminjaman/tambahBarang/<?= IdObfuscator::encode($row['id_peminjaman']); ?>" 
                                                class="btn-action btn-add"
                                                data-toggle="tooltip" 
                                                data-placement="top"
@@ -147,7 +147,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                         </div>
 
                                     <?php else : ?>
-                                        <a href="<?= BASEURL; ?>Riwayat/detail/<?= $row['id_peminjaman']; ?>" 
+                                        <a href="<?= BASEURL; ?>Riwayat/detail/<?= IdObfuscator::encode($row['id_peminjaman']); ?>" 
                                            class="btn-action btn-detail"
                                            data-toggle="tooltip" 
                                            data-placement="top"

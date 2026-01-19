@@ -114,7 +114,7 @@ if (!isset($_SESSION['login'])) {
                         <?php foreach ($data['dataTampilBarang'] as $row): ?>
                             <tr>
                                 <td class="text-center">
-                                    <input type="checkbox" name="id_barang[]" value="<?= $row['id_barang'] ?>" class="custom-checkbox item-checkbox">
+                                    <input type="checkbox" name="id_barang[]" value="<?= IdObfuscator::encode($row['id_barang']) ?>" class="custom-checkbox item-checkbox">
                                 </td>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td style="font-weight:600;"><?= $row['kode_barang']; ?></td>
@@ -141,20 +141,20 @@ if (!isset($_SESSION['login'])) {
                                 <td class="text-center">
                                     <div style="display: flex; justify-content: center; gap: 10px;">
                                         <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
-                                            <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= $item['id_barang']; ?>"
-                                                data-toggle="modal" data-target="#modalTambah" data-id="<?= $row['id_barang']; ?>">
+                                            <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
+                                                data-toggle="modal" data-target="#modalTambah" data-id="<?= IdObfuscator::encode($row['id_barang']); ?>">
                                                 <i class="fa-regular fa-pen-to-square fa-lg" style="color: var(--accent-green);"></i>
                                             </a>
-                                            <a data-toggle="modal" data-target="#konfirmasiHapus<?= $row['id_barang'] ?>" style="cursor: pointer;">
+                                            <a data-toggle="modal" data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" style="cursor: pointer;">
                                                 <i class="fa-regular fa-trash-can fa-lg" style="color: var(--accent-red);"></i>
                                             </a>
                                         <?php endif; ?>
-                                        <a href="<?= BASEURL; ?>DetailBarang/detail/<?= $row['id_barang']; ?>" title="Lihat Detail">
+                                        <a href="<?= BASEURL; ?>DetailBarang/detail/<?= IdObfuscator::encode($row['id_barang']); ?>" title="Lihat Detail">
                                             <i class="fa-solid fa-circle-info fa-lg" style="color: #1250ba;"></i>
                                         </a>
                                     </div>
 
-                                    <div class="modal fade" id="konfirmasiHapus<?= $row['id_barang'] ?>" tabindex="-1" role="dialog">
+                                    <div class="modal fade" id="konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" tabindex="-1" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content" style="border-radius: 15px;">
                                                 <div class="modal-body" style="text-align: center;">
@@ -163,13 +163,13 @@ if (!isset($_SESSION['login'])) {
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
                                                     <button type="button" class="btn btn-light" data-dismiss="modal">Batal</button>
-                                                    <button type="button" class="btn btn-danger" onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= $row['id_barang'] ?>'">Hapus</button>
+                                                    <button type="button" class="btn btn-danger" onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= IdObfuscator::encode($row['id_barang']) ?>'">Hapus</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="modal fade" id="modalDetail<?= $row['id_barang']; ?>" tabindex="-1" role="dialog">
+                                    <div class="modal fade" id="modalDetail<?= IdObfuscator::encode($row['id_barang']); ?>" tabindex="-1" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content" style="border-radius: 15px;">
                                                 <div class="modal-header">

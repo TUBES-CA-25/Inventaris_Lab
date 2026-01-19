@@ -70,6 +70,11 @@ class JenisBarang extends Controller {
      * * @param int $id_jenis_barang ID data yang akan dihapus
      */
     public function hapus($id_jenis_barang){
+        $id_jenis_barang = IdObfuscator::decode($id_jenis_barang);
+        if (!$id_jenis_barang) {
+            header('Location: ' . BASEURL . 'JenisBarang');
+            exit;
+        }
         // Panggil fungsi hapus dari model
         $status = $this->jenisBarangModel->hapusJenisBarang($id_jenis_barang);
 
@@ -96,7 +101,11 @@ class JenisBarang extends Controller {
      * Output berupa JSON.
      */
     public function getUbah(){
-        echo json_encode($this->jenisBarangModel->getUbah($_POST['id_jenis_barang']));
+        $data = $this->jenisBarangModel->getUbah(IdObfuscator::decode($_POST['id_jenis_barang']));
+        if ($data) {
+            $data['id_jenis_barang'] = IdObfuscator::encode($data['id_jenis_barang']);
+        }
+        echo json_encode($data);
     }
 
     /**
@@ -106,6 +115,7 @@ class JenisBarang extends Controller {
     public function ubahJenisBarang(){
         // Langkah 1: Cek Duplikasi
         // (Memastikan data baru tidak bentrok dengan data lain, kecuali dirinya sendiri)
+        $_POST['id_jenis_barang'] = IdObfuscator::decode($_POST['id_jenis_barang']);
         if ($this->jenisBarangModel->cekDataJenisBarang($_POST) > 0) {
             Flasher::setFlash('Jenis Barang', 'gagal', 'diubah (Data Sudah Ada)', 'danger');
             header('Location: '. BASEURL . 'JenisBarang');

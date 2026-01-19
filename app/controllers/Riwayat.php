@@ -55,6 +55,11 @@ class Riwayat extends Controller
 
     public function detail($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
         $data['info_peminjaman'] = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
         $rawDetailBarang = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
 
@@ -83,6 +88,10 @@ class Riwayat extends Controller
 
     public function cetakPdf($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+             echo "ID tidak valid."; exit;
+        }
         $model = $this->model('Peminjaman_model');
         $info = $model->getPeminjamanById($id_peminjaman);
 
