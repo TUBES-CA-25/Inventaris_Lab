@@ -1,125 +1,152 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atur Posisi Tanda Tangan</title>
-    
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
+
     <style>
-        body { background-color: #e3e6f0; font-family: sans-serif; }
-        
+        body {
+            background-color: #e3e6f0;
+            font-family: sans-serif;
+            overflow-x: hidden;
+        }
+
         #pdf-wrapper {
             position: relative;
             width: 100%;
             max-width: 850px;
+            /* Lebar standar A4 di layar */
             margin: 20px auto;
-            border: 1px solid #858796;
             background-color: #525659;
-            overflow: hidden;
-            user-select: none;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            overflow: hidden;
         }
-        #the-canvas { width: 100%; height: auto; display: block; }
 
-        /* KOTAK DRAG UMUM */
+        #the-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- GAYA BARU: GAMBAR TANDA TANGAN --- */
         .drag-box {
             position: absolute;
-            width: 160px; height: 70px;
-            border: 2px dashed; border-radius: 8px;
-            display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
-            text-align: center; color: #fff; font-weight: bold; font-size: 12px;
-            cursor: grab; z-index: 100; touch-action: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            text-shadow: 1px 1px 2px black;
-        }
-        .drag-box:active { cursor: grabbing; opacity: 0.8; }
+            top: 0;
+            left: 0;
 
-        /* KOTAK FATIMAH (HIJAU) */
-        #drag-fatimah {
-            background-color: rgba(40, 167, 69, 0.6);
-            border-color: #28a745;
-            top: 50%; left: 30%; transform: translate(-50%, -50%);
+            /* Ukuran ini disesuaikan agar mirip hasil cetak PDF (sekitar 3-4cm) */
+            width: 140px;
+            height: auto;
+            /* Tinggi menyesuaikan rasio gambar */
+
+            cursor: move;
+            z-index: 100;
+
+            /* Transparan agar teks di belakang terlihat */
+            background: transparent;
+
+            /* Border tipis putus-putus untuk bantu lihat area klik */
+            border: 1px dashed rgba(0, 0, 0, 0.2);
+
+            display: none;
+            /* Sembunyi dulu sebelum PDF load */
         }
 
-        /* KOTAK HUZAIN (BIRU) */
-        #drag-huzain {
-            background-color: rgba(0, 123, 255, 0.6);
-            border-color: #007bff;
-            top: 50%; left: 70%; transform: translate(-50%, -50%);
+        /* Saat didrag, border jadi jelas */
+        .drag-box:active,
+        .drag-box:hover {
+            border: 1px dashed #007bff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gambar Tanda Tangan */
+        .drag-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            /* Agar gambar tidak ter-select saat drag */
+            filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+            /* Bayangan tipis biar kontras */
         }
 
         #loader {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.95); z-index: 9999;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
     </style>
 </head>
+
 <body>
 
     <div id="loader">
-        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-        <p class="mt-3 font-weight-bold text-dark">Memuat PDF...</p>
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 font-weight-bold">Memuat Dokumen & Tanda Tangan...</p>
     </div>
 
     <nav class="navbar navbar-light bg-white shadow mb-4">
         <div class="container-fluid">
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($data['id_peminjaman']); ?>" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
-            <span class="navbar-brand mb-0 h1 mx-auto font-weight-bold">Mode Pengaturan Tanda Tangan</span>
+            <span class="navbar-brand mb-0 h1 mx-auto font-weight-bold">Atur Posisi Tanda Tangan</span>
         </div>
     </nav>
 
     <div class="container-fluid pb-5">
-        
         <div class="row justify-content-center mb-3">
             <div class="col-md-8">
-                <div class="alert alert-info shadow-sm text-center">
-                    <i class="fas fa-info-circle mr-1"></i> 
-                    Geser <strong>Kotak Hijau</strong> (Fatimah) dan <strong>Kotak Biru</strong> (Huzain) ke posisi yang pas.
+                <div class="alert alert-warning shadow-sm text-center">
+                    <i class="fas fa-hand-paper mr-2"></i>
+                    Geser <strong>Gambar Tanda Tangan</strong> di bawah ini ke posisi yang diinginkan.
                 </div>
             </div>
         </div>
 
         <div id="pdf-wrapper">
             <canvas id="the-canvas"></canvas>
-            
-            <div id="drag-fatimah" class="drag-box" data-x="0" data-y="0">
-                <i class="fas fa-pen mb-1"></i> Fatimah (Laboran)
+
+            <div id="drag-fatimah" class="drag-box">
+                <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah">
             </div>
 
-            <div id="drag-huzain" class="drag-box" data-x="0" data-y="0">
-                <i class="fas fa-user-tie mb-1"></i> Huzain (KaLab)
+            <div id="drag-huzain" class="drag-box">
+                <img src="<?= BASEURL; ?>img/ttd/ttd_huzain.png?t=<?= time(); ?>" alt="TTD Huzain">
             </div>
         </div>
 
-        <div class="row justify-content-center pb-5">
+        <div class="row justify-content-center pb-5 mt-4">
             <div class="col-md-8 text-center">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/prosesAccLaboran" method="post" id="formTTD">
-                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['id_peminjaman']); ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= $data['id_peminjaman']; ?>">
                     <input type="hidden" name="page_target" id="input_page" value="1">
+
                     <input type="hidden" name="fatimah_x" id="fatimah_x">
                     <input type="hidden" name="fatimah_y" id="fatimah_y">
                     <input type="hidden" name="huzain_x" id="huzain_x">
                     <input type="hidden" name="huzain_y" id="huzain_y">
 
-                    <button type="button" class="btn btn-success btn-lg px-4 shadow mr-2" onclick="submitValidasi()">
-                        <i class="fas fa-save mr-2"></i> Simpan
+                    <button type="button" class="btn btn-primary btn-lg px-5 shadow mr-2" onclick="submitValidasi()">
+                        <i class="fas fa-save mr-2"></i> Simpan Posisi
                     </button>
 
-                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($data['id_peminjaman']); ?>" class="btn btn-secondary btn-lg px-4 shadow">
-                        <i class="fas fa-times mr-2"></i> Batal
+                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= $data['id_peminjaman']; ?>" class="btn btn-secondary btn-lg px-5 shadow">
+                        Batal
                     </a>
                 </form>
             </div>
         </div>
-
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -127,90 +154,112 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // --- 1. SETUP PDF.JS ---
         const url = '<?= BASEURL; ?>files/surat-peminjaman/<?= $data['file_surat']; ?>';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        
-        let pdfDoc = null, pageNum = 1, canvas = document.getElementById('the-canvas'), ctx = canvas.getContext('2d');
 
-        function renderPage(num) {
-            pdfDoc.getPage(num).then(function(page) {
-                var viewport = page.getViewport({scale: 1.5});
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                page.render({canvasContext: ctx, viewport: viewport}).promise.then(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('input_page').value = num;
-                    updateCoord('drag-fatimah', 'fatimah_x', 'fatimah_y');
-                    updateCoord('drag-huzain', 'huzain_x', 'huzain_y');
-                });
+        let canvas = document.getElementById('the-canvas');
+        let ctx = canvas.getContext('2d');
+
+        // --- 1. RENDER PDF ---
+        pdfjsLib.getDocument(url).promise.then(function(pdf) {
+            return pdf.getPage(1);
+        }).then(function(page) {
+            let viewport = page.getViewport({
+                scale: 1.5
             });
-        }
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-        pdfjsLib.getDocument(url).promise.then((pdfDoc_) => {
-            pdfDoc = pdfDoc_;
-            pageNum = pdfDoc.numPages; 
-            renderPage(pageNum);
-        }).catch(err => {
-            alert("Gagal memuat PDF: " + err.message);
-            document.getElementById('loader').style.display = 'none';
+            let renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+
+            page.render(renderContext).promise.then(function() {
+                document.getElementById('loader').style.display = 'none';
+                document.querySelectorAll('.drag-box').forEach(el => el.style.display = 'block');
+
+                // SET POSISI AWAL (Sesuaikan visual agar enak dilihat pertama kali)
+                // Kiri Bawah (Fatimah)
+                initPosition('drag-fatimah', 0.15, 0.75);
+                // Kanan Bawah (Huzain)
+                initPosition('drag-huzain', 0.60, 0.75);
+            });
+        }).catch(function(error) {
+            alert('Gagal memuat PDF: ' + error.message);
         });
 
-        // --- 2. SETUP DRAG ---
-        function setupDrag(idBox, inputX, inputY) {
-            const position = { x: 0, y: 0 };
-            interact('#' + idBox).draggable({
-                listeners: {
-                    move (event) {
-                        position.x += event.dx;
-                        position.y += event.dy;
-                        event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
-                    },
-                    end (event) { updateCoord(idBox, inputX, inputY); }
-                },
-                modifiers: [ interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true }) ]
-            });
+        // --- 2. FUNGSI POSISI & DRAG ---
+        function initPosition(id, percentX, percentY) {
+            let el = document.getElementById(id);
+            let w = canvas.offsetWidth;
+            let h = canvas.offsetHeight;
+            let x = w * percentX;
+            let y = h * percentY;
+
+            el.setAttribute('data-x', x);
+            el.setAttribute('data-y', y);
+            el.style.transform = `translate(${x}px, ${y}px)`;
         }
 
-        function updateCoord(idBox, inputXId, inputYId) {
-            const wrapper = document.getElementById('pdf-wrapper');
-            const box = document.getElementById(idBox);
-            const boxRect = box.getBoundingClientRect();
-            const wrapperRect = wrapper.getBoundingClientRect();
-            
-            // Hitung relatif terhadap wrapper
-            const relativeLeft = boxRect.left - wrapperRect.left;
-            const relativeTop = boxRect.top - wrapperRect.top;
-            
-            const percentX = relativeLeft / wrapperRect.width;
-            const percentY = relativeTop / wrapperRect.height;
+        interact('.drag-box').draggable({
+            listeners: {
+                move(event) {
+                    let target = event.target;
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-            document.getElementById(inputXId).value = percentX.toFixed(4);
-            document.getElementById(inputYId).value = percentY.toFixed(4);
-        }
+                    target.style.transform = `translate(${x}px, ${y}px)`;
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                }
+            },
+            modifiers: [
+                interact.modifiers.restrictRect({
+                    restriction: '#the-canvas', // Batasi dalam gambar PDF
+                    endOnly: false
+                })
+            ]
+        });
 
-        setupDrag('drag-fatimah', 'fatimah_x', 'fatimah_y');
-        setupDrag('drag-huzain', 'huzain_x', 'huzain_y');
-
+        // --- 3. SIMPAN KOORDINAT ---
         function submitValidasi() {
-            updateCoord('drag-fatimah', 'fatimah_x', 'fatimah_y');
-            updateCoord('drag-huzain', 'huzain_x', 'huzain_y');
-            
-            // Cek apakah SweetAlert tersedia
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Simpan Posisi?',
-                    text: "Tanda tangan akan ditempel permanen.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Simpan'
-                }).then((result) => {
-                    if (result.isConfirmed) document.getElementById('formTTD').submit();
-                });
-            } else {
-                if(confirm("Simpan posisi tanda tangan?")) document.getElementById('formTTD').submit();
+            let w = canvas.offsetWidth;
+            let h = canvas.offsetHeight;
+
+            function getPercent(id) {
+                let el = document.getElementById(id);
+                let x = parseFloat(el.getAttribute('data-x')) || 0;
+                let y = parseFloat(el.getAttribute('data-y')) || 0;
+
+                // Kalkulasi Persentase (Presisi Tinggi)
+                return {
+                    x: (x / w).toFixed(4),
+                    y: (y / h).toFixed(4)
+                };
             }
+
+            let fatimah = getPercent('drag-fatimah');
+            let huzain = getPercent('drag-huzain');
+
+            document.getElementById('fatimah_x').value = fatimah.x;
+            document.getElementById('fatimah_y').value = fatimah.y;
+            document.getElementById('huzain_x').value = huzain.x;
+            document.getElementById('huzain_y').value = huzain.y;
+
+            Swal.fire({
+                title: 'Simpan Posisi?',
+                text: "Posisi tanda tangan akan disimpan sesuai tampilan ini.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Simpan'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('formTTD').submit();
+                }
+            });
         }
     </script>
 </body>
+
 </html>
