@@ -5,9 +5,9 @@ class DetailBarang extends Controller
     public function index()
     {
         $data['judul'] = 'Detail Barang';
-        
+
         $DetailBarangModel = $this->model('Detail_barang_model');
-        
+
         $data += [
             'kondisiBarang' => $DetailBarangModel->getKondisiBarang(),
             'satuan' => $DetailBarangModel->getSatuan(),
@@ -16,22 +16,22 @@ class DetailBarang extends Controller
             'nama_merek_barang' => $DetailBarangModel->getMerekBarang(),
             'lokasiPenyimpanan' => $DetailBarangModel->getLokasiPenyimpanan()
         ];
-        
+
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        
+
         $lokasi_id = $_POST['lokasi'] ?? '';
         $jenis_barang_id = $_POST['sub_barang'] ?? '';
         $merek_barang_id = $_POST['merek_barang'] ?? '';
-        
+
         $data['dataTampilBarang'] = $DetailBarangModel->getDataBarangByFilters($merek_barang_id, $jenis_barang_id, $lokasi_id);
-        
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('DetailBarang/index', $data);
         $this->view('templates/footer');
     }
-    
+
     public function detail($id_barang)
     {
         $id_barang = IdObfuscator::decode($id_barang);
@@ -42,7 +42,7 @@ class DetailBarang extends Controller
         $data['judul'] = 'Detail Barang';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        
+
         $DetailBarangModel = $this->model('Detail_barang_model');
         $data['dataTampilDetailBarang'] = $DetailBarangModel->getDetailDataBarang($id_barang);
 
@@ -55,12 +55,12 @@ class DetailBarang extends Controller
     public function tambah()
     {
         $data['judul'] = 'Tambah Barang';
-        
+
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
         $DetailBarangModel = $this->model('Detail_barang_model');
-        
+
         $data['sub_barang'] = $DetailBarangModel->getSubBarang();
         $data['nama_merek_barang'] = $DetailBarangModel->getMerekBarang();
         $data['kondisiBarang'] = $DetailBarangModel->getKondisiBarang();
@@ -91,20 +91,29 @@ class DetailBarang extends Controller
     {
         $id_barang = IdObfuscator::decode($id_barang);
         if (!$id_barang) {
+            Flasher::setFlash('ID Barang', 'tidak valid', '', 'danger');
             header('Location: ' . BASEURL . 'DetailBarang');
             exit;
         }
+
         try {
-            if ($this->model('Detail_barang_model')->hapusBarang($id_barang) > 0) {
+            $result = $this->model('Detail_barang_model')->hapusBarang($id_barang);
+
+            if ($result > 0) {
                 Flasher::setFlash('Barang', 'berhasil', ' dihapus', 'success');
-                header('Location: ' . BASEURL . 'DetailBarang');
-                exit;
+            } else {
+                Flasher::setFlash('Barang', 'tidak ditemukan atau sudah dihapus', '', 'warning');
             }
         } catch (PDOException $e) {
+            error_log("PDO Error hapus barang: " . $e->getMessage());
+            Flasher::setFlash('Barang', 'gagal', ' dihapus (Database Error)', 'danger');
+        } catch (Exception $e) {
+            error_log("Error hapus barang: " . $e->getMessage());
             Flasher::setFlash('Barang', 'gagal', ' dihapus', 'danger');
-            header('Location: ' . BASEURL . 'DetailBarang');
-            exit;
         }
+
+        header('Location: ' . BASEURL . 'DetailBarang');
+        exit;
     }
 
     public function getUbah()
@@ -133,12 +142,12 @@ class DetailBarang extends Controller
     public function cari()
     {
         $data['judul'] = 'Detail Barang';
-        
+
         $DetailBarangModel = $this->model('Detail_barang_model');
         $data['dataTampilBarang'] = $DetailBarangModel->cariDataBarang();
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('DetailBarang/index', $data);
@@ -149,17 +158,18 @@ class DetailBarang extends Controller
     {
         if (isset($_POST['id_barang']) && !empty($_POST['id_barang'])) {
             $data['judul'] = 'Laporan Detail Barang';
-            
-            $ids_barang = $_POST['id_barang']; 
+
+            $ids_barang = $_POST['id_barang'];
             if (is_array($ids_barang)) {
                 $ids_barang = array_map(['IdObfuscator', 'decode'], $ids_barang);
             }
             if (empty($ids_barang)) {
-                header('Location: ' . BASEURL . 'DetailBarang'); exit;
-            } 
-            
+                header('Location: ' . BASEURL . 'DetailBarang');
+                exit;
+            }
+
             $data['dataCetak'] = $this->model('Detail_barang_model')->cetak($ids_barang);
-            
+
             $this->view('templates/header', $data);
             $this->view('DetailBarang/print', $data);
         } else {
