@@ -1,5 +1,5 @@
 <form action="<?= BASEURL; ?>/Register/tambah" method="post" enctype="multipart/form-data">
-  <div class="body-register">
+  <div class="body-register row">
     <div class="figure-daftar col-12 col-lg-5">
       <div class="logo">
         <img src="<?= BASEURL ?>img/logo bg putih.svg" alt="logo" />

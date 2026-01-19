@@ -1,14 +1,16 @@
 .body-register {
     display: flex;
+    flex-wrap: wrap;
     min-height: 100vh;
     background-color: white;
     width: 100%;
+    padding: 20px;
 }
 
 .figure-daftar {
-    width: 40%;
     display: flex;
     flex-direction: column;
+    padding: 0 10px;
 }
 
 .figure-daftar .logo {
@@ -53,8 +55,7 @@
 }
 
 .form-daftar-kiri {
-    width: 30%;
-    margin-top: 60px;
+    margin-: 0 1;
     padding-right: 20px;
 }
 
@@ -72,12 +73,11 @@
 }
 
 .form-daftar-kanan {
-    width: 30%;
     display: flex;
     flex-direction: column;
     margin-top: 170px;
     gap: 20px;
-    padding-right: 50px;
+    padding: 0 10px;
 }
 
 .body-register label {
