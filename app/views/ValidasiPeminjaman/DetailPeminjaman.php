@@ -143,10 +143,12 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
                             
                             <div>
                                 <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
-                                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>" 
-                                       class="btn btn-primary btn-sm shadow-sm">
-                                        <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
-                                    </a>
+                                    <form action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab" method="post" class="d-inline">
+                                        <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                                        <button type="submit" class="btn btn-primary btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menyetujui peminjaman ini?')">
+                                            <i class="fas fa-check mr-1"></i> Setujui
+                                        </button>
+                                     </form>
                                 <?php elseif ($p['validasi_kalab'] == '1') : ?>
                                     <span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span>
                                 <?php else : ?>
