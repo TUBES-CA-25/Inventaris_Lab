@@ -95,14 +95,16 @@ class Pengembalian extends Controller
 
     public function getUbah()
     {
-        echo json_encode(
-            $this->model('Pengembalian_model')
-                 ->getUbahPengembalian($_POST['id_pengembalian'])
-        );
+        $data = $this->model('Pengembalian_model')->getUbahPengembalian(IdObfuscator::decode($_POST['id_pengembalian']));
+        if ($data) {
+            $data['id_pengembalian'] = IdObfuscator::encode($data['id_pengembalian']);
+        }
+        echo json_encode($data);
     }
 
     public function ubahPengembalian()
     {
+        $_POST['id_pengembalian'] = IdObfuscator::decode($_POST['id_pengembalian']);
         if ($this->model('Pengembalian_model')->updatePengembalian($_POST) > 0) {
             Flasher::setFlash('Data berhasil diubah.', 'success');
         } else {

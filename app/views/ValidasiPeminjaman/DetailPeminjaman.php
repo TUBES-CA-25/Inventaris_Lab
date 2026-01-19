@@ -143,7 +143,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
                             
                             <div>
                                 <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
-                                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= $p['id_peminjaman']; ?>" 
+                                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>" 
                                        class="btn btn-primary btn-sm shadow-sm">
                                         <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
                                     </a>
@@ -168,7 +168,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
                                 <?php if ($role_login == '2' && $p['validasi_laboran'] == '0') : ?>
                                     
                                     <?php if ($p['validasi_kalab'] == '1') : ?>
-                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= $p['id_peminjaman']; ?>" 
+                                        <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>" 
                                            class="btn btn-success btn-sm shadow-sm">
                                             <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
                                         </a>
@@ -199,7 +199,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
                             <p class="mb-3">Barang sudah diambil. Tunggu pengembalian.</p>
                             
                             <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
-                                <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                                 <input type="hidden" name="status" value="dikembalikan">
                                 <button type="submit" class="btn btn-primary btn-block shadow-sm" onclick="return confirm('Yakin barang sudah dikembalikan lengkap?')">
                                     <i class="fas fa-box-open mr-2"></i>Terima Pengembalian
@@ -230,7 +230,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
             </div>
             <div class="card-body">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
-                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                     <input type="hidden" name="status" value="ditolak">
                     <div class="form-group">
                         <label>Alasan Penolakan:</label>
@@ -250,7 +250,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
             </div>
             <div class="card-body">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
-                    <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                     <div class="form-group">
                         <label>Detail Masalah (Rusak/Hilang):</label>
                         <textarea class="form-control" name="alasan_penolakan" required rows="3"></textarea>

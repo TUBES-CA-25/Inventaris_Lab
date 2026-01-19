@@ -69,7 +69,7 @@
 
     <nav class="navbar navbar-light bg-white shadow mb-4">
         <div class="container-fluid">
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= $data['id_peminjaman']; ?>" class="btn btn-secondary btn-sm">
+            <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($data['id_peminjaman']); ?>" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             <span class="navbar-brand mb-0 h1 mx-auto font-weight-bold">Mode Pengaturan Tanda Tangan</span>
@@ -102,7 +102,7 @@
         <div class="row justify-content-center pb-5">
             <div class="col-md-8 text-center">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/prosesAccLaboran" method="post" id="formTTD">
-                    <input type="hidden" name="id_peminjaman" value="<?= $data['id_peminjaman']; ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['id_peminjaman']); ?>">
                     <input type="hidden" name="page_target" id="input_page" value="1">
                     <input type="hidden" name="fatimah_x" id="fatimah_x">
                     <input type="hidden" name="fatimah_y" id="fatimah_y">
@@ -113,7 +113,7 @@
                         <i class="fas fa-save mr-2"></i> Simpan
                     </button>
 
-                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= $data['id_peminjaman']; ?>" class="btn btn-secondary btn-lg px-4 shadow">
+                    <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($data['id_peminjaman']); ?>" class="btn btn-secondary btn-lg px-4 shadow">
                         <i class="fas fa-times mr-2"></i> Batal
                     </a>
                 </form>

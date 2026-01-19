@@ -1,5 +1,6 @@
 :root {
-    --primary-color: #0c1740; /* Biru Tua */
+    --primary-color: #0c1740;
+    /* Biru Tua */
     --white: #ffffff;
     --bg-color: #f8f9fa;
     --border-radius: 12px;
@@ -125,14 +126,16 @@ h3#title {
 .table-responsive {
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    background-color: white; /* Pastikan background container putih */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    background-color: white;
+    /* Pastikan background container putih */
 }
 
 .custom-table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
+    overflow-x: auto;
 }
 
 /* Style Header Tabel */
@@ -147,7 +150,8 @@ h3#title {
     font-size: 14px;
     text-align: left;
     border: none;
-    position: relative; /* Untuk positioning icon sorting */
+    position: relative;
+    /* Untuk positioning icon sorting */
 }
 
 /* 1. MENGHILANGKAN HOVER HEADER
@@ -155,10 +159,13 @@ h3#title {
 .custom-table thead tr:hover {
     background-color: var(--primary-color) !important;
 }
+
 .custom-table thead th:hover {
     background-color: var(--primary-color) !important;
     color: white !important;
-} */
+}
+
+*/
 
 /* 2. MEMBUAT SORTING LEBIH CERAH (DataTables Support) */
 /* Biasanya DataTables menggunakan pseudo-element ::before dan ::after untuk panah */
@@ -168,9 +175,12 @@ table.dataTable thead .sorting_asc:before,
 table.dataTable thead .sorting_asc:after,
 table.dataTable thead .sorting_desc:before,
 table.dataTable thead .sorting_desc:after {
-    opacity: 1 !important;        /* Membuat ikon tidak transparan (jelas) */
-    color: #ffffff !important;    /* Warna Putih Terang */
-    font-size: 0.9em !important;  /* Sedikit memperjelas ukuran */
+    opacity: 1 !important;
+    /* Membuat ikon tidak transparan (jelas) */
+    color: #ffffff !important;
+    /* Warna Putih Terang */
+    font-size: 0.9em !important;
+    /* Sedikit memperjelas ukuran */
 }
 
 /* Menghilangkan background image default jika ada tabrakan style */
@@ -280,9 +290,10 @@ table.dataTable thead .sorting_desc {
 }
 
 .radio-item input[type="radio"]:checked {
-    background-color: var(--primary-color); 
+    background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
+
 .radio-item input[type="radio"]:checked::before {
     background: white;
 }

@@ -75,13 +75,15 @@ body {
 .btn-submit-container {
     display: flex;
     justify-content: flex-end;
-    margin-top: 40px;
+    align-items: center;
+    margin-top: 65px;
+    margin-left: 40px;
 }
 
 .btn-submit {
     background-color: var(--primary-dark);
     color: white;
-    padding: 15px 60px;
+    padding: 10px 60px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 16px;

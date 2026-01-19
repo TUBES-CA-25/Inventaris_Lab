@@ -88,14 +88,14 @@ if (!isset($_SESSION['login'])) {
                         </button>
 
                         <form action="<?= BASEURL; ?>DetailBarang/cetak" method="post" target="_blank" style="width:100%;">
-                            <input type="hidden" name="id_barang[]" value="<?= $item['id_barang']; ?>">
-                            <a href="<?= BASEURL; ?>DetailBarang/cetakSatuan/<?= $item['id_barang']; ?>" target="_blank" class="btn-action-custom btn-navy-slide">
+                            <input type="hidden" name="id_barang[]" value="<?= IdObfuscator::encode($item['id_barang']); ?>">
+                            <a href="<?= BASEURL; ?>DetailBarang/cetakSatuan/<?= IdObfuscator::encode($item['id_barang']); ?>" target="_blank" class="btn-action-custom btn-navy-slide">
                                 <i class="fa-solid fa-file-pdf"></i> Ekspor PDF
                             </a>
                         </form>
 
                         <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) : ?>
-                            <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= $item['id_barang']; ?>"
+                            <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
                                 class="btn-action-custom btn-navy-slide">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </a>

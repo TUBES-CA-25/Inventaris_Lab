@@ -351,3 +351,49 @@ label {
 .content-figure:hover .hello-text {
   opacity: 1; transform: translateY(0);
 }
+
+/* Aturan Utama untuk Konten */
+.content {
+    transition: all 0.3s ease;
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Tampilan Desktop (Layar Lebar >= 992px) */
+@media (min-width: 992px) {
+    .content {
+        /* Geser konten ke kanan sebesar lebar sidebar Anda */
+        /* Ganti 260px sesuai dengan lebar asli .side-bar Anda */
+        margin-left: 260px; 
+        width: calc(100% - 260px);
+    }
+
+    /* Sembunyikan tombol hamburger di desktop jika sidebar ingin selalu tampil */
+    .hamburger-menu {
+        display: none;
+    }
+    
+    /* Pastikan sidebar tetap tampil di desktop */
+    .side-bar {
+        left: 0 !important;
+    }
+}
+
+/* Tampilan Mobile (Layar Kecil < 992px) */
+@media (max-width: 991.98px) {
+    .content {
+        margin-left: 0;
+        width: 100%;
+        /* Beri jarak atas agar tidak tertutup tombol hamburger floating */
+        padding-top: 70px; 
+    }
+    
+    .side-bar {
+        left: -100%; /* Sembunyikan sidebar di kiri luar layar */
+    }
+    
+    .side-bar.active {
+        left: 0; /* Tampilkan saat tombol hamburger diklik */
+    }
+}

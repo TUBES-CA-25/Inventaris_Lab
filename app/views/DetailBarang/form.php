@@ -27,9 +27,9 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                     <input type="hidden" name="foto_lama" value="<?= $barang['foto_barang']; ?>">
                 <?php endif; ?>
 
-                <div class="form-grid">
-
-                    <div class="left-column">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-6">
+                        <!-- Left Column -->
 
                         <div class="form-group mb-4" id="group-jenis">
                             <label class="form-label">Jenis Barang</label>
@@ -134,8 +134,10 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             </div>
                         </div>
                     </div>
+                        <!-- End Left Column -->
 
-                    <div class="right-column">
+                        <div class="col-12 col-lg-6">
+                            <!-- Right Column -->
                         <div class="form-group mb-4" id="group-merek">
                             <label class="form-label">Merek Barang</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
@@ -228,39 +230,47 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             <?php if ($isEdit && !empty($barang['foto_barang'])): ?>
                                 <small style="display:block; margin-top:5px;">File: <?= basename($barang['foto_barang']) ?></small>
                             <?php endif; ?>
-                        </div>
                     </div>
+                    <!-- End Right Column -->
                 </div>
 
                 <?php if (!$isEdit): ?>
                     <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
                         <p style="font-size: 13px; font-weight: 600; color: #888;">Data Penomoran</p>
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-                            <div class="form-group">
-                                <label class="form-label" style="font-size: 13px;">Barang Ke-</label>
-                                <input type="number" name="barang_ke" class="form-input" placeholder="Contoh: 1" required>
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-label" style="font-size: 13px;">Barang Ke-</label>
+                                    <input type="number" name="barang_ke" class="form-input" placeholder="Contoh: 1" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" style="font-size: 13px;">Total Barang</label>
-                                <input type="number" name="total_barang" class="form-input" placeholder="Contoh: 10" required>
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-label" style="font-size: 13px;">Total Barang</label>
+                                    <input type="number" name="total_barang" class="form-input" placeholder="Contoh: 10" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" style="font-size: 13px;">Status Peminjaman</label>
-                                <select name="status_pinjam" class="form-select">
-                                    <option value="Bisa">Bisa Dipinjam</option>
-                                    <option value="Tidak Bisa">Tidak Bisa</option>
-                                </select>
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-label" style="font-size: 13px;">Status Peminjaman</label>
+                                    <select name="status_pinjam" class="form-select">
+                                        <option value="Bisa">Bisa Dipinjam</option>
+                                        <option value="Tidak Bisa">Tidak Bisa</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 <?php else: ?>
                     <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <div class="form-group" style="max-width: 300px;">
-                            <label class="form-label">Status Peminjaman</label>
-                            <select name="status_pinjam" class="form-select">
-                                <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
-                                <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
-                            </select>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label">Status Peminjaman</label>
+                                <select name="status_pinjam" class="form-select">
+                                    <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
+                                    <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 <?php endif; ?>
