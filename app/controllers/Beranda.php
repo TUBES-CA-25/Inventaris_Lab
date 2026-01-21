@@ -15,7 +15,6 @@ class Beranda extends Controller {
         $berandaModel = $this->model('Beranda_model');
         $stats = $berandaModel->getAllCounts();
 
-        // Data Cards Statistik
         $data['jumlah_jenis_barang']  = $stats['jml_jenis'];
         $data['jumlah_peminjaman']    = $stats['jml_peminjaman'];
         $data['jumlah_merek_barang']  = $stats['jml_merek'];
@@ -32,7 +31,6 @@ class Beranda extends Controller {
     }
 
     public function getAjaxStats() {
-        // Ambil data dari POST JS
         $json = file_get_contents('php://input');
         $input = json_decode($json, true);
 

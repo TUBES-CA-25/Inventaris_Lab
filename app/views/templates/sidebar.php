@@ -50,6 +50,15 @@
                 </a>
             <?php endif; ?>
 
+            <?php if (isset($_SESSION['id_role']) && ($_SESSION['id_role'] == 3 || $_SESSION['id_role'] == 4)) : ?>
+                <li class="nav-item <?= ($data['judul'] == 'Pengembalian' || $data['judul'] == 'Manajemen Pengembalian') ? 'active' : ''; ?>">
+                    <a class="nav-link" href="<?= BASEURL; ?>Pengembalian">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Pengembalian</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
             <?php if (isset($_SESSION['login'])) : ?>
                 <a href="<?= BASEURL; ?>Riwayat" class="menu-item <?= ($data['judul'] == 'Riwayat Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-clock-rotate-left"></i>
@@ -64,7 +73,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3'])) : ?>
+            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) : ?>
                 <a href="<?= BASEURL; ?>KelolaAkun" class="menu-item <?= ($data['judul'] == 'Kelola Akun') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-users-gear"></i>
                     <span>Kelola Akun</span>
@@ -72,7 +81,7 @@
             <?php endif; ?>
             <?php if (isset($_SESSION['login'])) : ?>
                 <a href="<?= BASEURL; ?>Profil" class="menu-item <?= ($data['judul'] == 'Profil') ? 'active' : ''; ?>">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <i class="fa-solid fa-user"></i>
                     <span>Profile</span>
                 </a>
             <?php endif; ?>
