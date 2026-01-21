@@ -1,54 +1,45 @@
 <?php
 
-/**
- * Controller Pengembalian
- * * Mengelola proses pengembalian barang dan pemantauan status (Tepat waktu/Terlambat).
- */
-class Pengembalian extends Controller
-{
-    private function auth()
-    {
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-    }
-    public function __construct()
-    {
-        // 1. Gatekeeper: Cek Login
+class Pengembalian extends Controller {
+
+    public function __construct() {
         if (!isset($_SESSION['login'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
     }
+    
+    public function index() {
+        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
 
-    public function index()
-    {
-        $this->auth();
-
-        $data['judul'] = 'Pengembalian Barang';
+        $data['judul'] = 'Daftar Pengecekan Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        $data['pengembalian'] = $this->pengembalianModel->getAllPengembalian();
+        
+        // Ambil SEMUA data peminjaman untuk semua role
+        $data['riwayat'] = $this->model('Pengembalian_model')->getAllRiwayatForPetugas();
 
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data);
-        $this->view('Pengembalian/from', $data);
+        $this->view('templates/sidebar', $data); 
+        $this->view('Pengembalian/index', $data);
         $this->view('templates/footer');
     }
 
-    public function Riwayat()
-    {
-        $this->auth();
-
-        $data['judul'] = 'Riwayat Pengembalian';
+    public function detail($id) {
+        $data['judul'] = 'Detail Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
-        $data['pengembalian'] =
-            $this->model('Pengembalian_model')->getAllPengembalian();
         $data['profile'] = $this->model("User_model")->profile($data);
+        
+        // Ambil data satu baris spesifik untuk detail
+        $data['detail'] = $this->model('Pengembalian_model')->getRiwayatById($id);
 
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data);
-        $this->view('Pengembalian/index', $data);
+        $this->view('templates/sidebar', $data); 
+        $this->view('Pengembalian/detail', $data);
         $this->view('templates/footer');
     }
 

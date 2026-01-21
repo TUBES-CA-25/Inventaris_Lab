@@ -1,21 +1,17 @@
 <?php
 if (!isset($_SESSION['login'])) {
-    header("Location: " . BASEURL . "Login");
+    header("Location:" . BASEURL . "Login");
     exit;
 }
 ?>
-<!-- modal keluar -->
-<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-body"
-                style="display: flex; justify-content: center; flex-direction: column; align-items: center;">
 
-                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                    background="#FFFFFF" speed="1" style="width: 250px; height: 250px" loop autoplay></lottie-player>
-                <p style="color:#385161; opacity: 0.6; font-weight: 500; font-size: medium;">Apakah Anda yakin ingin
-                    keluar?</p>
+<div class="container-fluid" style="padding-left: 280px; padding-top: 30px; padding-right: 30px;">
+    <div class="card shadow-sm border-0" style="border-radius: 15px; background: white; padding: 25px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold">Pengembalian</h3>
+            <div class="input-group" style="width: 300px;">
+                <input type="text" class="form-control" placeholder="Search...">
+                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
@@ -181,114 +177,50 @@ if (!isset($_SESSION['login'])) {
             </table>
 
         </div>
+        
+       <div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead style="background-color: #0d1b3e; color: white;">
+            <tr>
+                <th class="py-3 ps-3">No</th>
+                <th>Judul kegiatan</th>
+                <th>Tgl pengajuan</th>
+                <th>Tgl mulai peminjaman</th>
+                <th>Tgl akhir peminjaman</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $i = 1; foreach($data['riwayat'] as $r) : ?>
+            <tr>
+                <td class="ps-3"><?= $i++; ?></td>
+                <td><?= $r['judul_kegiatan']; ?></td>
+                <td><?= $r['tanggal_pengajuan']; ?></td>
+                <td><?= $r['tanggal_peminjaman']; ?></td>
+                <td><?= $r['tanggal_pengembalian']; ?></td>
+                <td class="text-center">
+                    <?php if($r['status'] == 'dikembalikan') : ?>
+                        <span class="badge bg-success rounded-pill px-3">dikembalikan</span>
+                    <?php else : ?>
+                        <span class="badge bg-warning text-dark rounded-pill px-3">dipinjam</span>
+                    <?php endif; ?>
+                </td>
+                <td class="text-center">
+                    <?php if($r['status'] == 'dipinjam') : ?>
+                    <a href="<?= BASEURL; ?>Pengembalian/input/<?= $r['id_peminjaman']; ?>" class="text-dark me-2" title="Input Pengembalian">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <?php endif; ?>
 
-
-            <!-- Modal Edit Pengembalian -->
-            <div class="modal fade bd-example-modal-lg" id="modalEditPengembalian" tabindex="-1" role="dialog"
-                aria-labelledby="editPengembalian" aria-hidden="true">
-                <div class="modal-dialog modal-xl" role="document" style="
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        overflow: hidden;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editPengembalian">Edit Data Pengembalian</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" style="padding: 30px;">
-                            <form action="<?= BASEURL ?>/pengembalian/editPengembalian" method="post">
-                                <input type="hidden" name="id_pengembalian" id="id_pengembalian">
-                                <input type="hidden" name="id_peminjaman" id="id_peminjaman">
-                                <!-- Layout Nama Peminjam, Tanggal Peminjaman, dsb. di kiri & IMG di kanan -->
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div style="width: 50%;">
-                                        <div class="form-group">
-                                            <label for="nama_peminjam">Nama Peminjam</label>
-                                            <input type="text" id="nama_peminjam" class="form-control" readonly
-                                                style="background-color: #f0f5ff; color: #0c1740; font-weight: bold; border: none; padding: 5px; border-radius: 5px; font-size: 14px; width: 80%;">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="tanggal_peminjaman">Tanggal Peminjaman</label>
-                                            <input type="text" id="tanggal_peminjaman" class="form-control" readonly
-                                                style="background-color: #f0f5ff; color: #0c1740; font-weight: bold; border: none; padding: 5px; border-radius: 5px; font-size: 14px; width: 80%;">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="tanggal_pengembalian">Tanggal Pengembalian</label>
-                                            <input type="text" id="tanggal_pengembalian"  name="tanggal_pengembalian" class="form-control" readonly
-                                                style="background-color: #f0f5ff; color: #0c1740; font-weight: bold; border: none; padding: 5px; border-radius: 5px; font-size: 14px; width: 80%;">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="tanggal_sekarang">Tanggal Sekarang</label>
-                                            <input type="text" id="tanggal_sekarang" class="form-control" readonly
-                                                style="background-color: #f0f5ff; color: #0c1740; font-weight: bold; border: none; padding: 5px; border-radius: 5px; font-size: 14px; width: 80%;"
-                                                value="<?= date('d-m-Y'); ?>">
-                                        </div>
-
-                                    </div>
-                                    <div style="width: 50%; text-align: center;">
-                                        <img src="<?= BASEURL ?>img/happy robot assistant.svg"
-                                            alt="Happy Robot Assistant" style="width: 250px; height: 250px;">
-                                    </div>
-                                </div>
-
-                                <!-- Status Pengembalian & Keterangan (Sudah Sesuai) -->
-                                <div style="display: flex; gap: 20px;">
-                                    <div style="flex: 1;">
-                                        <label for="status_pengembalian">Status Pengembalian</label>
-                                        <select name="status_pengembalian" id="status_pengembalian" required
-                                            style="width: 100%; height: 40px; border-radius: 5px; border: none; padding: 5px 10px; background-color: #f0f5ff; color: #0c1740;">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="Dikembalikan">Dikembalikan</option>
-                                            <option value="Belum Dikembalikan">Belum Dikembalikan</option>
-                                            <option value="Rusak">Rusak</option>
-                                            <option value="Hilang">Hilang</option>
-                                        </select>
-                                    </div>
-                                    <div style="flex: 1;">
-                                        <label for="keterangan">Keterangan</label>
-                                        <select name="keterangan" id="keterangan" required readonly
-                                            style="width: 100%; height: 40px; border-radius: 5px; border: none; padding: 5px 10px; background-color: #f0f5ff; color: #0c1740; pointer-events: none;">
-                                            <option value=""></option>
-                                            <option value="Tepat Waktu">Tepat Waktu</option>
-                                            <option value="Tidak Tepat Waktu">Tidak Tepat Waktu</option>
-                                            <option value="Bermasalah">Bermasalah</option>
-                                        </select>
-                                    </div>
-
-                                </div>
-
-                                <!-- Detail Masalah -->
-                                <div style="margin-top: 20px;">
-                                    <label for="detail_masalah">Detail Masalah</label>
-                                    <textarea name="detail_masalah" id="detail_masalah" rows="4"
-                                        style="width: 100%; border-radius: 5px; padding: 10px; border: none; background-color: #f0f5ff; color: #0c1740;"></textarea>
-                                </div>
-
-                                <!-- Tombol Simpan -->
-                                <div class="modal-footer" style="justify-content: center;">
-                                    <button type="submit" class="btn" style="
-                            background-color: #0c1740;
-                            color: white;
-                            border: none;
-                            border-radius: 8px;
-                            height: 40px;
-                            width: 200px;
-                            font-size: 16px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            transition: 0.3s;
-                        " onmouseover="this.style.backgroundColor='#162a66'"
-                                        onmouseout="this.style.backgroundColor='#0c1740'">
-                                        Simpan Perubahan
-                                    </button>
-                                </div></form>
-            </div>
-        </div>
-    </div>
+                    <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $r['id_peminjaman']; ?>" class="text-dark" title="Lihat Detail">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
 </div>
-
-
     </div>
 </div>
