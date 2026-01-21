@@ -79,4 +79,27 @@ class ValidasiPeminjaman extends Controller
             exit;
         }
     }
+
+    public function tolakPengembalian()
+    {
+        if (!isset($_SESSION['login'])) {
+            header("Location:" . BASEURL . "Login");
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id_peminjaman = $_POST['id_peminjaman'];
+            $alasan        = $_POST['alasan_penolakan'];
+
+            if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
+                Flasher::setFlash('Berhasil', 'Pengembalian ditolak. Status diubah menjadi Ditolak.', '', 'warning');
+            } else {
+                Flasher::setFlash('Gagal', 'Gagal menyimpan penolakan.', '', 'danger');
+            }
+
+            // Redirect kembali ke halaman detail atau index
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
+    }
 }

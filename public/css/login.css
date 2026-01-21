@@ -13,7 +13,7 @@ body {
 
 /* ================= LEFT SECTION (FIGURE) ================= */
 .figure-section {
-    flex: 1; /* Mengambil 50% lebar layar */
+    flex: 1;
     background: linear-gradient(135deg, #0c1740 0%, #1e3a8a 100%);
     display: flex;
     flex-direction: column;
@@ -30,7 +30,7 @@ body {
 }
 
 .logo-container img {
-    width: 150px; /* Ukuran logo konsisten */
+    width: 150px;
     height: auto;
 }
 
@@ -55,10 +55,10 @@ body {
 
 /* ================= RIGHT SECTION (FORM) ================= */
 .form-section {
-    flex: 1; /* Mengambil 50% lebar layar */
+    flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center; /* Memastikan form tepat di tengah vertikal & horizontal */
+    justify-content: center;
     padding: 2rem;
     background-color: #ffffff;
 }
@@ -66,17 +66,14 @@ body {
 /* Container kotak putih form */
 .form-container {
     width: 100%;
-    max-width: 480px; /* Batas lebar agar simetris */
-    padding: 3.5rem; /* Padding dalam yang luas agar lega */
-    /* Opsional: Jika ingin ada bayangan kotak */
-    /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
-    /* border-radius: 20px; */
+    max-width: 480px;
+    padding: 3.5rem;
 }
 
 /* ================= TYPOGRAPHY & HEADER ================= */
 .form-header {
     margin-bottom: 2.5rem;
-    text-align: left; /* Rata kiri agar sejajar dengan input */
+    text-align: left;
 }
 
 .form-header h2 {
@@ -109,7 +106,7 @@ body {
 }
 
 .form-group input {
-    width: 100%; /* Kunci simetri: Lebar penuh */
+    width: 100%;
     padding: 1rem 1.2rem;
     border: 1.5px solid #e0e0e0;
     border-radius: 12px;
@@ -135,7 +132,7 @@ body {
 .forgot-password-wrapper {
     display: flex;
     justify-content: flex-end;
-    margin-top: -0.5rem; /* Sedikit naik mendekati input password */
+    margin-top: -0.5rem;
     margin-bottom: 2rem;
 }
 
@@ -151,7 +148,7 @@ body {
 }
 
 .btn-login {
-    width: 100%; /* Tombol selebar input */
+    width: 100%;
     padding: 1rem;
     background: #0c1740;
     color: white;
@@ -190,26 +187,97 @@ body {
     text-decoration: underline;
 }
 
+/* Logo mobile - hidden by default */
+.mobile-logo {
+    display: none;
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 1000;
+}
+
+.mobile-logo img {
+    width: 140px;
+    height: auto;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 900px) {
     .body-login {
-        flex-direction: column; /* Ubah jadi atas-bawah di HP */
+        flex-direction: column;
         height: auto;
         overflow-y: auto;
+        background-color: #ffffff; /* Background putih untuk mobile */
     }
 
+    /* Sembunyikan figure section di mobile */
     .figure-section {
-        display: none; /* Sembunyikan gambar di layar kecil agar fokus ke login */
-        /* Atau ganti min-height: 200px jika ingin tetap ditampilkan */
+        display: none;
+    }
+
+    /* Tampilkan logo mobile */
+    .mobile-logo {
+        display: block;
     }
 
     .form-section {
-        padding: 2rem 1.5rem;
+        padding: 6rem 1.5rem 2rem; /* Tambah padding top agar tidak tertutup logo */
         min-height: 100vh;
+        background-color: transparent; /* Hilangkan background */
     }
 
     .form-container {
-        padding: 2rem;
+        padding: 2rem 1.5rem;
         box-shadow: none;
+    }
+
+    .form-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .form-header p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .mobile-logo {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .mobile-logo img {
+        width: 110px;
+    }
+
+    .form-section {
+        padding: 5rem 1rem 2rem;
+    }
+
+    .form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+    .form-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .form-group input {
+        padding: 0.9rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-login {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+
+    .register-prompt {
+        font-size: 0.85rem;
+        flex-direction: row;
     }
 }

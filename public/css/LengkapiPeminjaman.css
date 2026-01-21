@@ -44,7 +44,7 @@ body {
 }
 
 .step-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
     padding: 20px 25px;
     display: flex;
     align-items: center;
@@ -92,17 +92,6 @@ body {
     overflow: hidden;
 }
 
-.info-box::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--primary-navy);
-    transition: width 0.3s ease;
-}
-
 .info-box:hover {
     border-color: var(--primary-navy);
     transform: translateX(5px);
@@ -131,6 +120,47 @@ body {
     margin-right: 12px;
 }
 
+.info-box1 {
+    background: #f8f9fc;
+    border: 2px solid #e3e6f0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-navy);
+    transition: width 0.3s ease;
+}
+
+.info-box1:hover {
+    border-color: var(--primary-navy);
+    transform: translateX(5px);
+}
+
+.info-box1:hover::before {
+    width: 8px;
+}
+
+.info-box1::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--primary-navy);
+    transition: width 0.3s ease;
+}
+
 .info-label {
     font-size: 12px;
     color: #6c757d;
@@ -154,7 +184,7 @@ body {
 
 .download-section {
     background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
-    border: 2px dashed var(--danger-red);
+    border: 2px dashed var(--secondary-navy);
     border-radius: 15px;
     padding: 30px;
     text-align: center;
@@ -314,7 +344,7 @@ body {
 }
 
 .alert-custom {
-    background: #fff3cd;
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);;
     border-left: 4px solid #ffc107;
     border-radius: 10px;
     padding: 15px 20px;
@@ -336,12 +366,12 @@ body {
 .alert-custom-content strong {
     display: block;
     margin-bottom: 5px;
-    color: #856404;
+    color: white;
 }
 
 .alert-custom-content p {
     margin: 0;
-    color: #856404;
+    color: white;
     font-size: 14px;
 }
 
