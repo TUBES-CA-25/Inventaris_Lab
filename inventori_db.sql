@@ -310,10 +310,11 @@ CREATE TABLE `trx_data_user` (
   `no_hp_user` varchar(15) NOT NULL,
   `jenis_kelamin` enum('Laki-laki','Perempuan') NOT NULL,
   `alamat` varchar(100) NOT NULL,
+  `file_ttd` text DEFAULT NULL,
   PRIMARY KEY (`id_data_user`),
   KEY `id_user` (`id_user`),
   CONSTRAINT `trx_data_user_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -322,7 +323,7 @@ CREATE TABLE `trx_data_user` (
 
 LOCK TABLES `trx_data_user` WRITE;
 /*!40000 ALTER TABLE `trx_data_user` DISABLE KEYS */;
-INSERT INTO `trx_data_user` VALUES (5,6,'../public/img/foto-profile/user.svg','Furqon Fatahillah','','085240153953','Laki-laki','Borong raya'),(11,12,'../public/img/foto-profile/WhatsApp Image 2024-02-02 at 19.05.56_a1d84076.jpg','Nurul Azmi','','082292704208','Perempuan','pampang'),(21,22,'../public/img/foto-profile/Vectto.jpeg','akbar','','0834326473434','Laki-laki','makassar'),(25,26,'../public/img/foto-profile/f.jpg','Dewi Ernita Rahma','','085216090040','Perempuan','Jl. Kakaktua II'),(26,27,'../public/img/foto-profile/69652cd74c2ce.png','Julisa','13020230219','085216090048','Perempuan','Pampang'),(27,28,'../public/img/foto-profile/','Ahsan','','09090909090','Laki-laki','masalae'),(28,29,'../public/img/foto-profile/','Andi Ahsan','','0912836728938','Laki-laki','nasakkkee'),(29,30,'../public/img/foto-profile/695cba19df719.png','Andi Rahman','','088246700573','Laki-laki','Perumnas BTP Blok H.lama No.509, Tamalanrea, Kec. Tamalanrea, Kota Makassar, Sulawesi Selatan 90245'),(30,31,'../public/img/foto-profile/6964df00b1fd6.jpg','Cacantik','','081374636860','Perempuan','Mars');
+INSERT INTO `trx_data_user` VALUES (5,6,'../public/img/foto-profile/user.svg','Furqon Fatahillah','','085240153953','Laki-laki','Borong raya',NULL),(11,12,'../public/img/foto-profile/WhatsApp Image 2024-02-02 at 19.05.56_a1d84076.jpg','Nurul Azmi','','082292704208','Perempuan','pampang',NULL),(21,22,'../public/img/foto-profile/Vectto.jpeg','akbar','','0834326473434','Laki-laki','makassar',NULL),(25,26,'../public/img/foto-profile/f.jpg','Dewi Ernita Rahma','','085216090040','Perempuan','Jl. Kakaktua II',NULL),(26,27,'../public/img/foto-profile/69652cd74c2ce.png','Julisa','13020230219','085216090048','Perempuan','Pampang',NULL),(27,28,'../public/img/foto-profile/','Ahsan','','09090909090','Laki-laki','masalae',NULL),(28,29,'../public/img/foto-profile/','Andi Ahsan','','0912836728938','Laki-laki','nasakkkee',NULL),(29,30,'../public/img/foto-profile/695cba19df719.png','Andi Rahman','','088246700573','Laki-laki','Perumnas BTP Blok H.lama No.509, Tamalanrea, Kec. Tamalanrea, Kota Makassar, Sulawesi Selatan 90245',NULL),(30,31,'../public/img/foto-profile/6964df00b1fd6.jpg','Cacantik','','081374636860','Perempuan','Mars',NULL),(31,32,'../public/img/foto-profile/696bcf369de9c.png','Andi Rifqi Aunur Rahman','13020230219','088246700573','Laki-laki','Perumnas BTP Blok H.lama No.509, Tamalanrea, Kec. Tamalanrea, Kota Makassar, Sulawesi Selatan 90245',NULL);
 /*!40000 ALTER TABLE `trx_data_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -347,7 +348,7 @@ CREATE TABLE `trx_detail_peminjaman` (
   CONSTRAINT `fk_detail_barang_unit` FOREIGN KEY (`id_barang`) REFERENCES `trx_barang` (`id_barang`) ON DELETE SET NULL,
   CONSTRAINT `trx_detail_peminjaman_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE,
   CONSTRAINT `trx_detail_peminjaman_ibfk_2` FOREIGN KEY (`id_jenis_barang`) REFERENCES `mst_jenis_barang` (`id_jenis_barang`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,7 +357,7 @@ CREATE TABLE `trx_detail_peminjaman` (
 
 LOCK TABLES `trx_detail_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_detail_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_detail_peminjaman` VALUES (5,1,1,NULL,1,NULL),(6,1,2,NULL,1,NULL);
+INSERT INTO `trx_detail_peminjaman` VALUES (2,1,1,1,1,NULL),(3,2,2,2,1,NULL),(4,3,2,2,1,NULL);
 /*!40000 ALTER TABLE `trx_detail_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -369,7 +370,7 @@ DROP TABLE IF EXISTS `trx_peminjaman`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trx_peminjaman` (
   `id_peminjaman` int(11) NOT NULL AUTO_INCREMENT,
-  `nama_peminjam` varchar(255) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `judul_kegiatan` varchar(255) NOT NULL,
   `tanggal_pengajuan` date NOT NULL,
   `tanggal_peminjaman` date NOT NULL,
@@ -377,8 +378,12 @@ CREATE TABLE `trx_peminjaman` (
   `keterangan_peminjaman` text DEFAULT NULL,
   `status` enum('Diproses','Disetujui','Ditolak','Dikembalikan','Melengkapi Surat') DEFAULT 'Melengkapi Surat',
   `file_surat` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id_peminjaman`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `validasi_kalab` enum('0','1') DEFAULT '0' COMMENT '0=Belum, 1=Sudah (Huzain)',
+  `validasi_laboran` enum('0','1') DEFAULT '0' COMMENT '0=Belum, 1=Sudah (Fatimah)',
+  PRIMARY KEY (`id_peminjaman`),
+  KEY `fk_peminjaman_user` (`id_user`),
+  CONSTRAINT `fk_peminjaman_user` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -387,7 +392,7 @@ CREATE TABLE `trx_peminjaman` (
 
 LOCK TABLES `trx_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_peminjaman` VALUES (1,'Julisa','COBA AJA Admin','2026-01-13','2026-01-10','2026-01-21','-','Melengkapi Surat',NULL);
+INSERT INTO `trx_peminjaman` VALUES (1,27,'Mencoba','2026-01-17','2026-01-16','2026-01-22','asdasda','Melengkapi Surat',NULL,'0','0'),(2,30,'Mencoba','2026-01-17','2026-01-16','2026-01-22','1234567890-','Disetujui','SIGNED_696bc845f2f55.pdf','1','1'),(3,32,'Mencoba','2026-01-17','2026-01-16','2026-01-22','-','Disetujui','SIGNED_696bf0e2c7600.pdf','1','1');
 /*!40000 ALTER TABLE `trx_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -407,7 +412,7 @@ CREATE TABLE `trx_pengembalian` (
   PRIMARY KEY (`id_pengembalian`),
   KEY `id_peminjaman` (`id_peminjaman`),
   CONSTRAINT `trx_pengembalian_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -416,6 +421,7 @@ CREATE TABLE `trx_pengembalian` (
 
 LOCK TABLES `trx_pengembalian` WRITE;
 /*!40000 ALTER TABLE `trx_pengembalian` DISABLE KEYS */;
+INSERT INTO `trx_pengembalian` VALUES (1,2,NULL,NULL,NULL),(2,3,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `trx_pengembalian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -461,7 +467,7 @@ CREATE TABLE `trx_user` (
   PRIMARY KEY (`id_user`),
   KEY `id_role` (`id_role`),
   CONSTRAINT `trx_user_ibfk_1` FOREIGN KEY (`id_role`) REFERENCES `mst_role` (`id_role`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -470,8 +476,41 @@ CREATE TABLE `trx_user` (
 
 LOCK TABLES `trx_user` WRITE;
 /*!40000 ALTER TABLE `trx_user` DISABLE KEYS */;
-INSERT INTO `trx_user` VALUES (6,'furqonfatahillah999@gmail.com','$2y$10$Shs7Errud4hePyn4.Ke/Z.H6kTEPRw3wNVZVhKCvYIrBUhGHy1xxy',3),(12,'nrl.azmi160103@gmail.com','$2y$10$JENJHI1HEJ5xOdNTZDVUKOTBUFprh5nIDWC.OCKgWqoUGEFcc/8RG',1),(22,'akbar@gmail.com','$2y$10$dr0rox81DcM8tZzZwm.FWeOJUTpQ6puBX86cxJX4rfg4MAorflB6S',1),(26,'dewiernitarahma@gmail.com','$2y$10$HB.9TCSY1xOwi8hy0Eh.Cu8BHMKkv8tHdFfmvuIJfokaSs2y3FkL6',7),(27,'julisa@gmail.com','$2y$10$oxn/vy7HVG762.M/y4JTEu73nUrfrpSmy9X7aXBMJXTOepFQ1CEEC',1),(28,'admin@gmail.com','$2y$10$1vrpNVH6REUpkz/PxBMrquGrMMSEXYbobyta8DZUgYo/rPoXYUOFi',7),(29,'ahsan@gmail.com','$2y$10$T9Oek/rxszCN2i2XvcAnD.zYHrwjLan9HYLRZO2lv5DrNNPdVyxnm',7),(30,'andikah3954g@gmail.com','$2y$10$c1u4p2bZnPEBqWFcxDAqVuAvV0mupw/2K.Yy6cCioDZKnhrpKrCz.',7),(31,'cacantik@gmail.com','$2y$10$LPDOT2V5b0vZDmNrvj3DFuM.TtOKzWlz029XBrpZOTq3DLo80olMq',7);
+INSERT INTO `trx_user` VALUES (6,'furqonfatahillah999@gmail.com','$2y$10$Shs7Errud4hePyn4.Ke/Z.H6kTEPRw3wNVZVhKCvYIrBUhGHy1xxy',3),(12,'nrl.azmi160103@gmail.com','$2y$10$JENJHI1HEJ5xOdNTZDVUKOTBUFprh5nIDWC.OCKgWqoUGEFcc/8RG',1),(22,'akbar@gmail.com','$2y$10$dr0rox81DcM8tZzZwm.FWeOJUTpQ6puBX86cxJX4rfg4MAorflB6S',1),(26,'dewiernitarahma@gmail.com','$2y$10$HB.9TCSY1xOwi8hy0Eh.Cu8BHMKkv8tHdFfmvuIJfokaSs2y3FkL6',7),(27,'julisa@gmail.com','$2y$10$oxn/vy7HVG762.M/y4JTEu73nUrfrpSmy9X7aXBMJXTOepFQ1CEEC',1),(28,'admin@gmail.com','$2y$10$1vrpNVH6REUpkz/PxBMrquGrMMSEXYbobyta8DZUgYo/rPoXYUOFi',7),(29,'ahsan@gmail.com','$2y$10$T9Oek/rxszCN2i2XvcAnD.zYHrwjLan9HYLRZO2lv5DrNNPdVyxnm',7),(30,'andikah3954g@gmail.com','$2y$10$c1u4p2bZnPEBqWFcxDAqVuAvV0mupw/2K.Yy6cCioDZKnhrpKrCz.',7),(31,'cacantik@gmail.com','$2y$10$LPDOT2V5b0vZDmNrvj3DFuM.TtOKzWlz029XBrpZOTq3DLo80olMq',7),(32,'1andikah3954g@gmail.com','$2y$10$DCPkhgCqlUj0sRfQB4t2B.O5Mdq4KWQhZiCKUYvGaaN92uq2WF6we',2),(33,'admin_test@mail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',1),(34,'asisten_test@mail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',4),(35,'user_test@mail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',7);
 /*!40000 ALTER TABLE `trx_user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trx_data_user`
+--
+
+DROP TABLE IF EXISTS `trx_data_user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trx_data_user` (
+  `id_data_user` int(11) NOT NULL AUTO_INCREMENT,
+  `id_user` int(11) NOT NULL,
+  `foto` text DEFAULT NULL,
+  `nama_user` varchar(100) NOT NULL,
+  `nim_nip` varchar(30) NOT NULL,
+  `no_hp_user` varchar(15) NOT NULL,
+  `jenis_kelamin` enum('Laki-laki','Perempuan') NOT NULL,
+  `alamat` varchar(100) NOT NULL,
+  `file_ttd` text DEFAULT NULL,
+  PRIMARY KEY (`id_data_user`),
+  KEY `id_user` (`id_user`),
+  CONSTRAINT `trx_data_user_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`)
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trx_data_user`
+--
+
+LOCK TABLES `trx_data_user` WRITE;
+/*!40000 ALTER TABLE `trx_data_user` DISABLE KEYS */;
+INSERT INTO `trx_data_user` VALUES (5,6,'../public/img/foto-profile/user.svg','Furqon Fatahillah','','085240153953','Laki-laki','Borong raya',NULL),(11,12,'../public/img/foto-profile/WhatsApp Image 2024-02-02 at 19.05.56_a1d84076.jpg','Nurul Azmi','','082292704208','Perempuan','pampang',NULL),(21,22,'../public/img/foto-profile/Vectto.jpeg','akbar','','0834326473434','Laki-laki','makassar',NULL),(25,26,'../public/img/foto-profile/f.jpg','Dewi Ernita Rahma','','085216090040','Perempuan','Jl. Kakaktua II',NULL),(26,27,'../public/img/foto-profile/69652cd74c2ce.png','Julisa','13020230219','085216090048','Perempuan','Pampang',NULL),(27,28,'../public/img/foto-profile/','Ahsan','','09090909090','Laki-laki','masalae',NULL),(28,29,'../public/img/foto-profile/','Andi Ahsan','','0912836728938','Laki-laki','nasakkkee',NULL),(29,30,'../public/img/foto-profile/695cba19df719.png','Andi Rahman','','088246700573','Laki-laki','Perumnas BTP Blok H.lama No.509, Tamalanrea, Kec. Tamalanrea, Kota Makassar, Sulawesi Selatan 90245',NULL),(30,31,'../public/img/foto-profile/6964df00b1fd6.jpg','Cacantik','','081374636860','Perempuan','Mars',NULL),(31,32,'../public/img/foto-profile/696bcf369de9c.png','Andi Rifqi Aunur Rahman','13020230219','088246700573','Laki-laki','Perumnas BTP Blok H.lama No.509, Tamalanrea, Kec. Tamalanrea, Kota Makassar, Sulawesi Selatan 90245',NULL),(32,33,'../public/img/foto-profile/user.svg','Admin Test','99999','081234567890','Laki-laki','Makassar',NULL),(33,34,'../public/img/foto-profile/user.svg','Asisten Test','88888','081234567891','Laki-laki','Makassar',NULL),(34,35,'../public/img/foto-profile/user.svg','User Test','77777','081234567892','Perempuan','Makassar',NULL);
+/*!40000 ALTER TABLE `trx_data_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -501,4 +540,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-13 13:13:54
+-- Dump completed on 2026-01-18  4:32:51

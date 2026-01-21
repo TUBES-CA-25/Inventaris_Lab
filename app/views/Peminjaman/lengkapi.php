@@ -149,7 +149,7 @@ if (!isset($_SESSION['login'])) {
                 </div>
 
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_peminjaman" value="<?= $data['peminjaman']['id_peminjaman']; ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
                     
                     <div class="upload-section" id="drop-zone">
                         <input type="file" 

@@ -25,6 +25,11 @@ class KelolaAkun extends Controller {
     }
 
     public function hapusUser($id_user){
+        $id_user = IdObfuscator::decode($id_user);
+        if (!$id_user) {
+            header('Location: ' . BASEURL . 'KelolaAkun');
+            exit;
+        }
         if($this->userModel->hapusUser($id_user) > 0){
             Flasher::setFlash('User', 'berhasil', 'dihapus', 'success');
         }else{
@@ -35,13 +40,21 @@ class KelolaAkun extends Controller {
     }
 
     public function getUbah(){
-        echo json_encode($this->userModel->getUbah($_POST['id_user']));
+        $data = $this->userModel->getUbah(IdObfuscator::decode($_POST['id_user']));
+        if ($data) {
+            $data['id_user'] = IdObfuscator::encode($data['id_user']);
+        }
+        echo json_encode($data);
     }
 
     public function ubahUser(){
         // Cek jika update berhasil (rowCount >= 0 karena bisa saja user simpan tanpa ubah data)
         // Disarankan model return rowCount, tapi kadang 0 jika tidak ada perubahan
         // Jadi logicnya: Asal tidak Error/False
+        
+        if(isset($_POST['id_user'])) {
+            $_POST['id_user'] = IdObfuscator::decode($_POST['id_user']);
+        }
         
         if($this->userModel->updateUser($_POST) >= 0){
             Flasher::setFlash('Data User', 'berhasil', 'diubah', 'success');
@@ -65,10 +78,18 @@ class KelolaAkun extends Controller {
     }
 
     public function getRole(){
-        echo json_encode($this->userModel->getRole($_POST['id_user']));
+        $data = $this->userModel->getRole(IdObfuscator::decode($_POST['id_user']));
+        if ($data) {
+             // Assuming getRole returns user data with 'id_user' or related
+             // If it returns role list, maybe no need. 
+             // But usually it returns the user's current role.
+             if(isset($data['id_user'])) $data['id_user'] = IdObfuscator::encode($data['id_user']);
+        }
+        echo json_encode($data);
     }
 
     public function ubahRole() {      
+        $_POST['id_user'] = IdObfuscator::decode($_POST['id_user']);
         if($this->userModel->ubahRole($_POST) > 0){
             Flasher::setFlash('Role', 'berhasil', 'diubah', 'success');
         } else {

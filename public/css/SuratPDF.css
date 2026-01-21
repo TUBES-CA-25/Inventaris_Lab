@@ -1,4 +1,4 @@
-    @page {
+@page {
     margin: 150px 2.5cm 2cm 2.5cm;
 }
 
@@ -16,7 +16,7 @@ body {
     top: -130px; 
     left: 0;
     right: 0;
-    height: 120px; 
+    height: 90px; 
     width: 100%;
     text-align: center;
     padding-bottom: 5px; 
@@ -25,8 +25,8 @@ body {
 }
 
 .header-kop img {
-    width: 100%;
-    max-height: 110px; 
+    width: 115%;
+    margin-left: 70px;
     object-fit: contain;
 }
 

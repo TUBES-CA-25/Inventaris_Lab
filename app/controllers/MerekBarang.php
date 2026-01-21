@@ -70,6 +70,11 @@ class MerekBarang extends Controller {
      * Menangani skenario jika data sedang digunakan oleh tabel lain.
      */
     public function hapus($id_merek_barang){
+        $id_merek_barang = IdObfuscator::decode($id_merek_barang);
+        if (!$id_merek_barang) {
+            header('Location: ' . BASEURL . 'MerekBarang');
+            exit;
+        }
         // Panggil fungsi hapus di model yang mengembalikan kode status
         $status = $this->merekBarangModel->hapusMerekBarang($id_merek_barang);
 
@@ -95,7 +100,11 @@ class MerekBarang extends Controller {
      */
     public function getUbah(){
         // Pastikan parameter dikirim via POST
-        echo json_encode($this->merekBarangModel->getUbah($_POST['id_merek_barang']));
+        $data = $this->merekBarangModel->getUbah(IdObfuscator::decode($_POST['id_merek_barang']));
+        if ($data) {
+            $data['id_merek_barang'] = IdObfuscator::encode($data['id_merek_barang']);
+        }
+        echo json_encode($data);
     }
 
     /**
@@ -103,6 +112,7 @@ class MerekBarang extends Controller {
      */
     public function ubahMerekBarang(){
         // Langkah 1: Validasi Duplikasi
+        $_POST['id_merek_barang'] = IdObfuscator::decode($_POST['id_merek_barang']);
         if ($this->merekBarangModel->cekDataMerekBarang($_POST) > 0) {
             Flasher::setFlash('Merek Barang', 'gagal', 'diubah (Data Sudah Ada)', 'danger');
             header('Location: '. BASEURL . 'MerekBarang');

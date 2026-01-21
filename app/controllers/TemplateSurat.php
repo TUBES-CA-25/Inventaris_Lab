@@ -31,6 +31,11 @@ class TemplateSurat extends Controller
     }
 
     public function lengkapi($id_peminjaman) {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'TemplateSurat');
+            exit;
+        }
         $data['judul'] = 'Pelengkapan Berkas'; 
         $data['id_peminjaman'] = $id_peminjaman;
         
@@ -54,6 +59,10 @@ class TemplateSurat extends Controller
     }
 
     public function generatePDF($id_peminjaman) {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            echo "ID tidak valid."; exit;
+        }
         
         $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
         $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
@@ -91,15 +100,15 @@ class TemplateSurat extends Controller
 
         if (ob_get_length()) { ob_end_clean(); }
 
-        $filename = 'Surat_Peminjaman_' . $id_peminjaman . '.pdf';
-        $dompdf->stream($filename, ["Attachment" => 0]);
+        $filename = 'Surat_Peminjaman_' . '.pdf';
+        $dompdf->stream($filename, ["Attachment" => 1]);
         exit;
     }
 
     public function prosesUpload()
     {
         if (isset($_POST['submit_upload'])) {
-            $id_peminjaman = $_POST['id_peminjaman'];
+            $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
 
             $file = $_FILES['file_surat'];
             $ekstensiValid = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];

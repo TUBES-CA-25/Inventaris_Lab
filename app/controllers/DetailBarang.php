@@ -34,6 +34,11 @@ class DetailBarang extends Controller
     
     public function detail($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
         $data['judul'] = 'Detail Barang';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -84,6 +89,11 @@ class DetailBarang extends Controller
 
     public function hapus($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
         try {
             if ($this->model('Detail_barang_model')->hapusBarang($id_barang) > 0) {
                 Flasher::setFlash('Barang', 'berhasil', ' dihapus', 'success');
@@ -99,11 +109,16 @@ class DetailBarang extends Controller
 
     public function getUbah()
     {
-        echo json_encode($this->model('Detail_barang_model')->getUbah($_POST['id_barang']));
+        $data = $this->model('Detail_barang_model')->getUbah(IdObfuscator::decode($_POST['id_barang']));
+        if ($data) {
+            $data['id_barang'] = IdObfuscator::encode($data['id_barang']);
+        }
+        echo json_encode($data);
     }
 
     public function ubahBarang()
     {
+        $_POST['id_barang'] = IdObfuscator::decode($_POST['id_barang']);
         if ($this->model('Detail_barang_model')->ubahBarang($_POST) > 0) {
             Flasher::setFlash('Barang', 'berhasil', ' diUbah', 'success');
             header('Location: ' . BASEURL . 'DetailBarang');
@@ -136,6 +151,12 @@ class DetailBarang extends Controller
             $data['judul'] = 'Laporan Detail Barang';
             
             $ids_barang = $_POST['id_barang']; 
+            if (is_array($ids_barang)) {
+                $ids_barang = array_map(['IdObfuscator', 'decode'], $ids_barang);
+            }
+            if (empty($ids_barang)) {
+                header('Location: ' . BASEURL . 'DetailBarang'); exit;
+            } 
             
             $data['dataCetak'] = $this->model('Detail_barang_model')->cetak($ids_barang);
             
@@ -150,6 +171,11 @@ class DetailBarang extends Controller
 
     public function ubah($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
         $data['judul'] = 'Ubah Barang';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -172,6 +198,11 @@ class DetailBarang extends Controller
 
     public function cetakSatuan($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
         $data['judul'] = 'Laporan Detail Barang';
         $DetailBarangModel = $this->model('Detail_barang_model');
         $data['item'] = $DetailBarangModel->getDetailDataBarang($id_barang);

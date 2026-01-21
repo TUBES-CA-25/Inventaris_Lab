@@ -51,6 +51,11 @@ class Peminjaman extends Controller
 
     public function tambahItem($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'Peminjaman');
+            exit;
+        }
         if (!isset($_SESSION)) session_start();
 
         if (!isset($_SESSION['keranjang'])) {
@@ -118,6 +123,11 @@ class Peminjaman extends Controller
 
     public function hapusItem($id_barang)
     {
+        $id_barang = IdObfuscator::decode($id_barang);
+        if (!$id_barang) {
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
         if (!isset($_SESSION)) session_start();
 
         if (isset($_SESSION['keranjang'])) {
@@ -135,6 +145,11 @@ class Peminjaman extends Controller
     
     public function detail($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
         $data['judul'] = 'Detail Peminjaman';
         $data['dataTampilPeminjaman'] = $this->model('Peminjaman_model')->getDetailDataPeminjaman($id_peminjaman);
 
@@ -145,6 +160,11 @@ class Peminjaman extends Controller
 
     public function tambahBarang($id_peminjaman)
     {
+        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman) {
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
         $header = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
         $details = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
 
@@ -215,7 +235,7 @@ class Peminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_peminjaman = $_POST['id_peminjaman'];
+            $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
             $alasan        = $_POST['alasan_penolakan'];
 
             if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {

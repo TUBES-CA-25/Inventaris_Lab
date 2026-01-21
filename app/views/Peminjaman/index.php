@@ -39,7 +39,7 @@ if (!isset($_SESSION['login'])) {
 
                             <div class="card-desc">
                                 <h6 class="barang-title"><?= $brg['sub_barang']; ?></h6>
-                                <a href="<?= BASEURL; ?>Peminjaman/tambahItem/<?= $brg['id_jenis_barang']; ?>"
+                                <a href="<?= BASEURL; ?>Peminjaman/tambahItem/<?= IdObfuscator::encode($brg['id_jenis_barang']); ?>"
                                     class="btn-pinjam-now">
                                     Pinjam
                                 </a>

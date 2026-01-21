@@ -105,22 +105,22 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                     <!-- Delete Button -->
                                     <a class="action-btn-custom action-btn-delete" 
                                        data-toggle="modal"
-                                       data-target="#konfirmasiHapus<?= $row['id_merek_barang'] ?>">
+                                       data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_merek_barang']) ?>">
                                         <i class="fa-solid fa-trash-can fa-lg" style="color: #dc2626;"></i>
                                     </a>
                                     
                                     <!-- Edit Button -->
-                                    <a href="<?= BASEURL; ?>MerekBarang/ubah/<?= $row['id_merek_barang']; ?>"
+                                    <a href="<?= BASEURL; ?>MerekBarang/ubah/<?= IdObfuscator::encode($row['id_merek_barang']); ?>"
                                        class="action-btn-custom action-btn-edit tampilMerekBarangUbah"
                                        data-toggle="modal" 
                                        data-target="#modalTambah" 
-                                       data-id="<?= $row['id_merek_barang']; ?>">
+                                       data-id="<?= IdObfuscator::encode($row['id_merek_barang']); ?>">
                                         <i class="fa-solid fa-pen-to-square fa-lg" style="color: #059669;"></i>
                                     </a>
                                 </div>
 
                                 <!-- Modal Konfirmasi Hapus -->
-                                <div class="modal fade modal-custom" id="konfirmasiHapus<?= $row['id_merek_barang'] ?>" tabindex="-1" role="dialog">
+                                <div class="modal fade modal-custom" id="konfirmasiHapus<?= IdObfuscator::encode($row['id_merek_barang']) ?>" tabindex="-1" role="dialog">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
                                             <div class="modal-body text-center py-4">
@@ -141,7 +141,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                                     Batal
                                                 </button>
                                                 <button type="button" class="btn-danger-custom"
-                                                        onclick="location.href='<?= BASEURL; ?>MerekBarang/hapus/<?= $row['id_merek_barang']; ?>'">
+                                                        onclick="location.href='<?= BASEURL; ?>MerekBarang/hapus/<?= IdObfuscator::encode($row['id_merek_barang']); ?>'">
                                                     Hapus
                                                 </button>
                                             </div>

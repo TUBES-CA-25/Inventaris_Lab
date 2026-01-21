@@ -106,22 +106,22 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                     <!-- Delete Button -->
                                     <a class="btn d-flex align-items-center justify-content-center" 
                                        data-toggle="modal"
-                                       data-target="#konfirmasiHapus<?= $row['id_jenis_barang']; ?>">
+                                       data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_jenis_barang']); ?>">
                                         <i class="fa-solid fa-trash-can fa-lg icon-delete"></i>
                                     </a>
                                     
                                     <!-- Edit Button -->
-                                    <a href="<?= BASEURL; ?>/JenisBarang/ubah/<?= $row['id_jenis_barang']; ?>"
+                                    <a href="<?= BASEURL; ?>/JenisBarang/ubah/<?= IdObfuscator::encode($row['id_jenis_barang']); ?>"
                                        class="btn d-flex align-items-center justify-content-center tampilJenisBarangUbah"
                                        data-toggle="modal" 
                                        data-target="#modalTambah"
-                                       data-id="<?= $row['id_jenis_barang']; ?>">
+                                       data-id="<?= IdObfuscator::encode($row['id_jenis_barang']); ?>">
                                         <i class="fa-solid fa-pen-to-square fa-lg icon-edit"></i>
                                     </a>
                                 </div>
                                 
                                 <!-- Modal Konfirmasi Hapus -->
-                                <div class="modal fade" id="konfirmasiHapus<?= $row['id_jenis_barang']; ?>" 
+                                <div class="modal fade" id="konfirmasiHapus<?= IdObfuscator::encode($row['id_jenis_barang']); ?>" 
                                      tabindex="-1" 
                                      role="dialog" 
                                      aria-labelledby="exampleModalCenterTitle" 
@@ -144,7 +144,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-light btn-modal-width" data-dismiss="modal">Batal</button>
                                                 <button type="button" class="btn btn-danger btn-modal-width" 
-                                                        onclick="location.href='<?= BASEURL; ?>JenisBarang/hapus/<?= $row['id_jenis_barang']; ?>'">Hapus</button>
+                                                        onclick="location.href='<?= BASEURL; ?>JenisBarang/hapus/<?= IdObfuscator::encode($row['id_jenis_barang']); ?>'">Hapus</button>
                                             </div>
                                         </div>
                                     </div>
