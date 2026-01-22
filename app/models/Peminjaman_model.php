@@ -487,7 +487,7 @@ class Peminjaman_model
         return $this->db->resultSet();
     }
 
-public function getCekValidasiKalab($id)
+    public function getCekValidasiKalab($id)
     {
         $this->db->query("SELECT validasi_kalab FROM trx_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $id);
@@ -633,19 +633,28 @@ public function getCekValidasiKalab($id)
             $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $pdf->useTemplate($tplIdx);
 
-            if ($i == $data['page']) {
-                $widthMM = $size['width'];
-                $heightMM = $size['height'];
-                $ttdWidth = 35;
+            $widthMM = $size['width'];
+            $heightMM = $size['height'];
+            $ttdWidth = 35;
 
+            // --- LOGIKA BARU DIMULAI DARI SINI ---
+
+            // 1. Cek Apakah Halaman ini adalah tempat Fatimah TTD?
+            if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
-                $hx = $widthMM * $data['huzain_x'];
-                $hy = $heightMM * $data['huzain_y'];
-
+                
                 if (file_exists($pathFatimah)) {
                     $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
                 }
+            }
+
+            // 2. Cek Apakah Halaman ini adalah tempat Huzain TTD?
+            // Menggunakan IF terpisah (bukan ELSE IF) agar bisa TTD di halaman yang sama
+            if ($i == $data['huzain_page']) {
+                $hx = $widthMM * $data['huzain_x'];
+                $hy = $heightMM * $data['huzain_y'];
+
                 if (file_exists($pathHuzain)) {
                     $pdf->Image($pathHuzain, $hx, $hy, $ttdWidth);
                 }
@@ -654,11 +663,26 @@ public function getCekValidasiKalab($id)
 
         $pdf->Output($pathAsli, 'F');
 
-        $query = "UPDATE trx_peminjaman SET validasi_kalab='1', validasi_laboran='1', status='disetujui' WHERE id_peminjaman=:id";
-        $this->db->query($query);
-        $this->db->bind('id', $id);
-        $this->db->execute();
+        // $query = "UPDATE trx_peminjaman SET validasi_kalab='1', validasi_laboran='1', status='disetujui' WHERE id_peminjaman=:id";
+        // $this->db->query($query);
+        // $this->db->bind('id', $id);
+        // $this->db->execute();
 
         return 1;
+    }
+
+    public function finalisasiValidasi($id_peminjaman)
+    {
+        $query = "UPDATE trx_peminjaman SET 
+                    validasi_kalab = '1', 
+                    validasi_laboran = '1', 
+                    status = 'disetujui' 
+                    WHERE id_peminjaman = :id";
+
+        $this->db->query($query);
+        $this->db->bind('id', $id_peminjaman);
+        $this->db->execute();
+
+        return $this->db->rowCount();
     }
 }

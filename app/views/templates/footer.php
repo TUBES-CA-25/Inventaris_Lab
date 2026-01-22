@@ -29,6 +29,8 @@
 
 <script src="<?= BASEURL; ?>/js/script.js"></script>
 <script src="<?= BASEURL; ?>/js/form.js"></script>
+<script src="<?= BASEURL; ?>/js/ValidasiPeminjaman.js"></script>
+<script src="<?= BASEURL; ?>/js/upload.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>

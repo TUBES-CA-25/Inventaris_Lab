@@ -144,7 +144,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
                             <div>
                                 <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
                                     <form action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab" method="post" class="d-inline">
-                                        <input type="hidden" name="id_peminjaman" value="<?= $p['id_peminjaman']; ?>">
+                                        <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                                         <button type="submit" class="btn btn-primary btn-sm shadow-sm" onclick="return confirm('Apakah Anda yakin ingin menyetujui peminjaman ini?')">
                                             <i class="fas fa-check mr-1"></i> Setujui
                                         </button>
@@ -276,13 +276,11 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
 </div>
 
 <script>
-    // Fungsi ini dibuat di Global Scope agar tidak terpengaruh error library lain
     function bukaFormTolak(id) {
         // Tutup semua form dulu
         document.getElementById('formTolakContainer').style.display = 'none';
         document.getElementById('formTolakPengembalianContainer').style.display = 'none';
         
-        // Buka yang diminta
         var el = document.getElementById(id);
         if(el) {
             el.style.display = 'block';
