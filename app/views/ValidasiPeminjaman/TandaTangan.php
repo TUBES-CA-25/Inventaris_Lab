@@ -24,29 +24,6 @@
             margin: 20px auto;
             background-color: #525659;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-<<<<<<< HEAD
-            /* Hapus overflow: hidden agar drag bisa lebih leluasa, tapi wrapper tetap membungkus */
-            min-height: 500px;
-        }
-
-        /* Container untuk menampung semua canvas halaman */
-        #pdf-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .pdf-page {
-            display: block;
-            width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-            /* Jarak antar halaman */
-            background-color: white;
-        }
-
-=======
             overflow: hidden;
         }
 
@@ -57,22 +34,10 @@
         }
 
         /* --- GAYA BARU: GAMBAR TANDA TANGAN --- */
->>>>>>> 88e9f128c9946328174c406131f6bbb7ee021c28
         .drag-box {
             position: absolute;
             top: 0;
             left: 0;
-<<<<<<< HEAD
-            width: 140px;
-            height: auto;
-            cursor: move;
-            z-index: 100;
-            background: transparent;
-            border: 1px dashed rgba(0, 0, 0, 0.2);
-            display: none;
-        }
-
-=======
 
             /* Ukuran ini disesuaikan agar mirip hasil cetak PDF (sekitar 3-4cm) */
             width: 140px;
@@ -93,7 +58,6 @@
         }
 
         /* Saat didrag, border jadi jelas */
->>>>>>> 88e9f128c9946328174c406131f6bbb7ee021c28
         .drag-box:active,
         .drag-box:hover {
             border: 1px dashed #007bff;
@@ -165,7 +129,7 @@
         <div class="row justify-content-center pb-5 mt-4">
             <div class="col-md-8 text-center">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/prosesAccLaboran" method="post" id="formTTD">
-                    <input type="hidden" name="id_peminjaman" value="<?= $data['id_peminjaman']; ?>">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['id_peminjaman']); ?>">
                     <input type="hidden" name="page_target" id="input_page" value="1">
 
                     <input type="hidden" name="fatimah_x" id="fatimah_x">
