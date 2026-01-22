@@ -29,7 +29,7 @@
 
 <script src="<?= BASEURL; ?>/js/script.js"></script>
 <script src="<?= BASEURL; ?>/js/form.js"></script>
-<script src="<?= BASEURL; ?>/js/ValidasiPeminjaman.js"></script>
+
 <script src="<?= BASEURL; ?>/js/upload.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>

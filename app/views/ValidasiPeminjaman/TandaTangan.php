@@ -20,59 +20,55 @@
             position: relative;
             width: 100%;
             max-width: 850px;
-            /* Lebar standar A4 di layar */
             margin: 20px auto;
             background-color: #525659;
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            overflow: hidden;
+            /* Hapus overflow: hidden agar drag bisa lebih leluasa, tapi wrapper tetap membungkus */
+            min-height: 500px;
         }
 
-        #the-canvas {
+        /* Container untuk menampung semua canvas halaman */
+        #pdf-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pdf-page {
+            display: block;
             width: 100%;
             height: auto;
-            display: block;
+            margin-bottom: 10px;
+            /* Jarak antar halaman */
+            background-color: white;
         }
 
-        /* --- GAYA BARU: GAMBAR TANDA TANGAN --- */
         .drag-box {
             position: absolute;
             top: 0;
             left: 0;
-
-            /* Ukuran ini disesuaikan agar mirip hasil cetak PDF (sekitar 3-4cm) */
             width: 140px;
             height: auto;
-            /* Tinggi menyesuaikan rasio gambar */
-
             cursor: move;
             z-index: 100;
-
-            /* Transparan agar teks di belakang terlihat */
             background: transparent;
-
-            /* Border tipis putus-putus untuk bantu lihat area klik */
             border: 1px dashed rgba(0, 0, 0, 0.2);
-
             display: none;
-            /* Sembunyi dulu sebelum PDF load */
         }
 
-        /* Saat didrag, border jadi jelas */
         .drag-box:active,
         .drag-box:hover {
             border: 1px dashed #007bff;
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Gambar Tanda Tangan */
         .drag-box img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             pointer-events: none;
-            /* Agar gambar tidak ter-select saat drag */
             filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
-            /* Bayangan tipis biar kontras */
         }
 
         #loader {
@@ -95,7 +91,7 @@
 
     <div id="loader">
         <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-3 font-weight-bold">Memuat Dokumen & Tanda Tangan...</p>
+        <p class="mt-3 font-weight-bold">Memuat Seluruh Halaman Dokumen...</p>
     </div>
 
     <nav class="navbar navbar-light bg-white shadow mb-4">
@@ -109,13 +105,13 @@
             <div class="col-md-8">
                 <div class="alert alert-warning shadow-sm text-center">
                     <i class="fas fa-hand-paper mr-2"></i>
-                    Geser <strong>Gambar Tanda Tangan</strong> di bawah ini ke posisi yang diinginkan.
+                    Geser <strong>Gambar Tanda Tangan</strong> ke halaman dan posisi yang diinginkan.
                 </div>
             </div>
         </div>
 
         <div id="pdf-wrapper">
-            <canvas id="the-canvas"></canvas>
+            <div id="pdf-container"></div>
 
             <div id="drag-fatimah" class="drag-box">
                 <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah">
@@ -130,7 +126,9 @@
             <div class="col-md-8 text-center">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/prosesAccLaboran" method="post" id="formTTD">
                     <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['id_peminjaman']); ?>">
-                    <input type="hidden" name="page_target" id="input_page" value="1">
+
+                    <input type="hidden" name="fatimah_page" id="fatimah_page" value="1">
+                    <input type="hidden" name="huzain_page" id="huzain_page" value="1">
 
                     <input type="hidden" name="fatimah_x" id="fatimah_x">
                     <input type="hidden" name="fatimah_y" id="fatimah_y">
@@ -157,51 +155,85 @@
         const url = '<?= BASEURL; ?>files/surat-peminjaman/<?= $data['file_surat']; ?>';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        let canvas = document.getElementById('the-canvas');
-        let ctx = canvas.getContext('2d');
+        const pdfContainer = document.getElementById('pdf-container');
+        // Array untuk menyimpan info tinggi setiap halaman untuk kalkulasi nanti
+        let pagesMetaData = [];
 
-        // --- 1. RENDER PDF ---
-        pdfjsLib.getDocument(url).promise.then(function(pdf) {
-            return pdf.getPage(1);
-        }).then(function(page) {
-            let viewport = page.getViewport({
-                scale: 1.5
-            });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+        // --- 1. RENDER PDF (ALL PAGES) ---
+        pdfjsLib.getDocument(url).promise.then(async function(pdf) {
 
-            let renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
+            // Loop semua halaman
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                await pdf.getPage(pageNum).then(function(page) {
+                    let viewport = page.getViewport({
+                        scale: 1.5
+                    });
 
-            page.render(renderContext).promise.then(function() {
-                document.getElementById('loader').style.display = 'none';
-                document.querySelectorAll('.drag-box').forEach(el => el.style.display = 'block');
+                    // Buat Canvas baru untuk halaman ini
+                    let canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    canvas.id = 'page-' + pageNum;
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
 
-                // SET POSISI AWAL (Sesuaikan visual agar enak dilihat pertama kali)
-                // Kiri Bawah (Fatimah)
-                initPosition('drag-fatimah', 0.15, 0.75);
-                // Kanan Bawah (Huzain)
-                initPosition('drag-huzain', 0.60, 0.75);
-            });
+                    let ctx = canvas.getContext('2d');
+                    let renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+
+                    // Tambahkan ke container
+                    pdfContainer.appendChild(canvas);
+
+                    // Render
+                    return page.render(renderContext).promise.then(() => {
+                        // Simpan metadata halaman (Tinggi halaman)
+                        pagesMetaData.push({
+                            pageNumber: pageNum,
+                            height: canvas.offsetHeight,
+                            width: canvas.offsetWidth,
+                            top: canvas.offsetTop // Posisi Y dari atas wrapper
+                        });
+                    });
+                });
+            }
+
+            // Selesai render semua halaman
+            document.getElementById('loader').style.display = 'none';
+            document.querySelectorAll('.drag-box').forEach(el => el.style.display = 'block');
+
+            // Set posisi awal di halaman pertama (Page 1)
+            // Asumsi: metadata[0] adalah halaman 1
+            if (pagesMetaData.length > 0) {
+                // Fatimah di kiri bawah halaman 1
+                initPositionOnPage('drag-fatimah', 1, 0.15, 0.75);
+                // Huzain di kanan bawah halaman 1
+                initPositionOnPage('drag-huzain', 1, 0.60, 0.75);
+            }
+
         }).catch(function(error) {
+            console.error(error);
             alert('Gagal memuat PDF: ' + error.message);
         });
 
-        // --- 2. FUNGSI POSISI & DRAG ---
-        function initPosition(id, percentX, percentY) {
-            let el = document.getElementById(id);
-            let w = canvas.offsetWidth;
-            let h = canvas.offsetHeight;
-            let x = w * percentX;
-            let y = h * percentY;
+        // --- Fungsi Helper: Set Posisi di Halaman Tertentu ---
+        function initPositionOnPage(elementId, pageNum, percentX, percentY) {
+            // Ambil metadata halaman yang sesuai (index array = pageNum - 1)
+            let pageData = pagesMetaData[pageNum - 1];
+            if (!pageData) return;
+
+            let el = document.getElementById(elementId);
+
+            let x = pageData.width * percentX;
+            // Y Absolute = Posisi Y halaman + (Tinggi Halaman * Persen)
+            let y = pageData.top + (pageData.height * percentY);
 
             el.setAttribute('data-x', x);
             el.setAttribute('data-y', y);
             el.style.transform = `translate(${x}px, ${y}px)`;
         }
 
+        // --- 2. FUNGSI DRAG (INTERACT.JS) ---
         interact('.drag-box').draggable({
             listeners: {
                 move(event) {
@@ -216,7 +248,7 @@
             },
             modifiers: [
                 interact.modifiers.restrictRect({
-                    restriction: '#the-canvas', // Batasi dalam gambar PDF
+                    restriction: '#pdf-wrapper', // Batasi drag di dalam wrapper utama
                     endOnly: false
                 })
             ]
@@ -224,32 +256,75 @@
 
         // --- 3. SIMPAN KOORDINAT ---
         function submitValidasi() {
-            let w = canvas.offsetWidth;
-            let h = canvas.offsetHeight;
 
-            function getPercent(id) {
+            // Fungsi untuk mencari tahu elemen ada di halaman mana
+            function calculatePosition(id) {
                 let el = document.getElementById(id);
-                let x = parseFloat(el.getAttribute('data-x')) || 0;
-                let y = parseFloat(el.getAttribute('data-y')) || 0;
+                // Koordinat Absolute terhadap Wrapper
+                let absX = parseFloat(el.getAttribute('data-x')) || 0;
+                let absY = parseFloat(el.getAttribute('data-y')) || 0;
 
-                // Kalkulasi Persentase (Presisi Tinggi)
+                // Cari halaman mana yang 'diduduki' oleh tanda tangan ini
+                // Kita cek berdasarkan posisi Y
+                let targetPage = null;
+
+                // Tambahkan offset kecil (+50px) agar kalau ttd pas di garis potong, masuk ke halaman bawahnya
+                let checkY = absY + 50;
+
+                for (let i = 0; i < pagesMetaData.length; i++) {
+                    let p = pagesMetaData[i];
+                    // Cek jika Y berada dalam rentang halaman ini (termasuk margin)
+                    // (p.top + p.height) + 10 (margin) 
+                    if (checkY >= p.top && checkY <= (p.top + p.height + 10)) {
+                        targetPage = p;
+                        break;
+                    }
+                }
+
+                // Jika tidak ketemu (misal drag terlalu jauh), default ke halaman terakhir
+                if (!targetPage) {
+                    targetPage = pagesMetaData[pagesMetaData.length - 1];
+                }
+
+                // Hitung koordinat Relatif terhadap Halaman tersebut
+                // Y Relatif = Y Absolute - Y Awal Halaman
+                let relativeY = absY - targetPage.top;
+
+                // Hitung Persentase (0.0 - 1.0)
+                let percentX = (absX / targetPage.width).toFixed(4);
+                let percentY = (relativeY / targetPage.height).toFixed(4);
+
                 return {
-                    x: (x / w).toFixed(4),
-                    y: (y / h).toFixed(4)
+                    page: targetPage.pageNumber,
+                    x: percentX,
+                    y: percentY
                 };
             }
 
-            let fatimah = getPercent('drag-fatimah');
-            let huzain = getPercent('drag-huzain');
+            let fatimah = calculatePosition('drag-fatimah');
+            let huzain = calculatePosition('drag-huzain');
 
+            // --- LOGIKA HALAMAN ---
+            // Kita menggunakan halaman posisi Fatimah sebagai acuan 'page_target' utama
+            // Jika backend Anda mendukung multiple page, logic ini bisa disesuaikan.
+            // --- LOGIKA HALAMAN BARU ---
+            
+            // Masukkan data halaman masing-masing ke input yang baru dibuat
+            document.getElementById('fatimah_page').value = fatimah.page;
+            document.getElementById('huzain_page').value = huzain.page;
+
+            // Masukkan koordinat (X, Y)
             document.getElementById('fatimah_x').value = fatimah.x;
             document.getElementById('fatimah_y').value = fatimah.y;
             document.getElementById('huzain_x').value = huzain.x;
             document.getElementById('huzain_y').value = huzain.y;
+            
+            // Update pesan konfirmasi agar user tahu posisi halaman masing-masing
+            let warningText = `TTD Fatimah di Hal ${fatimah.page}, TTD Huzain di Hal ${huzain.page}. Simpan?`;
 
             Swal.fire({
                 title: 'Simpan Posisi?',
-                text: "Posisi tanda tangan akan disimpan sesuai tampilan ini.",
+                text: warningText,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Simpan'

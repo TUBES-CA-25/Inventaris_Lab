@@ -633,28 +633,19 @@ class Peminjaman_model
             $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $pdf->useTemplate($tplIdx);
 
-            $widthMM = $size['width'];
-            $heightMM = $size['height'];
-            $ttdWidth = 35;
+            if ($i == $data['page']) {
+                $widthMM = $size['width'];
+                $heightMM = $size['height'];
+                $ttdWidth = 35;
 
-            // --- LOGIKA BARU DIMULAI DARI SINI ---
-
-            // 1. Cek Apakah Halaman ini adalah tempat Fatimah TTD?
-            if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
-                
-                if (file_exists($pathFatimah)) {
-                    $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
-                }
-            }
-
-            // 2. Cek Apakah Halaman ini adalah tempat Huzain TTD?
-            // Menggunakan IF terpisah (bukan ELSE IF) agar bisa TTD di halaman yang sama
-            if ($i == $data['huzain_page']) {
                 $hx = $widthMM * $data['huzain_x'];
                 $hy = $heightMM * $data['huzain_y'];
 
+                if (file_exists($pathFatimah)) {
+                    $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
+                }
                 if (file_exists($pathHuzain)) {
                     $pdf->Image($pathHuzain, $hx, $hy, $ttdWidth);
                 }
