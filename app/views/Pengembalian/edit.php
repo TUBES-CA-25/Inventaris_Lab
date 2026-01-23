@@ -5,240 +5,521 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
+<style>
+    /* Modern Item Card with Glassmorphism */
+    .item-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(13, 27, 62, 0.08);
+        border-radius: 16px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .item-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #0d1b3e 0%, #3498db 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .item-card:hover {
+        border-color: rgba(13, 27, 62, 0.2);
+        box-shadow: 0 8px 30px rgba(13, 27, 62, 0.12);
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    .item-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Modern Icon Container */
+    .item-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .item-icon::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        top: 0;
+        left: 0;
+    }
+
+    .item-icon.icon-variant-1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .item-icon.icon-variant-2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .item-icon.icon-variant-3 {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .item-icon.icon-variant-4 {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .item-icon.icon-variant-5 {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    /* Modern Badge */
+    .qty-badge {
+        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(13, 27, 62, 0.2);
+        letter-spacing: 0.3px;
+    }
+
+    /* Item Info Section */
+    .item-info {
+        flex: 1;
+    }
+
+    .item-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .item-code {
+        display: inline-flex;
+        align-items: center;
+        background: #f7fafc;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+    }
+
+    .item-spec {
+        background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+        padding: 6px 12px;
+        border-radius: 8px;
+        margin-top: 8px;
+        border-left: 3px solid #3b82f6;
+    }
+
+    /* Modern Condition Panel */
+    .condition-panel {
+        background: #ffffff;
+        border: 2px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .condition-panel:hover {
+        border-color: #0d1b3e;
+        box-shadow: 0 4px 20px rgba(13, 27, 62, 0.08);
+    }
+
+    .form-label-sm {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Modern Select Dropdown */
+    .modern-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+
+    .modern-select:focus {
+        border-color: #0d1b3e;
+        box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
+        outline: none;
+    }
+
+    .modern-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 14px;
+        transition: all 0.3s ease;
+    }
+
+    .modern-input:focus {
+        border-color: #0d1b3e;
+        box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
+        outline: none;
+    }
+
+    /* Section Header */
+    .section-header {
+        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 15px rgba(13, 27, 62, 0.2);
+    }
+
+    .section-header i {
+        font-size: 1.3rem;
+        margin-right: 10px;
+        opacity: 0.9;
+    }
+
+    /* Enhanced Cards */
+    .info-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .info-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 2px solid #e5e7eb;
+        padding: 18px 24px;
+    }
+
+    .finalize-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 8px 30px rgba(13, 27, 62, 0.12);
+        border-top: 4px solid #0d1b3e;
+    }
+
+    /* Modern Button */
+    .btn-modern-primary {
+        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(13, 27, 62, 0.3);
+    }
+
+    .btn-modern-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(13, 27, 62, 0.4);
+    }
+
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .item-card {
+        animation: fadeInUp 0.5s ease backwards;
+    }
+
+    .item-card:nth-child(1) { animation-delay: 0.1s; }
+    .item-card:nth-child(2) { animation-delay: 0.2s; }
+    .item-card:nth-child(3) { animation-delay: 0.3s; }
+    .item-card:nth-child(4) { animation-delay: 0.4s; }
+    .item-card:nth-child(5) { animation-delay: 0.5s; }
+
+    /* Preview Container */
+    #previewContainer img {
+        border-radius: 12px;
+        border: 3px solid #e5e7eb;
+    }
+</style>
+
 <div class="content">
     <div class="content-beranda">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold" style="color: #0d1b3e;">Edit Status Pengembalian</h3>
-            <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Kembali
+            <h3 class="fw-bold" style="color: #0d1b3e;">
+                <i class="fas fa-check-double me-2"></i>Verifikasi Pengembalian
+            </h3>
+            <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-secondary btn-sm rounded-pill px-4">
+                <i class="fas fa-arrow-left me-2"></i>Kembali
             </a>
         </div>
 
-        <!-- Form Edit Status -->
-        <form action="<?= BASEURL; ?>Pengembalian/proses_edit" method="POST" enctype="multipart/form-data"
-            class="needs-validation" novalidate>
+        <form action="<?= BASEURL; ?>Pengembalian/proses_edit" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             <input type="hidden" name="id_peminjaman" value="<?= $data['peminjaman']['id_peminjaman']; ?>">
 
-            <!-- Informasi Peminjaman -->
-            <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-4"
-                        style="color: #0d1b3e; border-bottom: 2px solid #0d1b3e; padding-bottom: 10px;">
-                        <i class="fas fa-info-circle"></i> Informasi Peminjaman
-                    </h5>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Judul Kegiatan</label>
-                            <input type="text" class="form-control bg-light"
-                                value="<?= htmlspecialchars($data['peminjaman']['judul_kegiatan'] ?? '-'); ?>" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Nama Peminjam</label>
-                            <input type="text" class="form-control bg-light"
-                                value="<?= htmlspecialchars($data['peminjaman']['nama_peminjam'] ?? '-'); ?>" readonly>
-                        </div>
+            <div class="row g-4">
+                
+                <div class="col-lg-8">
+                    <div class="section-header">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fas fa-boxes"></i>Daftar Barang & Verifikasi Kondisi
+                        </h5>
                     </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Tanggal Peminjaman</label>
-                            <input type="text" class="form-control bg-light"
-                                value="<?= !empty($data['peminjaman']['tanggal_peminjaman']) ? date('d/m/Y', strtotime($data['peminjaman']['tanggal_peminjaman'])) : '-'; ?>"
-                                readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Tanggal Jatuh Tempo</label>
-                            <input type="text" class="form-control bg-light"
-                                value="<?= !empty($data['peminjaman']['tanggal_pengembalian']) ? date('d/m/Y', strtotime($data['peminjaman']['tanggal_pengembalian'])) : '-'; ?>"
-                                readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Status Peminjaman</label>
-                            <input type="text" class="form-control bg-light"
-                                value="<?= htmlspecialchars($data['peminjaman']['status'] ?? '-'); ?>" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form Status Pengembalian -->
-            <div class="card shadow-sm border-0" style="border-radius: 15px;">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-4"
-                        style="color: #0d1b3e; border-bottom: 2px solid #0d1b3e; padding-bottom: 10px;">
-                        <i class="fas fa-edit"></i> Status Pengembalian
-                    </h5>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Status Barang <span class="text-danger">*</span></label>
-                            <select name="status_pengembalian" class="form-select" required>
-                                <option value="">-- Pilih Status --</option>
-                                <option value="Dikembalikan" <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Dikembalikan') ? 'selected' : ''; ?>>
-                                    ✅ Dikembalikan (Barang sudah kembali)
-                                </option>
-                                <option value="Belum Dikembalikan"
-                                    <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Belum Dikembalikan') ? 'selected' : ''; ?>>
-                                    ⏳ Belum Dikembalikan (Masih dipinjam)
-                                </option>
-                                <option value="Rusak" <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Rusak') ? 'selected' : ''; ?>>
-                                    🔧 Rusak
-                                </option>
-                                <option value="Hilang" <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Hilang') ? 'selected' : ''; ?>>
-                                    ❌ Hilang
-                                </option>
-                            </select>
-                            <div class="invalid-feedback">Pilih status barang</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Keterangan Waktu <span
-                                    class="text-danger">*</span></label>
-                            <select name="keterangan" class="form-select" required>
-                                <option value="">-- Pilih Keterangan --</option>
-                                <option value="Tepat Waktu" <?= (!empty($data['peminjaman']['keterangan_pengembalian']) && $data['peminjaman']['keterangan_pengembalian'] == 'Tepat Waktu') ? 'selected' : ''; ?>>
-                                    ⏰ Tepat Waktu
-                                </option>
-                                <option value="Tidak Tepat Waktu"
-                                    <?= (!empty($data['peminjaman']['keterangan_pengembalian']) && $data['peminjaman']['keterangan_pengembalian'] == 'Tidak Tepat Waktu') ? 'selected' : ''; ?>>
-                                    ⚠️ Terlambat
-                                </option>
-                                <option value="Bermasalah" <?= (!empty($data['peminjaman']['keterangan_pengembalian']) && $data['peminjaman']['keterangan_pengembalian'] == 'Bermasalah') ? 'selected' : ''; ?>>
-                                    🚨 Bermasalah
-                                </option>
-                            </select>
-                            <div class="invalid-feedback">Pilih keterangan waktu</div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Tanggal Pengembalian Aktual</label>
-                            <input type="date" name="tgl_pengembalian_aktual" class="form-control"
-                                value="<?= !empty($data['peminjaman']['tgl_pengembalian_aktual']) ? $data['peminjaman']['tgl_pengembalian_aktual'] : date('Y-m-d'); ?>">
-                            <small class="text-muted">Kosongkan untuk auto-set tanggal hari ini</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Bukti Foto Pengembalian</label>
-                            <input type="file" name="bukti_foto" class="form-control" accept="image/*" id="buktiInput">
-                            <small class="text-muted">Format: JPG, JPEG, PNG (Max 5MB)</small>
-
-                            <?php if (!empty($data['peminjaman']['bukti_foto'])): ?>
-                                <div class="mt-2">
-                                    <small class="text-success"><i class="fas fa-check-circle"></i> Bukti foto sudah
-                                        ada</small>
-                                    <a href="<?= BASEURL . $data['peminjaman']['bukti_foto']; ?>" target="_blank"
-                                        class="btn btn-sm btn-outline-primary ms-2">
-                                        <i class="fas fa-eye"></i> Lihat
-                                    </a>
+                    
+                    <?php if(!empty($data['items'])): ?>
+                        <?php foreach($data['items'] as $index => $item): 
+                            $kondisi_sebelumnya = $item['kondisi_existing'] ?? 'Baik';
+                            $ket_sebelumnya = $item['ket_existing'] ?? '';
+                            $iconVariant = ($index % 5) + 1;
+                        ?>
+                        
+                        <div class="item-card p-4 mb-3">
+                            <div class="row g-4 align-items-center">
+                                <div class="col-lg-6">
+                                    <div class="d-flex align-items-start">
+                                        <div class="item-info">
+                                            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                                                <h6 class="item-title mb-0">
+                                                    <?= htmlspecialchars($item['nama_barang']); ?>
+                                                </h6>
+                                                <span class="qty-badge badge text-white">
+                                                    <i class="fas fa-layer-group me-1"></i><?= $item['jumlah']; ?> Unit
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="item-code mb-2">
+                                                <i class="fas fa-barcode me-2"></i>
+                                                <?= htmlspecialchars($item['kode_barang']); ?>
+                                            </div>
+                                            
+                                            <?php if(!empty($item['spesifikasi_barang']) && $item['spesifikasi_barang'] != '-'): ?>
+                                                <div class="item-spec">
+                                                    <div class="d-flex align-items-start">
+                                                        <i class="fas fa-info-circle text-primary me-2 mt-1" style="font-size: 0.9rem;"></i>
+                                                        <small class="text-dark fw-medium">
+                                                            <?= htmlspecialchars($item['spesifikasi_barang']); ?>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
                                 </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold">Detail Masalah (Opsional)</label>
-                            <textarea name="detail_masalah" class="form-control" rows="4"
-                                placeholder="Tuliskan detail jika ada kerusakan, kehilangan, atau masalah lainnya..."><?= htmlspecialchars($data['peminjaman']['detail_masalah'] ?? ''); ?></textarea>
+                                <div class="col-lg-6">
+                                    <div class="condition-panel">
+                                        <div class="mb-3">
+                                            <label class="form-label-sm">
+                                                <i class="fas fa-clipboard-check me-1"></i>Kondisi Pengembalian 
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select name="kondisi[<?= $item['id_detail']; ?>]" 
+                                                    class="form-select modern-select" required>
+                                                <option value="Baik" <?= ($kondisi_sebelumnya == 'Baik') ? 'selected' : ''; ?>>
+                                                    ✅ Baik / Normal
+                                                </option>
+                                                <option value="Rusak" <?= ($kondisi_sebelumnya == 'Rusak') ? 'selected' : ''; ?>>
+                                                    🔧 Rusak / Perlu Perbaikan
+                                                </option>
+                                                <option value="Hilang" <?= ($kondisi_sebelumnya == 'Hilang') ? 'selected' : ''; ?>>
+                                                    ❌ Hilang / Tidak Kembali
+                                                </option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="form-label-sm">
+                                                <i class="fas fa-pen me-1"></i>Catatan Kondisi
+                                            </label>
+                                            <input type="text" 
+                                                   name="ket_item[<?= $item['id_detail']; ?>]" 
+                                                   class="form-control modern-input" 
+                                                   placeholder="Deskripsikan kerusakan atau masalah..."
+                                                   value="<?= htmlspecialchars($ket_sebelumnya); ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="alert alert-warning rounded-3 border-0 shadow-sm">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Tidak ada data barang yang ditemukan untuk peminjaman ini.
+                        </div>
+                    <?php endif; ?>
+                </div>
 
-                    <!-- Preview Image -->
-                    <div class="row mb-3" id="previewContainer" style="display: none;">
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold">Preview Foto:</label>
-                            <div class="position-relative" style="max-width: 400px;">
-                                <img id="previewImage" class="img-fluid rounded shadow" alt="Preview">
-                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
-                                    onclick="removePreview()">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                <div class="col-lg-4">
+                    
+                    <div class="card info-card mb-4">
+                        <div class="card-header">
+                            <h6 class="fw-bold mb-0">
+                                <i class="fas fa-user-circle me-2"></i>Informasi Peminjam
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold mb-1">
+                                    <i class="fas fa-user me-1"></i>Nama Peminjam
+                                </label>
+                                <div class="fw-bold text-dark fs-6">
+                                    <?= htmlspecialchars($data['peminjaman']['nama_peminjam']); ?>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold mb-1">
+                                    <i class="fas fa-calendar-alt me-1"></i>Kegiatan
+                                </label>
+                                <div class="text-dark">
+                                    <?= htmlspecialchars($data['peminjaman']['judul_kegiatan']); ?>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="small text-muted fw-bold mb-1">
+                                        <i class="fas fa-arrow-right me-1"></i>Tgl Pinjam
+                                    </label>
+                                    <div class="badge bg-primary text-white px-3 py-2 w-100">
+                                        <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_peminjaman'])); ?>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label class="small text-muted fw-bold mb-1">
+                                        <i class="fas fa-clock me-1"></i>Jatuh Tempo
+                                    </label>
+                                    <div class="badge bg-danger text-white px-3 py-2 w-100">
+                                        <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_pengembalian'])); ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-light px-4">
-                            <i class="fas fa-times"></i> Batal
-                        </a>
-                        <button type="submit" class="btn px-4" style="background-color: #0d1b3e; color: white;">
-                            <i class="fas fa-save"></i> Simpan Perubahan
-                        </button>
+                    <div class="card finalize-card">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4">
+                                <i class="fas fa-check-circle me-2"></i>Finalisasi Transaksi
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label-sm">
+                                    <i class="fas fa-user-tie me-1"></i>Petugas Pemeriksa
+                                </label>
+                                <input type="text" 
+                                       class="form-control modern-input bg-light" 
+                                       value="<?= $data['profile']['nama_user']; ?>" 
+                                       readonly>
+                                <input type="hidden" name="id_petugas" value="<?= $_SESSION['id_user']; ?>">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-sm">
+                                    <i class="fas fa-calendar-check me-1"></i>Tanggal Kembali Aktual 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" 
+                                       name="tgl_pengembalian_aktual" 
+                                       class="form-control modern-input"
+                                       value="<?= !empty($data['peminjaman']['tgl_pengembalian_aktual']) ? $data['peminjaman']['tgl_pengembalian_aktual'] : date('Y-m-d'); ?>" 
+                                       required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-sm">
+                                    <i class="fas fa-flag-checkered me-1"></i>Status Akhir 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select name="status_pengembalian" 
+                                        class="form-select modern-select fw-bold" 
+                                        required>
+                                    <option value="Dikembalikan" 
+                                            <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Dikembalikan') ? 'selected' : ''; ?>>
+                                        ✅ Selesai (Lengkap & Normal)
+                                    </option>
+                                    <option value="Belum Dikembalikan" 
+                                            <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Belum Dikembalikan') ? 'selected' : ''; ?>>
+                                        ⏳ Pending (Kurang/Rusak)
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label-sm">
+                                    <i class="fas fa-camera me-1"></i>Bukti Foto (Opsional)
+                                </label>
+                                <input type="file" 
+                                       name="bukti_foto" 
+                                       class="form-control modern-input" 
+                                       accept="image/*" 
+                                       id="buktiInput">
+                                
+                                <div id="previewContainer" class="mt-3 text-center" style="display: none;">
+                                    <img id="previewImage" class="img-fluid" style="max-height: 150px;">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger mt-2 w-100 rounded-pill" 
+                                            onclick="removePreview()">
+                                        <i class="fas fa-trash me-1"></i>Hapus Preview
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label-sm">
+                                    <i class="fas fa-sticky-note me-1"></i>Catatan Umum
+                                </label>
+                                <textarea name="detail_masalah" 
+                                          class="form-control modern-input" 
+                                          rows="3" 
+                                          placeholder="Tambahkan informasi atau catatan penting..."><?= htmlspecialchars($data['peminjaman']['detail_masalah'] ?? ''); ?></textarea>
+                            </div>
+
+                            <hr class="my-4">
+                            
+                            <button type="submit" class="btn btn-modern-primary w-100">
+                                <i class="fas fa-save me-2"></i>Simpan & Verifikasi Data
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </form>
     </div>
 </div>
 
-<style>
-    .form-label {
-        color: #0d1b3e;
-        font-size: 14px;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #0d1b3e;
-        box-shadow: 0 0 0 0.2rem rgba(13, 27, 62, 0.25);
-    }
-
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    .btn:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-        transition: all 0.2s ease;
-    }
-
-    #previewImage {
-        max-height: 300px;
-        object-fit: cover;
-    }
-</style>
-
 <script>
-    // Form validation
-    (function () {
-        'use strict';
-        var forms = document.querySelectorAll('.needs-validation');
-        Array.prototype.slice.call(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    })();
-
-    // Image preview
+    // Preview Image with modern UX
     document.getElementById('buktiInput').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (file) {
-            // Validasi ukuran (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Ukuran file terlalu besar! Maksimal 5MB');
-                this.value = '';
+            if (file.size > 5 * 1024 * 1024) { 
+                alert('⚠️ Ukuran file terlalu besar! Maksimal 5MB');
+                this.value = ''; 
                 return;
             }
-
-            // Validasi tipe
-            if (!file.type.match('image.*')) {
-                alert('Hanya file gambar yang diperbolehkan!');
-                this.value = '';
-                return;
-            }
-
-            // Show preview
+            
             const reader = new FileReader();
             reader.onload = function (e) {
                 document.getElementById('previewImage').src = e.target.result;
@@ -252,4 +533,19 @@ if (!isset($_SESSION['login'])) {
         document.getElementById('buktiInput').value = '';
         document.getElementById('previewContainer').style.display = 'none';
     }
+
+    // Form Validation with modern feedback
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
 </script>
