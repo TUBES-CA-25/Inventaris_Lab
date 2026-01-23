@@ -529,6 +529,17 @@ ADD CONSTRAINT `fk_pengembalian_petugas`
 -- tgl_pengembalian_aktual: Tanggal barang benar-benar dikembalikan/dicek oleh petugas
 -- id_petugas: ID user (Asisten/Korlab) yang menerima pengembalian
 
+
+-- SQL untuk menambahkan field bukti foto pengembalian
+-- Jalankan di phpMyAdmin
+
+ALTER TABLE `trx_pengembalian` 
+ADD COLUMN `bukti_foto` VARCHAR(255) NULL COMMENT 'Path foto bukti pengembalian' AFTER `detail_masalah`;
+
+-- Penjelasan:
+-- bukti_foto: Path file foto yang diupload sebagai bukti pengembalian barang
+
+
 --
 -- Final view structure for view `detail_barang`
 --

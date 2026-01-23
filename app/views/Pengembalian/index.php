@@ -49,13 +49,35 @@ if (!isset($_SESSION['login'])) {
                     $i = 1;
                     if (!empty($data['riwayat'])):
                         foreach ($data['riwayat'] as $r):
-                            // Tentukan status berdasarkan data
-                            $status_display = 'dipinjam';
+                            // Tentukan status berdasarkan status_pengembalian
+                            $status_display = 'Belum Dikembalikan';
                             $status_class = 'bg-warning text-dark';
+                            $status_icon = '⏳';
 
-                            if ($r['status'] == 'Dikembalikan' || strtolower($r['status']) == 'dikembalikan') {
-                                $status_display = 'dikembalikan';
-                                $status_class = 'bg-success text-white';
+                            // Jika sudah ada data pengembalian, ambil dari status_pengembalian
+                            if (!empty($r['status_pengembalian'])) {
+                                $status_display = $r['status_pengembalian'];
+
+                                // Set warna dan icon berdasarkan status
+                                switch ($r['status_pengembalian']) {
+                                    case 'Dikembalikan':
+                                        $status_class = 'bg-success text-white';
+                                        $status_icon = '✅';
+                                        break;
+                                    case 'Rusak':
+                                        $status_class = 'bg-danger text-white';
+                                        $status_icon = '🔧';
+                                        break;
+                                    case 'Hilang':
+                                        $status_class = 'bg-dark text-white';
+                                        $status_icon = '❌';
+                                        break;
+                                    case 'Belum Dikembalikan':
+                                    default:
+                                        $status_class = 'bg-warning text-dark';
+                                        $status_icon = '⏳';
+                                        break;
+                                }
                             }
                             ?>
                             <tr style="cursor: pointer; transition: background-color 0.2s ease;">
@@ -67,19 +89,19 @@ if (!isset($_SESSION['login'])) {
                                 <td class="text-center">
                                     <span class="badge <?= $status_class ?> rounded-pill px-3 py-2"
                                         style="font-size: 12px; font-weight: 500;">
-                                        <?= ucfirst($status_display) ?>
+                                        <?= $status_icon ?>         <?= $status_display ?>
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <!-- Edit Button - Mengarah ke Detail Pengembalian -->
-                                        <a href="<?= BASEURL; ?>Pengembalian/input/<?= $r['id_peminjaman']; ?>"
-                                            class="btn btn-sm" title="Input Pengembalian"
+                                        <!-- Edit Button - Selalu tampil untuk toggle status -->
+                                        <a href="<?= BASEURL; ?>Pengembalian/edit/<?= $r['id_peminjaman']; ?>"
+                                            class="btn btn-sm" title="Edit Status Pengembalian"
                                             style="background: none; border: none; padding: 5px;">
                                             <i class="fa-solid fa-pen-to-square" style="color: #30cc30; font-size: 18px;"></i>
                                         </a>
 
-                                        <!-- View Button -->
+                                        <!-- View Button - Selalu tampil -->
                                         <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $r['id_peminjaman']; ?>"
                                             class="btn btn-sm" title="Detail Pengembalian"
                                             style="background: none; border: none; padding: 5px;">

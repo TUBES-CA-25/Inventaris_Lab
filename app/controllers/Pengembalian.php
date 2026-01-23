@@ -55,12 +55,27 @@ class Pengembalian extends Controller
             exit;
         }
 
+        // Ambil data peminjaman berdasarkan ID
+        $peminjaman = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        // PROTEKSI: Cek apakah sudah pernah di-ACC
+        if (!empty($peminjaman['id_pengembalian'])) {
+            Flasher::setFlash('Pengembalian', 'sudah di-ACC sebelumnya', '', 'warning');
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
+        // PROTEKSI: Cek apakah peminjaman sudah disetujui
+        if ($peminjaman['status'] != 'Disetujui') {
+            Flasher::setFlash('Peminjaman', 'belum disetujui atau sudah selesai', '', 'warning');
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
         $data['judul'] = 'Input Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-
-        // Ambil data peminjaman berdasarkan ID
-        $data['peminjaman'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+        $data['peminjaman'] = $peminjaman;
 
         // Ambil semua jenis barang untuk dropdown
         $data['jenis_barang'] = $this->model('Pengembalian_model')->getAllJenisBarang();
@@ -88,9 +103,77 @@ class Pengembalian extends Controller
         $result = $this->model('Pengembalian_model')->inputPengembalianAsisten($_POST);
 
         if ($result > 0) {
-            Flasher::setFlash('Pengembalian berhasil dicatat!', 'success');
+            Flasher::setFlash('Pengembalian', 'berhasil', 'dicatat', 'success');
         } else {
-            Flasher::setFlash('Pengembalian gagal dicatat!', 'danger');
+            Flasher::setFlash('Pengembalian', 'gagal', 'dicatat', 'danger');
+        }
+
+        header('Location: ' . BASEURL . 'Pengembalian');
+        exit;
+    }
+
+    public function edit($id)
+    {
+        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
+
+        $data['judul'] = 'Edit Status Pengembalian';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['profile'] = $this->model("User_model")->profile($data);
+
+        // Ambil data peminjaman dan pengembalian
+        $data['peminjaman'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data);
+        $this->view('Pengembalian/edit', $data);
+        $this->view('templates/footer');
+    }
+
+    public function proses_edit()
+    {
+        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
+        // Handle upload foto
+        if (isset($_FILES['bukti_foto']) && $_FILES['bukti_foto']['error'] === 0) {
+            $uploadDir = __DIR__ . '/../../public/uploads/pengembalian/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $ext = strtolower(pathinfo($_FILES['bukti_foto']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png'];
+
+            if (in_array($ext, $allowed)) {
+                $_POST['bukti_foto'] = uniqid() . '_' . $_FILES['bukti_foto']['name'];
+                move_uploaded_file(
+                    $_FILES['bukti_foto']['tmp_name'],
+                    $uploadDir . $_POST['bukti_foto']
+                );
+            }
+        }
+
+        $_POST['id_petugas'] = $_SESSION['id_user'];
+
+        // Proses update/insert pengembalian
+        $result = $this->model('Pengembalian_model')->updateOrInsertPengembalian($_POST);
+
+        if ($result > 0) {
+            Flasher::setFlash('Status Pengembalian', 'berhasil', ' diperbarui', 'success');
+        } else {
+            Flasher::setFlash('Status Pengembalian', 'gagal', ' diperbarui', 'danger');
         }
 
         header('Location: ' . BASEURL . 'Pengembalian');
@@ -129,9 +212,9 @@ class Pengembalian extends Controller
         $_POST['id_user'] = $_SESSION['id_user'];
 
         if ($this->model('Pengembalian_model')->tambahPengembalian($_POST) > 0) {
-            Flasher::setFlash('Data pengembalian berhasil disimpan!', 'success');
+            Flasher::setFlash('Data pengembalian', 'berhasil', 'disimpan', 'success');
         } else {
-            Flasher::setFlash('Data pengembalian gagal disimpan!', 'danger');
+            Flasher::setFlash('Data pengembalian', 'gagal', 'disimpan', 'danger');
         }
 
         header('Location: ' . BASEURL . 'Pengembalian');
@@ -151,9 +234,9 @@ class Pengembalian extends Controller
     {
         $_POST['id_pengembalian'] = IdObfuscator::decode($_POST['id_pengembalian']);
         if ($this->model('Pengembalian_model')->updatePengembalian($_POST) > 0) {
-            Flasher::setFlash('Data berhasil diubah.', 'success');
+            Flasher::setFlash('Data', 'berhasil', 'diubah', 'success');
         } else {
-            Flasher::setFlash('Data gagal diubah.', 'danger');
+            Flasher::setFlash('Data', 'gagal', 'diubah', 'danger');
         }
 
         header('Location: ' . BASEURL . 'Pengembalian/index');
