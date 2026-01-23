@@ -513,6 +513,33 @@ INSERT INTO `trx_data_user` VALUES (5,6,'../public/img/foto-profile/user.svg','F
 /*!40000 ALTER TABLE `trx_data_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+-- SQL untuk menambahkan field baru ke tabel trx_pengembalian
+-- Jalankan di phpMyAdmin atau MySQL client
+
+-- 1. Tambah field tanggal pengembalian aktual
+ALTER TABLE `trx_pengembalian` 
+ADD COLUMN `tgl_pengembalian_aktual` DATE NULL AFTER `id_peminjaman`,
+ADD COLUMN `id_petugas` INT(11) NULL AFTER `detail_masalah`,
+ADD CONSTRAINT `fk_pengembalian_petugas` 
+    FOREIGN KEY (`id_petugas`) REFERENCES `trx_user` (`id_user`) 
+    ON DELETE SET NULL;
+
+-- Penjelasan:
+-- tgl_pengembalian_aktual: Tanggal barang benar-benar dikembalikan/dicek oleh petugas
+-- id_petugas: ID user (Asisten/Korlab) yang menerima pengembalian
+
+
+-- SQL untuk menambahkan field bukti foto pengembalian
+-- Jalankan di phpMyAdmin
+
+ALTER TABLE `trx_pengembalian` 
+ADD COLUMN `bukti_foto` VARCHAR(255) NULL COMMENT 'Path foto bukti pengembalian' AFTER `detail_masalah`;
+
+-- Penjelasan:
+-- bukti_foto: Path file foto yang diupload sebagai bukti pengembalian barang
+
+
 --
 -- Final view structure for view `detail_barang`
 --
