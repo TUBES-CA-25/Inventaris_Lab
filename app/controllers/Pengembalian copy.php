@@ -1,10 +1,16 @@
 <?php
 
+<<<<<<< HEAD
+class Pengembalian extends Controller {
+
+    public function __construct() {
+=======
 class Pengembalian extends Controller
 {
 
     public function __construct()
     {
+>>>>>>> 1abea17a8ce7e7dddc08e8c4e6093bc993c5efc6
         if (!isset($_SESSION['login'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
@@ -14,6 +20,19 @@ class Pengembalian extends Controller
             exit;
         }
     }
+<<<<<<< HEAD
+    
+    public function index() {
+        $data['judul'] = 'Pengembalian';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['profile'] = $this->model("User_model")->profile($data);
+        
+        // Ambil SEMUA data peminjaman untuk semua role
+        $data['riwayat'] = $this->model('Pengembalian_model')->getAllRiwayatForPetugas();
+
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data); 
+=======
 
     public function index()
     {
@@ -32,25 +51,33 @@ class Pengembalian extends Controller
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
+>>>>>>> 1abea17a8ce7e7dddc08e8c4e6093bc993c5efc6
         $this->view('Pengembalian/index', $data);
         $this->view('templates/footer');
     }
 
+<<<<<<< HEAD
+    public function detail($id) {
+        $data['judul'] = 'Detail Pengembalian';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['profile'] = $this->model("User_model")->profile($data);
+        
+        // Ambil data satu baris spesifik untuk detail
+        $data['detail'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data); 
+        $this->view('Pengembalian/detail', $data);
+        $this->view('templates/footer');
+=======
     public function detail($id)
     {
         $data['judul'] = 'Detail Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // 1. Ambil Header Data
+        // Ambil data satu baris spesifik untuk detail
         $data['detail'] = $this->model('Pengembalian_model')->getRiwayatById($id);
-
-        // 2. Ambil List Barang
-        // Kita gunakan satu fungsi saja yang sudah kita perbaiki logic-nya (LEFT JOIN)
-        $id_pengembalian = $data['detail']['id_pengembalian'] ?? null;
-        
-        // Kirim ID Peminjaman DAN ID Pengembalian (jika ada)
-        $data['items_kembali'] = $this->model('Pengembalian_model')->getBarangPengembalian($id, $id_pengembalian);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -135,13 +162,8 @@ class Pengembalian extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // 1. Ambil Header Peminjaman
+        // Ambil data peminjaman dan pengembalian
         $data['peminjaman'] = $this->model('Pengembalian_model')->getRiwayatById($id);
-
-        // 2. [PERBAIKAN DISINI] Ambil Items untuk Form Edit
-        // Gunakan getItemsForForm agar spesifikasi dan kondisi existing terpanggil
-        // Simpan ke $data['items'] agar sesuai dengan edit.php
-        $data['items'] = $this->model('Pengembalian_model')->getItemsForForm($id);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -257,5 +279,6 @@ class Pengembalian extends Controller
 
         header('Location: ' . BASEURL . 'Pengembalian/index');
         exit;
+>>>>>>> 1abea17a8ce7e7dddc08e8c4e6093bc993c5efc6
     }
 }

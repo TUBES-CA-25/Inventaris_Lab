@@ -633,19 +633,28 @@ class Peminjaman_model
             $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $pdf->useTemplate($tplIdx);
 
-            if ($i == $data['page']) {
-                $widthMM = $size['width'];
-                $heightMM = $size['height'];
-                $ttdWidth = 35;
+            $widthMM = $size['width'];
+            $heightMM = $size['height'];
+            $ttdWidth = 35; // Lebar tanda tangan dalam mm
 
+            // --- PERBAIKAN LOGIKA DI SINI ---
+            
+            // 1. Cek Apakah Halaman Ini Adalah Halaman TTD Fatimah?
+            if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
-                $hx = $widthMM * $data['huzain_x'];
-                $hy = $heightMM * $data['huzain_y'];
 
                 if (file_exists($pathFatimah)) {
                     $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
                 }
+            }
+
+            // 2. Cek Apakah Halaman Ini Adalah Halaman TTD Huzain?
+            // (Dipisah if-nya supaya bisa support jika mereka di halaman yang sama maupun beda)
+            if ($i == $data['huzain_page']) {
+                $hx = $widthMM * $data['huzain_x'];
+                $hy = $heightMM * $data['huzain_y'];
+
                 if (file_exists($pathHuzain)) {
                     $pdf->Image($pathHuzain, $hx, $hy, $ttdWidth);
                 }

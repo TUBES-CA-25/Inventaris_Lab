@@ -9,6 +9,10 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
+        else if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
     }
 
     public function index()
@@ -58,6 +62,7 @@ class ValidasiPeminjaman extends Controller
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('ValidasiPeminjaman/DetailPeminjaman', $data);
+        // $this->view('templates/footer', $data);
     }
 
     public function accKalab()
