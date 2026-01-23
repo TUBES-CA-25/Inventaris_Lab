@@ -51,12 +51,10 @@
             <?php endif; ?>
 
             <?php if (isset($_SESSION['id_role']) && ($_SESSION['id_role'] == 3 || $_SESSION['id_role'] == 4)) : ?>
-                <li class="nav-item <?= ($data['judul'] == 'Pengembalian' || $data['judul'] == 'Manajemen Pengembalian') ? 'active' : ''; ?>">
-                    <a class="nav-link" href="<?= BASEURL; ?>Pengembalian">
-                        <i class="fas fa-exchange-alt"></i>
-                        <span>Pengembalian</span>
-                    </a>
-                </li>
+                <a href="<?= BASEURL; ?>Pengembalian" class="menu-item <?= ($data['judul'] == 'Pengembalian' || $data['judul'] == 'Daftar Pengecekan Pengembalian' || $data['judul'] == 'Detail Pengembalian') ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Pengembalian</span>
+                </a>
             <?php endif; ?>
 
             <?php if (isset($_SESSION['login'])) : ?>

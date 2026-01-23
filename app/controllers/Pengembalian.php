@@ -1,46 +1,100 @@
 <?php
 
-class Pengembalian extends Controller {
+class Pengembalian extends Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         if (!isset($_SESSION['login'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
     }
-    
-    public function index() {
+
+    public function index()
+    {
         // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
         if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
             header('Location: ' . BASEURL . 'Beranda');
             exit;
         }
 
-        $data['judul'] = 'Daftar Pengecekan Pengembalian';
+        $data['judul'] = 'Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        
+
         // Ambil SEMUA data peminjaman untuk semua role
         $data['riwayat'] = $this->model('Pengembalian_model')->getAllRiwayatForPetugas();
 
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data); 
+        $this->view('templates/sidebar', $data);
         $this->view('Pengembalian/index', $data);
         $this->view('templates/footer');
     }
 
-    public function detail($id) {
+    public function detail($id)
+    {
         $data['judul'] = 'Detail Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
-        
+
         // Ambil data satu baris spesifik untuk detail
         $data['detail'] = $this->model('Pengembalian_model')->getRiwayatById($id);
 
         $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data); 
-        $this->view('Pengembalian/detail', $data);
+        $this->view('templates/sidebar', $data);
+        $this->view('Pengembalian/detil', $data);
         $this->view('templates/footer');
+    }
+
+    public function input($id)
+    {
+        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
+
+        $data['judul'] = 'Input Pengembalian';
+        $data['id_user'] = $_SESSION['id_user'];
+        $data['profile'] = $this->model("User_model")->profile($data);
+
+        // Ambil data peminjaman berdasarkan ID
+        $data['peminjaman'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        // Ambil semua jenis barang untuk dropdown
+        $data['jenis_barang'] = $this->model('Pengembalian_model')->getAllJenisBarang();
+
+        $this->view('templates/header', $data);
+        $this->view('templates/sidebar', $data);
+        $this->view('Pengembalian/input', $data);
+        $this->view('templates/footer');
+    }
+
+    public function proses_input()
+    {
+        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
+        // Proses input pengembalian
+        $result = $this->model('Pengembalian_model')->inputPengembalianAsisten($_POST);
+
+        if ($result > 0) {
+            Flasher::setFlash('Pengembalian berhasil dicatat!', 'success');
+        } else {
+            Flasher::setFlash('Pengembalian gagal dicatat!', 'danger');
+        }
+
+        header('Location: ' . BASEURL . 'Pengembalian');
+        exit;
     }
 
     public function simpan()

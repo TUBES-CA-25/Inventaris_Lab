@@ -5,222 +5,212 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-<div class="container-fluid" style="padding-left: 280px; padding-top: 30px; padding-right: 30px;">
-    <div class="card shadow-sm border-0" style="border-radius: 15px; background: white; padding: 25px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold">Pengembalian</h3>
-            <div class="input-group" style="width: 300px;">
-                <input type="text" class="form-control" placeholder="Search...">
-                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
-                <button type="button" style="width: 100px;" class="btn btn-danger"
-                    onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
+<div class="content">
+    <div class="content-beranda">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4" style="padding: 20px 0;">
+            <h3 class="fw-bold" style="color: #0d1b3e; font-size: 28px; margin: 0;">Pengembalian</h3>
+
+            <!-- Search Box -->
+            <div class="position-relative" style="width: 320px;">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search..." style="
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        padding: 10px 40px 10px 15px;
+                        height: 42px;
+                        background: white;
+                    ">
+                <i class="fas fa-filter position-absolute"
+                    style="right: 15px; top: 50%; transform: translateY(-50%); color: #0d1b3e; cursor: pointer;"></i>
             </div>
         </div>
-    </div>
-</div>
-<div class="content">
-    <div class="content-beranda" style="overflow: hidden;">
-        <h3 id="title">Pengembalian</h3>
-        <div class="flash" style="width: 40%; margin-left:15px;">
+
+        <!-- Flash Message -->
+        <div class="flash mb-3">
             <?php Flasher::flash(); ?>
         </div>
 
-        <div
-            style="max-height: 400px; overflow-y: auto; box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.5); border-radius: 5px; padding: 15px;">
-            <div
-                style="height: 80px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; position: sticky; top: 0; background-color: #fff; z-index: 10;">
-                <div class="dataTables_length"
-                    style="display: inline-block; font-size: 14px; display: flex; justify-content: space-between; align-items: center;">
-                    <label>
-                        Show
-                        <select name="entries_length" aria-controls="example" class="form-control form-control-sm"
-                            style="width: auto; display: inline-block; margin-left: 5px; margin-right: 5px;">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        entries
-                    </label>
-                </div>
-
-                <div
-                    style="display: flex; align-items: center; justify-content: flex-end; box-shadow: 5px 5px 10px 0 rgba(0, 0, 0, 0.5); border-radius: 8px; overflow: hidden; width: 320px;">
-                    <button
-                        style="background-color: #0d1a4a; border: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
-                            <path
-                                d="M10 2a8 8 0 016.32 12.9l5.38 5.38a1 1 0 01-1.42 1.42l-5.38-5.38A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z">
-                            </path>
-                        </svg>
-                    </button>
-                    <input type="text" id="customSearch" class="form-control" placeholder="Cari"
-                        style="border: none; outline: none; padding: 10px 15px; font-size: 16px; flex-grow: 1; height: 40px;">
-                </div>
-            </div>
-
-            <table id="myTable" class="table table-hover table-sm" style="width:100%;">
-                <thead class="table-info">
+        <!-- Table Container -->
+        <div class="table-responsive" style="border-radius: 10px; overflow: hidden;">
+            <table class="table table-hover align-middle" id="pengembalianTable" style="margin-bottom: 0;">
+                <thead style="background-color: #0d1b3e; color: white;">
                     <tr>
-                        <th>No.</th>
-                        <th>Nama Peminjam</th>
-                        <th>Tanggal Peminjaman</th>
-                        <th>Tanggal Pengembalian</th>
-                        <th>Sub Barang</th>
-                        <th>Status</th>
-                        <th>Keterangan</th>
-                        <th>Detail Masalah</th>
-                        <th scope="col" class="p-2">Aksi</th> <!-- Kolom aksi -->
+                        <th class="py-3 ps-3" style="font-weight: 500;">No</th>
+                        <th style="font-weight: 500;">Judul kegiatan</th>
+                        <th style="font-weight: 500;">Tgl pengajuan</th>
+                        <th style="font-weight: 500;">Tgl mulai peminjaman</th>
+                        <th style="font-weight: 500;">Tgl akhir peminjaman</th>
+                        <th class="text-center" style="font-weight: 500;">Status</th>
+                        <th class="text-center" style="font-weight: 500;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    $no = 1;
-                    if (!empty($data['pengembalian'])):
-                        foreach ($data['pengembalian'] as $pengembalian): ?>
-                            <tr data-id="<?= IdObfuscator::encode($pengembalian['id_pengembalian'] ?? '') ?>" style="cursor: pointer;">
-                                <td><?= $no++ ?></td>
-                                <td><?= $pengembalian['nama_peminjam'] ?></td>
-                                <td><?= date('d-m-Y', strtotime($pengembalian['tanggal_peminjaman'])) ?></td>
-                                <td><?= date('d-m-Y', strtotime($pengembalian['tanggal_pengembalian'])) ?></td>
-                                <td><?= $pengembalian['sub_barang'] ?></td>
-                                <td><?= $pengembalian['status_pengembalian'] ?></td>
-                                <td><?= $pengembalian['keterangan'] ?? '-' ?></td>
-                                <td><?= $pengembalian['detail_masalah'] ?? '-' ?></td>
-                                <td style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                                <?php if (isset($_SESSION['login']) && ($_SESSION['id_role'] == '1' || $_SESSION['id_role'] == '2' || $_SESSION['id_role'] == '3' || $_SESSION['id_role'] == '4')): ?>
-                                    <a href="<?= BASEURL; ?>/Pengembalian/ubahPengembalian/<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
-                                        class="btn d-flex align-items-center justify-content-center tampilModalPengembalian"
-                                        data-toggle="modal" data-target="#modalEditPengembalian"
-                                        data-id="<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>">
-                                        <i class="fa-solid fa-pen-to-square fa-lg" style="color: #30cc30;"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <a href="<?= BASEURL; ?>Pengembalian/detail/<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
-                                        data-toggle="modal"
-                                        data-target="#modalPengembalian<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>"
-                                        class="btn d-flex align-items-center justify-content-center">
-                                        <i class="fa-solid fa-circle-info fa-lg " style="color: #1250ba;"></i>
-                                    </a>
+                    $i = 1;
+                    if (!empty($data['riwayat'])):
+                        foreach ($data['riwayat'] as $r):
+                            // Tentukan status berdasarkan data
+                            $status_display = 'dipinjam';
+                            $status_class = 'bg-warning text-dark';
+
+                            if ($r['status'] == 'Dikembalikan' || strtolower($r['status']) == 'dikembalikan') {
+                                $status_display = 'dikembalikan';
+                                $status_class = 'bg-success text-white';
+                            }
+                            ?>
+                            <tr style="cursor: pointer; transition: background-color 0.2s ease;">
+                                <td class="ps-3"><?= $i++; ?></td>
+                                <td><?= htmlspecialchars($r['judul_kegiatan']); ?></td>
+                                <td><?= date('d/m/Y', strtotime($r['tanggal_pengajuan'])); ?></td>
+                                <td><?= date('d/m/Y', strtotime($r['tanggal_peminjaman'])); ?></td>
+                                <td><?= date('d/m/Y', strtotime($r['tanggal_pengembalian'])); ?></td>
+                                <td class="text-center">
+                                    <span class="badge <?= $status_class ?> rounded-pill px-3 py-2"
+                                        style="font-size: 12px; font-weight: 500;">
+                                        <?= ucfirst($status_display) ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <!-- Edit Button - Mengarah ke Detail Pengembalian -->
+                                        <a href="<?= BASEURL; ?>Pengembalian/input/<?= $r['id_peminjaman']; ?>"
+                                            class="btn btn-sm" title="Input Pengembalian"
+                                            style="background: none; border: none; padding: 5px;">
+                                            <i class="fa-solid fa-pen-to-square" style="color: #30cc30; font-size: 18px;"></i>
+                                        </a>
+
+                                        <!-- View Button -->
+                                        <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $r['id_peminjaman']; ?>"
+                                            class="btn btn-sm" title="Detail Pengembalian"
+                                            style="background: none; border: none; padding: 5px;">
+                                            <i class="fa-solid fa-eye" style="color: #1250ba; font-size: 18px;"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
-
-
-                            <!-- Modal Detail Pengembalian -->
-                            <div class="modal fade" id="modalPengembalian<?= IdObfuscator::encode($pengembalian['id_pengembalian']); ?>" tabindex="-1"
-                                role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content" style="width: 700px;">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLongTitle" style="font-weight: 600;">Detail
-                                                Pengembalian
-                                            </h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body" style="display: flex; gap:50px; font-weight: 500; width:100%;">
-                                            <style>
-                                                span p {
-                                                    word-wrap: break-word;
-                                                    opacity: 0.5;
-                                                }
-                                            </style>
-                                            <div style="width: 50%;">
-                                                <span>
-                                                    <h6>Nama Peminjam</h6>
-                                                    <p><?= $pengembalian['nama_peminjam']; ?></p>
-                                                </span>
-                                                <span>
-                                                    <h6>Tanggal Mulai Peminjaman</h6>
-                                                    <p style="text-transform: capitalize;">
-                                                        <?= date('d-m-Y', strtotime($pengembalian['tanggal_peminjaman'])) ?>
-                                                    </p>
-                                                </span>
-                                                <span>
-                                                    <h6>Tanggal Pengembalian</h6>
-                                                    <p><?= date('d-m-Y', strtotime($pengembalian['tanggal_pengembalian'])) ?>
-                                                    </p>
-                                                </span>
-                                            </div>
-                                            <div style="width: 50%;">
-                                                <span>
-                                                    <h6>Jenis Barang</h6>
-                                                    <p><?= $pengembalian['sub_barang']; ?></p>
-                                                </span>
-                                                <span>
-                                                    <h6>Status </h6>
-                                                    <p><?= $pengembalian['status_pengembalian']; ?></p>
-                                                </span>
-                                                <span>
-                                                    <h6>Keterangan </h6>
-                                                    <p><?= $pengembalian['keterangan']; ?></p>
-                                                </span>
-                                                <span>
-                                                    <h6>Detail Masalah</h6>
-                                                    <p><?= $pengembalian['detail_masalah']; ?></p>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                       
-                            <?php endforeach;
-                    endif; ?>
+                            <?php
+                        endforeach;
+                    else:
+                        ?>
+                        <tr>
+                            <td colspan="7" class="text-center py-4" style="color: #666;">
+                                <i class="fas fa-inbox fa-3x mb-3" style="color: #ddd;"></i>
+                                <p class="mb-0">Tidak ada data peminjaman</p>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
-
         </div>
-        
-       <div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead style="background-color: #0d1b3e; color: white;">
-            <tr>
-                <th class="py-3 ps-3">No</th>
-                <th>Judul kegiatan</th>
-                <th>Tgl pengajuan</th>
-                <th>Tgl mulai peminjaman</th>
-                <th>Tgl akhir peminjaman</th>
-                <th class="text-center">Status</th>
-                <th class="text-center">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php $i = 1; foreach($data['riwayat'] as $r) : ?>
-            <tr>
-                <td class="ps-3"><?= $i++; ?></td>
-                <td><?= $r['judul_kegiatan']; ?></td>
-                <td><?= $r['tanggal_pengajuan']; ?></td>
-                <td><?= $r['tanggal_peminjaman']; ?></td>
-                <td><?= $r['tanggal_pengembalian']; ?></td>
-                <td class="text-center">
-                    <?php if($r['status'] == 'dikembalikan') : ?>
-                        <span class="badge bg-success rounded-pill px-3">dikembalikan</span>
-                    <?php else : ?>
-                        <span class="badge bg-warning text-dark rounded-pill px-3">dipinjam</span>
-                    <?php endif; ?>
-                </td>
-                <td class="text-center">
-                    <?php if($r['status'] == 'dipinjam') : ?>
-                    <a href="<?= BASEURL; ?>Pengembalian/input/<?= $r['id_peminjaman']; ?>" class="text-dark me-2" title="Input Pengembalian">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <?php endif; ?>
-
-                    <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $r['id_peminjaman']; ?>" class="text-dark" title="Lihat Detail">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
     </div>
 </div>
+
+<!-- Custom Styling -->
+<style>
+    /* Table Hover Effect */
+    #pengembalianTable tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Search Input Focus */
+    #searchInput:focus {
+        outline: none;
+        border-color: #0d1b3e;
+        box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
+    }
+
+    /* Badge Animation */
+    .badge {
+        transition: transform 0.2s ease;
+    }
+
+    .badge:hover {
+        transform: scale(1.05);
+    }
+
+    /* Action Buttons Hover */
+    .btn i {
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .btn:hover i {
+        transform: scale(1.2);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .content {
+            padding: 15px;
+        }
+
+        #searchInput {
+            width: 200px !important;
+        }
+
+        table {
+            font-size: 0.9rem;
+        }
+    }
+
+    /* Custom Scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #0d1b3e;
+        border-radius: 10px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #1a2d5a;
+    }
+</style>
+
+<!-- Search Functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const table = document.getElementById('pengembalianTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        searchInput.addEventListener('keyup', function () {
+            const filter = searchInput.value.toLowerCase();
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                // Search through all cells except the action column
+                for (let j = 0; j < cells.length - 1; j++) {
+                    const cellText = cells[j].textContent || cells[j].innerText;
+                    if (cellText.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        });
+
+        // Row click effect
+        Array.from(rows).forEach(row => {
+            row.addEventListener('click', function (e) {
+                // Don't trigger if clicking on action buttons
+                if (!e.target.closest('.btn')) {
+                    this.style.backgroundColor = '#e8f4f8';
+                    setTimeout(() => {
+                        this.style.backgroundColor = '';
+                    }, 200);
+                }
+            });
+        });
+    });
+</script>
