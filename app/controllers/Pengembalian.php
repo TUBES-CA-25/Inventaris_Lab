@@ -7,16 +7,14 @@ class Pengembalian extends Controller {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
-    }
-    
-    public function index() {
-        // PROTEKSI: Jika bukan Korlab(3) atau Asisten(4), tendang keluar
         if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
             header('Location: ' . BASEURL . 'Beranda');
             exit;
         }
-
-        $data['judul'] = 'Daftar Pengecekan Pengembalian';
+    }
+    
+    public function index() {
+        $data['judul'] = 'Pengembalian';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
         

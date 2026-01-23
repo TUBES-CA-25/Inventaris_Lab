@@ -50,6 +50,13 @@
                 </a>
             <?php endif; ?>
 
+            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['3', '4'])) : ?>
+                <a href="<?= BASEURL; ?>Pengembalian" class="menu-item <?= ($data['judul'] == 'Pengembalian') ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Pengembalian</span>
+                </a>
+            <?php endif; ?>
+
             <?php if (isset($_SESSION['login'])) : ?>
                 <a href="<?= BASEURL; ?>Riwayat" class="menu-item <?= ($data['judul'] == 'Riwayat Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-clock-rotate-left"></i>

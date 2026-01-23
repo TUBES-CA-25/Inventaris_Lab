@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // Validasi
     if (!empty($judul_kegiatan) && !empty($jenis_barang) && !empty($mulai_tanggal) && !empty($sampai_tanggal) && !empty($jumlah)) {
         Flasher::setFlash('Data pengembalian berhasil ditambahkan!', 'success');
         header('Location: ' . BASEURL . 'Pengembalian');
