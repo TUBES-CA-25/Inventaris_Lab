@@ -49,37 +49,30 @@ if (!isset($_SESSION['login'])) {
                     $i = 1;
                     if (!empty($data['riwayat'])):
                         foreach ($data['riwayat'] as $r):
-                            // Tentukan status berdasarkan status_pengembalian
-                            $status_display = 'Belum Dikembalikan';
-                            $status_class = 'bg-warning text-dark';
-                            $status_icon = '⏳';
+                            // Default status jika belum ada data di trx_pengembalian
+                            $status_display = 'Belum Diperiksa';
+                            $status_class = 'bg-secondary text-white'; // Abu-abu (Netral)
 
-                            // Jika sudah ada data pengembalian, ambil dari status_pengembalian
+                            // Cek jika data pengembalian sudah ada
                             if (!empty($r['status_pengembalian'])) {
                                 $status_display = $r['status_pengembalian'];
 
-                                // Set warna dan icon berdasarkan status
                                 switch ($r['status_pengembalian']) {
-                                    case 'Dikembalikan':
-                                        $status_class = 'bg-success text-white';
-                                        $status_icon = '✅';
+                                    case 'Selesai Periksa':
+                                        $status_class = 'bg-success text-white'; // Hijau (Aman)
                                         break;
-                                    case 'Rusak':
-                                        $status_class = 'bg-danger text-white';
-                                        $status_icon = '🔧';
+                                    case 'Periksa':
+                                        $status_class = 'bg-primary text-white'; // Biru (Sedang Proses)
                                         break;
-                                    case 'Hilang':
-                                        $status_class = 'bg-dark text-white';
-                                        $status_icon = '❌';
+                                    case 'Periksa Ulang':
+                                        $status_class = 'bg-danger text-white'; // Merah (Masalah)
                                         break;
-                                    case 'Belum Dikembalikan':
                                     default:
-                                        $status_class = 'bg-warning text-dark';
-                                        $status_icon = '⏳';
+                                        $status_class = 'bg-warning text-dark'; // Kuning (Lainnya)
                                         break;
                                 }
                             }
-                            ?>
+                    ?>
                             <tr style="cursor: pointer; transition: background-color 0.2s ease;">
                                 <td class="ps-3"><?= $i++; ?></td>
                                 <td><?= htmlspecialchars($r['judul_kegiatan']); ?></td>
@@ -89,19 +82,17 @@ if (!isset($_SESSION['login'])) {
                                 <td class="text-center">
                                     <span class="badge <?= $status_class ?> rounded-pill px-3 py-2"
                                         style="font-size: 12px; font-weight: 500;">
-                                        <?= $status_icon ?>         <?= $status_display ?>
+                                        <?= $status_display ?>
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <!-- Edit Button - Selalu tampil untuk toggle status -->
                                         <a href="<?= BASEURL; ?>Pengembalian/edit/<?= $r['id_peminjaman']; ?>"
                                             class="btn btn-sm" title="Edit Status Pengembalian"
                                             style="background: none; border: none; padding: 5px;">
                                             <i class="fa-solid fa-pen-to-square" style="color: #30cc30; font-size: 18px;"></i>
                                         </a>
 
-                                        <!-- View Button - Selalu tampil -->
                                         <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $r['id_peminjaman']; ?>"
                                             class="btn btn-sm" title="Detail Pengembalian"
                                             style="background: none; border: none; padding: 5px;">
@@ -110,7 +101,7 @@ if (!isset($_SESSION['login'])) {
                                     </div>
                                 </td>
                             </tr>
-                            <?php
+                        <?php
                         endforeach;
                     else:
                         ?>
@@ -122,7 +113,6 @@ if (!isset($_SESSION['login'])) {
                         </tr>
                     <?php endif; ?>
                 </tbody>
-            </table>
         </div>
     </div>
 </div>
@@ -196,12 +186,12 @@ if (!isset($_SESSION['login'])) {
 
 <!-- Search Functionality -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
         const table = document.getElementById('pengembalianTable');
         const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-        searchInput.addEventListener('keyup', function () {
+        searchInput.addEventListener('keyup', function() {
             const filter = searchInput.value.toLowerCase();
 
             for (let i = 0; i < rows.length; i++) {
@@ -224,7 +214,7 @@ if (!isset($_SESSION['login'])) {
 
         // Row click effect
         Array.from(rows).forEach(row => {
-            row.addEventListener('click', function (e) {
+            row.addEventListener('click', function(e) {
                 // Don't trigger if clicking on action buttons
                 if (!e.target.closest('.btn')) {
                     this.style.backgroundColor = '#e8f4f8';

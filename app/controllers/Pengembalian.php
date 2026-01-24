@@ -48,7 +48,7 @@ class Pengembalian extends Controller
         // 2. Ambil List Barang
         // Kita gunakan satu fungsi saja yang sudah kita perbaiki logic-nya (LEFT JOIN)
         $id_pengembalian = $data['detail']['id_pengembalian'] ?? null;
-        
+
         // Kirim ID Peminjaman DAN ID Pengembalian (jika ada)
         $data['items_kembali'] = $this->model('Pengembalian_model')->getBarangPengembalian($id, $id_pengembalian);
 
@@ -158,6 +158,14 @@ class Pengembalian extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
+        if (!isset($_FILES['bukti_foto']) || $_FILES['bukti_foto']['error'] === 4) {
+            Flasher::setFlash('Gagal', 'Bukti foto wajib diupload!', '', 'danger');
+
+            // Redirect kembali ke halaman Pengembalian (atau halaman edit jika memungkinkan)
             header('Location: ' . BASEURL . 'Pengembalian');
             exit;
         }

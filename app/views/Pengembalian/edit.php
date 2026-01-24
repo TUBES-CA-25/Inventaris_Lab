@@ -38,52 +38,6 @@ if (!isset($_SESSION['login'])) {
         opacity: 1;
     }
 
-    /* Modern Icon Container */
-    .item-icon {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff;
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .item-icon::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
-        top: 0;
-        left: 0;
-    }
-
-    .item-icon.icon-variant-1 {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .item-icon.icon-variant-2 {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .item-icon.icon-variant-3 {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-
-    .item-icon.icon-variant-4 {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    }
-
-    .item-icon.icon-variant-5 {
-        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    }
-
     /* Modern Badge */
     .qty-badge {
         background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
@@ -191,12 +145,6 @@ if (!isset($_SESSION['login'])) {
         box-shadow: 0 4px 15px rgba(13, 27, 62, 0.2);
     }
 
-    .section-header i {
-        font-size: 1.3rem;
-        margin-right: 10px;
-        opacity: 0.9;
-    }
-
     /* Enhanced Cards */
     .info-card {
         border-radius: 16px;
@@ -206,9 +154,10 @@ if (!isset($_SESSION['login'])) {
     }
 
     .info-card .card-header {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
         border-bottom: 2px solid #e5e7eb;
         padding: 18px 24px;
+
     }
 
     .finalize-card {
@@ -241,6 +190,7 @@ if (!isset($_SESSION['login'])) {
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -251,11 +201,25 @@ if (!isset($_SESSION['login'])) {
         animation: fadeInUp 0.5s ease backwards;
     }
 
-    .item-card:nth-child(1) { animation-delay: 0.1s; }
-    .item-card:nth-child(2) { animation-delay: 0.2s; }
-    .item-card:nth-child(3) { animation-delay: 0.3s; }
-    .item-card:nth-child(4) { animation-delay: 0.4s; }
-    .item-card:nth-child(5) { animation-delay: 0.5s; }
+    .item-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .item-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .item-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .item-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .item-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
 
     /* Preview Container */
     #previewContainer img {
@@ -268,10 +232,10 @@ if (!isset($_SESSION['login'])) {
     <div class="content-beranda">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold" style="color: #0d1b3e;">
-                <i class="fas fa-check-double me-2"></i>Verifikasi Pengembalian
+                Verifikasi Pengembalian
             </h3>
             <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-secondary btn-sm rounded-pill px-4">
-                <i class="fas fa-arrow-left me-2"></i>Kembali
+                Kembali
             </a>
         </div>
 
@@ -279,110 +243,106 @@ if (!isset($_SESSION['login'])) {
             <input type="hidden" name="id_peminjaman" value="<?= $data['peminjaman']['id_peminjaman']; ?>">
 
             <div class="row g-4">
-                
+
                 <div class="col-lg-8">
                     <div class="section-header">
                         <h5 class="fw-bold mb-0">
-                            <i class="fas fa-boxes"></i>Daftar Barang & Verifikasi Kondisi
+                            Daftar Barang & Verifikasi Kondisi
                         </h5>
                     </div>
-                    
-                    <?php if(!empty($data['items'])): ?>
-                        <?php foreach($data['items'] as $index => $item): 
+
+                    <?php if (!empty($data['items'])): ?>
+                        <?php foreach ($data['items'] as $index => $item):
                             $kondisi_sebelumnya = $item['kondisi_existing'] ?? 'Baik';
                             $ket_sebelumnya = $item['ket_existing'] ?? '';
-                            $iconVariant = ($index % 5) + 1;
                         ?>
-                        
-                        <div class="item-card p-4 mb-3">
-                            <div class="row g-4 align-items-center">
-                                <div class="col-lg-6">
-                                    <div class="d-flex align-items-start">
-                                        <div class="item-info">
-                                            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-                                                <h6 class="item-title mb-0">
-                                                    <?= htmlspecialchars($item['nama_barang']); ?>
-                                                </h6>
-                                                <span class="qty-badge badge text-white">
-                                                    <i class="fas fa-layer-group me-1"></i><?= $item['jumlah']; ?> Unit
-                                                </span>
-                                            </div>
-                                            
-                                            <div class="item-code mb-2">
-                                                <i class="fas fa-barcode me-2"></i>
-                                                <?= htmlspecialchars($item['kode_barang']); ?>
-                                            </div>
-                                            
-                                            <?php if(!empty($item['spesifikasi_barang']) && $item['spesifikasi_barang'] != '-'): ?>
-                                                <div class="item-spec">
-                                                    <div class="d-flex align-items-start">
-                                                        <i class="fas fa-info-circle text-primary me-2 mt-1" style="font-size: 0.9rem;"></i>
-                                                        <small class="text-dark fw-medium">
-                                                            <?= htmlspecialchars($item['spesifikasi_barang']); ?>
-                                                        </small>
-                                                    </div>
+
+                            <div class="item-card p-4 mb-3">
+                                <div class="row g-4 align-items-center">
+                                    <div class="col-lg-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="item-info">
+                                                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                                                    <h6 class="item-title mb-0">
+                                                        <?= htmlspecialchars($item['nama_barang']); ?>
+                                                    </h6>
+                                                    <span class="qty-badge badge text-white">
+                                                        <?= $item['jumlah']; ?> Unit
+                                                    </span>
                                                 </div>
-                                            <?php endif; ?>
+
+                                                <div class="item-code mb-2">
+                                                    <?= htmlspecialchars($item['kode_barang']); ?>
+                                                </div>
+
+                                                <?php if (!empty($item['spesifikasi_barang']) && $item['spesifikasi_barang'] != '-'): ?>
+                                                    <div class="item-spec">
+                                                        <div class="d-flex align-items-start">
+                                                            <small class="text-dark fw-medium">
+                                                                <?= htmlspecialchars($item['spesifikasi_barang']); ?>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-lg-6">
-                                    <div class="condition-panel">
-                                        <div class="mb-3">
-                                            <label class="form-label-sm">
-                                                <i class="fas fa-clipboard-check me-1"></i>Kondisi Pengembalian 
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <select name="kondisi[<?= $item['id_detail']; ?>]" 
+                                    <div class="col-lg-6">
+                                        <div class="condition-panel">
+                                            <div class="mb-3">
+                                                <label class="form-label-sm">
+                                                    Kondisi Pengembalian
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <select name="kondisi[<?= $item['id_detail']; ?>]"
                                                     class="form-select modern-select" required>
-                                                <option value="Baik" <?= ($kondisi_sebelumnya == 'Baik') ? 'selected' : ''; ?>>
-                                                    ✅ Baik / Normal
-                                                </option>
-                                                <option value="Rusak" <?= ($kondisi_sebelumnya == 'Rusak') ? 'selected' : ''; ?>>
-                                                    🔧 Rusak / Perlu Perbaikan
-                                                </option>
-                                                <option value="Hilang" <?= ($kondisi_sebelumnya == 'Hilang') ? 'selected' : ''; ?>>
-                                                    ❌ Hilang / Tidak Kembali
-                                                </option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div>
-                                            <label class="form-label-sm">
-                                                <i class="fas fa-pen me-1"></i>Catatan Kondisi
-                                            </label>
-                                            <input type="text" 
-                                                   name="ket_item[<?= $item['id_detail']; ?>]" 
-                                                   class="form-control modern-input" 
-                                                   placeholder="Deskripsikan kerusakan atau masalah..."
-                                                   value="<?= htmlspecialchars($ket_sebelumnya); ?>">
+                                                    <option value="Baik" <?= ($kondisi_sebelumnya == 'Baik') ? 'selected' : ''; ?>>
+                                                        Baik / Normal
+                                                    </option>
+                                                    <option value="Rusak" <?= ($kondisi_sebelumnya == 'Rusak') ? 'selected' : ''; ?>>
+                                                        Rusak / Perlu Perbaikan
+                                                    </option>
+                                                    <option value="Hilang" <?= ($kondisi_sebelumnya == 'Hilang') ? 'selected' : ''; ?>>
+                                                        Hilang / Tidak Kembali
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label class="form-label-sm">
+                                                    Catatan Kondisi
+                                                </label>
+                                                <input type="text"
+                                                    name="ket_item[<?= $item['id_detail']; ?>]"
+                                                    class="form-control modern-input"
+                                                    placeholder="Deskripsikan kerusakan atau masalah..."
+                                                    value="<?= htmlspecialchars($ket_sebelumnya); ?>">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <div class="alert alert-warning rounded-3 border-0 shadow-sm">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
                             Tidak ada data barang yang ditemukan untuk peminjaman ini.
                         </div>
                     <?php endif; ?>
                 </div>
 
                 <div class="col-lg-4">
-                    
+
                     <div class="card info-card mb-4">
                         <div class="card-header">
-                            <h6 class="fw-bold mb-0">
-                                <i class="fas fa-user-circle me-2"></i>Informasi Peminjam
+                            <h6 class="fw-bold mb-0 text-white">
+                                Informasi Peminjam
                             </h6>
                         </div>
                         <div class="card-body p-4">
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold mb-1">
-                                    <i class="fas fa-user me-1"></i>Nama Peminjam
+                                    Nama Peminjam
                                 </label>
                                 <div class="fw-bold text-dark fs-6">
                                     <?= htmlspecialchars($data['peminjaman']['nama_peminjam']); ?>
@@ -390,7 +350,7 @@ if (!isset($_SESSION['login'])) {
                             </div>
                             <div class="mb-3">
                                 <label class="small text-muted fw-bold mb-1">
-                                    <i class="fas fa-calendar-alt me-1"></i>Kegiatan
+                                    Kegiatan
                                 </label>
                                 <div class="text-dark">
                                     <?= htmlspecialchars($data['peminjaman']['judul_kegiatan']); ?>
@@ -399,7 +359,7 @@ if (!isset($_SESSION['login'])) {
                             <div class="row g-3">
                                 <div class="col-6">
                                     <label class="small text-muted fw-bold mb-1">
-                                        <i class="fas fa-arrow-right me-1"></i>Tgl Pinjam
+                                        Tgl Pinjam
                                     </label>
                                     <div class="badge bg-primary text-white px-3 py-2 w-100">
                                         <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_peminjaman'])); ?>
@@ -407,7 +367,7 @@ if (!isset($_SESSION['login'])) {
                                 </div>
                                 <div class="col-6">
                                     <label class="small text-muted fw-bold mb-1">
-                                        <i class="fas fa-clock me-1"></i>Jatuh Tempo
+                                        Jatuh Tempo
                                     </label>
                                     <div class="badge bg-danger text-white px-3 py-2 w-100">
                                         <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_pengembalian'])); ?>
@@ -417,88 +377,102 @@ if (!isset($_SESSION['login'])) {
                         </div>
                     </div>
 
-                    <div class="card finalize-card">
-                        <div class="card-body p-4">
-                            <h6 class="fw-bold mb-4">
-                                <i class="fas fa-check-circle me-2"></i>Finalisasi Transaksi
+                    <div class="card info-card mb-4 ">
+                        <div class="card-header ">
+                            <h6 class="fw-bold mb-0 text-white">
+                                Informasi Peminjam
                             </h6>
-                            
+                        </div>
+                        <div class="p-3">
                             <div class="mb-3">
                                 <label class="form-label-sm">
-                                    <i class="fas fa-user-tie me-1"></i>Petugas Pemeriksa
+                                    Petugas Pemeriksa
                                 </label>
-                                <input type="text" 
-                                       class="form-control modern-input bg-light" 
-                                       value="<?= $data['profile']['nama_user']; ?>" 
-                                       readonly>
+                                <input type="text"
+                                    class="form-control modern-input bg-light"
+                                    value="<?= $data['profile']['nama_user']; ?>"
+                                    readonly>
                                 <input type="hidden" name="id_petugas" value="<?= $_SESSION['id_user']; ?>">
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label-sm">
-                                    <i class="fas fa-calendar-check me-1"></i>Tanggal Kembali Aktual 
+                                    Tanggal Kembali Aktual
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="date" 
-                                       name="tgl_pengembalian_aktual" 
-                                       class="form-control modern-input"
-                                       value="<?= !empty($data['peminjaman']['tgl_pengembalian_aktual']) ? $data['peminjaman']['tgl_pengembalian_aktual'] : date('Y-m-d'); ?>" 
-                                       required>
+                                <input type="date"
+                                    name="tgl_pengembalian_aktual"
+                                    class="form-control modern-input"
+                                    value="<?= !empty($data['peminjaman']['tgl_pengembalian_aktual']) ? $data['peminjaman']['tgl_pengembalian_aktual'] : date('Y-m-d'); ?>"
+                                    required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label-sm">
-                                    <i class="fas fa-flag-checkered me-1"></i>Status Akhir 
+                                    Status Pemeriksaan
                                     <span class="text-danger">*</span>
                                 </label>
-                                <select name="status_pengembalian" 
-                                        class="form-select modern-select fw-bold" 
-                                        required>
-                                    <option value="Dikembalikan" 
-                                            <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Dikembalikan') ? 'selected' : ''; ?>>
-                                        ✅ Selesai (Lengkap & Normal)
+                                <select name="status_pengembalian" class="form-select modern-select fw-bold" required>
+
+                                    <option value="Selesai Periksa"
+                                        <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Selesai Periksa') ? 'selected' : ''; ?>>
+                                        Selesai Periksa
                                     </option>
-                                    <option value="Belum Dikembalikan" 
-                                            <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Belum Dikembalikan') ? 'selected' : ''; ?>>
-                                        ⏳ Pending (Kurang/Rusak)
+
+                                    <option value="Periksa"
+                                        <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Periksa') ? 'selected' : ''; ?>>
+                                        Periksa
                                     </option>
+
+                                    <option value="Periksa Ulang"
+                                        <?= (!empty($data['peminjaman']['status_pengembalian']) && $data['peminjaman']['status_pengembalian'] == 'Periksa Ulang') ? 'selected' : ''; ?>>
+                                        Periksa Ulang
+                                    </option>
+
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label-sm">
-                                    <i class="fas fa-camera me-1"></i>Bukti Foto (Opsional)
+                                    Bukti Foto
+                                    <span class="text-danger">*</span>
                                 </label>
-                                <input type="file" 
-                                       name="bukti_foto" 
-                                       class="form-control modern-input" 
-                                       accept="image/*" 
-                                       id="buktiInput">
-                                
+
+                                <input type="file"
+                                    name="bukti_foto"
+                                    class="form-control modern-input"
+                                    accept="image/*"
+                                    id="buktiInput"
+                                    required>
+
+                                <div class="form-text text-muted small">
+                                    Wajib melampirkan foto bukti barang.
+                                </div>
+
                                 <div id="previewContainer" class="mt-3 text-center" style="display: none;">
                                     <img id="previewImage" class="img-fluid" style="max-height: 150px;">
-                                    <button type="button" 
-                                            class="btn btn-sm btn-danger mt-2 w-100 rounded-pill" 
-                                            onclick="removePreview()">
-                                        <i class="fas fa-trash me-1"></i>Hapus Preview
+                                    <button type="button"
+                                        class="btn btn-sm btn-danger mt-2 w-100 rounded-pill"
+                                        onclick="removePreview()">
+                                        Hapus Preview
                                     </button>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="form-label-sm">
-                                    <i class="fas fa-sticky-note me-1"></i>Catatan Umum
+                                    Catatan Umum
                                 </label>
-                                <textarea name="detail_masalah" 
-                                          class="form-control modern-input" 
-                                          rows="3" 
-                                          placeholder="Tambahkan informasi atau catatan penting..."><?= htmlspecialchars($data['peminjaman']['detail_masalah'] ?? ''); ?></textarea>
+                                <textarea name="detail_masalah"
+                                    class="form-control modern-input"
+                                    rows="3"
+                                    placeholder="Tambahkan informasi atau catatan penting..."><?= htmlspecialchars($data['peminjaman']['detail_masalah'] ?? ''); ?></textarea>
                             </div>
 
                             <hr class="my-4">
-                            
-                            <button type="submit" class="btn btn-modern-primary w-100">
-                                <i class="fas fa-save me-2"></i>Simpan & Verifikasi Data
+
+                            <button type="submit" class="btn btn-modern-primary w-100 text-white">
+                                Simpan & Verifikasi Data
                             </button>
                         </div>
                     </div>
@@ -511,17 +485,17 @@ if (!isset($_SESSION['login'])) {
 
 <script>
     // Preview Image with modern UX
-    document.getElementById('buktiInput').addEventListener('change', function (e) {
+    document.getElementById('buktiInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 5 * 1024 * 1024) { 
-                alert('⚠️ Ukuran file terlalu besar! Maksimal 5MB');
-                this.value = ''; 
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran file terlalu besar! Maksimal 5MB');
+                this.value = '';
                 return;
             }
-            
+
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 document.getElementById('previewImage').src = e.target.result;
                 document.getElementById('previewContainer').style.display = 'block';
             }
@@ -535,11 +509,11 @@ if (!isset($_SESSION['login'])) {
     }
 
     // Form Validation with modern feedback
-    (function () {
+    (function() {
         'use strict';
         var forms = document.querySelectorAll('.needs-validation');
-        Array.prototype.slice.call(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
                 if (!form.checkValidity()) {
                     event.preventDefault();
                     event.stopPropagation();

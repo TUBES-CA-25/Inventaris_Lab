@@ -387,10 +387,10 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                         </td>
                                         <td class="fw-bold text-dark"><?= htmlspecialchars($item['nama_barang']); ?></td>
                                         <td class="text-center">
-                                            <span class="badge bg-secondary"><?= htmlspecialchars($jumlah); ?></span>
+                                            <span class="badge"><?= htmlspecialchars($jumlah); ?></span>
                                         </td>
                                         <td>
-                                            <span class="status-badge <?= $statusClass ?>">
+                                            <span class="status-badge text-black <?= $statusClass ?>">
                                                 <i class="fas <?= $icon ?>"></i>
                                                 <?= ucfirst($kondisi); ?>
                                             </span>

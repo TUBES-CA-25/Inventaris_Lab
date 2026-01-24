@@ -75,92 +75,92 @@ class Pengembalian_model
             $id_pengembalian = null;
 
             if ($existing) {
-                // UPDATE Header Existing
                 $id_pengembalian = $existing['id_pengembalian'];
                 $query = "UPDATE trx_pengembalian SET 
-                          tgl_pengembalian_aktual = :tgl,
-                          status_pengembalian = :status,
-                          keterangan = :ket,
-                          detail_masalah = :detail,
-                          id_petugas = :petugas";
-                if (!empty($data['bukti_foto'])) { $query .= ", bukti_foto = :foto"; }
+                      tgl_pengembalian_aktual = :tgl,
+                      status_pengembalian = :status, 
+                      keterangan = :ket,
+                      detail_masalah = :detail,
+                      id_petugas = :petugas";
+
+                if (!empty($data['bukti_foto'])) {
+                    $query .= ", bukti_foto = :foto";
+                }
                 $query .= " WHERE id_pengembalian = :id";
 
                 $this->db->query($query);
                 $this->db->bind('tgl', $data['tgl_pengembalian_aktual'] ?? date('Y-m-d'));
-                $this->db->bind('status', $data['status_pengembalian']);
+                $this->db->bind('status', $data['status_pengembalian']); // Langsung ambil value dari form ('Selesai Periksa'/'Periksa'/'Periksa Ulang')
                 $this->db->bind('ket', $data['keterangan'] ?? '-');
                 $this->db->bind('detail', $data['detail_masalah'] ?? '-');
                 $this->db->bind('petugas', $data['id_petugas']);
                 $this->db->bind('id', $id_pengembalian);
-                if (!empty($data['bukti_foto'])) { $this->db->bind('foto', 'uploads/pengembalian/' . $data['bukti_foto']); }
+
+                if (!empty($data['bukti_foto'])) {
+                    $this->db->bind('foto', 'uploads/pengembalian/' . $data['bukti_foto']);
+                }
                 $this->db->execute();
             } else {
-                // INSERT Header Baru
                 $query = "INSERT INTO trx_pengembalian 
-                          (id_peminjaman, tgl_pengembalian_aktual, status_pengembalian, keterangan, detail_masalah, id_petugas, bukti_foto) 
-                          VALUES (:id_pinjam, :tgl, :status, :ket, :detail, :petugas, :foto)";
-                
+                      (id_peminjaman, tgl_pengembalian_aktual, status_pengembalian, keterangan, detail_masalah, id_petugas, bukti_foto) 
+                      VALUES (:id_pinjam, :tgl, :status, :ket, :detail, :petugas, :foto)";
+
                 $this->db->query($query);
                 $this->db->bind('id_pinjam', $data['id_peminjaman']);
                 $this->db->bind('tgl', $data['tgl_pengembalian_aktual'] ?? date('Y-m-d'));
-                $this->db->bind('status', $data['status_pengembalian']);
+                $this->db->bind('status', $data['status_pengembalian']); // Value sesuai ENUM baru
                 $this->db->bind('ket', $data['keterangan'] ?? '-');
                 $this->db->bind('detail', $data['detail_masalah'] ?? '-');
                 $this->db->bind('petugas', $data['id_petugas']);
                 $this->db->bind('foto', !empty($data['bukti_foto']) ? 'uploads/pengembalian/' . $data['bukti_foto'] : null);
                 $this->db->execute();
-                
+
                 $this->db->query("SELECT LAST_INSERT_ID() as id");
                 $newId = $this->db->single();
                 $id_pengembalian = $newId['id'];
             }
 
-            // 2. PROSES DETAIL BARANG (Looping Input Form)
-            // Ini bagian yang HILANG di file upload kamu sebelumnya
             if (isset($data['kondisi']) && is_array($data['kondisi'])) {
-                foreach ($data['kondisi'] as $id_detail_pinjam => $kondisi_item) {
-                    $ket_item = $data['ket_item'][$id_detail_pinjam] ?? '-';
-                    $jumlah_kembali = 1; // Default
+            foreach ($data['kondisi'] as $id_detail_pinjam => $kondisi_item) {
+                $ket_item = $data['ket_item'][$id_detail_pinjam] ?? '-';
+                $jumlah_kembali = 1;
 
-                    // Cek apakah item ini sudah ada?
-                    $this->db->query("SELECT id_detail_pengembalian FROM trx_detail_pengembalian 
-                                      WHERE id_pengembalian = :id_peng AND id_detail_peminjaman = :id_dp");
+                // Cek Item
+                $this->db->query("SELECT id_detail_pengembalian FROM trx_detail_pengembalian 
+                                  WHERE id_pengembalian = :id_peng AND id_detail_peminjaman = :id_dp");
+                $this->db->bind('id_peng', $id_pengembalian);
+                $this->db->bind('id_dp', $id_detail_pinjam);
+                $cekItem = $this->db->single();
+
+                if ($cekItem) {
+                    $this->db->query("UPDATE trx_detail_pengembalian SET 
+                                      kondisi_barang = :kondisi, 
+                                      keterangan_kondisi = :ket 
+                                      WHERE id_detail_pengembalian = :id");
+                    $this->db->bind('kondisi', $kondisi_item);
+                    $this->db->bind('ket', $ket_item);
+                    $this->db->bind('id', $cekItem['id_detail_pengembalian']);
+                    $this->db->execute();
+                } else {
+                    $this->db->query("INSERT INTO trx_detail_pengembalian 
+                                      (id_pengembalian, id_detail_peminjaman, jumlah_kembali, kondisi_barang, keterangan_kondisi) 
+                                      VALUES (:id_peng, :id_dp, :jml, :kondisi, :ket)");
                     $this->db->bind('id_peng', $id_pengembalian);
                     $this->db->bind('id_dp', $id_detail_pinjam);
-                    $cekItem = $this->db->single();
-
-                    if ($cekItem) {
-                        // Update Kondisi Item
-                        $this->db->query("UPDATE trx_detail_pengembalian SET 
-                                          kondisi_barang = :kondisi, 
-                                          keterangan_kondisi = :ket 
-                                          WHERE id_detail_pengembalian = :id");
-                        $this->db->bind('kondisi', $kondisi_item);
-                        $this->db->bind('ket', $ket_item);
-                        $this->db->bind('id', $cekItem['id_detail_pengembalian']);
-                        $this->db->execute();
-                    } else {
-                        // Insert Kondisi Item Baru
-                        $this->db->query("INSERT INTO trx_detail_pengembalian 
-                                          (id_pengembalian, id_detail_peminjaman, jumlah_kembali, kondisi_barang, keterangan_kondisi) 
-                                          VALUES (:id_peng, :id_dp, :jml, :kondisi, :ket)");
-                        $this->db->bind('id_peng', $id_pengembalian);
-                        $this->db->bind('id_dp', $id_detail_pinjam);
-                        $this->db->bind('jml', $jumlah_kembali);
-                        $this->db->bind('kondisi', $kondisi_item);
-                        $this->db->bind('ket', $ket_item);
-                        $this->db->execute();
-                    }
+                    $this->db->bind('jml', $jumlah_kembali);
+                    $this->db->bind('kondisi', $kondisi_item);
+                    $this->db->bind('ket', $ket_item);
+                    $this->db->execute();
                 }
             }
+        }
 
             // 3. UPDATE STATUS PEMINJAMAN UTAMA
-            $status_peminjaman = ($data['status_pengembalian'] == 'Dikembalikan') ? 'Dikembalikan' : 'Disetujui';
-            $this->db->query("UPDATE trx_peminjaman SET status = :status WHERE id_peminjaman = :id");
-            $this->db->bind('status', $status_peminjaman);
-            $this->db->bind('id', $data['id_peminjaman']);
-            $this->db->execute();
+            // $status_peminjaman = ($data['status_pengembalian'] == 'Dikembalikan') ? 'Dikembalikan' : 'Disetujui';
+            // $this->db->query("UPDATE trx_peminjaman SET status = :status WHERE id_peminjaman = :id");
+            // $this->db->bind('status', $status_peminjaman);
+            // $this->db->bind('id', $data['id_peminjaman']);
+            // $this->db->execute();
 
             $this->db->commit();
             return 1;
@@ -183,7 +183,7 @@ class Pengembalian_model
         // Kuncinya: Mulai dari trx_detail_peminjaman (dp)
         // Lalu LEFT JOIN ke trx_detail_pengembalian (tk)
         // Ini menjamin SEMUA barang yang dipinjam akan tampil di list
-        
+
         $query = "SELECT 
                     dp.id_detail as id_detail_peminjaman,
                     dp.jumlah as jumlah_pinjam,
