@@ -153,18 +153,24 @@ class Peminjaman_model
 
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
     {
-        // Tambahkan tdu.nama_user dan tdu.nim_nip
+        // PERBAIKAN: Tambahkan select peng.status_pengembalian dan JOIN ke trx_pengembalian
         $query = "SELECT tp.*, 
                       tdu.nama_user, 
                       tdu.nim_nip,
                       GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
                       SUM(tdp.jumlah) as jumlah_peminjaman,
-                      tpt.alasan_penolakan
+                      tpt.alasan_penolakan,
+                      peng.status_pengembalian  -- <--- Tambahan Kolom Ini
+
               FROM trx_peminjaman tp
-              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  -- JOIN ke tabel user
+              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
               LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
               LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman 
+              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
+              
+              -- JOIN BARU UNTUK CEK STATUS PENGEMBALIAN
+              LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
+              
               WHERE tp.id_peminjaman = :id_peminjaman
               GROUP BY tp.id_peminjaman";
 
@@ -415,19 +421,34 @@ class Peminjaman_model
 
     public function getDetailBarangByPeminjamanId($id)
     {
-        // PERBAIKAN: Tambahkan 'tb.foto_barang' di baris SELECT
         $query = "SELECT 
+            d.id_detail,
             d.id_jenis_barang, 
             d.jumlah, 
             d.id_barang,
+            
             mjb.sub_barang as nama_barang, 
-            mjb.kode_sub as kode_barang,
-            mjb.grup_sub,
-            tb.spesifikasi_barang,
-            tb.foto_barang  -- <--- INI WAJIB DITAMBAHKAN
+            COALESCE(tb.kode_barang, mjb.kode_sub) as kode_barang,
+            tb.spesifikasi_barang as spesifikasi,
+            tb.foto_barang,
+            
+            -- TAMBAHAN PENTING: Ambil Status Pengembalian Header
+            p_header.status_pengembalian, 
+
+            tk.kondisi_barang as kondisi_kembali,
+            tk.keterangan_kondisi as ket_kembali
+            
           FROM trx_detail_peminjaman d 
+          
           JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
           LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
+          
+          -- Join ke Header Pengembalian untuk ambil status 'Selesai Periksa'
+          LEFT JOIN trx_pengembalian p_header ON d.id_peminjaman = p_header.id_peminjaman
+          
+          LEFT JOIN trx_detail_pengembalian tk ON p_header.id_pengembalian = tk.id_pengembalian 
+               AND d.id_detail = tk.id_detail_peminjaman
+          
           WHERE d.id_peminjaman = :id";
 
         $this->db->query($query);

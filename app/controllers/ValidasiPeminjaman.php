@@ -58,6 +58,7 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
+        $data['status_Kembali'] = isset($data['peminjaman']['status_pengembalian']) ? $data['peminjaman']['status_pengembalian'] : '-';
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);

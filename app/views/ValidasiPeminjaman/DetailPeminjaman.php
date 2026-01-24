@@ -8,58 +8,411 @@
 $p = $data['peminjaman'];
 $status_sekarang = strtolower($p['status']);
 $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
+$status_Kembali = $data['status_Kembali'];
 ?>
 
+<link rel="stylesheet" href="<?= BASEURL; ?>public/css/ValidasiPeminjaman.css">
+
+<div class="content">
+    <div class="content-beranda container-fluid p-4">
+
+        <!-- Header Section -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 mb-2 font-weight-bold" style="color: var(--primary-navy);">Detail Peminjaman</h1>
+                <p class="text-muted mb-0">ID Peminjaman: #<?= $p['id_peminjaman']; ?></p>
+            </div>
+
+            <?php
+            $statusClass = 'navy';
+            if ($status_sekarang == 'disetujui') $statusClass = 'disetujui';
+            if ($status_sekarang == 'ditolak') $statusClass = 'ditolak';
+            if ($status_sekarang == 'diproses') $statusClass = 'diproses';
+            ?>
+            <span class="status-badge <?= $statusClass; ?>">
+                <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                <?= ucfirst($status_sekarang); ?>
+            </span>
+        </div>
+
+        <div class="row">
+            <!-- Kolom Kiri: Data Peminjam -->
+            <div class="col-xl-7 col-lg-6">
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h6><i class="fas fa-user-circle mr-2"></i>Data Peminjam</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-borderless modern-table" width="100%" cellspacing="0">
+                                <tr>
+                                    <th width="35%">Nama Peminjam</th>
+                                    <td><strong><?= $p['nama_user']; ?></strong> <span class="text-muted">(<?= $p['nim_nip']; ?>)</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Judul Kegiatan</th>
+                                    <td><?= $p['judul_kegiatan']; ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Tanggal Pengajuan</th>
+                                    <td><?= date('d F Y', strtotime($p['tanggal_pengajuan'])); ?></td>
+                                </tr>
+                                <tr>
+                                    <th>Waktu Peminjaman</th>
+                                    <td>
+                                        <span style="color: var(--accent-blue); font-weight: 600;">
+                                            <?= date('d M Y', strtotime($p['tanggal_peminjaman'])); ?>
+                                        </span>
+                                        <span class="mx-2">→</span>
+                                        <span style="color: var(--accent-blue); font-weight: 600;">
+                                            <?= date('d M Y', strtotime($p['tanggal_pengembalian'])); ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Keterangan</th>
+                                    <td><?= $p['keterangan_peminjaman'] ? $p['keterangan_peminjaman'] : '<span class="text-muted">-</span>'; ?></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <hr style="border-color: #e2e8f0;">
+                        <h6 class="font-weight-bold mb-3" style="color: var(--primary-navy);">
+                            <i class="fas fa-boxes mr-2"></i>Barang yang Dipinjam
+                        </h6>
+                        <ul class="list-group list-group-flush">
+                            <?php if (!empty($data['detail_barang'])) : foreach ($data['detail_barang'] as $item) : ?>
+                                    <li class="list-group-item py-3 px-0">
+                                        <div class="row align-items-center mx-0" style="color: var(--text-dark);">
+
+                                            <div class="col-md-4 col-12 mb-1 mb-md-0 pl-0">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-box mr-2" style="color: var(--accent-blue);"></i>
+                                                    <span class="font-weight-bold">
+                                                        <?= htmlspecialchars($item['nama_barang']); ?>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-12 mb-1 mb-md-0">
+                                                <?php if (!empty($item['spesifikasi'])) : ?>
+                                                    <span style="font-size: 1rem; color: var(--text-dark);">
+                                                        <?= $item['spesifikasi']; ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <div class="col-md-2 col-12 text-md-right pl-md-0">
+                                                <span class="badge badge-light border" style="font-size: 0.9rem;">
+                                                    <?= $item['jumlah']; ?> Unit
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                <?php endforeach;
+                            else : ?>
+                                <li class="list-group-item text-muted">Tidak ada data barang.</li>
+                            <?php endif; ?>
+                        </ul>
+                        <div class="mt-3 p-3 text-center font-weight-bold" style="background: var(--primary-navy); color: white; border-radius: 10px;">
+                            Total Peminjaman: <?= $p['jumlah_peminjaman']; ?> Unit
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Surat & Validasi -->
+            <div class="col-xl-5 col-lg-6">
+
+                <!-- Card Surat Permohonan -->
+                <div class="modern-card">
+                    <div class="card-header-modern">
+                        <h6><i class="fas fa-file-alt mr-2"></i>Surat Permohonan</h6>
+                    </div>
+                    <div class="card-body text-center p-4">
+                        <?php if (!empty($p['file_surat'])) : ?>
+                            <div class="mb-3">
+                                <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #dc2626, #ef4444); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+                                    <i class="fas fa-file-pdf text-white" style="font-size: 40px;"></i>
+                                </div>
+                                <p class="mt-3 mb-0 text-muted small"><?= $p['file_surat']; ?></p>
+                            </div>
+                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" class="btn btn-navy btn-block">
+                                <i class="fas fa-download mr-2"></i>Download Surat
+                            </a>
+                        <?php else : ?>
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>File surat belum diupload
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Card Proses Validasi -->
+                <?php if ($status_sekarang == 'diproses') : ?>
+                    <div class="modern-card">
+                        <div class="card-header-modern">
+                            <h6><i class="fas fa-tasks mr-2"></i>Proses Validasi</h6>
+                        </div>
+                        <div class="card-body p-4">
+
+                            <!-- Step 1: Kepala Lab -->
+                            <div class="step-card">
+                                <div class="step-icon <?= ($p['validasi_kalab'] == '1') ? 'step-success' : 'step-pending'; ?>">
+                                    <?= ($p['validasi_kalab'] == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Kepala Lab</h6>
+                                    <small class="text-muted">Huzain Aziz</small>
+                                </div>
+                                <div>
+                                    <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
+                                        <form id="formAccKalab" action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab" method="post" class="d-inline">
+                                            <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                                            <button type="button" class="btn btn-navy btn-sm"
+                                                onclick="konfirmasiAksi('formAccKalab', 'Setujui Peminjaman?', 'Yakin setujui?', 'question')">
+                                                <i class="fas fa-check mr-1"></i> Setujui
+                                            </button>
+                                        </form>
+                                    <?php elseif ($p['validasi_kalab'] == '1') : ?>
+                                        <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                            <i class="fas fa-check"></i> Selesai
+                                        </span>
+                                    <?php else : ?>
+                                        <span class="badge badge-light text-muted">Menunggu</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Laboran -->
+                            <div class="step-card">
+                                <div class="step-icon <?= ($p['validasi_laboran'] == '1') ? 'step-success' : (($p['validasi_kalab'] == '1') ? 'step-active' : 'step-pending'); ?>">
+                                    <?= ($p['validasi_laboran'] == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Laboran</h6>
+                                    <small class="text-muted">Fatimah Azzahrah</small>
+                                </div>
+                                <div>
+                                    <?php if ($role_login == '2' && $p['validasi_laboran'] == '0') : ?>
+                                        <?php if ($p['validasi_kalab'] == '1') : ?>
+                                            <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
+                                                class="btn btn-navy btn-sm">
+                                                <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
+                                            </a>
+                                        <?php else : ?>
+                                            <button class="btn btn-secondary btn-sm" disabled style="cursor: not-allowed; opacity: 0.6;">
+                                                <i class="fas fa-lock"></i> Terkunci
+                                            </button>
+                                        <?php endif; ?>
+                                    <?php elseif ($p['validasi_laboran'] == '1') : ?>
+                                        <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                            <i class="fas fa-check"></i> Selesai
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <hr style="border-color: #e2e8f0; margin: 20px 0;">
+                            <button type="button" class="btn btn-outline-danger btn-block" style="border-radius: 8px; padding: 10px; font-weight: 600;" onclick="bukaFormTolak('formTolakContainer')">
+                                <i class="fas fa-times mr-2"></i>Tolak Peminjaman
+                            </button>
+
+                        </div>
+                    </div>
+
+                <?php elseif ($status_sekarang == 'disetujui') : ?>
+                    <div class="modern-card" style="border-left: 4px solid #22c55e;">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <div style="width: 60px; height: 60px; margin: 0 auto; background: var(--success-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-check-circle" style="font-size: 30px; color: var(--success-text);"></i>
+                                </div>
+                            </div>
+                            <h5 class="font-weight-bold text-center mb-2" style="color: var(--success-text);">Sedang Dipinjam</h5>
+                            <p class="text-center text-muted mb-4">Barang sudah diambil. Tunggu pengembalian.</p>
+
+                            <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
+                                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                                <input type="hidden" name="status" value="dikembalikan">
+                                <button type="submit" class="btn btn-navy btn-block" onclick="return confirm('Yakin barang sudah dikembalikan lengkap?')">
+                                    <i class="fas fa-box-open mr-2"></i>Terima Pengembalian
+                                </button>
+                            </form>
+
+                            <button type="button" class="btn btn-outline-danger btn-block btn-sm" onclick="bukaFormTolak('formTolakPengembalianContainer')">
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Lapor Masalah
+                            </button>
+                        </div>
+                    </div>
+
+                <?php elseif ($status_sekarang == 'ditolak') : ?>
+                    <div class="modern-card" style="border-left: 4px solid #ef4444;">
+                        <div class="card-body p-4">
+                            <div class="text-center mb-3">
+                                <div style="width: 60px; height: 60px; margin: 0 auto; background: var(--danger-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-times-circle" style="font-size: 30px; color: var(--danger-text);"></i>
+                                </div>
+                            </div>
+                            <h5 class="font-weight-bold text-center mb-3" style="color: var(--danger-text);">Peminjaman Ditolak</h5>
+                            <div class="condition-box danger">
+                                <strong class="d-block mb-1">Alasan Penolakan:</strong>
+                                <p class="mb-0"><?= !empty($p['alasan_penolakan']) ? $p['alasan_penolakan'] : '-'; ?></p>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+            </div>
+        </div>
+
+        <!-- Form Penolakan (Hidden) -->
+        <div id="formTolakContainer" class="modern-card form-section-hidden" style="border-left: 4px solid #ef4444;">
+            <div class="card-header-modern" style="background: #ef4444;">
+                <h6><i class="fas fa-times-circle mr-2"></i>Form Penolakan</h6>
+            </div>
+            <div class="card-body p-4">
+                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                    <input type="hidden" name="status" value="ditolak">
+                    <div class="form-group">
+                        <label class="font-weight-bold" style="color: var(--text-dark);">Alasan Penolakan:</label>
+                        <textarea class="form-control" name="pesan_penolakan" required rows="4" placeholder="Contoh: Jadwal bentrok dengan kegiatan lain..." style="border-radius: 8px;"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakContainer')" style="border-radius: 8px;">Batal</button>
+                        <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;">
+                            <i class="fas fa-paper-plane mr-2"></i>Kirim Penolakan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Form Lapor Masalah Pengembalian (Hidden) -->
+        <div id="formTolakPengembalianContainer" class="modern-card form-section-hidden" style="border-left: 4px solid #ef4444;">
+            <div class="card-header-modern" style="background: #ef4444;">
+                <h6><i class="fas fa-exclamation-triangle mr-2"></i>Lapor Masalah Pengembalian</h6>
+            </div>
+            <div class="card-body p-4">
+                <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
+                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                    <div class="form-group">
+                        <label class="font-weight-bold" style="color: var(--text-dark);">Detail Masalah (Rusak/Hilang):</label>
+                        <textarea class="form-control" name="alasan_penolakan" required rows="4" placeholder="Jelaskan kondisi barang yang rusak atau hilang..." style="border-radius: 8px;"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakPengembalianContainer')" style="border-radius: 8px;">Batal</button>
+                        <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;">
+                            <i class="fas fa-save mr-2"></i>Simpan Laporan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Detail Barang & Status Pengembalian -->
+        <?php if ($status_sekarang == 'disetujui' || $status_sekarang == 'dikembalikan') : ?>
+            <div class="modern-card mt-4">
+                <div class="card-header-modern">
+                    <h6><i class="fas fa-clipboard-list mr-2"></i>Detail Barang & Status Pengembalian</h6>
+                </div>
+                <div class="card-body p-4">
+                    <?php if ($status_Kembali == 'Selesai Periksa') : ?>
+                        
+                        <div class="row px-0 mb-3 d-none d-md-flex" style="color: #888; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                            <div class="col-md-3 pl-4">Nama Barang</div>
+                            <div class="col-md-3">Spesifikasi</div>
+                            <div class="col-md-3">Kondisi Fisik</div>
+                            <div class="col-md-3">Keterangan</div> </div>
+
+                        <ul class="list-group list-group-flush">
+                            <?php if (!empty($data['detail_barang'])) : ?>
+                                <?php foreach ($data['detail_barang'] as $item) : ?>
+                                    <li class="list-group-item px-0 py-3">
+
+                                        <div class="row align-items-center mx-0" style="color: #333; font-size: 1rem; font-weight: 500;">
+                                            
+                                            <div class="col-md-3 col-12 mb-2 mb-md-0 pl-md-3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-box mr-2" style="color: var(--accent-blue);"></i>
+                                                    <?= htmlspecialchars($item['nama_barang']); ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 col-12 mb-2 mb-md-0">
+                                                <?= !empty($item['spesifikasi']) ? $item['spesifikasi'] : '-'; ?>
+                                            </div>
+
+                                            <div class="col-md-3 col-12 mb-2 mb-md-0">
+                                                <?php
+                                                if (!empty($item['kondisi_kembali'])) {
+                                                    $color = '#333';
+                                                    $icon = '';
+
+                                                    if ($item['kondisi_kembali'] == 'Baik') {
+                                                        $color = '#1cc88a'; 
+                                                        $icon = 'fa-check';
+                                                    } elseif ($item['kondisi_kembali'] == 'Rusak') {
+                                                        $color = '#f6c23e'; 
+                                                        $icon = 'fa-exclamation-triangle';
+                                                    } elseif ($item['kondisi_kembali'] == 'Hilang') {
+                                                        $color = '#e74a3b'; 
+                                                        $icon = 'fa-times';
+                                                    }
+
+                                                    echo '<span style="color: ' . $color . ';">';
+                                                    echo '<i class="fas ' . $icon . ' mr-1"></i> ' . ucfirst($item['kondisi_kembali']);
+                                                    echo '</span>';
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
+                                                ?>
+                                            </div>
+                                            
+                                            <div class="col-md-3 col-12">
+                                                <?php if (!empty($item['ket_kembali']) && $item['ket_kembali'] != '-') : ?>
+                                                    <span style="color: #555; font-size: 0.95rem;">
+                                                        <?= htmlspecialchars($item['ket_kembali']); ?>
+                                                    </span>
+                                                <?php else : ?>
+                                                    <span class="text-muted small font-italic">Tidak ada catatan</span>
+                                                <?php endif; ?>
+                                            </div>
+
+                                        </div>
+
+                                        </li>
+                                <?php endforeach; ?>
+                            <?php else : ?>
+                                <li class="list-group-item text-muted text-center">Tidak ada data barang.</li>
+                            <?php endif; ?>
+                        </ul>
+                        
+                    <?php else : ?>
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-clock mb-2" style="font-size: 2rem; color: #cbd5e0;"></i>
+                            <p class="mb-0">Barang belum diperiksa oleh laboran.</p>
+                         </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Tombol Kembali -->
+        <div class="mb-4">
+            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn btn-outline-navy">
+                <i class="fas fa-arrow-left mr-2"></i>Kembali ke Daftar
+            </a>
+        </div>
+    </div>
+</div>
+
 <style>
-    .step-card {
-        border: 1px solid #e3e6f0;
-        border-radius: 0.5rem;
-        background-color: #fff;
-        margin-bottom: 1rem;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        padding: 15px;
-    }
-
-    .step-card:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .step-icon {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        margin-right: 15px;
-        flex-shrink: 0;
-    }
-
-    .step-pending {
-        background-color: #eaecf4;
-        color: #858796;
-        border: 2px solid #d1d3e2;
-    }
-
-    .step-active {
-        background-color: #4e73df;
-        color: white;
-        border: 2px solid #4e73df;
-        box-shadow: 0 0 10px rgba(78, 115, 223, 0.5);
-    }
-
-    .step-success {
-        background-color: #1cc88a;
-        color: white;
-        border: 2px solid #1cc88a;
-    }
-
-    /* Form Tolak Animasi */
+    /* Form Hidden Animation */
     .form-section-hidden {
         display: none;
         margin-top: 20px;
@@ -77,245 +430,25 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
             transform: translateY(0);
         }
     }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+        }
+
+        .step-card {
+            padding: 12px;
+        }
+
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 0.9rem;
+        }
+    }
 </style>
-
-<div class="content">
-    <div class="container-fluid p-4">
-
-        <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Detail Peminjaman</h1>
-
-            <?php
-            $badgeColor = 'secondary';
-            if ($status_sekarang == 'disetujui') $badgeColor = 'success';
-            if ($status_sekarang == 'ditolak') $badgeColor = 'danger';
-            if ($status_sekarang == 'diproses') $badgeColor = 'warning';
-            ?>
-            <span class="badge badge-<?= $badgeColor; ?> px-3 py-2" style="font-size: 1rem;">
-                Status: <?= ucfirst($status_sekarang); ?>
-            </span>
-        </div>
-
-        <div class="row">
-            <div class="col-xl-7 col-lg-6">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Data Peminjam</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-borderless" width="100%" cellspacing="0">
-                                <tr>
-                                    <th width="35%">Nama Peminjam</th>
-                                    <td>: <strong><?= $p['nama_user']; ?></strong> (<?= $p['nim_nip']; ?>)</td>
-                                </tr>
-                                <tr>
-                                    <th>Judul Kegiatan</th>
-                                    <td>: <?= $p['judul_kegiatan']; ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Tanggal Pengajuan</th>
-                                    <td>: <?= date('d F Y', strtotime($p['tanggal_pengajuan'])); ?></td>
-                                </tr>
-                                <tr>
-                                    <th>Waktu Peminjaman</th>
-                                    <td>: <span class="text-primary"><?= date('d M Y', strtotime($p['tanggal_peminjaman'])); ?></span> s/d <span class="text-primary"><?= date('d M Y', strtotime($p['tanggal_pengembalian'])); ?></span></td>
-                                </tr>
-                                <tr>
-                                    <th>Keterangan</th>
-                                    <td>: <?= $p['keterangan_peminjaman'] ? $p['keterangan_peminjaman'] : '-'; ?></td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <hr>
-                        <h6 class="font-weight-bold text-gray-800 ml-2">Barang yang Dipinjam:</h6>
-                        <ul class="list-group list-group-flush mt-2">
-                            <?php if (!empty($data['detail_barang'])) : foreach ($data['detail_barang'] as $item) : ?>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span><i class="fas fa-box mr-2 text-gray-400"></i> <?= htmlspecialchars($item['nama_barang']); ?></span>
-                                        <span class="badge badge-primary badge-pill"><?= $item['jumlah']; ?> Unit</span>
-                                    </li>
-                                <?php endforeach;
-                            else : ?><li class="list-group-item text-muted">Tidak ada data barang.</li><?php endif; ?>
-                            <li class="list-group-item active text-center font-weight-bold">Total: <?= $p['jumlah_peminjaman']; ?> Unit</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-5 col-lg-6">
-
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Surat Permohonan</h6>
-                    </div>
-                    <div class="card-body text-center">
-                        <?php if (!empty($p['file_surat'])) : ?>
-                            <div class="mb-3">
-                                <i class="fas fa-file-pdf text-danger" style="font-size: 50px;"></i>
-                                <p class="mt-2 small text-muted"><?= $p['file_surat']; ?></p>
-                            </div>
-                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" class="btn btn-danger btn-icon-split btn-sm">
-                                <span class="icon text-white-50"><i class="fas fa-download"></i></span>
-                                <span class="text">Download / Lihat Surat</span>
-                            </a>
-                        <?php else : ?>
-                            <div class="alert alert-warning">File surat belum diupload.</div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <?php if ($status_sekarang == 'diproses') : ?>
-                    <div class="card shadow mb-4 border-bottom-warning">
-                        <div class="card-header py-3 bg-warning text-white">
-                            <h6 class="m-0 font-weight-bold">Proses Validasi</h6>
-                        </div>
-                        <div class="card-body">
-
-                            <div class="step-card">
-                                <div class="step-icon <?= ($p['validasi_kalab'] == '1') ? 'step-success' : 'step-pending'; ?>">
-                                    <?= ($p['validasi_kalab'] == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="font-weight-bold mb-0 text-gray-800">Kepala Lab</h6>
-                                    <small>Huzain Aziz</small>
-                                </div>
-
-                                <div>
-                                    <?php if ($role_login == '1' && $p['validasi_kalab'] == '0') : ?>
-                                        <form id="formAccKalab" action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab" method="post" class="d-inline">
-                                            <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                                            <button type="button" class="btn btn-primary btn-sm shadow-sm"
-                                                onclick="konfirmasiAksi('formAccKalab', 'Setujui Peminjaman?', 'Yakin setujui?', 'question')">
-                                                <i class="fas fa-check mr-1"></i> Setujui
-                                            </button>
-                                        </form>
-                                    <?php elseif ($p['validasi_kalab'] == '1') : ?>
-                                        <span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span>
-                                    <?php else : ?>
-                                        <span class="badge badge-light text-muted">Menunggu</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <div class="step-card">
-                                <div class="step-icon <?= ($p['validasi_laboran'] == '1') ? 'step-success' : (($p['validasi_kalab'] == '1') ? 'step-active' : 'step-pending'); ?>">
-                                    <?= ($p['validasi_laboran'] == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="font-weight-bold mb-0 text-gray-800">Laboran</h6>
-                                    <small>Fatimah Azzahrah</small>
-                                </div>
-
-                                <div>
-                                    <?php if ($role_login == '2' && $p['validasi_laboran'] == '0') : ?>
-
-                                        <?php if ($p['validasi_kalab'] == '1') : ?>
-                                            <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
-                                                class="btn btn-success btn-sm shadow-sm">
-                                                <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
-                                            </a>
-                                        <?php else : ?>
-                                            <button class="btn btn-secondary btn-sm" disabled style="cursor: not-allowed; opacity: 0.7;">
-                                                <i class="fas fa-lock"></i> Terkunci
-                                            </button>
-                                        <?php endif; ?>
-
-                                    <?php elseif ($p['validasi_laboran'] == '1') : ?>
-                                        <span class="badge badge-success"><i class="fas fa-check"></i> Selesai</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <hr>
-                            <button type="button" class="btn btn-danger btn-block" onclick="bukaFormTolak('formTolakContainer')">
-                                <i class="fas fa-times mr-2"></i>Tolak Peminjaman
-                            </button>
-
-                        </div>
-                    </div>
-
-                <?php elseif ($status_sekarang == 'disetujui') : ?>
-                    <div class="card shadow mb-4 border-left-success">
-                        <div class="card-body">
-                            <h5 class="text-success font-weight-bold"><i class="fas fa-check-circle"></i> Sedang Dipinjam</h5>
-                            <p class="mb-3">Barang sudah diambil. Tunggu pengembalian.</p>
-
-                            <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
-                                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                                <input type="hidden" name="status" value="dikembalikan">
-                                <button type="submit" class="btn btn-primary btn-block shadow-sm" onclick="return confirm('Yakin barang sudah dikembalikan lengkap?')">
-                                    <i class="fas fa-box-open mr-2"></i>Terima Pengembalian
-                                </button>
-                            </form>
-
-                            <button type="button" class="btn btn-outline-danger btn-block btn-sm" onclick="bukaFormTolak('formTolakPengembalianContainer')">
-                                <i class="fas fa-exclamation-triangle mr-1"></i> Lapor Masalah
-                            </button>
-                        </div>
-                    </div>
-
-                <?php elseif ($status_sekarang == 'ditolak') : ?>
-                    <div class="card shadow mb-4 border-left-danger">
-                        <div class="card-body">
-                            <h5 class="text-danger font-weight-bold"><i class="fas fa-times-circle"></i> Ditolak</h5>
-                            <p class="mb-0"><strong>Alasan:</strong> <?= !empty($p['alasan_penolakan']) ? $p['alasan_penolakan'] : '-'; ?></p>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-            </div>
-        </div>
-
-        <div id="formTolakContainer" class="card shadow mb-4 border-bottom-danger form-section-hidden">
-            <div class="card-header py-3 bg-danger text-white">
-                <h6 class="m-0 font-weight-bold">Form Penolakan</h6>
-            </div>
-            <div class="card-body">
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
-                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                    <input type="hidden" name="status" value="ditolak">
-                    <div class="form-group">
-                        <label>Alasan Penolakan:</label>
-                        <textarea class="form-control" name="pesan_penolakan" required rows="3" placeholder="Contoh: Jadwal bentrok..."></textarea>
-                    </div>
-                    <div class="text-right">
-                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakContainer')">Batal</button>
-                        <button type="submit" class="btn btn-danger">Kirim Penolakan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="formTolakPengembalianContainer" class="card shadow mb-4 border-bottom-danger form-section-hidden">
-            <div class="card-header py-3 bg-danger text-white">
-                <h6 class="m-0 font-weight-bold">Lapor Masalah Pengembalian</h6>
-            </div>
-            <div class="card-body">
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
-                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                    <div class="form-group">
-                        <label>Detail Masalah (Rusak/Hilang):</label>
-                        <textarea class="form-control" name="alasan_penolakan" required rows="3"></textarea>
-                    </div>
-                    <div class="text-right">
-                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakPengembalianContainer')">Batal</button>
-                        <button type="submit" class="btn btn-danger">Simpan Laporan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn btn-secondary btn-icon-split">
-                <span class="icon text-white-50"><i class="fas fa-arrow-left"></i></span>
-                <span class="text">Kembali ke Daftar</span>
-            </a>
-        </div>
-
-    </div>
-</div>
 
 <script>
     function bukaFormTolak(id) {
@@ -342,16 +475,15 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
         Swal.fire({
             title: judul,
             text: pesan,
-            icon: ikon, // 'warning', 'error', 'success', 'info', 'question'
+            icon: ikon,
             showCancelButton: true,
-            confirmButtonColor: '#4e73df', // Warna biru tema template
-            cancelButtonColor: '#e74a3b', // Warna merah tema template
+            confirmButtonColor: '#0d1b3e',
+            cancelButtonColor: '#e74a3b',
             confirmButtonText: 'Ya, Lanjutkan!',
             cancelButtonText: 'Batal',
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                // Jika user klik Ya, submit form sesuai ID yang dikirim
                 document.getElementById(formId).submit();
             }
         });
