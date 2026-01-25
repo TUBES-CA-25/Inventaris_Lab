@@ -28,7 +28,7 @@ if (!isset($_SESSION['login'])) {
             </div>
         </div>
 
-        <div class="step-card">
+        <div class="step-card1">
             <div class="step-header">
                 <div class="step-number-circle">1</div>
                 <div>
@@ -130,7 +130,7 @@ if (!isset($_SESSION['login'])) {
             </div>
         </div>
 
-        <div class="step-card">
+        <div class="step-card1">
             <div class="step-header">
                 <div class="step-number-circle">2</div>
                 <div>
