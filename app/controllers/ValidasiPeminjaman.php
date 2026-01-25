@@ -176,26 +176,12 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // 1. AMBIL ID DARI VIEW (Masih Ter-Encode / String Acak)
-            // Pastikan input hidden di view bernama 'id_peminjaman'
             $id_encoded = $_POST['id_peminjaman'];
-
-            // Cek Keamanan: Jika ID kosong, jangan lanjut (Cegah error URL buntung)
-            if (empty($id_encoded)) {
-                Flasher::setFlash('Gagal', 'ID tidak ditemukan.', '', 'danger');
-                header('Location: ' . BASEURL . 'ValidasiPeminjaman');
-                exit;
-            }
-
-            // 2. DECODE ID (Ubah jadi Angka untuk Database)
             $id_decoded = IdObfuscator::decode($id_encoded);
 
-            // Ambil data lain
             $status = $_POST['status'];
             $pesan  = $_POST['pesan_penolakan'] ?? '';
 
-            // 3. UPDATE DATABASE (Pakai ID Decoded / Angka)
-            // Model butuh angka asli untuk mencari row di tabel
             if ($this->model('Peminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
                 Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
             } else {

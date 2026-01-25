@@ -114,20 +114,23 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                         <?php
                                         $st = strtolower($row['status']);
                                         $badgeColor = 'secondary';
-                                        $iconStatus = '';
+                                        
 
                                         if ($st == 'disetujui' || $st == 'diterima') {
                                             $badgeColor = 'success';
-                                            $iconStatus = 'fa-check';
-                                        } elseif ($st == 'ditolak') {
+                                            
+                                        } elseif ($st == 'tolak peminjaman') {
                                             $badgeColor = 'danger';
-                                            $iconStatus = 'fa-times';
+                                            
+                                        } elseif ($st == 'tolak pengembalian') {
+                                            $badgeColor = 'danger';
+                                            
                                         } elseif ($st == 'melengkapi surat') {
                                             $badgeColor = 'warning';
-                                            $iconStatus = 'fa-file-signature';
+                                            
                                         } elseif ($st == 'diproses') {
                                             $badgeColor = 'info';
-                                            $iconStatus = 'fa-spinner';
+                                            
                                         }
                                         ?>
                                         <span class="badge badge-<?= $badgeColor; ?> px-3 py-2 rounded-pill">

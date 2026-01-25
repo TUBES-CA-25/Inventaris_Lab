@@ -153,22 +153,24 @@ class Peminjaman_model
 
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
     {
-        // PERBAIKAN: Tambahkan select peng.status_pengembalian dan JOIN ke trx_pengembalian
         $query = "SELECT tp.*, 
                       tdu.nama_user, 
                       tdu.nim_nip,
                       GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
                       SUM(tdp.jumlah) as jumlah_peminjaman,
-                      tpt.alasan_penolakan,
-                      peng.status_pengembalian  -- <--- Tambahan Kolom Ini
+                      
+                      -- AMBIL ALASAN LANGSUNG DARI KOLOM KETERANGAN (Pengganti tabel tolak)
+                      tp.keterangan_peminjaman as alasan_penolakan,
+                      
+                      peng.status_pengembalian
 
               FROM trx_peminjaman tp
               JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
               LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
               LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
               
-              -- JOIN BARU UNTUK CEK STATUS PENGEMBALIAN
+              -- HAPUS JOIN trx_pengembalian_tolak DI SINI --
+              
               LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
               
               WHERE tp.id_peminjaman = :id_peminjaman
@@ -178,6 +180,33 @@ class Peminjaman_model
         $this->db->bind("id_peminjaman", $id_peminjaman);
         return $this->db->single();
     }
+
+    // public function getDetailValidasiDataPeminjaman($id_peminjaman)
+    // {
+    //     $query = "SELECT tp.*, 
+    //                   tdu.nama_user, 
+    //                   tdu.nim_nip,
+    //                   GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
+    //                   SUM(tdp.jumlah) as jumlah_peminjaman,
+    //                   tpt.alasan_penolakan,
+    //                   peng.status_pengembalian  -- <--- Tambahan Kolom Ini
+
+    //           FROM trx_peminjaman tp
+    //           JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+    //           LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+    //           LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+    //           LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
+              
+    //           -- JOIN BARU UNTUK CEK STATUS PENGEMBALIAN
+    //           LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
+              
+    //           WHERE tp.id_peminjaman = :id_peminjaman
+    //           GROUP BY tp.id_peminjaman";
+
+    //     $this->db->query($query);
+    //     $this->db->bind("id_peminjaman", $id_peminjaman);
+    //     return $this->db->single();
+    // }
 
     public function getUbah($id_peminjaman)
     {
@@ -306,31 +335,34 @@ class Peminjaman_model
         return $this->db->resultSet();
     }
 
-    public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
-    {
-        $query = "UPDATE trx_peminjaman SET status = :status";
 
-        if ($status == 'ditolak') {
-            $query .= ", keterangan_peminjaman = :keterangan";
-        }
+public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
+{
+    $query = "UPDATE trx_peminjaman SET status = :status";
 
-        $query .= " WHERE id_peminjaman = :id_peminjaman";
-
-        $this->db->query($query);
-        $this->db->bind('status', $status);
-        $this->db->bind('id_peminjaman', $id_peminjaman);
-
-        if ($status == 'ditolak') {
-            $pesan = "[DITOLAK] " . $catatan;
-            $this->db->bind('keterangan', $pesan);
-        }
-
-        $this->db->execute();
-        return $this->db->rowCount();
+    // Jika status adalah Tolak Peminjaman, simpan alasan ke kolom keterangan_tolak
+    if ($status == 'tolak peminjaman') {
+        $query .= ", keterangan_tolak = :keterangan";
     }
 
+    $query .= " WHERE id_peminjaman = :id_peminjaman";
+
+    $this->db->query($query);
+    $this->db->bind('status', $status);
+    $this->db->bind('id_peminjaman', $id_peminjaman);
+
+    if ($status == 'tolak peminjaman') {
+        // Tetap menggunakan variabel $pesan sesuai struktur Anda
+        $pesan = $catatan; 
+        $this->db->bind('keterangan', $pesan);
+    }
+
+    $this->db->execute();
+    return $this->db->rowCount();
+}
     public function getValidasiGabungan()
     {
+        // HAPUS join ke trx_pengembalian_tolak karena tabelnya sudah tidak ada
         $query = "SELECT tp.*, 
                       tdu.nama_user, 
                       GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
@@ -338,12 +370,11 @@ class Peminjaman_model
               JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
               LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
               LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-              LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
               
+              -- Logika Filter Baru:
+              -- Tampilkan yang diproses, disetujui, atau yang ditolak (baik peminjaman/pengembalian)
               WHERE 
-                tp.status IN ('diproses', 'disetujui') 
-                OR 
-                (tp.status = 'ditolak' AND tpt.id_peminjaman IS NOT NULL)
+                tp.status IN ('diproses', 'disetujui', 'Tolak Pengembalian') 
               
               GROUP BY tp.id_peminjaman
               
@@ -422,34 +453,31 @@ class Peminjaman_model
     public function getDetailBarangByPeminjamanId($id)
     {
         $query = "SELECT 
-            d.id_detail,
-            d.id_jenis_barang, 
-            d.jumlah, 
-            d.id_barang,
-            
-            mjb.sub_barang as nama_barang, 
-            COALESCE(tb.kode_barang, mjb.kode_sub) as kode_barang,
-            tb.spesifikasi_barang as spesifikasi,
-            tb.foto_barang,
-            
-            -- TAMBAHAN PENTING: Ambil Status Pengembalian Header
-            p_header.status_pengembalian, 
-
-            tk.kondisi_barang as kondisi_kembali,
-            tk.keterangan_kondisi as ket_kembali
-            
-          FROM trx_detail_peminjaman d 
-          
-          JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
-          LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
-          
-          -- Join ke Header Pengembalian untuk ambil status 'Selesai Periksa'
-          LEFT JOIN trx_pengembalian p_header ON d.id_peminjaman = p_header.id_peminjaman
-          
-          LEFT JOIN trx_detail_pengembalian tk ON p_header.id_pengembalian = tk.id_pengembalian 
-               AND d.id_detail = tk.id_detail_peminjaman
-          
-          WHERE d.id_peminjaman = :id";
+                d.id_detail,
+                d.id_jenis_barang, 
+                d.jumlah, 
+                d.id_barang,
+                
+                mjb.sub_barang as nama_barang, 
+                COALESCE(tb.kode_barang, mjb.kode_sub) as kode_barang,
+                -- Mengambil spesifikasi dari trx_barang (tb)
+                tb.spesifikasi_barang as spesifikasi_barang, 
+                tb.foto_barang,
+                
+                p_header.status_pengembalian, 
+                tk.kondisi_barang as kondisi_kembali,
+                tk.keterangan_kondisi as ket_kembali
+                
+              FROM trx_detail_peminjaman d 
+              JOIN mst_jenis_barang mjb ON d.id_jenis_barang = mjb.id_jenis_barang 
+              LEFT JOIN trx_barang tb ON d.id_barang = tb.id_barang
+              
+              -- Join ke data pengembalian (jika ada)
+              LEFT JOIN trx_pengembalian p_header ON d.id_peminjaman = p_header.id_peminjaman
+              LEFT JOIN trx_detail_pengembalian tk ON p_header.id_pengembalian = tk.id_pengembalian 
+                   AND d.id_detail = tk.id_detail_peminjaman
+              
+              WHERE d.id_peminjaman = :id";
 
         $this->db->query($query);
         $this->db->bind('id', $id);
@@ -460,37 +488,54 @@ class Peminjaman_model
     public function simpanTolakPengembalian($id_peminjaman, $alasan)
     {
         try {
-            $this->db->query("SELECT id_pengembalian_tolak FROM trx_pengembalian_tolak WHERE id_peminjaman = :id");
+            $this->db->beginTransaction();
+
+            // A. UPDATE STATUS UTAMA DI TRX_PEMINJAMAN
+            // Status jadi 'Tolak Pengembalian'
+            $queryMain = "UPDATE trx_peminjaman SET 
+                          status = 'Tolak Pengembalian', 
+                          keterangan_peminjaman = :ket 
+                          WHERE id_peminjaman = :id";
+            
+            $pesan_lengkap = "[MASALAH PENGEMBALIAN] " . $alasan;
+
+            $this->db->query($queryMain);
+            $this->db->bind('ket', $pesan_lengkap);
+            $this->db->bind('id', $id_peminjaman);
+            $this->db->execute();
+
+            // B. UPDATE HEADER PENGEMBALIAN (trx_pengembalian)
+            // Pastikan status di sini jadi 'Periksa Ulang' agar form edit terbuka lagi
+            $this->db->query("SELECT id_pengembalian FROM trx_pengembalian WHERE id_peminjaman = :id");
             $this->db->bind('id', $id_peminjaman);
             $existing = $this->db->single();
 
+            $id_pengembalian = null;
+
             if ($existing) {
-                $queryTolak = "UPDATE trx_pengembalian_tolak SET 
-                               alasan_penolakan = :alasan, 
-                               tanggal_penolakan = CURRENT_TIMESTAMP 
-                               WHERE id_peminjaman = :id";
+                $id_pengembalian = $existing['id_pengembalian'];
+                $this->db->query("UPDATE trx_pengembalian SET status_pengembalian = 'Periksa Ulang' WHERE id_pengembalian = :id");
+                $this->db->bind('id', $id_pengembalian);
+                $this->db->execute();
             } else {
-                $queryTolak = "INSERT INTO trx_pengembalian_tolak (id_peminjaman, alasan_penolakan) 
-                               VALUES (:id, :alasan)";
+                // Buat baru jika belum ada
+                $this->db->query("INSERT INTO trx_pengembalian (id_peminjaman, status_pengembalian) VALUES (:id, 'Periksa Ulang')");
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+                $id_pengembalian = $this->db->lastInsertId();
             }
 
-            $this->db->query($queryTolak);
-            $this->db->bind('id', $id_peminjaman);
-            $this->db->bind('alasan', $alasan);
+            // C. CATAT LOG RIWAYAT (PENTING)
+            // Agar tercatat siapa asisten yang melaporkan masalah ini
+            $this->db->query("INSERT INTO trx_pemeriksa_pengembalian (id_pengembalian, id_user) VALUES (:idp, :idu)");
+            $this->db->bind('idp', $id_pengembalian);
+            $this->db->bind('idu', $_SESSION['id_user']);
             $this->db->execute();
 
-            $queryUpdate = "UPDATE trx_peminjaman SET 
-                            status = 'ditolak',
-                            keterangan_peminjaman = CONCAT(IFNULL(keterangan_peminjaman, ''), ' [Tolak Kembali] ', :alasan) 
-                            WHERE id_peminjaman = :id";
-
-            $this->db->query($queryUpdate);
-            $this->db->bind('alasan', $alasan);
-            $this->db->bind('id', $id_peminjaman);
-            $this->db->execute();
-
+            $this->db->commit();
             return 1;
         } catch (Exception $e) {
+            $this->db->rollBack();
             return 0;
         }
     }

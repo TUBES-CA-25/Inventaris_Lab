@@ -12,13 +12,14 @@ $statusIcon = 'fa-clock';
 if (in_array($st, ['disetujui', 'diterima'])) {
     $statusClass = 'status-success';
     $statusIcon = 'fa-check-circle';
-} elseif ($st === 'ditolak') {
+} elseif (in_array($st, ['tolak peminjaman', 'tolak pengembalian', 'ditolak'])) { // Gunakan in_array
     $statusClass = 'status-danger';
     $statusIcon = 'fa-times-circle';
 } elseif (in_array($st, ['melengkapi surat', 'melengkapi'])) {
     $statusClass = 'status-warning';
     $statusIcon = 'fa-file-signature';
 }
+
 ?>
 
 <div class="container-fluid p-4">
