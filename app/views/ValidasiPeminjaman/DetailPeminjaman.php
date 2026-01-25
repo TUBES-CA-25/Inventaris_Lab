@@ -140,8 +140,9 @@ $status_Kembali = $data['status_Kembali'];
                                 </div>
                                 <p class="mt-3 mb-0 text-muted small"><?= $p['file_surat']; ?></p>
                             </div>
-                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" class="btn btn-navy btn-block">
-                                <i class="fas fa-download mr-2"></i>Download Surat
+                            <a href="<?= BASEURL; ?>public/files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank" 
+                               class="btn btn-navy btn-block">
+                                <i class="fas fa-cloud-download-alt mr-2"></i>Download Surat
                             </a>
                         <?php else : ?>
                             <div class="alert alert-warning mb-0">
@@ -235,16 +236,38 @@ $status_Kembali = $data['status_Kembali'];
                             <h5 class="font-weight-bold text-center mb-2" style="color: var(--success-text);">Sedang Dipinjam</h5>
                             <p class="text-center text-muted mb-4">Barang sudah diambil. Tunggu pengembalian.</p>
 
-                            <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
+                            <form id="formTerimaKembali" action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
                                 <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                                 <input type="hidden" name="status" value="dikembalikan">
-                                <button type="submit" class="btn btn-navy btn-block" onclick="return confirm('Yakin barang sudah dikembalikan lengkap?')">
-                                    <i class="fas fa-box-open mr-2"></i>Terima Pengembalian
+                                
+                                <?php 
+                                // AMBIL STATUS DENGAN AMAN (Cegah Error jika Controller belum update)
+                                // Gunakan data dari $status_Kembali jika ada, jika tidak pakai '-'
+                                $statusCek = isset($status_Kembali) ? $status_Kembali : '-';
+
+                                if ($statusCek == 'Selesai Periksa') {
+                                    // Skenario 1: SUDAH DIPERIKSA (Aman)
+                                    $judulPopup = 'Terima Barang?';
+                                    $pesanPopup = 'Pastikan fisik barang sudah dicek.';
+                                    $iconPopup  = 'question';
+                                    $warnaBtn   = '#0d1b3e'; // Navy
+                                } else {
+                                    // Skenario 2: BELUM DIPERIKSA (Peringatan)
+                                    $judulPopup = 'Peringatan!';
+                                    $pesanPopup = 'Barang belum dikembalikan dan diperiksa, yakin terima pengembalian?';
+                                    $iconPopup  = 'warning';
+                                    $warnaBtn   = '#d33'; // Merah
+                                }
+                                ?>
+
+                                <button type="button" class="btn btn-navy btn-block py-3" 
+                                    onclick="konfirmasiAksi('formTerimaKembali', '<?= $judulPopup; ?>', '<?= $pesanPopup; ?>', '<?= $iconPopup; ?>', '<?= $warnaBtn; ?>')">
+                                    <i class="fas fa-check-circle mr-2"></i>Terima Pengembalian
                                 </button>
                             </form>
 
                             <button type="button" class="btn btn-outline-danger btn-block btn-sm" onclick="bukaFormTolak('formTolakPengembalianContainer')">
-                                <i class="fas fa-exclamation-triangle mr-1"></i> Lapor Masalah
+                                <i class="fas fa-exclamation-triangle mr-1"></i> Keterangan Masalah Pengembalian
                             </button>
                         </div>
                     </div>
@@ -402,12 +425,11 @@ $status_Kembali = $data['status_Kembali'];
             </div>
         <?php endif; ?>
 
-        <!-- Tombol Kembali -->
-        <div class="mb-4">
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn btn-outline-navy">
+        <div class="mb-5 mt-4">
+            <a href="<?= BASEURL; ?>ValidasiPeminjaman" class="btn btn-navy px-4 py-2">
                 <i class="fas fa-arrow-left mr-2"></i>Kembali ke Daftar
             </a>
-        </div>
+        </div>          
     </div>
 </div>
 
@@ -471,15 +493,19 @@ $status_Kembali = $data['status_Kembali'];
         if (el) el.style.display = 'none';
     }
 
-    function konfirmasiAksi(formId, judul, pesan, ikon) {
+    function konfirmasiAksi(formId, judul, pesan, ikon, warnaTombol) {
+        
+        // Set default warna jika tidak dikirim (Fallback ke Navy)
+        if (!warnaTombol) warnaTombol = '#0d1b3e';
+
         Swal.fire({
             title: judul,
             text: pesan,
             icon: ikon,
             showCancelButton: true,
-            confirmButtonColor: '#0d1b3e',
-            cancelButtonColor: '#e74a3b',
-            confirmButtonText: 'Ya, Lanjutkan!',
+            confirmButtonColor: warnaTombol, // Warna dinamis (Merah/Navy)
+            cancelButtonColor: '#5a5c69',
+            confirmButtonText: 'Ya, Proses!',
             cancelButtonText: 'Batal',
             reverseButtons: true
         }).then((result) => {

@@ -394,6 +394,35 @@ INSERT INTO `trx_detail_pengembalian` VALUES (1,3,5,1,'Baik',''),(2,3,6,1,'Rusak
 UNLOCK TABLES;
 
 --
+-- Table structure for table `trx_pemeriksa_pengembalian`
+--
+
+DROP TABLE IF EXISTS `trx_pemeriksa_pengembalian`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trx_pemeriksa_pengembalian` (
+  `id_pemeriksa` int(11) NOT NULL AUTO_INCREMENT,
+  `id_pengembalian` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  `waktu_periksa` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_pemeriksa`),
+  KEY `fk_cek_pengem` (`id_pengembalian`),
+  KEY `fk_cek_user` (`id_user`),
+  CONSTRAINT `fk_cek_pengem` FOREIGN KEY (`id_pengembalian`) REFERENCES `trx_pengembalian` (`id_pengembalian`) ON DELETE CASCADE,
+  CONSTRAINT `fk_cek_user` FOREIGN KEY (`id_user`) REFERENCES `trx_data_user` (`id_user`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trx_pemeriksa_pengembalian`
+--
+
+LOCK TABLES `trx_pemeriksa_pengembalian` WRITE;
+/*!40000 ALTER TABLE `trx_pemeriksa_pengembalian` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trx_pemeriksa_pengembalian` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `trx_peminjaman`
 --
 
@@ -424,7 +453,7 @@ CREATE TABLE `trx_peminjaman` (
 
 LOCK TABLES `trx_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_peminjaman` VALUES (1,27,'Mencoba','2026-01-17','2026-01-16','2026-01-22','asdasda','Melengkapi Surat',NULL,'0','0'),(2,30,'Mencoba','2026-01-17','2026-01-16','2026-01-22','1234567890-','Disetujui','SIGNED_696bc845f2f55.pdf','1','1'),(3,32,'Mencoba','2026-01-17','2026-01-16','2026-01-22','-','Disetujui','SIGNED_696bf0e2c7600.pdf','1','1'),(4,32,'COBA AJA Admin','2026-01-23','2026-01-10','2026-01-21','-','Disetujui','SIGNED_697341a2e75d0.pdf','1','1'),(5,30,'COBA AJA Admin','2026-01-23','2026-01-22','2026-01-22','-','Diproses','SIGNED_69735af50fc02.pdf','1','0');
+INSERT INTO `trx_peminjaman` VALUES (1,27,'Mencoba','2026-01-17','2026-01-16','2026-01-22','asdasda','Melengkapi Surat',NULL,'0','0'),(2,30,'Mencoba','2026-01-17','2026-01-16','2026-01-22','1234567890-','Disetujui','SIGNED_696bc845f2f55.pdf','1','1'),(3,32,'Mencoba','2026-01-17','2026-01-16','2026-01-22','-','Disetujui','SIGNED_696bf0e2c7600.pdf','1','1'),(4,32,'COBA AJA Admin','2026-01-23','2026-01-10','2026-01-21','-','Dikembalikan','SIGNED_697341a2e75d0.pdf','1','1'),(5,30,'COBA AJA Admin','2026-01-23','2026-01-22','2026-01-22','-','Diproses','SIGNED_69735af50fc02.pdf','1','0');
 /*!40000 ALTER TABLE `trx_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -477,7 +506,7 @@ CREATE TABLE `trx_pengembalian_tolak` (
   PRIMARY KEY (`id_pengembalian_tolak`),
   KEY `id_peminjaman` (`id_peminjaman`),
   CONSTRAINT `trx_pengembalian_tolak_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -544,4 +573,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-25  0:20:31
+-- Dump completed on 2026-01-25 14:43:10

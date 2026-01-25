@@ -161,28 +161,46 @@ body {
 .step-pending { background: #e2e8f0; color: #94a3b8; }
 
 /* --- Buttons --- */
+/* --- Buttons Custom --- */
+
+/* Tombol Utama (Solid Navy) */
 .btn-navy {
-    background-color: var(--primary-navy);
-    color: black;
+    background-color: #0d1b3e !important; /* Warna Navy Gelap Pasti */
+    color: #ffffff !important;           /* Teks Putih Pasti */
+    border: 1px solid #0d1b3e;
     border-radius: 8px;
-    padding: 10px 20px;
-    transition: 0.3s;
-}
-
-.btn-navy:hover {
-    background-color: var(--secondary-navy);
-    color: white;
-    transform: translateY(-2px);
-}
-
-.btn-outline-navy {
-    border: 2px solid var(--primary-navy);
-    color: var(--primary-navy);
-    background: transparent;
+    padding: 10px 24px;
     font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(13, 27, 62, 0.2); /* Shadow halus */
 }
 
+/* Efek Hover: Sedikit lebih terang & naik */
+.btn-navy:hover {
+    background-color: #1a2e5a !important; /* Navy sedikit lebih terang */
+    border-color: #1a2e5a;
+    color: #ffffff !important;
+    transform: translateY(-2px); /* Efek naik sedikit */
+    box-shadow: 0 6px 12px rgba(13, 27, 62, 0.3);
+    text-decoration: none;
+}
+
+/* Tombol Outline (Garis Navy, Background Putih) */
+.btn-outline-navy {
+    background-color: transparent !important;
+    color: #0d1b3e !important;
+    border: 2px solid #0d1b3e;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Efek Hover Outline: Menjadi Solid Navy */
 .btn-outline-navy:hover {
-    background: var(--primary-navy);
-    color: white;
+    background-color: #0d1b3e !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(13, 27, 62, 0.15);
+    text-decoration: none;
 }

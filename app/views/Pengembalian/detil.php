@@ -412,47 +412,80 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
             </div>
         </div>
 
-        <!-- Petugas Info -->
         <?php if (!empty($data['detail']['id_pengembalian'])): ?>
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-body">
                     <div class="info-box">
-                        <div class="row align-items-center">
-                            <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="row">
+
+                            <div class="col-md-7 mb-4 mb-md-0">
                                 <p class="text-uppercase text-muted mb-3 fw-semibold small">
-                                    <i class="fas fa-info-circle me-1"></i> Informasi Validasi
+                                    <i class="fas fa-history me-1"></i> Riwayat Pemeriksaan Asisten
                                 </p>
-                                <div class="d-flex align-items-center">
-                                    <div class="petugas-avatar me-3">
-                                        <i class="fas fa-user-shield"></i>
+
+                                <?php if (!empty($data['detail']['log_history'])): ?>
+                                    <div class="d-flex flex-column gap-3">
+                                        <?php
+                                        // Pecah string history
+                                        $logs = explode('||', $data['detail']['log_history']);
+                                        foreach ($logs as $log):
+                                            // Format: "25 January 2026 10:00 - Huzain"
+                                            // Kita pisahkan Waktu dan Nama agar bisa di-styling
+                                            $parts = explode(' - ', $log);
+                                            $waktu = $parts[0] ?? '-';
+                                            $nama  = $parts[1] ?? 'Asisten';
+                                        ?>
+                                            <div class="d-flex align-items-center p-2 rounded" style="background: #fff; border: 1px solid #e9ecef;">
+                                                <div class="petugas-avatar me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                                    <i class="fas fa-user-check"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 text-navy fw-bold small"><?= htmlspecialchars($nama); ?></h6>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                                        <i class="fas fa-clock me-1"></i> <?= $waktu; ?>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    <div>
-                                        <p class="text-muted mb-1 small">Diverifikasi oleh:</p>
-                                        <h5 class="mb-0 text-navy fw-bold"><?= htmlspecialchars($data['detail']['nama_petugas'] ?? 'Petugas'); ?></h5>
-                                    </div>
-                                </div>
+                                <?php else: ?>
+                                    <div class="text-muted small font-italic">Belum ada riwayat pemeriksaan.</div>
+                                <?php endif; ?>
                             </div>
-                            <div class="col-md-6 text-md-end">
-                                <p class="text-muted mb-2 small">Tanggal Pengembalian Aktual:</p>
-                                <h4 class="text-navy fw-bold mb-3">
-                                    <i class="fas fa-calendar-check me-2" style="color: var(--accent-gold);"></i>
-                                    <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? date('d F Y', strtotime($data['detail']['tgl_pengembalian_aktual'])) : '-'; ?>
-                                </h4>
+
+                            <div class="col-md-5 text-md-end border-start-md ps-md-4">
+                                <div class="mb-4">
+                                    <p class="text-muted mb-1 small">Status Terakhir:</p>
+                                    <h5 class="text-navy fw-bold">
+                                        <?= !empty($data['detail']['status_pengembalian']) ? $data['detail']['status_pengembalian'] : '-'; ?>
+                                    </h5>
+                                </div>
+
+                                <div class="mb-3">
+                                    <p class="text-muted mb-1 small">Tanggal Pengembalian:</p>
+                                    <h5 class="fw-bold mb-0 text-dark">
+                                        <i class="fas fa-calendar-day me-2" style="color: var(--accent-gold);"></i>
+                                        <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? date('d F Y', strtotime($data['detail']['tgl_pengembalian_aktual'])) : '-'; ?>
+                                    </h5>
+                                </div>
+
                                 <?php if (!empty($data['detail']['bukti_foto'])): ?>
-                                    <a href="<?= BASEURL; ?>public/<?= $data['detail']['bukti_foto']; ?>" target="_blank" class="btn btn-outline-navy btn-sm">
-                                        <i class="fas fa-image me-1"></i> Lihat Bukti Foto
-                                    </a>
+                                    <div class="mt-3">
+                                        <a href="<?= BASEURL; ?>public/<?= $data['detail']['bukti_foto']; ?>" target="_blank" class="btn btn-outline-navy btn-sm w-100">
+                                            <i class="fas fa-image me-1"></i> Lihat Bukti Foto
+                                        </a>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
 
                         <?php if (!empty($data['detail']['detail_masalah']) && $data['detail']['detail_masalah'] != '-'): ?>
                             <hr class="my-4">
-                            <div class="alert alert-warning mb-0 d-flex align-items-start">
-                                <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+                            <div class="alert alert-warning mb-0 d-flex align-items-start border-0 shadow-sm">
+                                <i class="fas fa-exclamation-triangle me-3 mt-1 text-warning"></i>
                                 <div>
-                                    <strong>Catatan Masalah:</strong><br>
-                                    <?= htmlspecialchars($data['detail']['detail_masalah']); ?>
+                                    <strong class="text-dark">Catatan Masalah:</strong><br>
+                                    <span class="text-dark opacity-75"><?= htmlspecialchars($data['detail']['detail_masalah']); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>

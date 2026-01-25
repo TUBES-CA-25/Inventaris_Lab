@@ -176,18 +176,36 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_peminjaman = $_POST['id_peminjaman'];
-            $status        = $_POST['status'];
+            // 1. AMBIL ID DARI VIEW (Masih Ter-Encode / String Acak)
+            // Pastikan input hidden di view bernama 'id_peminjaman'
+            $id_encoded = $_POST['id_peminjaman'];
 
-            $pesan         = $_POST['pesan_penolakan'] ?? '';
-
-            if ($this->model('Peminjaman_model')->updateStatusValidasi($id_peminjaman, $status, $pesan) > 0) {
-                Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
-            } else {
-                Flasher::setFlash('Info', 'Tidak ada perubahan status', '', 'info');
+            // Cek Keamanan: Jika ID kosong, jangan lanjut (Cegah error URL buntung)
+            if (empty($id_encoded)) {
+                Flasher::setFlash('Gagal', 'ID tidak ditemukan.', '', 'danger');
+                header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+                exit;
             }
 
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            // 2. DECODE ID (Ubah jadi Angka untuk Database)
+            $id_decoded = IdObfuscator::decode($id_encoded);
+
+            // Ambil data lain
+            $status = $_POST['status'];
+            $pesan  = $_POST['pesan_penolakan'] ?? '';
+
+            // 3. UPDATE DATABASE (Pakai ID Decoded / Angka)
+            // Model butuh angka asli untuk mencari row di tabel
+            if ($this->model('Peminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
+                Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
+            } else {
+                // Info saja, mungkin status sudah sama sebelumnya
+                Flasher::setFlash('Info', 'Status diperbarui.', '', 'info');
+            }
+
+            // 4. REDIRECT URL (Pakai ID Encoded / String Acak)
+            // Kita kembalikan user ke halaman detail dengan ID yang aman
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
             exit;
         }
     }

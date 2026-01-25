@@ -35,29 +35,42 @@ class Pengembalian_model
         return $this->db->resultSet();
     }
 
-    public function getRiwayatById($id)
+    public function getRiwayatById($id_peminjaman)
     {
-        // Disederhanakan agar fokus mengambil Header saja. 
-        // Item diambil terpisah lewat getBarangPengembalian agar tidak duplikat baris.
         $this->db->query("SELECT 
                 p.*,
                 pen.id_pengembalian,
                 pen.tgl_pengembalian_aktual,
                 pen.keterangan as keterangan_header,
                 pen.detail_masalah,
-                pen.id_petugas,
                 pen.status_pengembalian,
                 pen.bukti_foto,
-                petugas.nama_user as nama_petugas,
-                u.nama_user as nama_peminjam
+                
+                -- HAPUS pen.id_petugas DARI SINI KARENA SUDAH DIHAPUS DI DB --
+                
+                u.nama_user as nama_peminjam,
+                
+                -- KITA MENGANDALKAN INI UNTUK DAFTAR PEMERIKSA --
+                GROUP_CONCAT(
+                    CONCAT(DATE_FORMAT(tpp.waktu_periksa, '%d %M %Y %H:%i'), ' - ', petugas.nama_user)
+                    ORDER BY tpp.waktu_periksa DESC
+                    SEPARATOR '||'
+                ) as log_history
+
             FROM trx_peminjaman p
             LEFT JOIN trx_pengembalian pen ON p.id_peminjaman = pen.id_peminjaman
-            LEFT JOIN trx_data_user petugas ON pen.id_petugas = petugas.id_user
             LEFT JOIN trx_user tu ON p.id_user = tu.id_user
             LEFT JOIN trx_data_user u ON tu.id_user = u.id_user
+            
+            -- Join ke tabel history
+            LEFT JOIN trx_pemeriksa_pengembalian tpp ON pen.id_pengembalian = tpp.id_pengembalian
+            LEFT JOIN trx_data_user petugas ON tpp.id_user = petugas.id_user
+            
             WHERE p.id_peminjaman = :id
+            GROUP BY p.id_peminjaman
             LIMIT 1");
-        $this->db->bind('id', $id);
+            
+        $this->db->bind('id', $id_peminjaman);
         return $this->db->single();
     }
 
@@ -67,100 +80,90 @@ class Pengembalian_model
         try {
             $this->db->beginTransaction();
 
-            // 1. CEK Header trx_pengembalian
-            $this->db->query("SELECT id_pengembalian FROM trx_pengembalian WHERE id_peminjaman = :id_peminjaman");
-            $this->db->bind('id_peminjaman', $data['id_peminjaman']);
+            // 1. CEK DATA LAMA
+            $this->db->query("SELECT id_pengembalian FROM trx_pengembalian WHERE id_peminjaman = :id");
+            $this->db->bind('id', $data['id_peminjaman']);
             $existing = $this->db->single();
-
+            
             $id_pengembalian = null;
 
+            // PERBAIKAN: Hapus 'id_petugas' dari Query Header
+            // Kita hanya update data inti pengembalian
+
             if ($existing) {
+                // UPDATE HEADER (Tanpa id_petugas)
                 $id_pengembalian = $existing['id_pengembalian'];
+                
                 $query = "UPDATE trx_pengembalian SET 
-                      tgl_pengembalian_aktual = :tgl,
-                      status_pengembalian = :status, 
-                      keterangan = :ket,
-                      detail_masalah = :detail,
-                      id_petugas = :petugas";
-
-                if (!empty($data['bukti_foto'])) {
-                    $query .= ", bukti_foto = :foto";
-                }
-                $query .= " WHERE id_pengembalian = :id";
-
+                          tgl_pengembalian_aktual = :tgl, 
+                          status_pengembalian = :st, 
+                          keterangan = :ket,
+                          detail_masalah = :detail,
+                          bukti_foto = COALESCE(:foto, bukti_foto) 
+                          WHERE id_pengembalian = :id";
+                
                 $this->db->query($query);
-                $this->db->bind('tgl', $data['tgl_pengembalian_aktual'] ?? date('Y-m-d'));
-                $this->db->bind('status', $data['status_pengembalian']); // Langsung ambil value dari form ('Selesai Periksa'/'Periksa'/'Periksa Ulang')
+                $this->db->bind('tgl', $data['tgl_pengembalian_aktual']);
+                $this->db->bind('st', $data['status_pengembalian']);
                 $this->db->bind('ket', $data['keterangan'] ?? '-');
                 $this->db->bind('detail', $data['detail_masalah'] ?? '-');
-                $this->db->bind('petugas', $data['id_petugas']);
+                $this->db->bind('foto', !empty($data['bukti_foto']) ? 'uploads/pengembalian/' . $data['bukti_foto'] : null);
                 $this->db->bind('id', $id_pengembalian);
-
-                if (!empty($data['bukti_foto'])) {
-                    $this->db->bind('foto', 'uploads/pengembalian/' . $data['bukti_foto']);
-                }
                 $this->db->execute();
-            } else {
-                $query = "INSERT INTO trx_pengembalian 
-                      (id_peminjaman, tgl_pengembalian_aktual, status_pengembalian, keterangan, detail_masalah, id_petugas, bukti_foto) 
-                      VALUES (:id_pinjam, :tgl, :status, :ket, :detail, :petugas, :foto)";
 
+            } else {
+                // INSERT HEADER BARU (Tanpa id_petugas)
+                $query = "INSERT INTO trx_pengembalian 
+                          (id_peminjaman, tgl_pengembalian_aktual, status_pengembalian, keterangan, detail_masalah, bukti_foto) 
+                          VALUES (:idp, :tgl, :st, :ket, :detail, :foto)";
+                
                 $this->db->query($query);
-                $this->db->bind('id_pinjam', $data['id_peminjaman']);
-                $this->db->bind('tgl', $data['tgl_pengembalian_aktual'] ?? date('Y-m-d'));
-                $this->db->bind('status', $data['status_pengembalian']); // Value sesuai ENUM baru
+                $this->db->bind('idp', $data['id_peminjaman']);
+                $this->db->bind('tgl', $data['tgl_pengembalian_aktual']);
+                $this->db->bind('st', $data['status_pengembalian']);
                 $this->db->bind('ket', $data['keterangan'] ?? '-');
                 $this->db->bind('detail', $data['detail_masalah'] ?? '-');
-                $this->db->bind('petugas', $data['id_petugas']);
                 $this->db->bind('foto', !empty($data['bukti_foto']) ? 'uploads/pengembalian/' . $data['bukti_foto'] : null);
                 $this->db->execute();
-
-                $this->db->query("SELECT LAST_INSERT_ID() as id");
-                $newId = $this->db->single();
-                $id_pengembalian = $newId['id'];
+                $id_pengembalian = $this->db->lastInsertId();
             }
 
+            // 2. CATAT LOG RIWAYAT (INI YANG UTAMA)
+            // Setiap kali simpan, kita catat siapa pelakunya di sini
+            
+            // Pastikan ambil variabel yang benar dari Controller/View
+            $id_petugas_aksi = isset($data['id_petugas']) ? $data['id_petugas'] : $_SESSION['id_user'];
+
+            $queryLog = "INSERT INTO trx_pemeriksa_pengembalian (id_pengembalian, id_user) 
+                         VALUES (:id_peng, :id_user)";
+            $this->db->query($queryLog);
+            $this->db->bind('id_peng', $id_pengembalian);
+            $this->db->bind('id_user', $id_petugas_aksi);
+            $this->db->execute();
+
+            // 3. UPDATE KONDISI BARANG (Tetap Sama)
             if (isset($data['kondisi']) && is_array($data['kondisi'])) {
-            foreach ($data['kondisi'] as $id_detail_pinjam => $kondisi_item) {
-                $ket_item = $data['ket_item'][$id_detail_pinjam] ?? '-';
-                $jumlah_kembali = 1;
-
-                // Cek Item
-                $this->db->query("SELECT id_detail_pengembalian FROM trx_detail_pengembalian 
-                                  WHERE id_pengembalian = :id_peng AND id_detail_peminjaman = :id_dp");
-                $this->db->bind('id_peng', $id_pengembalian);
-                $this->db->bind('id_dp', $id_detail_pinjam);
-                $cekItem = $this->db->single();
-
-                if ($cekItem) {
-                    $this->db->query("UPDATE trx_detail_pengembalian SET 
-                                      kondisi_barang = :kondisi, 
-                                      keterangan_kondisi = :ket 
-                                      WHERE id_detail_pengembalian = :id");
-                    $this->db->bind('kondisi', $kondisi_item);
-                    $this->db->bind('ket', $ket_item);
-                    $this->db->bind('id', $cekItem['id_detail_pengembalian']);
-                    $this->db->execute();
-                } else {
-                    $this->db->query("INSERT INTO trx_detail_pengembalian 
-                                      (id_pengembalian, id_detail_peminjaman, jumlah_kembali, kondisi_barang, keterangan_kondisi) 
-                                      VALUES (:id_peng, :id_dp, :jml, :kondisi, :ket)");
+                foreach ($data['kondisi'] as $id_detail_pinjam => $kondisi_item) {
+                    $ket_item = $data['ket_item'][$id_detail_pinjam] ?? '-';
+                    
+                    $this->db->query("SELECT id_detail_pengembalian FROM trx_detail_pengembalian WHERE id_pengembalian = :id_peng AND id_detail_peminjaman = :id_dp");
                     $this->db->bind('id_peng', $id_pengembalian);
                     $this->db->bind('id_dp', $id_detail_pinjam);
-                    $this->db->bind('jml', $jumlah_kembali);
-                    $this->db->bind('kondisi', $kondisi_item);
-                    $this->db->bind('ket', $ket_item);
+                    $cekItem = $this->db->single();
+
+                    if ($cekItem) {
+                        $this->db->query("UPDATE trx_detail_pengembalian SET kondisi_barang=:k, keterangan_kondisi=:kk WHERE id_detail_pengembalian=:id");
+                        $this->db->bind('id', $cekItem['id_detail_pengembalian']);
+                    } else {
+                        $this->db->query("INSERT INTO trx_detail_pengembalian (id_pengembalian, id_detail_peminjaman, jumlah_kembali, kondisi_barang, keterangan_kondisi) VALUES (:idp, :idd, 1, :k, :kk)");
+                        $this->db->bind('idp', $id_pengembalian);
+                        $this->db->bind('idd', $id_detail_pinjam);
+                    }
+                    $this->db->bind('k', $kondisi_item);
+                    $this->db->bind('kk', $ket_item);
                     $this->db->execute();
                 }
             }
-        }
-
-            // 3. UPDATE STATUS PEMINJAMAN UTAMA
-            // $status_peminjaman = ($data['status_pengembalian'] == 'Dikembalikan') ? 'Dikembalikan' : 'Disetujui';
-            // $this->db->query("UPDATE trx_peminjaman SET status = :status WHERE id_peminjaman = :id");
-            // $this->db->bind('status', $status_peminjaman);
-            // $this->db->bind('id', $data['id_peminjaman']);
-            // $this->db->execute();
 
             $this->db->commit();
             return 1;
