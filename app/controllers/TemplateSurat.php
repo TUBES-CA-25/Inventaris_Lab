@@ -69,6 +69,7 @@ class TemplateSurat extends Controller
 
         $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
         $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
+        // $data['barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
 
         if (!$peminjaman) {
             echo "Data tidak ditemukan.";
