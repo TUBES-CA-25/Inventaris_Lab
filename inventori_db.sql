@@ -57,7 +57,7 @@ CREATE TABLE `mst_jenis_barang` (
   `kode_jenis_barang` varchar(5) NOT NULL,
   PRIMARY KEY (`id_jenis_barang`),
   UNIQUE KEY `kode_sub` (`kode_sub`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,7 +66,7 @@ CREATE TABLE `mst_jenis_barang` (
 
 LOCK TABLES `mst_jenis_barang` WRITE;
 /*!40000 ALTER TABLE `mst_jenis_barang` DISABLE KEYS */;
-INSERT INTO `mst_jenis_barang` VALUES (1,'Mouse','C','MO4','C/MO4'),(2,'Monitor','C','MO3','C/MO3');
+INSERT INTO `mst_jenis_barang` VALUES (3,'Keyboard','C','KY1','C/KY1'),(4,'Headset','A','HS1','A/HS1'),(5,'Laptop','C','LP1','C/LP1');
 /*!40000 ALTER TABLE `mst_jenis_barang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -132,7 +132,7 @@ CREATE TABLE `mst_merek_barang` (
   PRIMARY KEY (`id_merek_barang`),
   UNIQUE KEY `kode_merek_barang` (`kode_merek_barang`),
   UNIQUE KEY `nama_merek_barang` (`nama_merek_barang`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -141,7 +141,7 @@ CREATE TABLE `mst_merek_barang` (
 
 LOCK TABLES `mst_merek_barang` WRITE;
 /*!40000 ALTER TABLE `mst_merek_barang` DISABLE KEYS */;
-INSERT INTO `mst_merek_barang` VALUES (1,'Logitech','001'),(2,'LG','101');
+INSERT INTO `mst_merek_barang` VALUES (3,'ASUS','201'),(4,'Lenovo','301'),(5,'HP','401');
 /*!40000 ALTER TABLE `mst_merek_barang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -281,7 +281,7 @@ CREATE TABLE `trx_barang` (
   CONSTRAINT `trx_barang_ibfk_4` FOREIGN KEY (`id_satuan`) REFERENCES `mst_satuan` (`id_satuan`),
   CONSTRAINT `trx_barang_ibfk_5` FOREIGN KEY (`id_lokasi_penyimpanan`) REFERENCES `mst_lokasi_penyimpanan` (`id_lokasi_penyimpanan`),
   CONSTRAINT `trx_barang_ibfk_6` FOREIGN KEY (`id_status`) REFERENCES `mst_status` (`id_status`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -290,7 +290,7 @@ CREATE TABLE `trx_barang` (
 
 LOCK TABLES `trx_barang` WRITE;
 /*!40000 ALTER TABLE `trx_barang` DISABLE KEYS */;
-INSERT INTO `trx_barang` VALUES (1,'../public/img/foto-barang/6965413feaac4_M90.png',1,1,1,10,1,'M90','2026-01-13','Sudah',4,'lemari 7',2,'Bisa','2026/I/C/MO4/001/1/10','../public/img/qr-code/code_6965413ff0417.png'),(2,'../public/img/foto-barang/6965419428280_k120.png',2,2,1,1,1,'LG 120 inch','2026-01-13','Sudah',15,'lemari 7',5,'Bisa','2026/I/C/MO3/101/1/10','../public/img/qr-code/code_696541942d0b7.png');
+INSERT INTO `trx_barang` VALUES (1,'../public/img/foto-barang/new_1.png',3,4,1,9,1,'Keyboard Lenovo Series-8674','2026-01-22','Sudah',7,'Pengadaan Baru',3,'Bisa','2026/I/C/KY1/301/1/01','../public/img/qr-code/new_1.png'),(2,'../public/img/foto-barang/new_2.png',3,3,1,7,5,'Keyboard ASUS Series-9962','2026-01-22','Sudah',6,'Pengadaan Baru',5,'Bisa','2026/I/C/KY1/201/2/02','../public/img/qr-code/new_2.png'),(3,'../public/img/foto-barang/new_3.png',4,4,2,3,1,'Headset Lenovo Series-7685','2026-01-22','Sudah',10,'Pengadaan Baru',5,'Bisa','2026/I/A/HS1/301/3/03','../public/img/qr-code/new_3.png'),(4,'../public/img/foto-barang/new_4.png',4,5,1,10,1,'Headset HP Series-4195','2026-01-22','Sudah',16,'Pengadaan Baru',3,'Bisa','2026/I/A/HS1/401/1/04','../public/img/qr-code/new_4.png'),(5,'../public/img/foto-barang/new_5.png',4,5,4,3,1,'Headset HP Series-7966','2026-01-22','Sudah',12,'Pengadaan Baru',3,'Tidak Bisa','2026/I/A/HS1/401/4/05','../public/img/qr-code/new_5.png'),(6,'../public/img/foto-barang/new_6.png',4,3,5,2,1,'Headset ASUS Series-4764','2026-01-22','Belum',6,'Pengadaan Baru',3,'Tidak Bisa','2026/I/A/HS1/201/5/06','../public/img/qr-code/new_6.png'),(7,'../public/img/foto-barang/new_7.png',5,5,1,1,5,'Laptop HP Series-8625','2026-01-22','Sudah',8,'Pengadaan Baru',5,'Bisa','2026/I/C/LP1/401/5/07','../public/img/qr-code/new_7.png'),(8,'../public/img/foto-barang/new_8.png',3,3,4,6,1,'Keyboard ASUS Series-1166','2026-01-22','Belum',12,'Pengadaan Baru',5,'Tidak Bisa','2026/I/C/KY1/201/4/08','../public/img/qr-code/new_8.png'),(9,'../public/img/foto-barang/new_9.png',3,4,1,7,5,'Keyboard Lenovo Series-3029','2026-01-22','Belum',18,'Pengadaan Baru',5,'Tidak Bisa','2026/I/C/KY1/301/4/09','../public/img/qr-code/new_9.png'),(10,'../public/img/foto-barang/new_10.png',4,3,1,2,3,'Headset ASUS Series-3302','2026-01-22','Sudah',4,'Pengadaan Baru',3,'Bisa','2026/I/A/HS1/201/1/10','../public/img/qr-code/new_10.png');
 /*!40000 ALTER TABLE `trx_barang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -348,7 +348,7 @@ CREATE TABLE `trx_detail_peminjaman` (
   CONSTRAINT `fk_detail_barang_unit` FOREIGN KEY (`id_barang`) REFERENCES `trx_barang` (`id_barang`) ON DELETE SET NULL,
   CONSTRAINT `trx_detail_peminjaman_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE,
   CONSTRAINT `trx_detail_peminjaman_ibfk_2` FOREIGN KEY (`id_jenis_barang`) REFERENCES `mst_jenis_barang` (`id_jenis_barang`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -357,7 +357,7 @@ CREATE TABLE `trx_detail_peminjaman` (
 
 LOCK TABLES `trx_detail_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_detail_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_detail_peminjaman` VALUES (2,1,1,1,1,NULL),(3,2,2,2,1,NULL),(4,3,2,2,1,NULL),(5,4,2,2,1,NULL),(6,4,1,1,1,NULL),(7,5,1,1,1,NULL),(8,5,2,2,1,NULL),(9,5,1,1,1,NULL);
+INSERT INTO `trx_detail_peminjaman` VALUES (4,1,3,2,1,NULL),(5,1,5,7,1,NULL),(6,1,3,2,1,NULL);
 /*!40000 ALTER TABLE `trx_detail_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,7 +410,7 @@ CREATE TABLE `trx_pemeriksa_pengembalian` (
   KEY `fk_cek_user` (`id_user`),
   CONSTRAINT `fk_cek_pengem` FOREIGN KEY (`id_pengembalian`) REFERENCES `trx_pengembalian` (`id_pengembalian`) ON DELETE CASCADE,
   CONSTRAINT `fk_cek_user` FOREIGN KEY (`id_user`) REFERENCES `trx_data_user` (`id_user`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -419,6 +419,7 @@ CREATE TABLE `trx_pemeriksa_pengembalian` (
 
 LOCK TABLES `trx_pemeriksa_pengembalian` WRITE;
 /*!40000 ALTER TABLE `trx_pemeriksa_pengembalian` DISABLE KEYS */;
+INSERT INTO `trx_pemeriksa_pengembalian` VALUES (1,3,30,'2026-01-25 07:09:02');
 /*!40000 ALTER TABLE `trx_pemeriksa_pengembalian` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -437,14 +438,15 @@ CREATE TABLE `trx_peminjaman` (
   `tanggal_peminjaman` date NOT NULL,
   `tanggal_pengembalian` date NOT NULL,
   `keterangan_peminjaman` text DEFAULT NULL,
-  `status` enum('Diproses','Disetujui','Ditolak','Dikembalikan','Melengkapi Surat') DEFAULT 'Melengkapi Surat',
+  `keterangan_tolak` text DEFAULT NULL,
+  `status` enum('Diproses','Disetujui','Tolak Peminjaman','Dikembalikan','Melengkapi Surat','Tolak Pengembalian') DEFAULT 'Melengkapi Surat',
   `file_surat` varchar(255) DEFAULT NULL,
   `validasi_kalab` enum('0','1') DEFAULT '0' COMMENT '0=Belum, 1=Sudah (Huzain)',
   `validasi_laboran` enum('0','1') DEFAULT '0' COMMENT '0=Belum, 1=Sudah (Fatimah)',
   PRIMARY KEY (`id_peminjaman`),
   KEY `fk_peminjaman_user` (`id_user`),
   CONSTRAINT `fk_peminjaman_user` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,7 +455,7 @@ CREATE TABLE `trx_peminjaman` (
 
 LOCK TABLES `trx_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_peminjaman` VALUES (1,27,'Mencoba','2026-01-17','2026-01-16','2026-01-22','asdasda','Melengkapi Surat',NULL,'0','0'),(2,30,'Mencoba','2026-01-17','2026-01-16','2026-01-22','1234567890-','Disetujui','SIGNED_696bc845f2f55.pdf','1','1'),(3,32,'Mencoba','2026-01-17','2026-01-16','2026-01-22','-','Disetujui','SIGNED_696bf0e2c7600.pdf','1','1'),(4,32,'COBA AJA Admin','2026-01-23','2026-01-10','2026-01-21','-','Dikembalikan','SIGNED_697341a2e75d0.pdf','1','1'),(5,30,'COBA AJA Admin','2026-01-23','2026-01-22','2026-01-22','-','Diproses','SIGNED_69735af50fc02.pdf','1','0');
+INSERT INTO `trx_peminjaman` VALUES (1,27,'qasd','2026-01-25','2026-01-25','2026-01-25','12312312',NULL,'Diproses','SIGNED_6976110029a5f.pdf','0','0');
 /*!40000 ALTER TABLE `trx_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -472,13 +474,10 @@ CREATE TABLE `trx_pengembalian` (
   `keterangan` enum('Tepat Waktu','Tidak Tepat Waktu','Bermasalah') DEFAULT NULL,
   `detail_masalah` text DEFAULT NULL,
   `bukti_foto` varchar(255) DEFAULT NULL COMMENT 'Path foto bukti pengembalian',
-  `id_petugas` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_pengembalian`),
   KEY `id_peminjaman` (`id_peminjaman`),
-  KEY `fk_pengembalian_petugas` (`id_petugas`),
-  CONSTRAINT `fk_pengembalian_petugas` FOREIGN KEY (`id_petugas`) REFERENCES `trx_user` (`id_user`) ON DELETE SET NULL,
   CONSTRAINT `trx_pengembalian_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -487,35 +486,7 @@ CREATE TABLE `trx_pengembalian` (
 
 LOCK TABLES `trx_pengembalian` WRITE;
 /*!40000 ALTER TABLE `trx_pengembalian` DISABLE KEYS */;
-INSERT INTO `trx_pengembalian` VALUES (1,2,NULL,NULL,NULL,NULL,NULL,NULL),(2,3,NULL,NULL,NULL,NULL,NULL,NULL),(3,4,'2026-01-24','Selesai Periksa','','','uploads/pengembalian/697475fba40a8_Group 237708.png',30);
 /*!40000 ALTER TABLE `trx_pengembalian` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `trx_pengembalian_tolak`
---
-
-DROP TABLE IF EXISTS `trx_pengembalian_tolak`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `trx_pengembalian_tolak` (
-  `id_pengembalian_tolak` int(11) NOT NULL AUTO_INCREMENT,
-  `id_peminjaman` int(11) NOT NULL,
-  `alasan_penolakan` text NOT NULL,
-  `tanggal_penolakan` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id_pengembalian_tolak`),
-  KEY `id_peminjaman` (`id_peminjaman`),
-  CONSTRAINT `trx_pengembalian_tolak_ibfk_1` FOREIGN KEY (`id_peminjaman`) REFERENCES `trx_peminjaman` (`id_peminjaman`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `trx_pengembalian_tolak`
---
-
-LOCK TABLES `trx_pengembalian_tolak` WRITE;
-/*!40000 ALTER TABLE `trx_pengembalian_tolak` DISABLE KEYS */;
-/*!40000 ALTER TABLE `trx_pengembalian_tolak` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -573,4 +544,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-25 14:43:10
+-- Dump completed on 2026-01-26  0:15:14
