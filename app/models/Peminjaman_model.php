@@ -154,27 +154,20 @@ class Peminjaman_model
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
     {
         $query = "SELECT tp.*, 
-                      tdu.nama_user, 
-                      tdu.nim_nip,
-                      GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
-                      SUM(tdp.jumlah) as jumlah_peminjaman,
-                      
-                      -- AMBIL ALASAN LANGSUNG DARI KOLOM KETERANGAN (Pengganti tabel tolak)
-                      tp.keterangan_peminjaman as alasan_penolakan,
-                      
-                      peng.status_pengembalian
-
-              FROM trx_peminjaman tp
-              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
-              LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
-              LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-              
-              -- HAPUS JOIN trx_pengembalian_tolak DI SINI --
-              
-              LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
-              
-              WHERE tp.id_peminjaman = :id_peminjaman
-              GROUP BY tp.id_peminjaman";
+                        tdu.nama_user, 
+                        tdu.nim_nip,
+                        GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
+                        SUM(tdp.jumlah) as jumlah_peminjaman,
+                        tp.keterangan_peminjaman as alasan_penolakan,
+                        peng.status_pengembalian
+                FROM trx_peminjaman tp
+                JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+                LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
+                
+                WHERE tp.id_peminjaman = :id_peminjaman
+                GROUP BY tp.id_peminjaman, tdu.nama_user, tdu.nim_nip, peng.status_pengembalian"; // Perbaikan di sini
 
         $this->db->query($query);
         $this->db->bind("id_peminjaman", $id_peminjaman);
@@ -362,29 +355,27 @@ class Peminjaman_model
     }
     public function getValidasiGabungan()
     {
-        // HAPUS join ke trx_pengembalian_tolak karena tabelnya sudah tidak ada
+        // Menambahkan tdu.nama_user ke dalam GROUP BY agar lolos validasi ONLY_FULL_GROUP_BY
         $query = "SELECT tp.*, 
-                      tdu.nama_user, 
-                      GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
-              FROM trx_peminjaman tp
-              JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
-              LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
-              LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
-              
-              -- Logika Filter Baru:
-              -- Tampilkan yang diproses, disetujui, atau yang ditolak (baik peminjaman/pengembalian)
-              WHERE 
-                tp.status IN ('diproses', 'disetujui', 'Tolak Pengembalian') 
-              
-              GROUP BY tp.id_peminjaman
-              
-              ORDER BY 
-                CASE 
-                    WHEN tp.status = 'diproses' THEN 1 
-                    WHEN tp.status = 'disetujui' THEN 2 
-                    ELSE 3
-                END ASC,
-                tp.tanggal_pengajuan DESC";
+                        tdu.nama_user, 
+                        GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
+                FROM trx_peminjaman tp
+                JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+                LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                
+                WHERE 
+                    tp.status IN ('diproses', 'disetujui', 'Tolak Pengembalian') 
+                
+                GROUP BY tp.id_peminjaman, tdu.nama_user -- Perbaikan di sini
+                
+                ORDER BY 
+                    CASE 
+                        WHEN tp.status = 'diproses' THEN 1 
+                        WHEN tp.status = 'disetujui' THEN 2 
+                        ELSE 3
+                    END ASC,
+                    tp.tanggal_pengajuan DESC";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -400,17 +391,20 @@ class Peminjaman_model
         return isset($result['total']) ? $result['total'] : 0;
     }
 
-    public function getPeminjamanTerbaruUser($nama_user)
+    public function getPeminjamanTerbaruUser($id_user)
     {
-        $query = "SELECT tp.*, mjb.sub_barang 
-                  FROM trx_peminjaman tp
-                  JOIN mst_jenis_barang mjb ON tp.id_jenis_barang = mjb.id_jenis_barang
-                  WHERE tp.nama_peminjam = :nama 
-                  AND tp.status = 'Melengkapi Surat'
-                  ORDER BY tp.id_peminjaman DESC";
+        // Menggunakan ID User lebih akurat daripada Nama User
+        $query = "SELECT tp.*, GROUP_CONCAT(mjb.sub_barang) as sub_barang 
+                FROM trx_peminjaman tp
+                JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
+                JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                WHERE tp.id_user = :id_user 
+                AND tp.status = 'Melengkapi Surat'
+                GROUP BY tp.id_peminjaman
+                ORDER BY tp.id_peminjaman DESC";
 
         $this->db->query($query);
-        $this->db->bind('nama', $nama_user);
+        $this->db->bind('id_user', $id_user);
         return $this->db->resultSet();
     }
 
