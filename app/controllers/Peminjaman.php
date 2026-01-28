@@ -62,9 +62,7 @@ class Peminjaman extends Controller
             $_SESSION['keranjang'] = [];
         }
 
-        if (!in_array($id_barang, $_SESSION['keranjang'])) {
-            $_SESSION['keranjang'][] = $id_barang;
-        }
+        $_SESSION['keranjang'][] = $id_barang;
 
         header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
         exit;
@@ -76,17 +74,29 @@ class Peminjaman extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        if (isset($_SESSION['keranjang']) && !empty($_SESSION['keranjang'])) {
-            $barang_selected = $this->model('Peminjaman_model')->getBarangWhereIn($_SESSION['keranjang']);
+        $data['barang_selected'] = [];
 
-            foreach ($barang_selected as $key => $item) {
-                $units = $this->model('Peminjaman_model')->getUnitBarangTersedia($item['id_jenis_barang']);
-                $barang_selected[$key]['list_unit'] = $units;
+        if (isset($_SESSION['keranjang']) && !empty($_SESSION['keranjang'])) {
+            $unique_ids = array_values(array_unique($_SESSION['keranjang']));
+            $db_items = $this->model('Peminjaman_model')->getBarangWhereIn($unique_ids);
+
+            $item_map = [];
+            foreach ($db_items as $item) {
+                $item_map[$item['id_jenis_barang']] = $item;
             }
 
-            $data['barang_selected'] = $barang_selected;
-        } else {
-            $data['barang_selected'] = [];
+            foreach ($_SESSION['keranjang'] as $index => $sess_id_barang) {
+                if (isset($item_map[$sess_id_barang])) {
+                    $item_data = $item_map[$sess_id_barang];
+
+                    $units = $this->model('Peminjaman_model')->getUnitBarangTersedia($sess_id_barang);
+                    $item_data['list_unit'] = $units;
+
+                    $item_data['hapus_id'] = IdObfuscator::encode($index);
+
+                    $data['barang_selected'][] = $item_data;
+                }
+            }
         }
 
         $this->view('templates/header', $data);
@@ -105,14 +115,14 @@ class Peminjaman extends Controller
 
         $dataUser['id_user'] = $_SESSION['id_user'];
         $userProfile = $this->model('User_model')->profile($dataUser);
-        
+
         $dataPayload = $_POST;
-        $dataPayload['nama_peminjam'] = $userProfile['nama_user']; 
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
 
         if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
-            unset($_SESSION['keranjang']); 
+            unset($_SESSION['keranjang']);
             Flasher::setFlash('Pengajuan berhasil! Silakan lengkapi surat.', 'berhasil', '', 'success');
-            header('Location: ' . BASEURL . 'Riwayat'); 
+            header('Location: ' . BASEURL . 'Riwayat');
             exit;
         } else {
             Flasher::setFlash('Gagal mengajukan peminjaman.', 'gagal', '', 'danger');
@@ -121,28 +131,23 @@ class Peminjaman extends Controller
         }
     }
 
-    public function hapusItem($id_barang)
+    public function hapusItem($encoded_index)
     {
-        $id_barang = IdObfuscator::decode($id_barang);
-        if (!$id_barang) {
-            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
-            exit;
-        }
+        $index = IdObfuscator::decode($encoded_index);
+
         if (!isset($_SESSION)) session_start();
 
-        if (isset($_SESSION['keranjang'])) {
-            $key = array_search($id_barang, $_SESSION['keranjang']);
-            
-            if ($key !== false) {
-                unset($_SESSION['keranjang'][$key]);
-                $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
-            }
+        if ($index !== false && isset($_SESSION['keranjang'][$index])) {
+
+            unset($_SESSION['keranjang'][$index]);
+
+            $_SESSION['keranjang'] = array_values($_SESSION['keranjang']);
         }
 
         header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
         exit;
     }
-    
+
     public function detail($id_peminjaman)
     {
         $id_peminjaman = IdObfuscator::decode($id_peminjaman);
@@ -175,14 +180,14 @@ class Peminjaman extends Controller
         }
 
         $_SESSION['keranjang'] = [];
-        $edit_details_map = []; 
+        $edit_details_map = [];
 
         foreach ($details as $item) {
             $_SESSION['keranjang'][] = $item['id_jenis_barang'];
 
             $edit_details_map[$item['id_jenis_barang']] = [
                 'jumlah'     => $item['jumlah'],
-                'keterangan' => $item['id_barang'] 
+                'keterangan' => $item['id_barang']
             ];
         }
 
@@ -206,9 +211,9 @@ class Peminjaman extends Controller
         $userProfile = $this->model('User_model')->profile($dataUser);
 
         $dataPayload = $_POST;
-        $dataPayload['id_peminjaman'] = $_SESSION['edit_id_peminjaman']; 
+        $dataPayload['id_peminjaman'] = $_SESSION['edit_id_peminjaman'];
         $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
-        $dataPayload['status'] = 'Melengkapi Surat'; 
+        $dataPayload['status'] = 'Melengkapi Surat';
 
         if ($this->model('Peminjaman_model')->ubahDataPeminjaman($dataPayload) >= 0) {
             unset($_SESSION['keranjang']);

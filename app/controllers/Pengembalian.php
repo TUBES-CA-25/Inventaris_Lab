@@ -9,6 +9,10 @@ class Pengembalian extends Controller
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
+        if ($_SESSION['id_role'] != 3 && $_SESSION['id_role'] != 4) {
+            header('Location: ' . BASEURL . 'Beranda');
+            exit;
+        }
     }
 
     public function index()
@@ -38,8 +42,15 @@ class Pengembalian extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // Ambil data satu baris spesifik untuk detail
+        // 1. Ambil Header Data
         $data['detail'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        // 2. Ambil List Barang
+        // Kita gunakan satu fungsi saja yang sudah kita perbaiki logic-nya (LEFT JOIN)
+        $id_pengembalian = $data['detail']['id_pengembalian'] ?? null;
+
+        // Kirim ID Peminjaman DAN ID Pengembalian (jika ada)
+        $data['items_kembali'] = $this->model('Pengembalian_model')->getBarangPengembalian($id, $id_pengembalian);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -124,8 +135,13 @@ class Pengembalian extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // Ambil data peminjaman dan pengembalian
+        // 1. Ambil Header Peminjaman
         $data['peminjaman'] = $this->model('Pengembalian_model')->getRiwayatById($id);
+
+        // 2. [PERBAIKAN DISINI] Ambil Items untuk Form Edit
+        // Gunakan getItemsForForm agar spesifikasi dan kondisi existing terpanggil
+        // Simpan ke $data['items'] agar sesuai dengan edit.php
+        $data['items'] = $this->model('Pengembalian_model')->getItemsForForm($id);
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -142,6 +158,14 @@ class Pengembalian extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASEURL . 'Pengembalian');
+            exit;
+        }
+
+        if (!isset($_FILES['bukti_foto']) || $_FILES['bukti_foto']['error'] === 4) {
+            Flasher::setFlash('Gagal', 'Bukti foto wajib diupload!', '', 'danger');
+
+            // Redirect kembali ke halaman Pengembalian (atau halaman edit jika memungkinkan)
             header('Location: ' . BASEURL . 'Pengembalian');
             exit;
         }

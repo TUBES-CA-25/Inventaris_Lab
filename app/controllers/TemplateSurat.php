@@ -23,24 +23,25 @@ class TemplateSurat extends Controller
         $data['judul'] = 'Daftar Template Surat';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model('User_model')->profile($data);
-        
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Peminjaman/lengkapi', $data);
         $this->view('templates/footer');
     }
 
-    public function lengkapi($id_peminjaman) {
+    public function lengkapi($id_peminjaman)
+    {
         $id_peminjaman = IdObfuscator::decode($id_peminjaman);
         if (!$id_peminjaman) {
             header('Location: ' . BASEURL . 'TemplateSurat');
             exit;
         }
-        $data['judul'] = 'Pelengkapan Berkas'; 
+        $data['judul'] = 'Pelengkapan Berkas';
         $data['id_peminjaman'] = $id_peminjaman;
-        
+
         $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
-        $data['peminjaman'] = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
+        $data['peminjaman'] = $this->peminjamanModel->getDetailValidasiDataPeminjaman($id_peminjaman);
         $data['details'] = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
 
         if (!$data['peminjaman']) {
@@ -58,23 +59,27 @@ class TemplateSurat extends Controller
         $this->view('templates/footer');
     }
 
-    public function generatePDF($id_peminjaman) {
+    public function generatePDF($id_peminjaman)
+    {
         $id_peminjaman = IdObfuscator::decode($id_peminjaman);
         if (!$id_peminjaman) {
-            echo "ID tidak valid."; exit;
+            echo "ID tidak valid.";
+            exit;
         }
-        
+
         $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
         $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
-        
+        // $data['barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
+
         if (!$peminjaman) {
-             echo "Data tidak ditemukan."; exit;
+            echo "Data tidak ditemukan.";
+            exit;
         }
 
-        $id_user = $_SESSION['id_user']; 
+        $id_user = $_SESSION['id_user'];
         $user = $this->peminjamanModel->getUserProfile($id_user);
 
-        $pathKop = '../public/img/kop_surat.png'; 
+        $pathKop = '../public/img/kop_surat.png';
         $gambar_kop = '';
 
         if (file_exists($pathKop)) {
@@ -84,21 +89,23 @@ class TemplateSurat extends Controller
         }
 
         ob_start();
-        require_once '../app/views/peminjaman/surat_pdf.php'; 
+        require_once '../app/views/peminjaman/surat_pdf.php';
         $htmlContent = ob_get_clean();
 
         $options = new Options();
         $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'Times-Roman'); 
+        $options->set('defaultFont', 'Times-Roman');
         $options->set('isHtml5ParserEnabled', true);
-        
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($htmlContent);
-        $dompdf->setPaper('A4', 'portrait');
-        
+        $dompdf->setPaper('legal', 'portrait');
+
         $dompdf->render();
 
-        if (ob_get_length()) { ob_end_clean(); }
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
 
         $filename = 'Surat_Peminjaman_' . '.pdf';
         $dompdf->stream($filename, ["Attachment" => 1]);
@@ -111,7 +118,7 @@ class TemplateSurat extends Controller
             $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
 
             $file = $_FILES['file_surat'];
-            $ekstensiValid = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+            $ekstensiValid = ['pdf'];
             $namaFile = $file['name'];
             $tmpName = $file['tmp_name'];
             $error = $file['error'];
@@ -137,7 +144,7 @@ class TemplateSurat extends Controller
                 mkdir($tujuan, 0777, true);
             }
 
-            if(move_uploaded_file($tmpName, $tujuan . $namaBaru)) {
+            if (move_uploaded_file($tmpName, $tujuan . $namaBaru)) {
                 if ($this->peminjamanModel->updateSuratPeminjaman($id_peminjaman, $namaBaru) > 0) {
                     Flasher::setFlash('Berhasil', 'Surat berhasil diupload. Menunggu verifikasi.', '', 'success');
                     header('Location: ' . BASEURL . 'Riwayat');

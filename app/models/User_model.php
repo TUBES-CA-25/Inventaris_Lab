@@ -121,7 +121,6 @@ class User_model
 
     public function updateUser($data)
     {
-        // 1. LOGIC FOTO PROFIL (Existing)
         if ($_FILES['foto']['error'] === 4) {
             $fotoPath = $data['fotoLama'];
         } else {
@@ -131,18 +130,14 @@ class User_model
             }
         }
 
-        // 2. LOGIC TANDA TANGAN (New)
-        // Default pakai TTD lama
-        $ttdName = $data['file_ttdLama']; 
-        
-        // Cek apakah ada upload baru di input 'file_ttd'
+        $ttdName = $data['file_ttdLama'];
+
         if (isset($_FILES['file_ttd']) && $_FILES['file_ttd']['error'] !== 4) {
             $uploadHasil = $this->uploadTTD();
-            
+
             if ($uploadHasil) {
                 $ttdName = $uploadHasil;
-                
-                // Hapus file lama
+
                 $pathLama = '../public/img/ttd/' . $data['file_ttdLama'];
                 if ($data['file_ttdLama'] && file_exists($pathLama)) {
                     unlink($pathLama);
@@ -150,14 +145,13 @@ class User_model
             }
         }
 
-        // Query Update (Gunakan file_ttd)
         $query = "UPDATE trx_data_user SET 
                     foto = :foto, 
                     nama_user = :nama_user, 
                     nim_nip = :nim_nip,
                     no_hp_user = :no_hp_user, 
                     alamat = :alamat,
-                    file_ttd = :file_ttd  -- <-- GANTI INI
+                    file_ttd = :file_ttd
                   WHERE id_user = :id_user";
 
         $this->db->query($query);
@@ -166,7 +160,7 @@ class User_model
         $this->db->bind('nim_nip', $data['nim_nip']);
         $this->db->bind('no_hp_user', $data['no_hp_user']);
         $this->db->bind('alamat', $data['alamat']);
-        $this->db->bind('file_ttd', $ttdName); // Bind ke variabel
+        $this->db->bind('file_ttd', $ttdName);
         $this->db->bind('id_user', $data['id_user']);
 
         $this->db->execute();
@@ -257,67 +251,54 @@ class User_model
         return $this->db->rowCount();
     }
 
-    private function uploadTTD()
-    {
-        // Ganti 'ttd' jadi 'file_ttd'
-        $namaFile = $_FILES['file_ttd']['name'];
-        $ukuranFile = $_FILES['file_ttd']['size'];
-        $error = $_FILES['file_ttd']['error'];
-        $tmpName = $_FILES['file_ttd']['tmp_name'];
-
-        if ($error === 4) {
-            return false;
-        }
-
-        $ekstensiGambarValid = ['png'];
-        $ekstensiGambar = explode('.', $namaFile);
-        $ekstensiGambar = strtolower(end($ekstensiGambar));
-        
-        if (!in_array($ekstensiGambar, $ekstensiGambarValid)) {
-            return false;
-        }
-
-        if ($ukuranFile > 2000000) {
-            return false;
-        }
-
-        $namaFileBaru = uniqid() . '.' . $ekstensiGambar;
-        $targetDir = '../public/img/ttd/';
-        
-        move_uploaded_file($tmpName, $targetDir . $namaFileBaru);
-
-        return $namaFileBaru;
-    }
-
     public function updateTTDSpesifik($files)
     {
         $countSuccess = 0;
-        $targetDir = '../public/img/ttd/';
-        
-        if (isset($files['ttd_kalab']) && $files['ttd_kalab']['error'] !== 4) {
-            $tmp = $files['ttd_kalab']['tmp_name'];
-            $type = mime_content_type($tmp);
-            
-            // Validasi PNG
-            if ($type == 'image/png') {
-                if(move_uploaded_file($tmp, $targetDir . 'ttd_huzain.png')) {
-                    $countSuccess++;
-                }
-            } else {
-                return -1; 
+
+        $rootPath = dirname(__DIR__, 2);
+        $targetDir = $rootPath . '/public/img/ttd/';
+
+        if (!file_exists($targetDir)) {
+            if (!mkdir($targetDir, 0777, true)) {
+                return 0;
             }
         }
 
-        if (isset($files['ttd_laboran']) && $files['ttd_laboran']['error'] !== 4) {
-            $tmp = $files['ttd_laboran']['tmp_name'];
+        if (isset($files['ttd_kalab']) && $files['ttd_kalab']['error'] === 0) {
+            $tmp = $files['ttd_kalab']['tmp_name'];
             $type = mime_content_type($tmp);
-            
+
             if ($type == 'image/png') {
-                if(move_uploaded_file($tmp, $targetDir . 'ttd_fatimah.png')) {
+                $dest = $targetDir . 'ttd_huzain.png';
+
+                if (file_exists($dest)) {
+                    unlink($dest);
+                }
+
+                if (move_uploaded_file($tmp, $dest)) {
                     $countSuccess++;
                 }
             } else {
-                return -1; 
+                return -1;
+            }
+        }
+
+        if (isset($files['ttd_laboran']) && $files['ttd_laboran']['error'] === 0) {
+            $tmp = $files['ttd_laboran']['tmp_name'];
+            $type = mime_content_type($tmp);
+
+            if ($type == 'image/png') {
+                $dest = $targetDir . 'ttd_fatimah.png';
+
+                if (file_exists($dest)) {
+                    unlink($dest);
+                }
+
+                if (move_uploaded_file($tmp, $dest)) {
+                    $countSuccess++;
+                }
+            } else {
+                return -1;
             }
         }
 
