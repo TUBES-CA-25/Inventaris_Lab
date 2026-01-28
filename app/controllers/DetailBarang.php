@@ -191,6 +191,7 @@ class DetailBarang extends Controller
         $data['profile'] = $this->model("User_model")->profile($data);
 
         $data['barang'] = $this->model('Detail_barang_model')->getUbah($id_barang);
+        $data['barang']['id_barang'] = IdObfuscator::encode($data['barang']['id_barang']);
 
         $DetailBarangModel = $this->model('Detail_barang_model');
         $data['sub_barang'] = $DetailBarangModel->getSubBarang();

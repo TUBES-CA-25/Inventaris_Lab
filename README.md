@@ -232,3 +232,11 @@ Aturan Penting
 ## Ringkasan Alur
 
 Pull dari `main` → kerja di branch masing-masing → commit → push → merge ke `main` → sinkron database bila ada perubahan.
+
+## Syarat Running Project
+* Import Database yang Up to Date
+* Lakukan penginstalan Composer
+```
+composer install
+```
+

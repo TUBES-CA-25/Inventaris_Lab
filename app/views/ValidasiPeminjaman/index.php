@@ -1,6 +1,6 @@
 <?php
 // Cek sesi login & role
-if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) {
+if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
     header("Location:" . BASEURL . "Login");
     exit;
 }

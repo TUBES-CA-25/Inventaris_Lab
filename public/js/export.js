@@ -1,3 +1,5 @@
+
+
 $(document).ready(function () {
     var headerTitle = "LAPORAN INVENTARIS BARANG";
     var headerDate = "Dicetak pada: <?php echo date('d F Y, H:i'); ?>";
@@ -124,3 +126,4 @@ $(document).ready(function () {
     $('#triggerPdf').on('click', function () { table.button(1).trigger(); });
     $('#triggerPrint').on('click', function () { table.button(2).trigger(); });
 });
+

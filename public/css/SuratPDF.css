@@ -127,3 +127,22 @@ body {
     text-align: center;
     margin-top: 20px;
 }
+
+.approval-section {
+        /* Membuat elemen ini menjadi satu blok utuh yang tidak boleh dipotong */
+        page-break-inside: avoid;
+        break-inside: avoid;
+        
+        /* Pastikan lebar dan display diatur agar properti break berfungsi optimal */
+        display: block;
+        width: 100%;
+        margin-top: 20px; /* Opsional: Jarak dari elemen atas */
+    }
+
+    /* Jika Anda ingin tabel tanda tangan (Peminjam & Penyerah) juga ikut turun 
+       bersama Kepala Lab jika tidak muat, gunakan wrapper pembungkus seperti sebelumnya */
+    .signature-wrapper {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        width: 100%;
+    }

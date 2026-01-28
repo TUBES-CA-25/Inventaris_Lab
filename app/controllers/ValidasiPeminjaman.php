@@ -5,15 +5,12 @@ class ValidasiPeminjaman extends Controller
     {
         if (!isset($_SESSION)) session_start();
 
-        // 1. Cek Login
-        if (!isset($_SESSION['id_user'])) {
+        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
-
-        // 2. Cek Role: Mahasiswa (7) dilarang masuk sini
-        if (isset($_SESSION['id_role']) && $_SESSION['id_role'] == '7') {
-            header('Location: ' . BASEURL . 'Riwayat');
+        else if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
+            header('Location: ' . BASEURL . 'Beranda');
             exit;
         }
     }
@@ -53,7 +50,6 @@ class ValidasiPeminjaman extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // Mengambil data detail peminjaman
         $data['peminjaman'] = $this->model('Peminjaman_model')->getDetailValidasiDataPeminjaman($id);
         $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id);
 
@@ -62,12 +58,12 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
+        $data['status_Kembali'] = isset($data['peminjaman']['status_pengembalian']) ? $data['peminjaman']['status_pengembalian'] : '-';
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
-        // Pastikan nama view ini sesuai dengan file yang Anda edit sebelumnya
         $this->view('ValidasiPeminjaman/DetailPeminjaman', $data);
-        // $this->view('templates/footer');
+        // $this->view('templates/footer', $data);
     }
 
     public function accKalab()
@@ -137,7 +133,8 @@ class ValidasiPeminjaman extends Controller
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $dataPost = [
                 'id_peminjaman' => IdObfuscator::decode($_POST['id_peminjaman']),
-                'page'          => $_POST['page_target'],
+                'fatimah_page'  => $_POST['fatimah_page'],
+                'huzain_page'   => $_POST['huzain_page'],
                 'fatimah_x'     => $_POST['fatimah_x'],
                 'fatimah_y'     => $_POST['fatimah_y'],
                 'huzain_x'      => $_POST['huzain_x'],
@@ -146,7 +143,7 @@ class ValidasiPeminjaman extends Controller
 
             $this->model('Peminjaman_model')->validasiLaboranDouble($dataPost);
 
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/previewHasil/' . $dataPost['id_peminjaman']);
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/previewHasil/' . IdObfuscator::encode($dataPost['id_peminjaman']));
             exit;
         }
     }
@@ -166,11 +163,6 @@ class ValidasiPeminjaman extends Controller
         $data['judul'] = 'Preview Hasil Tanda Tangan';
         $data['peminjaman'] = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
-        if (!$data['peminjaman']) {
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
-            exit;
-        }
-
         $this->view('templates/header', $data);
         $this->view('ValidasiPeminjaman/preview_hasil', $data);
         $this->view('templates/footer');
@@ -184,18 +176,22 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_peminjaman = $_POST['id_peminjaman'];
-            $status        = $_POST['status'];
+            $id_encoded = $_POST['id_peminjaman'];
+            $id_decoded = IdObfuscator::decode($id_encoded);
 
-            $pesan         = $_POST['pesan_penolakan'] ?? '';
+            $status = $_POST['status'];
+            $pesan  = $_POST['pesan_penolakan'] ?? '';
 
-            if ($this->model('Peminjaman_model')->updateStatusValidasi($id_peminjaman, $status, $pesan) > 0) {
+            if ($this->model('Peminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
                 Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
             } else {
-                Flasher::setFlash('Info', 'Tidak ada perubahan status', '', 'info');
+                // Info saja, mungkin status sudah sama sebelumnya
+                Flasher::setFlash('Info', 'Status diperbarui.', '', 'info');
             }
 
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            // 4. REDIRECT URL (Pakai ID Encoded / String Acak)
+            // Kita kembalikan user ke halaman detail dengan ID yang aman
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
             exit;
         }
     }
@@ -208,7 +204,7 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_peminjaman = $_POST['id_peminjaman'];
+            $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
             $alasan        = $_POST['alasan_penolakan'];
 
             if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
@@ -217,7 +213,7 @@ class ValidasiPeminjaman extends Controller
                 Flasher::setFlash('Gagal', 'Gagal menyimpan penolakan.', '', 'danger');
             }
 
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $_POST['id_peminjaman']);
             exit;
         }
     }
@@ -229,7 +225,9 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
+
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
+        $this->model('Peminjaman_model')->finalisasiValidasi($id_peminjaman) > 0;
 
         if ($peminjaman) {
             $fileName = $peminjaman['file_surat'];

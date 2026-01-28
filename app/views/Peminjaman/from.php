@@ -92,8 +92,8 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="lbl mb-0">Jenis Barang</label>
                                                 <button type="button" class="btn-cancel-item"
-                                                    onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['id_jenis_barang']; ?>')">
-                                                    <i class="fa-solid fa-circle-xmark"></i> Hapus
+                                                    onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> <i class="fa-solid fa-circle-xmark"></i> Hapus
+</button>
                                                 </button>
                                             </div>
                                             <div class="icon-wrap">

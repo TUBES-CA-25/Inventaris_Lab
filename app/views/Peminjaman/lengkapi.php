@@ -28,7 +28,7 @@ if (!isset($_SESSION['login'])) {
             </div>
         </div>
 
-        <div class="step-card">
+        <div class="step-card1">
             <div class="step-header">
                 <div class="step-number-circle">1</div>
                 <div>
@@ -36,7 +36,7 @@ if (!isset($_SESSION['login'])) {
                     <small style="opacity: 0.9;">Periksa data peminjaman dan unduh surat yang perlu ditandatangani</small>
                 </div>
             </div>
-            
+
             <div class="step-body">
                 <div class="info-grid">
                     <div class="info-box">
@@ -49,7 +49,7 @@ if (!isset($_SESSION['login'])) {
                             </div>
                         </div>
                         <div class="info-value">
-                            <?= isset($data['peminjaman']['nama_peminjam']) ? $data['peminjaman']['nama_peminjam'] : '-'; ?>
+                            <?= isset($data['peminjaman']['nama_user']) ? $data['peminjaman']['nama_user'] : '-'; ?>
                         </div>
                     </div>
 
@@ -97,7 +97,7 @@ if (!isset($_SESSION['login'])) {
                                 <ul style="list-style: none; padding: 0; margin: 0;">
                                     <?php foreach ($data['detail_barang'] as $item) : ?>
                                         <li style="margin-bottom: 4px;">
-                                            • <?= $item['nama_barang']; ?> 
+                                            • <?= $item['nama_barang']; ?>
                                             <span style="font-weight: bold; color: var(--primary-navy);">
                                                 (<?= $item['jumlah']; ?> Unit)
                                             </span>
@@ -122,15 +122,15 @@ if (!isset($_SESSION['login'])) {
                     <p style="color: #6c757d; margin-bottom: 25px;">
                         Pastikan semua data di atas sudah benar sebelum mengunduh surat
                     </p>
-                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= $data['peminjaman']['id_peminjaman']; ?>" 
-                       class="btn-download">
+                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
+                        class="btn-download"
                         <i class="fas fa-download"></i>Download Surat PDF
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="step-card">
+        <div class="step-card1">
             <div class="step-header">
                 <div class="step-number-circle">2</div>
                 <div>
@@ -138,7 +138,7 @@ if (!isset($_SESSION['login'])) {
                     <small style="opacity: 0.9;">Setelah ditandatangani, scan atau foto lalu upload di sini</small>
                 </div>
             </div>
-            
+
             <div class="step-body">
                 <div class="alert-custom">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -150,38 +150,55 @@ if (!isset($_SESSION['login'])) {
 
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
-                    
-                    <div class="upload-section" id="drop-zone">
-                        <input type="file" 
-                               class="file-input-hidden" 
-                               id="file_surat" 
-                               name="file_surat" 
-                               required 
-                               accept=".pdf,.jpg,.jpeg,.png">
-                        
-                        <div class="upload-icon-wrapper">
-                            <i class="fas fa-cloud-upload-alt"></i>
+
+                    <div class="upload-section" id="drop-zone" onclick="triggerUpload()">
+                        <input type="file"
+                            class="file-input-hidden"
+                            id="file_surat"
+                            name="file_surat"
+                            required
+                            accept=".pdf"
+                            onchange="updateFileName(this)">
+
+                        <div id="view-default">
+                            <div class="upload-icon-wrapper">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+
+                            <h5 class="upload-title">
+                                Klik atau Seret File ke Sini
+                            </h5>
+                            <p class="upload-subtitle">
+                                Pilih file surat yang sudah ditandatangani
+                            </p>
+
+                            <div class="file-types">
+                                <span class="file-type-badge">📄 PDF</span>
+                            </div>
+
+                            <small class="d-block mt-3 text-muted">
+                                <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
+                            </small>
                         </div>
-                        
-                        <h5 class="upload-title" id="file-label">
-                            Klik atau Seret File ke Sini
-                        </h5>
-                        <p class="upload-subtitle">
-                            Pilih file surat yang sudah ditandatangani
-                        </p>
-                        
-                        <div class="file-types">
-                            <span class="file-type-badge">📄 PDF</span>
-                            <span class="file-type-badge">🖼️ JPG</span>
-                            <span class="file-type-badge">🖼️ PNG</span>
+
+                        <div id="view-preview" style="display: none;">
+                            <div class="upload-icon-wrapper" style="background: var(--success-green); box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);">
+                                <i class="fas fa-file-alt" style="color: white;"></i>
+                            </div>
+
+                            <h5 class="upload-title" style="color: var(--success-green);">File Diupload!</h5>
+
+                            <p id="filename-display" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; word-break: break-word; padding: 0 10px;">
+                                nama_file.pdf
+                            </p>
+
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="resetUpload(event)" style="border-radius: 20px; padding: 8px 20px;">
+                                <i class="fas fa-trash-alt mr-2"></i>Ganti File
+                            </button>
                         </div>
-                        
-                        <small class="d-block mt-3 text-muted">
-                            <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
-                        </small>
                     </div>
 
-                    <button type="submit" name="submit_upload" class="btn-submit" id="btn-submit">
+                    <button type="submit" name="submit_upload" class="btn-submit" id="btn-submit" disabled>
                         <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
                     </button>
                 </form>
