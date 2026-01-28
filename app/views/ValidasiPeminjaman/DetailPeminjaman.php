@@ -285,7 +285,7 @@ $status_Kembali = $data['status_Kembali'];
                             <h5 class="font-weight-bold text-danger mb-3">Pengajuan Ditolak</h5>
                             <div class="condition-box danger text-left">
                                 <strong class="d-block mb-1">Alasan Penolakan:</strong>
-                                <p class="mb-0"><?= !empty($p['keterangan_peminjaman']) ? $p['keterangan_peminjaman'] : '-'; ?></p>
+                                <p class="mb-0"><?= !empty($p['keterangan_tolak']) ? $p['keterangan_tolak'] : '-'; ?></p>
                             </div>
                         </div>
                     </div>
@@ -324,7 +324,7 @@ $status_Kembali = $data['status_Kembali'];
                 <h6><i class="fas fa-times-circle mr-2"></i>Form Penolakan</h6>
             </div>
             <div class="card-body p-4">
-                <form action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
+                <form id="formTolakPeminjaman" action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post">
                     <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
                     <input type="hidden" name="status" value="tolak peminjaman">
                     <div class="form-group">
@@ -333,7 +333,8 @@ $status_Kembali = $data['status_Kembali'];
                     </div>
                     <div class="text-right">
                         <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakContainer')" style="border-radius: 8px;">Batal</button>
-                        <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;">
+                        <button type="button" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;"
+                            onclick="konfirmasiAksi('formTolakPeminjaman', 'Tolak Permohonan?', 'Yakin alasan penolakan sudah sesuai?', 'warning', '#d33')">
                             <i class="fas fa-paper-plane mr-2"></i>Kirim Penolakan
                         </button>
                     </div>
@@ -344,7 +345,7 @@ $status_Kembali = $data['status_Kembali'];
         <!-- Form Lapor Masalah Pengembalian (Hidden) -->
         <div id="formTolakPengembalianContainer" class="modern-card form-section-hidden" style="border-left: 4px solid #ef4444;">
             <div class="card-header-modern" style="background: #ef4444;">
-                <h6><i class="fas fa-exclamation-triangle mr-2"></i>Lapor Masalah Pengembalian</h6>
+                <h6><i class="fas fa-exclamation-triangle mr-2"></i>Masalah Pengembalian</h6>
             </div>
             <div class="card-body p-4">
                 <form action="<?= BASEURL; ?>ValidasiPeminjaman/tolakPengembalian" method="post">
@@ -354,9 +355,12 @@ $status_Kembali = $data['status_Kembali'];
                         <textarea class="form-control" name="alasan_penolakan" required rows="4" placeholder="Jelaskan kondisi barang yang rusak atau hilang..." style="border-radius: 8px;"></textarea>
                     </div>
                     <div class="text-right">
-                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakPengembalianContainer')" style="border-radius: 8px;">Batal</button>
-                        <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;">
-                            <i class="fas fa-save mr-2"></i>Simpan Laporan
+                        <button type="button" class="btn btn-secondary mr-2" onclick="tutupForm('formTolakPengembalianContainer')" style="border-radius: 8px;">
+                            Batal
+                        </button>
+                        <button type="button" class="btn btn-danger" style="border-radius: 8px; padding: 10px 24px;"
+                            onclick="konfirmasiAksi('formTolakPengembalian', 'Tolak Pengembalian?', 'Yakin laporan masalah sudah benar?', 'warning', '#d33')">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Tolak Pengembalian
                         </button>
                     </div>
                 </form>

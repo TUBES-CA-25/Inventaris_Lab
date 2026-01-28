@@ -455,7 +455,7 @@ CREATE TABLE `trx_peminjaman` (
 
 LOCK TABLES `trx_peminjaman` WRITE;
 /*!40000 ALTER TABLE `trx_peminjaman` DISABLE KEYS */;
-INSERT INTO `trx_peminjaman` VALUES (1,27,'qasd','2026-01-25','2026-01-25','2026-01-25','12312312',NULL,'Diproses','SIGNED_6976110029a5f.pdf','0','0');
+INSERT INTO `trx_peminjaman` VALUES (1,27,'qasd','2026-01-25','2026-01-25','2026-01-25','12312312','','Tolak Peminjaman','SIGNED_6976110029a5f.pdf','0','0');
 /*!40000 ALTER TABLE `trx_peminjaman` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -544,4 +544,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-26  0:15:14
+-- Dump completed on 2026-01-28 16:41:36

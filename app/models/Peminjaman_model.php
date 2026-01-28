@@ -196,10 +196,10 @@ class Peminjaman_model
     //           LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
     //           LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
     //           LEFT JOIN trx_pengembalian_tolak tpt ON tp.id_peminjaman = tpt.id_peminjaman
-              
+
     //           -- JOIN BARU UNTUK CEK STATUS PENGEMBALIAN
     //           LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
-              
+
     //           WHERE tp.id_peminjaman = :id_peminjaman
     //           GROUP BY tp.id_peminjaman";
 
@@ -336,30 +336,30 @@ class Peminjaman_model
     }
 
 
-public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
-{
-    $query = "UPDATE trx_peminjaman SET status = :status";
+    public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
+    {
+        $query = "UPDATE trx_peminjaman SET status = :status";
 
-    // Jika status adalah Tolak Peminjaman, simpan alasan ke kolom keterangan_tolak
-    if ($status == 'tolak peminjaman') {
-        $query .= ", keterangan_tolak = :keterangan";
+        // Jika status adalah Tolak Peminjaman, simpan alasan ke kolom keterangan_tolak
+        if ($status == 'tolak peminjaman') {
+            $query .= ", keterangan_tolak = :keterangan";
+        }
+
+        $query .= " WHERE id_peminjaman = :id_peminjaman";
+
+        $this->db->query($query);
+        $this->db->bind('status', $status);
+        $this->db->bind('id_peminjaman', $id_peminjaman);
+
+        if ($status == 'tolak peminjaman') {
+            // Tetap menggunakan variabel $pesan sesuai struktur Anda
+            $pesan = empty($catatan) ? '-' : $catatan;
+            $this->db->bind('keterangan', $pesan);
+        }
+
+        $this->db->execute();
+        return $this->db->rowCount();
     }
-
-    $query .= " WHERE id_peminjaman = :id_peminjaman";
-
-    $this->db->query($query);
-    $this->db->bind('status', $status);
-    $this->db->bind('id_peminjaman', $id_peminjaman);
-
-    if ($status == 'tolak peminjaman') {
-        // Tetap menggunakan variabel $pesan sesuai struktur Anda
-        $pesan = $catatan; 
-        $this->db->bind('keterangan', $pesan);
-    }
-
-    $this->db->execute();
-    return $this->db->rowCount();
-}
     public function getValidasiGabungan()
     {
         // HAPUS join ke trx_pengembalian_tolak karena tabelnya sudah tidak ada
@@ -494,9 +494,9 @@ public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
             // Status jadi 'Tolak Pengembalian'
             $queryMain = "UPDATE trx_peminjaman SET 
                           status = 'Tolak Pengembalian', 
-                          keterangan_peminjaman = :ket 
+                          keterangan_tolak = :ket 
                           WHERE id_peminjaman = :id";
-            
+
             $pesan_lengkap = "[MASALAH PENGEMBALIAN] " . $alasan;
 
             $this->db->query($queryMain);
@@ -704,7 +704,7 @@ public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
             $ttdWidth = 35; // Lebar tanda tangan dalam mm
 
             // --- PERBAIKAN LOGIKA DI SINI ---
-            
+
             // 1. Cek Apakah Halaman Ini Adalah Halaman TTD Fatimah?
             if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];

@@ -204,7 +204,7 @@ class ValidasiPeminjaman extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id_peminjaman = $_POST['id_peminjaman'];
+            $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
             $alasan        = $_POST['alasan_penolakan'];
 
             if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
@@ -213,7 +213,7 @@ class ValidasiPeminjaman extends Controller
                 Flasher::setFlash('Gagal', 'Gagal menyimpan penolakan.', '', 'danger');
             }
 
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $_POST['id_peminjaman']);
             exit;
         }
     }
