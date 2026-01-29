@@ -2,34 +2,46 @@
 
 class Database
 {
-    private $host       = DB_HOST;
-    private $user       = DB_USER;
-    private $pass       = DB_PASS;
-    private $db_name    = DB_NAME;
+    private $host = DB_HOST;
+    private $user = DB_USER;
+    private $pass = DB_PASS;
+    private $db_name = DB_NAME;
 
     private $dbh;
     private $stmt;
 
     public function __construct()
     {
-
-        // // data source name
+        // data source name
         $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->db_name;
 
         $option = [
             PDO::ATTR_PERSISTENT => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ];
+
         try {
-            $this->dbh = new PDO($dsn, $this->user, $this->pass);
+            $this->dbh = new PDO($dsn, $this->user, $this->pass, $option);
         } catch (PDOException $e) {
-            die($e->getMessage());
+            // Set error session untuk validasi
+            $_SESSION['has_error'] = true;
+            $_SESSION['error_type'] = 'database';
+            $_SESSION['error_message'] = $e->getMessage();
+            $_SESSION['error_code'] = $e->getCode();
+
+            // Redirect ke error page database
+            header("Location: " . BASEURL . "ErrorPage/databaseError");
+            exit;
         }
     }
 
     public function query($query)
     {
-        $this->stmt = $this->dbh->prepare($query);
+        try {
+            $this->stmt = $this->dbh->prepare($query);
+        } catch (PDOException $e) {
+            $this->handleDatabaseError($e);
+        }
     }
 
     public function bind($param, $value, $type = null)
@@ -60,21 +72,34 @@ class Database
 
     public function execute()
     {
-        $this->stmt->execute();
+        try {
+            $this->stmt->execute();
+        } catch (PDOException $e) {
+            $this->handleDatabaseError($e);
+        }
     }
 
 
     public function resultSet()
     {
-
-        $this->execute();
-        return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $this->execute();
+            return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->handleDatabaseError($e);
+            return [];
+        }
     }
 
     public function single()
     {
-        $this->execute();
-        return $this->stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $this->execute();
+            return $this->stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $this->handleDatabaseError($e);
+            return false;
+        }
     }
 
     public function rowCount()
@@ -108,5 +133,23 @@ class Database
     public function rollBack()
     {
         return $this->dbh->rollBack();
+    }
+
+    /**
+     * Handle database errors and redirect to error page
+     */
+    private function handleDatabaseError($e)
+    {
+        // Set error session
+        $_SESSION['has_error'] = true;
+        $_SESSION['error_type'] = 'database';
+        $_SESSION['error_message'] = $e->getMessage();
+        $_SESSION['error_code'] = $e->getCode();
+        $_SESSION['error_file'] = $e->getFile();
+        $_SESSION['error_line'] = $e->getLine();
+
+        // Redirect ke error page
+        header("Location: " . BASEURL . "ErrorPage/databaseError");
+        exit;
     }
 }
