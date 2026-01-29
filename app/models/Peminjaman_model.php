@@ -521,10 +521,10 @@ class Peminjaman_model
 
             // C. CATAT LOG RIWAYAT (PENTING)
             // Agar tercatat siapa asisten yang melaporkan masalah ini
-            $this->db->query("INSERT INTO trx_pemeriksa_pengembalian (id_pengembalian, id_user) VALUES (:idp, :idu)");
-            $this->db->bind('idp', $id_pengembalian);
-            $this->db->bind('idu', $_SESSION['id_user']);
-            $this->db->execute();
+            // $this->db->query("INSERT INTO trx_pemeriksa_pengembalian (id_pengembalian, id_user) VALUES (:idp, :idu)");
+            // $this->db->bind('idp', $id_pengembalian);
+            // $this->db->bind('idu', $_SESSION['id_user']);
+            // $this->db->execute();
 
             $this->db->commit();
             return 1;

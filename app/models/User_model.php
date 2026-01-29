@@ -84,6 +84,9 @@ class User_model
             $this->db->bind('jenis_kelamin', $data['jenis_kelamin']);
             $this->db->bind('alamat', $data['alamat']);
             $this->db->execute();
+
+            $this->db->query('COMMIT');
+            return 1;
         } catch (Exception $e) {
             $this->db->query('ROLLBACK');
             return 0;
