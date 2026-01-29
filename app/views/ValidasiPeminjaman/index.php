@@ -62,7 +62,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="table-responsive mt-4   ">
             <table id="myTable" class="table table-hover" style="width:100%; margin-bottom: 0;">
                 <thead class="table-custom-header">
                     <tr>
