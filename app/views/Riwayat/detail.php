@@ -4,22 +4,24 @@ if (!isset($_SESSION['login'])) {
     exit;
 }
 
-// Helper untuk status
+// 1. Helper untuk status & Variabel Cek Penolakan
 $st = strtolower($data['info_peminjaman']['status']);
 $statusClass = 'status-info';
 $statusIcon = 'fa-clock';
 
+// Cek apakah statusnya ditolak (baik peminjaman maupun pengembalian)
+$isRejected = in_array($st, ['tolak peminjaman', 'tolak pengembalian', 'ditolak']);
+
 if (in_array($st, ['disetujui', 'diterima'])) {
     $statusClass = 'status-success';
     $statusIcon = 'fa-check-circle';
-} elseif (in_array($st, ['tolak peminjaman', 'tolak pengembalian', 'ditolak'])) { // Gunakan in_array
+} elseif ($isRejected) { 
     $statusClass = 'status-danger';
     $statusIcon = 'fa-times-circle';
 } elseif (in_array($st, ['melengkapi surat', 'melengkapi'])) {
     $statusClass = 'status-warning';
     $statusIcon = 'fa-file-signature';
 }
-
 ?>
 
 <div class="container-fluid p-4">
@@ -31,10 +33,13 @@ if (in_array($st, ['disetujui', 'diterima'])) {
             <a href="<?= BASEURL ?>Riwayat/index" class="btn-modern btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
+            
+            <?php if (!$isRejected): ?>
             <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= IdObfuscator::encode($data['info_peminjaman']['id_peminjaman']) ?>"
                 target="_blank" class="btn-modern btn-pdf">
                 <i class="fas fa-file-pdf"></i> Cetak Bukti
             </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -54,6 +59,18 @@ if (in_array($st, ['disetujui', 'diterima'])) {
             </span>
         </div>
 
+        <?php if ($isRejected): ?>
+            <div class="mx-4 mt-4">
+                <div class="alert alert-danger border-0 shadow-sm" role="alert" style="background-color: #ffeef0; color: #e74a3b;">
+                    <h5 class="alert-heading fw-bold mb-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Alasan Penolakan
+                    </h5>
+                    <p class="mb-0" style="font-size: 1rem; color: #333;">
+                        <?= htmlspecialchars($data['info_peminjaman']['keterangan_tolak'] ?? 'Tidak ada catatan alasan penolakan.') ?>
+                    </p>
+                </div>
+            </div>
+        <?php endif; ?>
         <div class="card-body-clean">
             <div class="detail-cards-grid">
 
@@ -141,7 +158,9 @@ if (in_array($st, ['disetujui', 'diterima'])) {
                                 <td><?= $no++ ?></td>
                                 <td>
                                     <div class="img-zoom-container" onclick="showImageModal('<?= $item['foto_url_ready'] ?>', '<?= htmlspecialchars($item['nama_barang'] ?? '-') ?>')">
-                                        <img src="<?= $item['foto_url_ready'] ?>" alt="Foto" class="item-thumb">
+                                        <img src="<?= $item['foto_url_ready'] ?>"
+                                            alt="Foto" class="item-thumb"
+                                            onerror="this.onerror=null; this.src='<?= BASEURL; ?>img/foto-barang/default_tools.png';">
                                         <div class="zoom-overlay"><i class="fas fa-search-plus"></i></div>
                                     </div>
                                 </td>
@@ -155,7 +174,7 @@ if (in_array($st, ['disetujui', 'diterima'])) {
                                     </span>
                                 </td>
                                 <td><span class="item-code"><?= htmlspecialchars($item['kode_barang'] ?? '-') ?></span></td>
-                                <td class="text-center"><span class="item-qty"><?= $item['jumlah'] ?? 0 ?></span></td>
+                                <td class="text-center"><?= $item['jumlah'] ?? 0 ?></td>
                                 <td>
                                     <span class="badge bg-light border text-dark px-3 py-2">
                                         <?= htmlspecialchars($item['kondisi'] ?? 'Baik') ?>
@@ -169,9 +188,9 @@ if (in_array($st, ['disetujui', 'diterima'])) {
         </div>
     </div>
 </div>
+
 <div id="imageModal" class="modal-overlay" onclick="closeImageModal()">
     <span class="close-btn">&times;</span>
     <img id="fullImage" class="modal-content-img" src="">
     <div id="imageCaption" class="image-caption"></div>
 </div>
-
