@@ -20,3 +20,12 @@ define('SESSION_TIMEOUT_DURATION', 1800);
 // Development Mode - set to false in production
 // Jika true, akan menampilkan detail error
 define('DEVELOPMENT_MODE', true); // Change to false in production
+
+// Email Configuration for PHPMailer
+define('MAIL_HOST', 'smtp.gmail.com');
+define('MAIL_PORT', 587);
+define('MAIL_USERNAME', 'andiahsanashuri@gmail.com'); // TODO: Ganti dengan email Gmail Anda
+define('MAIL_PASSWORD', 'jkdm otvp mwul jhbt');    // TODO: Ganti dengan App Password dari Google
+define('MAIL_FROM_NAME', 'InventarisLab_Email');
+define('VERIFICATION_LINK_EXPIRY', 24); // Durasi expired token dalam jam
+
