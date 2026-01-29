@@ -2,6 +2,7 @@
 
 // define('BASEURL', 'http://0.0.0.0:8080/Inventaris_Lab1/public/');
 define('BASEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/Inventaris_Lab1/public/');
+// define('BASEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/public/');
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

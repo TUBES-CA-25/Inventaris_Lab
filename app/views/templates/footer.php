@@ -16,7 +16,6 @@
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 
 <script src="<?= BASEURL; ?>/js/script.js"></script>
 <script src="<?= BASEURL; ?>/js/form.js"></script>

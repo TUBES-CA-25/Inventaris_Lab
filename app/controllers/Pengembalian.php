@@ -172,7 +172,7 @@ class Pengembalian extends Controller
 
         // Handle upload foto
         if (isset($_FILES['bukti_foto']) && $_FILES['bukti_foto']['error'] === 0) {
-            $uploadDir = __DIR__ . '/../../public/uploads/pengembalian/';
+            $uploadDir = __DIR__ . '/../../public/img/pengembalian/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
