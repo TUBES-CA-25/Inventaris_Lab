@@ -427,3 +427,133 @@ body {
         padding: 30px 20px;
     }
 }
+
+.step-desc {
+    opacity: 0.9;
+}
+
+/* Panah pada tanggal */
+.date-arrow {
+    font-size: 12px;
+}
+
+/* Info Box yang memenuhi lebar (Grid Column Span) */
+.info-box-full {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+/* --- Tabel/List Barang --- */
+.item-list-header {
+    display: flex;
+    width: 100%;
+    padding: 0.5rem 1rem; /* px-3 py-2 */
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa; /* bg-light */
+    color: #6c757d; /* text-muted */
+    font-weight: 700;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+.item-list-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.item-list-row {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.item-content-wrapper {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding: 1rem; /* px-3 py-3 */
+}
+
+/* Kolom-kolom dalam List Barang */
+.col-item-name {
+    width: 30%;
+    padding-right: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.col-item-spec {
+    width: 55%;
+    padding-right: 15px;
+    font-size: 0.9em;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.col-item-qty {
+    width: 15%;
+    text-align: right;
+}
+
+/* Ikon Spesifikasi */
+.icon-spec {
+    font-size: 10px;
+    color: #b0b3b8;
+    flex-shrink: 0;
+}
+
+/* Badge Jumlah Unit */
+.badge-qty {
+    font-weight: bold;
+    color: var(--primary-navy);
+    background: #eef2ff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* State Kosong (Tidak ada barang) */
+.empty-state-icon {
+    opacity: 0.5;
+}
+
+/* --- Bagian Download --- */
+.download-title {
+    color: var(--danger-red);
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.download-desc {
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+/* --- Bagian Upload Preview --- */
+.upload-preview-wrapper {
+    display: none; /* Default hidden, dikontrol JS */
+}
+
+.upload-icon-success {
+    background: var(--success-green);
+    box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
+}
+
+.upload-title-success {
+    color: var(--success-green);
+}
+
+.filename-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    word-break: break-word;
+    padding: 0 10px;
+}
+
+.btn-reset-upload {
+    border-radius: 20px;
+    padding: 8px 20px;
+}

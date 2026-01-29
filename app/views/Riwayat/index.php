@@ -11,17 +11,63 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
     <div class="container-fluid p-4 content-beranda">
 
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <div>
-                <h4 class="mb-0 font-weight-bold text-dark">Riwayat Peminjaman</h4>
-                <small class="text-muted">Pantau status dan histori peminjaman barang.</small>
+            <h4 class="mb-0 font-weight-bold text-dark">Riwayat Peminjaman</h4>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card bg-navy">
+                    <div>
+                        <div class="stat-label">Total Diterima</div>
+                        <div class="stat-value"><?= isset($data['total_disetujui']) ? $data['total_disetujui'] : 0; ?></div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                </div>
             </div>
 
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card bg-white">
+                    <div>
+                        <div class="stat-label">Total Diproses</div>
+                        <div class="stat-value stat-value-navy"><?= isset($data['total_diproses']) ? $data['total_diproses'] : 0; ?></div>
+                    </div>
+                    <div class="stat-icon icon-dark">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card bg-white">
+                    <div>
+                        <div class="stat-label">Total Ditolak</div>
+                        <div class="stat-value stat-value-red"><?= isset($data['total_ditolak']) ? $data['total_ditolak'] : 0; ?></div>
+                    </div>
+                    <div class="stat-icon icon-dark stat-icon-danger-soft">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="stat-card bg-white">
+                    <div>
+                        <div class="stat-label">Total Pengembalian</div>
+                        <div class="stat-value stat-value-navy"><?= isset($data['total_kembali']) ? $data['total_kembali'] : 0; ?></div>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <?php if ($data['is_admin']): ?>
-            <div class="card mb-4 border-0 shadow-sm" style="border-radius: 10px;">
+            <div class="card mb-4 border-0 shadow-sm nav-card-container">
                 <div class="card-body p-2">
-                    <ul class="nav nav-pills nav-fill bg-light rounded p-1" style="border: 1px solid #eee;">
+                    <ul class="nav nav-pills nav-fill bg-light rounded p-1 nav-pills-container">
                         <li class="nav-item">
                             <a class="nav-link <?= ($data['active_tab'] == 'all') ? 'active font-weight-bold shadow-sm' : 'text-muted'; ?>"
                                 href="<?= BASEURL; ?>Riwayat/index/all"
@@ -43,34 +89,24 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="myTable" class="table table-hover align-middle mb-0">
+                <table id="tableRiwayat" class="table table-hover align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th class="pl-4 py-3 border-0" width="5%">No</th>
-
-                            <th class="py-3 border-0">
-                                <?= ($data['active_tab'] == 'all') ? 'Nama Peminjam' : 'Judul Kegiatan'; ?>
-                            </th>
-
-                            <?php if ($data['active_tab'] == 'all'): ?>
-                                <th class="py-3 border-0">Kegiatan</th>
-                            <?php endif; ?>
-
+                            <th class="pl-4 py-3 border-0 col-number">No</th>
+                            <th class="py-3 border-0">Nama Peminjam</th>
+                            <th class="py-3 border-0">Judul Kegiatan</th>
                             <th class="py-3 border-0">Tgl Pengajuan</th>
-                            <th class="text-center py-3 border-0">Status</th>
-
-                            <th class="text-center py-3 border-0"
-                                width="<?= ($data['active_tab'] == 'all') ? '10%' : '15%'; ?>">Aksi</th>
+                            <th id="th-status" class="text-center py-3 border-0 th-sortable">
+                                Status <i class="fas fa-filter ml-1"></i>
+                            </th>
+                            <th class="text-center py-3 border-0 col-action">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $no = 1; ?>
                         <?php if (empty($data['riwayat'])): ?>
                             <tr>
-                                <td colspan="<?= ($data['active_tab'] == 'all') ? '6' : '5'; ?>"
-                                    class="text-center py-5 text-muted">
-                                    <img src="<?= BASEURL; ?>img/empty.svg" alt="Kosong" style="width: 100px; opacity: 0.5;"
-                                        class="mb-3">
+                                <td colspan="6" class="text-center py-5 text-muted">
                                     <p class="mb-0">Belum ada riwayat peminjaman.</p>
                                 </td>
                             </tr>
@@ -80,33 +116,12 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                     <td class="pl-4 font-weight-bold text-muted"><?= $no++; ?></td>
 
                                     <td>
-                                        <?php if ($data['active_tab'] == 'all'): ?>
-                                            <div class="d-flex align-items-center">
-                                                <!-- <div class="avatar-circle bg-navy-light text-navy mr-3 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 14px;">
-                                                    <?= substr($row['nama_user'], 0, 1); ?>
-                                                </div> -->
-                                                <div>
-                                                    <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 14px;">
-                                                        <?= $row['nama_user']; ?>
-                                                    </h6>
-                                                </div>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-circle bg-light text-muted mr-3 d-flex align-items-center justify-content-center"
-                                                    style="width: 35px; height: 35px; border-radius: 8px;">
-                                                    <i class="fas fa-clipboard-list"></i>
-                                                </div>
-                                                <h6 class="mb-0 text-dark font-weight-bold" style="font-size: 14px;">
-                                                    <?= $row['judul_kegiatan']; ?>
-                                                </h6>
-                                            </div>
-                                        <?php endif; ?>
+                                        <h6 class="row-title-text">
+                                            <?= ($data['active_tab'] == 'all') ? $row['nama_user'] : 'Saya'; ?>
+                                        </h6>
                                     </td>
 
-                                    <?php if ($data['active_tab'] == 'all'): ?>
-                                        <td><?= $row['judul_kegiatan']; ?></td>
-                                    <?php endif; ?>
+                                    <td><?= $row['judul_kegiatan']; ?></td>
 
                                     <td><?= date('d M Y', strtotime($row['tanggal_pengajuan'])); ?></td>
 
@@ -114,28 +129,13 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                         <?php
                                         $st = strtolower($row['status']);
                                         $badgeColor = 'secondary';
-                                        
-
-                                        if ($st == 'disetujui' || $st == 'diterima') {
-                                            $badgeColor = 'success';
-                                            
-                                        } elseif ($st == 'tolak peminjaman') {
-                                            $badgeColor = 'danger';
-                                            
-                                        } elseif ($st == 'tolak pengembalian') {
-                                            $badgeColor = 'danger';
-                                            
-                                        } elseif ($st == 'melengkapi surat') {
-                                            $badgeColor = 'warning';
-                                            
-                                        } elseif ($st == 'diproses') {
-                                            $badgeColor = 'info';
-                                            
-                                        }
+                                        if ($st == 'disetujui' || $st == 'diterima') $badgeColor = 'success';
+                                        elseif (strpos($st, 'tolak') !== false) $badgeColor = 'danger';
+                                        elseif ($st == 'melengkapi surat') $badgeColor = 'warning';
+                                        elseif ($st == 'diproses') $badgeColor = 'info';
                                         ?>
-                                        <span class="badge badge-<?= $badgeColor; ?> px-3 py-2 rounded-pill">
-                                            <i class="fas <?= $iconStatus; ?> mr-1"
-                                                style="font-size: 10px;"></i><?= ucfirst($st); ?>
+                                        <span class="badge badge-<?= $badgeColor; ?> badge-status">
+                                            <?= ucfirst($st); ?>
                                         </span>
                                     </td>
 
@@ -166,6 +166,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                             </a>
                                         <?php endif; ?>
                                     </td>
+                                    
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -175,3 +176,10 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
         </div>
     </div>
 </div>
+
+<script>
+    $.fn.dataTable.ext.errMode = 'none';
+    $.fn.dataTable.ext.errMode = function(settings, helpPage, message) {
+        console.log("DataTables Error: ", message);
+    };
+</script>

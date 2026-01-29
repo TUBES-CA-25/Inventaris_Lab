@@ -1,4 +1,4 @@
-const lastSelectValue = {};
+    const lastSelectValue = {};
 
 function checkSelection(type) {
     const select = document.getElementById('select-' + type);
@@ -99,9 +99,23 @@ function hapusMaster(type) {
         const id = select.value;
         const text = select.options[select.selectedIndex].text.trim();
 
-        if (confirm("Yakin ingin menghapus '" + text + "'? Data hanya akan terhapus jika tidak digunakan oleh barang lain.")) {
-            window.location.href = "<?= BASEURL; ?>DetailBarang/hapusMaster/" + type + "/" + id;
-        }
+        // Menggunakan SweetAlert2 sebagai pengganti confirm
+        Swal.fire({
+            title: 'Hapus Data Master?',
+            text: "Anda akan menghapus '" + text + "'. Data tidak bisa dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Arahkan ke URL penghapusan jika user klik Ya
+                window.location.href = "<?= BASEURL; ?>DetailBarang/hapusMaster/" + type + "/" + id;
+            }
+        });
+
     } catch (error) {
         console.error('Error di hapusMaster:', error);
     }

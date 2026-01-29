@@ -2,11 +2,12 @@
 
 // define('BASEURL', 'http://0.0.0.0:8080/Inventaris_Lab1/public/');
 define('BASEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/Inventaris_Lab/public/');
+// define('BASEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/public/');
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
-define('DB_NAME', 'inventori_db');
+define('DB_NAME', 'inventori_db3');
 
 // ID Encryption Keys
 define('ID_ENCRYPTION_KEY', 'InventarisLabSecreetKey2024!!'); // 32 chars recommended for AES-256

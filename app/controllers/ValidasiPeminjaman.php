@@ -9,10 +9,6 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
-        else if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
-            header('Location: ' . BASEURL . 'Beranda');
-            exit;
-        }
     }
 
     public function index()
@@ -46,46 +42,78 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
+
         $data['judul'] = 'Detail Validasi Peminjaman';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
         $data['peminjaman'] = $this->model('Peminjaman_model')->getDetailValidasiDataPeminjaman($id);
         $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id);
-
         if (!$data['peminjaman']) {
             Flasher::setFlash('Gagal', 'Data peminjaman tidak ditemukan', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
+
         $data['status_Kembali'] = isset($data['peminjaman']['status_pengembalian']) ? $data['peminjaman']['status_pengembalian'] : '-';
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('ValidasiPeminjaman/DetailPeminjaman', $data);
-        // $this->view('templates/footer', $data);
+        $this->view('templates/footer1', $data);
     }
 
+    
     public function accKalab()
-    {
-        if ($_SESSION['id_role'] != '1') {
-            Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id = IdObfuscator::decode($_POST['id_peminjaman']);
-
-            if ($this->model('Peminjaman_model')->validasiKalab($id) > 0) {
-                Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
-            } else {
-                Flasher::setFlash('Gagal', 'Terjadi kesalahan atau data sudah disetujui sebelumnya.', '', 'warning');
-            }
-            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id);
-            exit;
-        }
+{
+    if ($_SESSION['id_role'] != '1') {
+        Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
+        header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+        exit;
     }
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // Simpan ID asli yang terenkripsi untuk redirect nanti
+        $id_encoded = $_POST['id_peminjaman']; 
+        
+        // Decode untuk keperluan database
+        $id_decoded = IdObfuscator::decode($id_encoded);
+
+        if ($this->model('Peminjaman_model')->validasiKalab($id_decoded) > 0) {
+            Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
+        } else {
+            // Jika data tidak berubah (misal sudah diklik sebelumnya), beri info saja, jangan error
+            Flasher::setFlash('Info', 'Data sudah disetujui sebelumnya atau tidak ada perubahan.', '', 'info');
+        }
+        
+        // PERBAIKAN PENTING DI SINI:
+        // Kembalikan ke halaman detail menggunakan ID YANG TER-ENKRIPSI ($id_encoded)
+        header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
+        exit;
+    }
+}
+
+    // public function accKalab()
+    // {
+        
+    //     if ($_SESSION['id_role'] != '1') {
+    //         Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
+    //         header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+    //         exit;
+    //     }
+
+    //     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    //         $id = IdObfuscator::decode($_POST['id_peminjaman']);
+
+    //         if ($this->model('Peminjaman_model')->validasiKalab($id) > 0) {
+    //             Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
+    //         } else {
+    //             Flasher::setFlash('Gagal', 'Terjadi kesalahan atau data sudah disetujui sebelumnya.', '', 'warning');
+    //         }
+    //         header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id);
+    //         exit;
+    //     }
+    // }
 
     public function viewValidasiPosisi($id_peminjaman)
     {

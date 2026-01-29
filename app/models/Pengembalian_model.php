@@ -28,7 +28,7 @@ class Pengembalian_model
             LEFT JOIN trx_user tu ON p.id_user = tu.id_user
             LEFT JOIN trx_data_user u ON tu.id_user = u.id_user
             LEFT JOIN trx_pengembalian pen ON p.id_peminjaman = pen.id_peminjaman
-            WHERE p.status IN ('Disetujui', 'Dikembalikan')
+            WHERE p.status IN ('Disetujui', 'tolak pengembalian')
             ORDER BY 
                 CASE WHEN pen.id_pengembalian IS NULL THEN 0 ELSE 1 END,
                 p.id_peminjaman DESC");

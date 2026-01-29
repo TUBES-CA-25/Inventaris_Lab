@@ -202,3 +202,75 @@ th#th-status.sorting::after {
 .tooltip.bs-tooltip-bottom .arrow::before {
     border-bottom-color: #0c1740;
 }
+
+/* --- Statistik Cards --- */
+.stat-value-navy {
+    color: #0C1740;
+}
+
+.stat-value-red {
+    color: #dc3545;
+}
+
+/* Ikon khusus untuk status Ditolak (Merah soft) */
+.stat-icon-danger-soft {
+    color: #dc3545 !important;
+    background-color: #ffebeb !important;
+}
+
+/* --- Navigasi Tab (Admin) --- */
+.nav-card-container {
+    border-radius: 10px;
+}
+
+.nav-pills-container {
+    border: 1px solid #eee;
+}
+
+/* Override style active default bootstrap dengan warna custom */
+.nav-pills .nav-link.active-custom {
+    background-color: #0C1740;
+    color: #fff !important;
+    font-weight: bold;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.nav-pills .nav-link:not(.active-custom) {
+    color: #6c757d; /* text-muted */
+}
+
+/* --- Tabel Riwayat --- */
+.col-number {
+    width: 5%;
+}
+
+.col-action {
+    width: 15%;
+}
+
+.th-sortable {
+    cursor: pointer;
+}
+
+.row-title-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #343a40; /* text-dark */
+    margin-bottom: 0;
+}
+
+/* Badge Status */
+.badge-status {
+    padding-left: 1rem !important; /* px-3 */
+    padding-right: 1rem !important;
+    padding-top: 0.5rem !important; /* py-2 */
+    padding-bottom: 0.5rem !important;
+    border-radius: 50rem !important; /* rounded-pill */
+}
+
+/* --- Tombol Aksi --- */
+.action-buttons-group {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}

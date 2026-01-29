@@ -26,9 +26,14 @@ class Riwayat extends Controller
         // Role 7 = Mahasiswa/User Biasa
         $is_mahasiswa = ($id_role_login == 7);
 
+        // Variabel untuk menampung hasil statistik
+        $stats = [];
+
         if ($is_mahasiswa) {
-            // Mode User Biasa
+            // Mode User Biasa: Ambil Data & Statistik Diri Sendiri
             $data['riwayat'] = $riwayatModel->getRiwayatByUser($id_user_login);
+            $stats = $riwayatModel->getStatistik($id_user_login);
+            
             $data['is_admin'] = false;
             $data['active_tab'] = 'me';
         } else {
@@ -36,13 +41,24 @@ class Riwayat extends Controller
             $data['is_admin'] = true;
 
             if ($filter == 'me') {
+                // Admin melihat riwayat sendiri
                 $data['riwayat'] = $riwayatModel->getRiwayatByUser($id_user_login);
+                $stats = $riwayatModel->getStatistik($id_user_login);
                 $data['active_tab'] = 'me';
             } else {
+                // Admin melihat semua riwayat
                 $data['riwayat'] = $riwayatModel->getAllRiwayat();
+                $stats = $riwayatModel->getStatistik(null); // Parameter null = hitung semua
                 $data['active_tab'] = 'all';
             }
         }
+
+        // Masukkan hasil statistik ke $data agar bisa dibaca di View (index.php)
+        // Menggunakan operator null coalescing (?? 0) untuk mencegah error jika data kosong
+        $data['total_disetujui'] = $stats['total_disetujui'] ?? 0;
+        $data['total_diproses']  = $stats['total_diproses'] ?? 0;
+        $data['total_ditolak']   = $stats['total_ditolak'] ?? 0;
+        $data['total_kembali']   = $stats['total_kembali'] ?? 0;
 
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $currentUser;

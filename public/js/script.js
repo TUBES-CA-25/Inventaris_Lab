@@ -55,7 +55,7 @@ $(function () {
       dataType: 'json',
       success: function (data) {
         if (data.error) {
-          alert(data.error);
+          Swal.fire('Gagal', data.error, 'error');
           return;
         }
 
@@ -68,7 +68,7 @@ $(function () {
         $('#id_peminjaman').val(data.id_peminjaman);
       },
       error: function () {
-        alert('Terjadi kesalahan saat mengambil data');
+        Swal.fire('Error', 'Terjadi kesalahan saat mengambil data', 'error');
       }
     });
   });
@@ -200,7 +200,11 @@ function submitForm() {
   });
   console.log(idbarang);
   if (idbarang.length === 0) {
-    alert("Pilih setidaknya satu barang untuk diekspor!");
+    Swal.fire({
+        icon: 'warning',
+        title: 'Peringatan',
+        text: 'Pilih setidaknya satu barang untuk diekspor!'
+    });
     return;
   }
 
@@ -321,7 +325,8 @@ $(function () {
 
 
   $(document).ready(function () {
-    $('#myTable').DataTable();
+    
+    // $('#myTable').DataTable();
 
     $("form#formCheckbox").submit(function (e) {
       const checkboxes = document.querySelectorAll(".checkbox");
@@ -341,18 +346,18 @@ $(function () {
     });
   });
 
-  let myTable = $('#myTable').DataTable({
-    dom: 'lrtip', // Menghilangkan search bawaan DataTable
-    "bLengthChange": false, // Menonaktifkan opsi show entries
-    "bInfo": true // Menonaktifkan informasi total entries
-  });
+  // let myTable = $('#myTable').DataTable({
+  //   dom: 'lrtip', 
+  //   "bLengthChange": false, 
+  //   "bInfo": true 
+  // });
 
   $('select[name="entries_length"]').on('change', function () {
-    myTable.page.len($(this).val()).draw(); // Atur jumlah entri per halaman
+    myTable.page.len($(this).val()).draw(); 
   });
 
   $('#customSearch').on('keyup', function () {
-    myTable.search(this.value).draw(); // Cari data sesuai input
+    myTable.search(this.value).draw(); 
   });
 
   let table = $("#example").DataTable({
@@ -594,130 +599,163 @@ function toggleFormTolak() {
 }
 
 $(document).ready(function () {
-  $('[data-toggle="tooltip"]').tooltip();
-
-  var table = $('#tableRiwayat').DataTable({
-    "dom": 'rtp',
-    "pageLength": 10,
-    "ordering": true,
-    "columnDefs": [
-      { "orderable": false, "targets": 0 },
-      { "orderable": false, "targets": 5 },
-      { "orderable": false, "targets": 6 }
-    ],
-    "language": {
-      "emptyTable": "Tidak ada data tersedia",
-      "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-      "infoEmpty": "Menampilkan 0 data",
-      "infoFiltered": "(difilter dari _MAX_ total data)",
-      "paginate": {
-        "first": "Pertama",
-        "last": "Terakhir",
-        "next": "Selanjutnya",
-        "previous": "Sebelumnya"
-      }
+    // 1. Hancurkan inisialisasi lama jika ada untuk mencegah alert "reinitialise"
+    if ($.fn.DataTable.isDataTable('#tableRiwayat')) {
+        $('#tableRiwayat').DataTable().destroy();
     }
-  });
 
-  $('#customSearch').on('keyup', function () {
-    table.search(this.value).draw();
-  });
+    // 2. Inisialisasi satu kali saja dengan konfigurasi yang benar
+    var table = $('#tableRiwayat').DataTable({
+        "dom": 'rtp', // 'f' dihilangkan karena pakai customSearch
+        "pageLength": 10,
+        "ordering": true,
+        "responsive": true,
+        "columnDefs": [
+            // Target adalah index kolom (dimulai dari 0). 
+            // Karena total 6 kolom, maka indexnya 0, 1, 2, 3, 4, 5.
+            { "orderable": false, "targets": [0, 5] } 
+        ],
+        "language": {
+            "emptyTable": "Tidak ada data tersedia",
+            "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+            "paginate": {
+                "next": "Berikutnya",
+                "previous": "Sebelumnya"
+            }
+        }
+    });
 
-  var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
-  var currentIndex = 0;
-
-  $('#th-status').on('click', function () {
-    if (currentIndex >= statusCycle.length) {
-      table.column(5).search('').draw();
-      $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
-      currentIndex = 0;
-    } else {
-      var currentStatus = statusCycle[currentIndex];
-      table.column(5).search(currentStatus).draw();
-      $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
-      currentIndex++;
-    }
-  });
-
-  table.on('draw', function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
+    // 3. Hubungkan input search custom Anda (jika ada)
+    $('#customSearch').on('keyup', function () {
+        table.search(this.value).draw();
+    });
 });
 
-$(document).ready(function () {
-  $('[data-toggle="tooltip"]').tooltip();
+// $(document).ready(function () {
+//   $('[data-toggle="tooltip"]').tooltip();
 
-  var table = $('#tableRiwayat').DataTable({
-    "dom": 'rtp',
-    "pageLength": 10,
-    "ordering": true,
-    "columnDefs": [
-      { "orderable": false, "targets": 0 },
-      { "orderable": false, "targets": 5 },
-      { "orderable": false, "targets": 6 }
-    ],
-    "language": {
-      "emptyTable": "Tidak ada data tersedia",
-      "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-      "infoEmpty": "Menampilkan 0 data",
-      "infoFiltered": "(difilter dari _MAX_ total data)",
-      "paginate": {
-        "first": "Pertama",
-        "last": "Terakhir",
-        "next": "Selanjutnya",
-        "previous": "Sebelumnya"
-      }
-    }
-  });
+//   var table = $('#tableRiwayat').DataTable({
+//     "dom": 'rtp',
+//     "pageLength": 10,
+//     "ordering": true,
+//     "columnDefs": [
+//       { "orderable": false, "targets": 0 },
+//       { "orderable": false, "targets": 5 },
+//       { "orderable": false, "targets": 6 }
+//     ],
+//     "language": {
+//       "emptyTable": "Tidak ada data tersedia",
+//       "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+//       "infoEmpty": "Menampilkan 0 data",
+//       "infoFiltered": "(difilter dari _MAX_ total data)",
+//       "paginate": {
+//         "first": "Pertama",
+//         "last": "Terakhir",
+//         "next": "Selanjutnya",
+//         "previous": "Sebelumnya"
+//       }
+//     }
+//   });
 
-  $('#customSearch').on('keyup', function () {
-    table.search(this.value).draw();
-  });
+//   $('#customSearch').on('keyup', function () {
+//     table.search(this.value).draw();
+//   });
 
-  var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
-  var currentIndex = 0;
+//   var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
+//   var currentIndex = 0;
 
-  $('#th-status').on('click', function () {
-    if (currentIndex >= statusCycle.length) {
-      table.column(5).search('').draw();
-      $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
-      currentIndex = 0;
-    } else {
-      var currentStatus = statusCycle[currentIndex];
-      table.column(5).search(currentStatus).draw();
-      $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
-      currentIndex++;
-    }
-  });
+//   $('#th-status').on('click', function () {
+//     if (currentIndex >= statusCycle.length) {
+//       table.column(5).search('').draw();
+//       $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
+//       currentIndex = 0;
+//     } else {
+//       var currentStatus = statusCycle[currentIndex];
+//       table.column(5).search(currentStatus).draw();
+//       $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
+//       currentIndex++;
+//     }
+//   });
 
-  table.on('draw', function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-});
+//   table.on('draw', function () {
+//     $('[data-toggle="tooltip"]').tooltip();
+//   });
+// });
 
-$(document).ready(function () {
-  $('#tableValidasi').DataTable({
-    // Konfigurasi Bahasa Indonesia
-    language: {
-      search: "Cari:",
-      lengthMenu: "Tampilkan _MENU_ data",
-      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-      infoEmpty: "Tidak ada data",
-      infoFiltered: "(difilter dari _MAX_ total data)",
-      zeroRecords: "Data tidak ditemukan",
-      paginate: {
-        first: "<<",
-        last: ">>",
-        next: ">",
-        previous: "<"
-      }
-    },
-    order: [[2, 'desc']],
-    columnDefs: [
-      { orderable: false, targets: [0, 7] }
-    ]
-  });
-});
+// $(document).ready(function () {
+//   $('[data-toggle="tooltip"]').tooltip();
+
+//   var table = $('#tableRiwayat').DataTable({
+//     "dom": 'rtp',
+//     "pageLength": 10,
+//     "ordering": true,
+//     "columnDefs": [
+//       { "orderable": false, "targets": 0 },
+//       { "orderable": false, "targets": 5 },
+//       { "orderable": false, "targets": 6 }
+//     ],
+//     "language": {
+//       "emptyTable": "Tidak ada data tersedia",
+//       "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+//       "infoEmpty": "Menampilkan 0 data",
+//       "infoFiltered": "(difilter dari _MAX_ total data)",
+//       "paginate": {
+//         "first": "Pertama",
+//         "last": "Terakhir",
+//         "next": "Selanjutnya",
+//         "previous": "Sebelumnya"
+//       }
+//     }
+//   });
+
+//   $('#customSearch').on('keyup', function () {
+//     table.search(this.value).draw();
+//   });
+
+//   var statusCycle = ['Melengkapi Surat', 'Diproses', 'Diterima', 'Dikembalikan', 'Ditolak'];
+//   var currentIndex = 0;
+
+//   $('#th-status').on('click', function () {
+//     if (currentIndex >= statusCycle.length) {
+//       table.column(5).search('').draw();
+//       $('#th-status').html('Status <i class="fas fa-filter ml-1" style="font-size: 10px; opacity: 0.7;"></i>');
+//       currentIndex = 0;
+//     } else {
+//       var currentStatus = statusCycle[currentIndex];
+//       table.column(5).search(currentStatus).draw();
+//       $('#th-status').html(currentStatus + ' <i class="fas fa-check-circle ml-1"></i>');
+//       currentIndex++;
+//     }
+//   });
+
+//   table.on('draw', function () {
+//     $('[data-toggle="tooltip"]').tooltip();
+//   });
+// });
+
+// $(document).ready(function () {
+//   $('#tableValidasi').DataTable({
+//     // Konfigurasi Bahasa Indonesia
+//     language: {
+//       search: "Cari:",
+//       lengthMenu: "Tampilkan _MENU_ data",
+//       info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+//       infoEmpty: "Tidak ada data",
+//       infoFiltered: "(difilter dari _MAX_ total data)",
+//       zeroRecords: "Data tidak ditemukan",
+//       paginate: {
+//         first: "<<",
+//         last: ">>",
+//         next: ">",
+//         previous: "<"
+//       }
+//     },
+//     order: [[2, 'desc']],
+//     columnDefs: [
+//       { orderable: false, targets: [0, 7] }
+//     ]
+//   });
+// });
 
 const fileInput = document.getElementById('file_surat');
 const fileLabel = document.getElementById('file-label');
@@ -850,9 +888,20 @@ function submitExport() {
   var checkboxes = document.querySelectorAll('.item-checkbox:checked');
 
   if (checkboxes.length === 0) {
-    if (confirm("Tidak ada barang yang dipilih. Apakah Anda ingin mengekspor SEMUA data?")) {
-      form.submit();
-    }
+    Swal.fire({
+        title: 'Ekspor Semua Data?',
+        text: "Tidak ada barang yang dipilih. Apakah Anda ingin mengekspor SEMUA data?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Ekspor Semua',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.submit();
+        }
+    });
   } else {
     form.submit();
   }

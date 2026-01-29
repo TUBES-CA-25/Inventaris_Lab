@@ -47,8 +47,8 @@ if (!isset($_SESSION['login'])) {
                 </button>
             </div>
 
-            <div class="search-container">
-                <i class="fa-solid fa-magnifying-glass search-icon d-none d-md-flex"></i>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="customSearch" class="search-input" placeholder="Cari barang...">
             </div>
         </div>
@@ -121,7 +121,6 @@ if (!isset($_SESSION['login'])) {
                                         value="<?= IdObfuscator::encode($row['id_barang']) ?>"
                                         class="custom-checkbox item-checkbox">
                                 </td>
-                                <td class="text-center"><?= $i++; ?></td>
                                 <td style="font-weight:600;"><?= $row['kode_barang']; ?></td>
                                 <td style="text-transform: capitalize;"><?= $row['sub_barang']; ?></td>
                                 <td style="text-transform: capitalize;"><?= $row['nama_merek_barang']; ?></td>
@@ -146,12 +145,12 @@ if (!isset($_SESSION['login'])) {
                                 <td class="text-center">
                                     <div style="display: flex; justify-content: center; gap: 10px;">
                                         <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
-                                            <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
+                                            <!-- <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
                                                 data-toggle="modal" data-target="#modalTambah"
                                                 data-id="<?= IdObfuscator::encode($row['id_barang']); ?>">
                                                 <i class="fa-regular fa-pen-to-square fa-lg"
                                                     style="color: var(--accent-green);"></i>
-                                            </a>
+                                            </a> -->
                                             <a data-toggle="modal"
                                                 data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>"
                                                 style="cursor: pointer;">
@@ -187,7 +186,7 @@ if (!isset($_SESSION['login'])) {
                                         </div>
                                     </div>
 
-                                    <div class="modal fade" id="modalDetail<?= IdObfuscator::encode($row['id_barang']); ?>"
+                                    <!-- <div class="modal fade" id="modalDetail<?= IdObfuscator::encode($row['id_barang']); ?>"
                                         tabindex="-1" role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
                                             <div class="modal-content" style="border-radius: 15px;">
@@ -216,7 +215,7 @@ if (!isset($_SESSION['login'])) {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                 </td>
                             </tr>

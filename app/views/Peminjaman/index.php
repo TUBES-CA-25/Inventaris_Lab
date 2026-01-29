@@ -14,14 +14,14 @@ if (!isset($_SESSION['login'])) {
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="customSearch" placeholder="Search...">
-            </div> 
+            </div>
         </div>
 
         <div class="row">
             <?php if (!empty($data['barang'])) : ?>
                 <?php foreach ($data['barang'] as $brg) : ?>
                     <?php
-                    $fotoPath = 'default_tools.png'; 
+                    $fotoPath = 'default_tools.png';
 
                     if (!empty($brg['foto_barang'])) {
                         $cleanPath = str_replace('../public/img/', '', $brg['foto_barang']);
@@ -34,7 +34,7 @@ if (!isset($_SESSION['login'])) {
                             <div class="card-img-container">
                                 <img src="<?= BASEURL; ?>img/<?= $fotoPath; ?>"
                                     alt="<?= $brg['sub_barang']; ?>"
-                                    onerror="this.src='<?= BASEURL; ?>img/default_tools.png';">
+                                    onerror="this.onerror=null; this.src='<?= BASEURL; ?>img/foto-barang/default_tools.png';">
                             </div>
 
                             <div class="card-desc">
