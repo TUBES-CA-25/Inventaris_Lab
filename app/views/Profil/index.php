@@ -60,17 +60,17 @@
 
         <div class="profile-actions" style="display: flex; justify-content: center; gap: 15px; padding-bottom: 20px;">
 
-            <a href="<?= BASEURL; ?>Beranda" class="btn btn-back">
+            <a href="<?= BASEURL; ?>Beranda" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> Kembali
             </a>
 
             <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
-                <button type="button" class="btn" style="background-color: #4e73df; color: white;" onclick="openTTDModal()">
+                <button type="button" class="btn btn-navy"  onclick="openTTDModal()">
                     <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
                 </button>
             <?php endif; ?>
 
-            <button type="button" class="btn btn-edit" onclick="openEditModal()">
+            <button type="button" class="btn btn-navy btn-edit" onclick="openEditModal()">
                 <i class="fa-solid fa-pen-to-square"></i> Edit Profil
             </button>
         </div>
@@ -96,7 +96,7 @@
                                 style="background: #f8f9fc; border: 2px dashed #4e73df; border-radius: 8px;">
                                 <img src="<?= BASEURL; ?>img/ttd/ttd_huzain.png?t=<?= time(); ?>" alt="TTD Huzain"
                                     class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                    onerror="this.src='https://via.placeholder.com/150x80?text=Belum+Ada';">
+                                    onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
                             </div>
 
                             <div class="form-group">
@@ -113,7 +113,7 @@
                                 style="background: #f0fdf4; border: 2px dashed #1cc88a; border-radius: 8px;">
                                 <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah"
                                     class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                    onerror="this.src='https://via.placeholder.com/150x80?text=Belum+Ada';">
+                                    onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
                             </div>
 
                             <div class="form-group">
@@ -198,8 +198,8 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-back" onclick="closeEditModal()">Batal</button>
-                    <button type="submit" class="btn btn-edit">Simpan Biodata</button>
+                    <button type="button" class="btn-back" onclick="closeEditModal()">Batal</button>
+                    <button type="submit" class="btn btn-navy btn-edit">Simpan</button>
                 </div>
             </form>
         </div>
