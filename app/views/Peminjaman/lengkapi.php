@@ -1,10 +1,3 @@
-<?php
-if (!isset($_SESSION['login'])) {
-    header("Location:" . BASEURL . "Login");
-    exit;
-}
-?>
-
 <div class="content">
     <div class="container-fluid p-4">
 
@@ -33,7 +26,7 @@ if (!isset($_SESSION['login'])) {
                 <div class="step-number-circle">1</div>
                 <div>
                     <h5 class="step-title">Review Data & Download Surat</h5>
-                    <small style="opacity: 0.9;">Periksa data peminjaman dan unduh surat yang perlu ditandatangani</small>
+                    <small class="step-desc">Periksa data peminjaman dan unduh surat yang perlu ditandatangani</small>
                 </div>
             </div>
 
@@ -78,53 +71,92 @@ if (!isset($_SESSION['login'])) {
                         </div>
                         <div class="info-value">
                             <?= isset($data['peminjaman']['tanggal_peminjaman']) ? date('d M Y', strtotime($data['peminjaman']['tanggal_peminjaman'])) : '-'; ?>
-                            <i class="fas fa-arrow-right mx-2 text-muted" style="font-size: 12px;"></i>
+                            <i class="fas fa-arrow-right mx-2 text-muted date-arrow"></i>
                             <?= isset($data['peminjaman']['tanggal_pengembalian']) ? date('d M Y', strtotime($data['peminjaman']['tanggal_pengembalian'])) : '-'; ?>
                         </div>
                     </div>
 
-                    <div class="info-box1">
+                    <div class="info-box">
                         <div class="info-box-header">
+                            <div class="info-icon-circle">
+                                <i class="fas fa-sticky-note"></i>
+                            </div>
+                            <div>
+                                <div class="info-label">Keterangan / Catatan</div>
+                            </div>
+                        </div>
+                        <div class="info-value">
+                            <?= !empty($data['peminjaman']['keterangan_peminjaman']) ? $data['peminjaman']['keterangan_peminjaman'] : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="info-box1 info-box-full">
+                        <div class="info-box-header mb-3">
                             <div class="info-icon-circle">
                                 <i class="fas fa-box-open"></i>
                             </div>
                             <div>
-                                <div class="info-label">Barang Dipinjam</div>
+                                <div class="info-label">Daftar Barang & Spesifikasi</div>
                             </div>
                         </div>
-                        <div class="info-value">
+
+                        <div class="info-value p-0 d-flex flex-column w-100">
+
                             <?php if (!empty($data['detail_barang'])) : ?>
-                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                <div class="item-list-header">
+                                    <div style="width: 30%;">NAMA BARANG</div>
+                                    <div style="width: 55%;">SPESIFIKASI</div>
+                                    <div style="width: 15%; text-align: right;">JUMLAH</div>
+                                </div>
+
+                                <ul class="item-list-ul">
                                     <?php foreach ($data['detail_barang'] as $item) : ?>
-                                        <li style="margin-bottom: 4px;">
-                                            • <?= $item['nama_barang']; ?>
-                                            <span style="font-weight: bold; color: var(--primary-navy);">
-                                                (<?= $item['jumlah']; ?> Unit)
-                                            </span>
+                                        <li class="item-list-row">
+                                            <div class="item-content-wrapper">
+                                                
+                                                <div class="col-item-name">
+                                                    <?= $item['nama_barang']; ?>
+                                                </div>
+
+                                                <div class="col-item-spec">
+                                                    <div class="d-flex align-items-start">
+                                                        <i class="fas fa-wrench mt-1 mr-2 icon-spec"></i>
+                                                        <span><?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?></span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-item-qty">
+                                                    <span class="badge-qty">
+                                                        <?= $item['jumlah']; ?> Unit
+                                                    </span>
+                                                </div>
+
+                                            </div>
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
                             <?php else : ?>
-                                <?= isset($data['peminjaman']['nama_barang']) ? $data['peminjaman']['nama_barang'] : '-'; ?>
+                                <div class="text-center text-muted font-italic py-4 w-100">
+                                    <i class="fas fa-box-open mb-2 empty-state-icon"></i><br>
+                                    - Tidak ada data barang -
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="download-section">
                     <div class="download-icon-wrapper">
                         <i class="fas fa-file-pdf"></i>
                     </div>
-                    <h5 style="color: var(--danger-red); font-weight: 700; margin-bottom: 10px;">
+                    <h5 class="download-title">
                         Unduh Surat Peminjaman
                     </h5>
-                    <p style="color: #6c757d; margin-bottom: 25px;">
+                    <p class="download-desc">
                         Pastikan semua data di atas sudah benar sebelum mengunduh surat
                     </p>
-                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
-                        class="btn-download"
-                        <i class="fas fa-download"></i>Download Surat PDF
+                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>" class="btn-download">
+                        <i class="fas fa-download mr-2"></i>Download Surat PDF
                     </a>
                 </div>
             </div>
@@ -135,7 +167,7 @@ if (!isset($_SESSION['login'])) {
                 <div class="step-number-circle">2</div>
                 <div>
                     <h5 class="step-title">Upload Surat Bertanda Tangan</h5>
-                    <small style="opacity: 0.9;">Setelah ditandatangani, scan atau foto lalu upload di sini</small>
+                    <small class="step-desc">Setelah ditandatangani, scan atau foto lalu upload di sini</small>
                 </div>
             </div>
 
@@ -181,18 +213,18 @@ if (!isset($_SESSION['login'])) {
                             </small>
                         </div>
 
-                        <div id="view-preview" style="display: none;">
-                            <div class="upload-icon-wrapper" style="background: var(--success-green); box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);">
-                                <i class="fas fa-file-alt" style="color: white;"></i>
+                        <div id="view-preview" class="upload-preview-wrapper">
+                            <div class="upload-icon-wrapper upload-icon-success">
+                                <i class="fas fa-file-alt text-white"></i>
                             </div>
 
-                            <h5 class="upload-title" style="color: var(--success-green);">File Diupload!</h5>
+                            <h5 class="upload-title upload-title-success">File Diupload!</h5>
 
-                            <p id="filename-display" style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; word-break: break-word; padding: 0 10px;">
+                            <p id="filename-display" class="filename-text">
                                 nama_file.pdf
                             </p>
 
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="resetUpload(event)" style="border-radius: 20px; padding: 8px 20px;">
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-reset-upload" onclick="resetUpload(event)">
                                 <i class="fas fa-trash-alt mr-2"></i>Ganti File
                             </button>
                         </div>
