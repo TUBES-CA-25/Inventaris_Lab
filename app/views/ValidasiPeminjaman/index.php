@@ -105,7 +105,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
                                     elseif ($status == 'dikembalikan')
                                         $badgeClass = 'bg-primary';
                                     ?>
-                                    <span class="badge rounded-pill <?= $badgeClass; ?> px-3 py-2">
+                                    <span class="badge text-white rounded-pill <?= $badgeClass; ?> px-3 py-2">
                                         <?= ucfirst($pinjam['status']); ?>
                                     </span>
                                 </td>

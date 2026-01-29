@@ -11,7 +11,7 @@ $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
 $status_Kembali = $data['status_Kembali'];
 ?>
 
-<link rel="stylesheet" href="<?= BASEURL; ?>public/css/ValidasiPeminjaman.css">
+
 
 <div class="content">
     <div class="content-beranda container-fluid p-4">
@@ -88,7 +88,7 @@ $status_Kembali = $data['status_Kembali'];
 
                                             <div class="col-md-4 col-12 mb-1 mb-md-0 pl-0">
                                                 <div class="d-flex align-items-center">
-                                                    <i class="fas fa-box mr-2" style="color: var(--accent-blue);"></i>
+                                                    <!-- <i class="fas fa-box mr-2" style="color: var(--accent-blue);"></i> -->
                                                     <span class="font-weight-bold">
                                                         <?= htmlspecialchars($item['nama_barang']); ?>
                                                     </span>
@@ -96,9 +96,9 @@ $status_Kembali = $data['status_Kembali'];
                                             </div>
 
                                             <div class="col-md-6 col-12 mb-1 mb-md-0">
-                                                <?php if (!empty($item['spesifikasi'])) : ?>
+                                                <?php if (!empty($item['spesifikasi_barang'])) : ?>
                                                     <span style="font-size: 1rem; color: var(--text-dark);">
-                                                        <?= $item['spesifikasi']; ?>
+                                                        <?= $item['spesifikasi_barang']; ?>
                                                     </span>
                                                 <?php else : ?>
                                                     <span class="text-muted">-</span>
@@ -139,7 +139,6 @@ $status_Kembali = $data['status_Kembali'];
                                 <div style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #dc2626, #ef4444); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
                                     <i class="fas fa-file-pdf text-white" style="font-size: 40px;"></i>
                                 </div>
-                                <p class="mt-3 mb-0 text-muted small"><?= $p['file_surat']; ?></p>
                             </div>
                             <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank"
                                 class="btn btn-navy btn-block">
@@ -285,35 +284,56 @@ $status_Kembali = $data['status_Kembali'];
                             <h5 class="font-weight-bold text-danger mb-3">Pengajuan Ditolak</h5>
                             <div class="condition-box danger text-left">
                                 <strong class="d-block mb-1">Alasan Penolakan:</strong>
-                                <p class="mb-0"><?= !empty($p['keterangan_peminjaman']) ? $p['keterangan_peminjaman'] : '-'; ?></p>
+                                <p class="mb-0"><?= !empty($p['keterangan_tolak']) ? $p['keterangan_tolak'] : '-'; ?></p>
                             </div>
                         </div>
                     </div>
                 <?php elseif ($status_sekarang == 'tolak pengembalian') : ?>
                     <div class="modern-card" style="border-left: 4px solid #f97316;">
-                        <div class="card-body p-4 text-center">
-                            <div class="mb-3">
-                                <div style="width: 60px; height: 60px; margin: 0 auto; background: #ffedd5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-exclamation-triangle" style="font-size: 30px; color: #f97316;"></i>
-                                </div>
-                            </div>
-                            <h5 class="font-weight-bold mb-3" style="color: #c2410c;">Masalah Pengembalian</h5>
+        <div class="card-body p-4 text-center">
+            <div class="mb-3">
+                <div style="width: 60px; height: 60px; margin: 0 auto; background: #ffedd5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 30px; color: #f97316;"></i>
+                </div>
+            </div>
+            <h5 class="font-weight-bold mb-3" style="color: #c2410c;">Masalah Pengembalian</h5>
 
-                            <div class="alert alert-warning text-left border-0" style="background-color: #fff7ed; color: #9a3412;">
-                                <strong><i class="fas fa-info-circle mr-1"></i> Detail Masalah:</strong><br>
-                                <?= !empty($p['keterangan_tolak']) ? $p['keterangan_tolak'] : '-'; ?>
-                            </div>
+            <div class="alert alert-warning text-left border-0 mb-4" style="background-color: #fff7ed; color: #9a3412;">
+                <strong><i class="fas fa-info-circle mr-1"></i> Detail Masalah:</strong><br>
+                <?= !empty($p['keterangan_tolak']) ? $p['keterangan_tolak'] : '-'; ?>
+            </div>
 
-                            <form id="formSelesaiMasalah" action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mt-3">
-                                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                                <input type="hidden" name="status" value="dikembalikan">
-                                <button type="button" class="btn btn-navy btn-block"
-                                    onclick="konfirmasiAksi('formSelesaiMasalah', 'Masalah Teratasi?', 'Barang sudah aman?', 'question')">
-                                    <i class="fas fa-check-double mr-2"></i>Tandai Selesai
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+            <form id="formTerimaKembaliLagi" action="<?= BASEURL; ?>ValidasiPeminjaman/updateStatus" method="post" class="mb-2">
+                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                <input type="hidden" name="status" value="dikembalikan">
+
+                <?php
+                // Logika popup yang sama dengan status disetujui
+                $statusCek = isset($status_Kembali) ? $status_Kembali : '-';
+                if ($statusCek == 'Selesai Periksa') {
+                    $judulPopup = 'Terima Barang?';
+                    $pesanPopup = 'Pastikan fisik barang sudah dicek kembali.';
+                    $iconPopup  = 'question';
+                    $warnaBtn   = '#0d1b3e';
+                } else {
+                    $judulPopup = 'Peringatan!';
+                    $pesanPopup = 'Barang belum dikembalikan/diperiksa ulang, yakin terima?';
+                    $iconPopup  = 'warning';
+                    $warnaBtn   = '#d33';
+                }
+                ?>
+
+                <button type="button" class="btn btn-navy btn-block py-3"
+                    onclick="konfirmasiAksi('formTerimaKembaliLagi', '<?= $judulPopup; ?>', '<?= $pesanPopup; ?>', '<?= $iconPopup; ?>', '<?= $warnaBtn; ?>')">
+                    <i class="fas fa-check-circle mr-2"></i>Terima Pengembalian
+                </button>
+            </form>
+
+            <button type="button" class="btn btn-outline-danger btn-block btn-sm" onclick="bukaFormTolak('formTolakPengembalianContainer')">
+                <i class="fas fa-edit mr-1"></i> Ubah Keterangan Masalah
+            </button>
+        </div>
+    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -364,7 +384,7 @@ $status_Kembali = $data['status_Kembali'];
         </div>
 
         <!-- Detail Barang & Status Pengembalian -->
-        <?php if ($status_sekarang == 'disetujui' || $status_sekarang == 'dikembalikan') : ?>
+        <?php if ($status_sekarang == 'disetujui' || $status_sekarang == 'dikembalikan' || $status_sekarang == 'tolak pengembalian') : ?>
             <div class="modern-card mt-4">
                 <div class="card-header-modern">
                     <h6><i class="fas fa-clipboard-list mr-2"></i>Detail Barang & Status Pengembalian</h6>
@@ -388,13 +408,13 @@ $status_Kembali = $data['status_Kembali'];
 
                                             <div class="col-md-3 col-12 mb-2 mb-md-0 pl-md-3">
                                                 <div class="d-flex align-items-center">
-                                                    <i class="fas fa-box mr-2" style="color: var(--accent-blue);"></i>
+                                                    
                                                     <?= htmlspecialchars($item['nama_barang']); ?>
                                                 </div>
                                             </div>
 
                                             <div class="col-md-3 col-12 mb-2 mb-md-0">
-                                                <?= !empty($item['spesifikasi']) ? $item['spesifikasi'] : '-'; ?>
+                                                <?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?>
                                             </div>
 
                                             <div class="col-md-3 col-12 mb-2 mb-md-0">
