@@ -2,13 +2,13 @@
     <div class="profile-card">
         <div class="profile-header">
             <img src="<?= BASEURL; ?>img/logo bg putih.svg" alt="logo" />
-            <div class="profile-header-text">
+            <!-- <div class="profile-header-text">
                 <h1>Sistem Inventori</h1>
                 <h2>Barang ICLabs</h2>
-            </div>
+            </div> -->
         </div>
 
-        <!-- Flash Message -->
+        <!-- Flash Message -->9
         <div class="row">
             <div class="col-12">
                 <?php Flasher::flash(); ?>
@@ -65,12 +65,12 @@
             </a>
 
             <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
-                <button type="button" class="btn btn-navy"  onclick="openTTDModal()">
+                <button type="button" class="btn btn-navy rounded-pill"  onclick="openTTDModal()">
                     <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
                 </button>
             <?php endif; ?>
 
-            <button type="button" class="btn btn-navy btn-edit" onclick="openEditModal()">
+            <button type="button" class="btn btn-navy rounded-pill btn-edit" onclick="openEditModal()">
                 <i class="fa-solid fa-pen-to-square"></i> Edit Profil
             </button>
         </div>

@@ -14,7 +14,7 @@ class Register extends Controller {
         $status = $this->model('User_model')->tambahUser($_POST);
 
         if($status === 1){
-            Flasher::setFlash('Akun', 'berhasil', 'ditambahkan. Silakan Login.', 'success');
+            Flasher::setFlash('Akun', 'berhasil', ' ditambahkan. Silakan Login.', 'success');
             header('Location: '. BASEURL . 'Login'); // Redirect ke Login, bukan Root
         } elseif ($status === -1) {
             Flasher::setFlash('Gagal', 'Email sudah digunakan.', 'Gunakan email lain.', 'danger');
