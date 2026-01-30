@@ -60,14 +60,21 @@ class User_model
             return -3;
         }
 
+        // Generate verification token
+        $verificationToken = bin2hex(random_bytes(32));
+        $tokenExpiry = date('Y-m-d H:i:s', strtotime('+' . VERIFICATION_LINK_EXPIRY . ' hours'));
+
         try {
             $this->db->query('START TRANSACTION');
 
-            $queryUser = "INSERT INTO trx_user (email, password, id_role) VALUES (:email, :password, :id_role)";
+            $queryUser = "INSERT INTO trx_user (email, password, id_role, email_verified, verification_token, token_expiry) 
+                          VALUES (:email, :password, :id_role, 0, :token, :expiry)";
             $this->db->query($queryUser);
             $this->db->bind('email', $data['email']);
             $this->db->bind('password', password_hash($data['password'], PASSWORD_BCRYPT));
             $this->db->bind('id_role', $data['id_role'] ?? 7);
+            $this->db->bind('token', $verificationToken);
+            $this->db->bind('expiry', $tokenExpiry);
             $this->db->execute();
 
             $newUserId = $this->db->lastInsertId();
@@ -86,7 +93,13 @@ class User_model
             $this->db->execute();
 
             $this->db->query('COMMIT');
-            return 1;
+
+            // Return success with token for email verification
+            return [
+                'status' => 1,
+                'user_id' => $newUserId,
+                'token' => $verificationToken
+            ];
         } catch (Exception $e) {
             $this->db->query('ROLLBACK');
             return 0;
@@ -211,6 +224,10 @@ class User_model
         $user = $this->db->single();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Check if email is verified
+            if ($user['email_verified'] == 0) {
+                return ['verified' => false];
+            }
             return $user;
         }
         return NULL;
@@ -250,6 +267,46 @@ class User_model
         $this->db->query("UPDATE trx_user SET id_role = :id_role WHERE id_user = :id_user");
         $this->db->bind('id_role', $data['id_role']);
         $this->db->bind('id_user', $data['id_user']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    /**
+     * Get user's email and name for sending verification email
+     */
+    public function getUserEmailAndName($userId)
+    {
+        $this->db->query("SELECT u.email, d.nama_user 
+                          FROM trx_user u
+                          JOIN trx_data_user d ON u.id_user = d.id_user
+                          WHERE u.id_user = :id_user");
+        $this->db->bind('id_user', $userId);
+        return $this->db->single();
+    }
+
+    /**
+     * Verify email token and check if it's still valid
+     */
+    public function verifyEmailToken($token)
+    {
+        $this->db->query("SELECT * FROM trx_user 
+                          WHERE verification_token = :token 
+                          AND token_expiry > NOW()");
+        $this->db->bind('token', $token);
+        return $this->db->single();
+    }
+
+    /**
+     * Mark user's email as verified
+     */
+    public function markEmailAsVerified($userId)
+    {
+        $this->db->query("UPDATE trx_user 
+                          SET email_verified = 1, 
+                              verification_token = NULL, 
+                              token_expiry = NULL 
+                          WHERE id_user = :id_user");
+        $this->db->bind('id_user', $userId);
         $this->db->execute();
         return $this->db->rowCount();
     }
