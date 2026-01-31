@@ -1,3 +1,8 @@
+<!-- Meta untuk Base URL -->
+<meta name="base-url" content="<?= BASEURL; ?>">
+
+<link rel="stylesheet" href="<?= BASEURL; ?>css/login.css">
+
 <div class="body-login">
     <div class="figure-section">
         <div class="logo-container">

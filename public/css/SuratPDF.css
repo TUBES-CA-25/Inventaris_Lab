@@ -30,6 +30,7 @@ body {
     object-fit: contain;
 }
 
+.header-kop h3, .header-kop p { margin: 0; }
 .judul-surat {
     text-align: center;
     font-weight: bold;
@@ -76,6 +77,8 @@ body {
     padding: 5px 8px;
     font-size: 11pt;
 }
+
+.table-barang td { text-align: left; }
 
 .table-barang th {
     background-color: #f9f9f9;

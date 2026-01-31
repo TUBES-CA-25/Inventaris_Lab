@@ -6,6 +6,7 @@
     <title>Downloading...</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="<?= BASEURL; ?>/css/PrintSatuDetailPeminjaman.css?v=<?= time(); ?>">
+    <meta name="print-filename" content="<?= str_replace(['/','\\'], '_', $data['item']['kode_barang']); ?>">
 </head>
 <body>
 
@@ -15,7 +16,7 @@
         <span style="font-size: 12px; font-weight: normal;">Download akan dimulai otomatis.</span>
     </div>
 
-    <div id="contentToPrint" style="position: absolute; left: -9999px;">
+    <div id="contentToPrint" class="offscreen">
         
         <div class="card-export">
             
@@ -98,7 +99,7 @@
                         <?php if (!empty($item['foto_barang'])) : ?>
                             <img src="<?= $finalSrc; ?>" alt="Foto Barang" crossorigin="anonymous">
                         <?php else : ?>
-                            <span style="color: #ccc;">No Image</span>
+                            <span class="no-image">No Image</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -107,20 +108,6 @@
         </div>
     </div>
 
-    <script>
-        window.onload = function() {
-            
-            const element = document.getElementById('contentToPrint');
-            const fileName = 'Detail_<?= str_replace(['/','\\'], '_', $item['kode_barang']); ?>.pdf';
-
-            const opt = {
-                margin:       [10, 10, 10, 10], 
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } 
-            };
-        };
-    </script>
+    <script src="<?= BASEURL; ?>js/print_satu.js"></script>
 </body>
 </html>

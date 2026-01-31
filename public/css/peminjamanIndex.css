@@ -1,0 +1,22 @@
+.empty-image { opacity: 0.5; }
+.search-box { display:flex; align-items:center; gap:8px; }
+.search-box input { padding:8px 12px; border-radius:8px; border:1px solid #e5e7eb; }
+
+/* Give breathing room between the search icon and the input text */
+.search-box i { margin-right: 10px; color: #374151; font-size: 16px; }
+.search-box input { padding-left: 12px; }
+.card-item { background:#fff; border-radius:12px; padding:12px; box-shadow:0 8px 30px rgba(2,6,23,0.06); }
+.card-img-container img { width:100%; height:180px; object-fit:cover; border-radius:8px; }
+.card-desc { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+.btn-pinjam-now { background:linear-gradient(135deg,#0c1740 0%,#1e3a8a 100%); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
+.modal-input-readonly { background-color: #e9ecef; }
+.modal-submit-dark { background-color: #0f1429; color:#fff; }
+
+/* Icon alignment helpers */
+.icon-wrap { position: relative; }
+.icon-wrap .form-control, .icon-wrap .modal-input-readonly { padding-right: 44px; }
+.icon-inside { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #374151; }
+
+/* action icon sizes inside cards */
+.card-desc i { font-size: 14px; }
+.btn-pinjam-now i { margin-right: 6px; }

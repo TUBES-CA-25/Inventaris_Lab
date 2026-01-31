@@ -1,0 +1,48 @@
+.icon-wrap { position: relative; }
+.icon-wrap .inp-custom, .icon-wrap select, .icon-wrap input[type="date"], .icon-wrap input[type="text"] { padding-right: 44px; }
+.icon-inside { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #374151; font-size: 16px; }
+.icon-calendar { color: #1e293b; }
+.icon-check { color: #22c55e; font-size: 18px; }
+.icon-caret { color: #1e293b; }
+.text-center-input { text-align: center; }
+.hr-dashed { border-top: 2px dashed #e2e8f0; margin: 30px 0; }
+.content-figure img { max-width: 100%; }
+
+/* Remove browser native date-picker icon to avoid duplicate calendar icons */
+input[type="date"]::-webkit-calendar-picker-indicator {
+	opacity: 0;
+	display: none;
+}
+input[type="date"]::-webkit-inner-spin-button,
+input[type="date"]::-webkit-clear-button {
+	display: none;
+}
+input[type="date"] {
+	-webkit-appearance: textfield;
+	appearance: textfield;
+}
+.custom-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(2,6,23,0.5); align-items: center; justify-content: center; }
+.custom-modal-overlay.show { display: flex; }
+.custom-modal-box { background: #fff; padding: 20px; border-radius: 12px; max-width: 420px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+.modal-icon-circle { width: 64px; height: 64px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.modal-title { text-align: center; font-weight: 700; margin-bottom: 8px; }
+.modal-desc { text-align: center; color: #64748b; }
+.modal-btn-group { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
+.btn-modal-cancel, .btn-modal-delete { padding: 8px 16px; border-radius: 8px; border: none; }
+.btn-modal-cancel { background: #f3f4f6; }
+.btn-modal-delete { background: linear-gradient(135deg,#dc2626 0%,#b91c1c 100%); color: #fff; }
+
+/* small helpers used in form */
+.form-card { background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 10px 30px rgba(2,6,23,0.06); }
+.gap-row { margin-bottom: 18px; }
+.lbl { display:block; font-weight:600; margin-bottom:6px; }
+.inp-custom { width:100%; padding:10px 14px; border-radius:8px; border:1px solid #e5e7eb; }
+.inp-readonly { background:#f8fafc; }
+.btn-cancel-item { background: transparent; border: none; color: #ef4444; font-weight:600; }
+.btn-add-more { display:inline-flex; align-items:center; justify-content:center; background:#1e3a8a; color:#fff; padding:10px; border-radius:8px; }
+.action-footer { display:flex; gap:12px; justify-content:space-between; align-items:center; margin-top:20px; }
+.btn-back { background:#e5e7eb; padding:10px 16px; border-radius:8px; }
+.btn-send { background:linear-gradient(135deg,#0c1740 0%,#1e3a8a 100%); color:#fff; padding:10px 18px; border-radius:8px; }
+/* small icon tweaks */
+.btn-cancel-item i { margin-right:6px; font-size:16px; vertical-align:middle; }
+.icon-inside { color: #374151; }

@@ -13,12 +13,12 @@
         <?php if (!empty($gambar_kop)): ?>
             <img src="<?= $gambar_kop; ?>" alt="Kop Surat">
         <?php else: ?>
-            <h3 style="margin:0;">LABORATORIUM TERPADU</h3>
-            <p style="margin:0;">Fakultas Ilmu Komputer - UMI</p>
+            <h3>LABORATORIUM TERPADU</h3>
+            <p>Fakultas Ilmu Komputer - UMI</p>
         <?php endif; ?>
     </div>
 
-    <div class="judul-surat" style="text-decoration: underline;">FORM PEMINJAMAN ALAT</div>
+    <div class="judul-surat">FORM PEMINJAMAN ALAT</div>
 
     <div class="paragraph">
         Assalamu'alaikum Warahmatullahi Wabarakatuh.<br>
@@ -79,9 +79,9 @@
             foreach ($details as $item): ?>
                 <tr>
                     <td class="text-center"><?= $no++ ?></td>
-                    <td style="text-align: left;"><?= $item['nama_barang'] ?></td>
+                    <td><?= $item['nama_barang'] ?></td>
                     
-                    <td style="text-align: left;">
+                    <td>
                         <?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?>
                     </td>
                     
@@ -100,7 +100,7 @@
         Demikian surat permohonan peminjaman ini saya buat. Atas perhatian dan bantuannya saya ucapkan terima kasih.
     </div>
 
-    <div style="margin-top: 30px;"></div>
+    <div class="signature-wrapper"></div>
 
     <table class="signature-table">
         <tr>

@@ -5,226 +5,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 }
 ?>
 
-<style>
-    :root {
-        --navy-primary: #0d1b3e;
-        --navy-secondary: #1a2d5a;
-        --navy-light: #2a3f6f;
-        --accent-gold: #f39c12;
-        --accent-orange: #e67e22;
-    }
-
-    .page-wrapper {
-        background: #f8f9fa;
-        min-height: 100vh;
-        padding: 20px 0;
-    }
-
-    /* Custom Navy Theme */
-    .bg-navy-gradient {
-        background: linear-gradient(135deg, var(--navy-primary) 0%, var(--navy-secondary) 100%);
-    }
-
-    .text-navy {
-        color: var(--navy-primary) !important;
-    }
-
-    .border-navy {
-        border-color: var(--navy-primary) !important;
-    }
-
-    .btn-navy {
-        background: var(--navy-primary);
-        color: white;
-        border: none;
-    }
-
-    .btn-navy:hover {
-        background: var(--navy-secondary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(13, 27, 62, 0.3);
-    }
-
-    .btn-outline-navy {
-        border: 2px solid var(--navy-primary);
-        color: var(--navy-primary);
-        background: transparent;
-    }
-
-    .btn-outline-navy:hover {
-        background: var(--navy-primary);
-        color: white;
-    }
-
-    /* Card Styling */
-    .stat-card {
-        border-left: 4px solid var(--navy-primary);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-card.active {
-        border-left-color: var(--accent-gold);
-        background: linear-gradient(145deg, #fff9e6 0%, #ffffff 100%);
-    }
-
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .stat-icon.navy {
-        background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
-        color: white;
-    }
-
-    .stat-icon.gold {
-        background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
-        color: white;
-    }
-
-    /* Table Custom */
-    .table-navy thead {
-        background: var(--navy-primary);
-        color: white;
-    }
-
-    .table-navy thead th {
-        border: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        padding: 1rem;
-    }
-
-    .table-navy tbody tr {
-        transition: all 0.2s ease;
-    }
-
-    .table-navy tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Status Badges */
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .badge-baik {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .badge-rusak {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-
-    .badge-hilang {
-        background: #e2e3e5;
-        color: #383d41;
-        border: 1px solid #d6d8db;
-    }
-
-    .badge-pinjam {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-
-    /* Search Box */
-    .search-box-custom {
-        position: relative;
-    }
-
-    .search-box-custom .form-control {
-        padding-left: 2.5rem;
-        border-radius: 50px;
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-
-    .search-box-custom .form-control:focus {
-        border-color: var(--navy-primary);
-        box-shadow: 0 0 0 0.2rem rgba(13, 27, 62, 0.1);
-    }
-
-    .search-box-custom .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6c757d;
-    }
-
-    /* Info Box */
-    .info-box {
-        background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
-        border: 2px dashed #dee2e6;
-        border-radius: 12px;
-        padding: 2rem;
-    }
-
-    .petugas-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(13, 27, 62, 0.2);
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-        }
-
-        .table-responsive {
-            border-radius: 8px;
-        }
-
-        .info-box {
-            padding: 1.5rem;
-        }
-
-        .petugas-avatar {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-        }
-    }
-</style>
+<meta name="base-url" content="<?= BASEURL; ?>">
+<link rel="stylesheet" href="<?= BASEURL; ?>css/pengembalianDetil.css">
 
 <div class="content">
     <div class="container-fluid">
@@ -326,7 +108,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <h5 class="mb-0 text-navy fw-bold">
-                            <i class="fas fa-boxes me-2" style="color: var(--accent-gold);"></i>
+                            <i class="fas fa-boxes me-2 icon-gold"></i>
                             Rincian Barang & Kondisi
                         </h5>
                     </div>
@@ -435,13 +217,13 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                             $waktu = $parts[0] ?? '-';
                                             $nama  = $parts[1] ?? 'Asisten';
                                         ?>
-                                            <div class="d-flex align-items-center p-2 rounded" style="background: #fff; border: 1px solid #e9ecef;">
-                                                <div class="petugas-avatar me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                            <div class="d-flex align-items-center p-2 rounded petugas-info-card">
+                                                <div class="petugas-avatar sm">
                                                     <i class="fas fa-user-check"></i>
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-0 text-navy fw-bold small"><?= htmlspecialchars($nama); ?></h6>
-                                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                                    <small class="text-muted date-info">
                                                         <i class="fas fa-clock me-1"></i> <?= $waktu; ?>
                                                     </small>
                                                 </div>
@@ -464,7 +246,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                 <div class="mb-3">
                                     <p class="text-muted mb-1 small">Tanggal Pengembalian:</p>
                                     <h5 class="fw-bold mb-0 text-dark">
-                                        <i class="fas fa-calendar-day me-2" style="color: var(--accent-gold);"></i>
+                                        <i class="fas fa-calendar-day me-2 icon-gold"></i>
                                         <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? date('d F Y', strtotime($data['detail']['tgl_pengembalian_aktual'])) : '-'; ?>
                                     </h5>
                                 </div>

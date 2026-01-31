@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <table id="tableExport" class="display nowrap" style="width:100%">
+    <table id="tableExport" class="display nowrap table-full">
         <thead>
             <tr>
                 <th width="3%">No</th> 

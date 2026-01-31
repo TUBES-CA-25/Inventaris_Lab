@@ -5,6 +5,11 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 }
 ?>
 
+<!-- Meta untuk Base URL -->
+<meta name="base-url" content="<?= BASEURL; ?>">
+
+<link rel="stylesheet" href="<?= BASEURL; ?>css/jenisBarang.css">
+
 <!-- modal keluar -->
 <div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">

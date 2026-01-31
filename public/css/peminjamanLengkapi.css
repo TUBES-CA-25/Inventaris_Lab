@@ -1,0 +1,53 @@
+.page-header h3 { margin: 0 0 6px 0; }
+.page-header p { margin: 0 0 0 0; color: #6b7280; }
+.step-card1 { background:#fff; border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(2,6,23,0.06); margin-bottom:18px; }
+.step-header { display:flex; gap:12px; align-items:center; }
+.step-number-circle { width:40px; height:40px; border-radius:50%; background:#eef2ff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.step-title { margin:0; }
+.step-desc { color:#6b7280; }
+.info-grid { display:flex; flex-wrap:wrap; gap:16px; }
+.info-box { flex: 1 1 220px; background:#f8fafc; padding:12px; border-radius:8px; }
+.info-box-header { display:flex; gap:12px; align-items:center; }
+.info-icon-circle { width:44px; height:44px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(2,6,23,0.06); }
+.info-label { font-weight:700; }
+.info-value { margin-top:8px; font-weight:600; color:#111827; }
+.info-box-full { flex:1 1 100%; }
+.item-list-header { display:flex; width:100%; font-weight:700; padding:8px 12px; background:#fff; border-bottom:1px solid #e5e7eb; }
+.col-item-name { width:30%; }
+.col-item-spec { width:55%; }
+.col-item-qty { width:15%; text-align:right; }
+.item-list-row { padding:10px 6px; border-bottom:1px solid #f3f4f6; }
+.item-content-wrapper { display:flex; gap:12px; align-items:center; }
+.col-item-name, .col-item-spec, .col-item-qty { display:inline-block; }
+.icon-spec { color:#0f172a; margin-right:8px; }
+.badge-qty { background:#eef2ff; padding:6px 10px; border-radius:8px; font-weight:700; }
+.empty-state-icon { font-size:48px; color:#9ca3af; opacity:0.7; }
+
+.download-section { margin-top:18px; display:flex; align-items:center; gap:12px; }
+.download-icon-wrapper { width:54px; height:54px; border-radius:8px; background:#fef3f2; display:flex; align-items:center; justify-content:center; }
+.btn-download { display:inline-flex; align-items:center; gap:8px; background:#ef4444; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
+
+/* Icon helpers */
+.icon-wrap { position: relative; }
+.icon-inside { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+
+/* download/upload icon sizing */
+.download-icon-wrapper i, .upload-icon-wrapper i { font-size:20px; }
+.upload-icon-wrapper.upload-icon-success i { font-size:18px; color:#fff; }
+.btn-download i { margin-right:6px; }
+
+.alert-custom { display:flex; gap:12px; background:#fff7ed; padding:12px; border-radius:8px; align-items:flex-start; }
+.alert-custom i { color:#f59e0b; }
+
+.upload-section { border:2px dashed #e5e7eb; padding:18px; border-radius:12px; cursor:pointer; }
+.file-input-hidden { display:none; }
+#view-preview { display:none; }
+.upload-preview-wrapper { display:flex; gap:12px; align-items:center; }
+.upload-icon-success { background:#10b981; width:44px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+.filename-text { font-weight:600; }
+.btn-reset-upload { background:transparent; border:1px solid #f87171; color:#ef4444; padding:6px 10px; border-radius:8px; }
+.btn-submit { background:#0ea5e9; color:#fff; padding:10px 16px; border-radius:8px; border:none; }
+.btn-submit:disabled { opacity:0.6; cursor:not-allowed; }
+
+/* helpers */
+.btn-back { background:#e5e7eb; padding:8px 12px; border-radius:8px; }

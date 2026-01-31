@@ -6,17 +6,16 @@ if (!isset($_SESSION['login'])) {
 ?>
 
 <div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-body" style="text-align: center;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content rounded-modal">
+            <div class="modal-body text-center">
                 <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                    background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop
-                    autoplay></lottie-player>
-                <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
+                    background="transparent" speed="1" class="lottie-large" loop autoplay></lottie-player>
+                <p class="modal-confirm-text">Apakah anda yakin ingin keluar?</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" style="width: 100px;"
+                <button type="button" class="btn btn-light modal-btn-fixed" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger modal-btn-fixed"
                     onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
             </div>
         </div>
@@ -95,7 +94,7 @@ if (!isset($_SESSION['login'])) {
 
         <div class="table-responsive">
             <form id="formCetak" action="<?= BASEURL ?>DetailBarang/cetak" method="post" target="_blank">
-                <table id="myTable" class="table table-hover" style="width:100%; margin-bottom: 0;">
+            <table id="myTable" class="table table-hover table-full">
                     <thead class="table-custom-header">
                         <tr>
                             <th class="p-3 text-center" style="width: 50px;">
@@ -167,19 +166,18 @@ if (!isset($_SESSION['login'])) {
                                         id="konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>" tabindex="-1"
                                         role="dialog">
                                         <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <div class="modal-content" style="border-radius: 15px;">
-                                                <div class="modal-body" style="text-align: center;">
+                                            <div class="modal-content rounded-modal">
+                                                <div class="modal-body text-center">
                                                     <lottie-player
                                                         src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
-                                                        background="transparent" speed="1"
-                                                        style="width: 200px; height: 200px; margin: 0 auto;" loop
+                                                        background="transparent" speed="1" class="lottie-medium" loop
                                                         autoplay></lottie-player>
                                                     <p>Apakah anda yakin ingin menghapus item ini?</p>
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
-                                                    <button type="button" class="btn btn-light"
+                                                    <button type="button" class="btn btn-light modal-btn-fixed"
                                                         data-dismiss="modal">Batal</button>
-                                                    <button type="button" class="btn btn-danger"
+                                                    <button type="button" class="btn btn-danger modal-btn-fixed"
                                                         onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= IdObfuscator::encode($row['id_barang']) ?>'">Hapus</button>
                                                 </div>
                                             </div>
@@ -226,3 +224,5 @@ if (!isset($_SESSION['login'])) {
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="<?= BASEURL; ?>css/DetailBarang.css">

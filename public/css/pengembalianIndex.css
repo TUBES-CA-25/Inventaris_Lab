@@ -1,0 +1,38 @@
+/* Header Styling */
+.pengembalian-header { padding: 20px 0; }
+.pengembalian-title { color: #0d1b3e; font-size: 28px; margin: 0; }
+
+/* Search Box */
+.pengembalian-search { width: 320px; border: 1px solid #ddd; border-radius: 8px; padding: 10px 40px 10px 15px; height: 42px; background: white; }
+.pengembalian-search:focus { outline: none; border-color: #0d1b3e; box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1); }
+.pengembalian-search-icon { right: 15px; top: 50%; transform: translateY(-50%); color: #0d1b3e; cursor: pointer; }
+
+/* Table Styling */
+.pengembalian-table-wrapper { border-radius: 10px; overflow: hidden; }
+.pengembalian-thead { background-color: #0d1b3e; color: white; }
+.pengembalian-thead th { font-weight: 500; py-3; }
+.pengembalian-tbody tr { cursor: pointer; transition: background-color 0.2s ease; }
+.pengembalian-tbody tr:hover { background-color: #f8f9fa; }
+
+/* Status Badges */
+.status-badge { border-radius: 50px; padding: 6px 12px; font-size: 12px; font-weight: 500; transition: transform 0.2s ease; }
+.status-badge:hover { transform: scale(1.05); }
+
+/* Action Buttons */
+.action-btn { background: none; border: none; padding: 5px; }
+.action-btn i { transition: transform 0.2s ease, color 0.2s ease; font-size: 18px; }
+.action-btn:hover i { transform: scale(1.2); }
+
+/* Empty State */
+.empty-state-icon { color: #ddd; font-size: 48px; }
+
+/* Scrollbar */
+.table-responsive::-webkit-scrollbar { height: 8px; }
+.table-responsive::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.table-responsive::-webkit-scrollbar-thumb { background: #0d1b3e; border-radius: 10px; }
+.table-responsive::-webkit-scrollbar-thumb:hover { background: #1a2d5a; }
+
+@media (max-width: 768px) {
+    .pengembalian-search { width: 200px !important; }
+    table { font-size: 0.9rem; }
+}

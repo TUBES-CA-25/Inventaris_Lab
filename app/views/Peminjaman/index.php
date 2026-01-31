@@ -5,6 +5,9 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
+<meta name="base-url" content="<?= BASEURL; ?>">
+<link rel="stylesheet" href="<?= BASEURL; ?>css/peminjamanIndex.css">
+
 <div class="content">
     <div class="container-fluid content-beranda p-4">
 
@@ -49,7 +52,7 @@ if (!isset($_SESSION['login'])) {
                 <?php endforeach; ?>
             <?php else : ?>
                 <div class="col-12 text-center py-5">
-                    <img src="<?= BASEURL; ?>img/empty_state.svg" width="200" style="opacity: 0.5;">
+                    <img src="<?= BASEURL; ?>img/empty_state.svg" width="200" class="empty-image">
                     <h5 class="text-muted mt-3">Barang tidak ditemukan.</h5>
                 </div>
             <?php endif; ?>
@@ -73,7 +76,7 @@ if (!isset($_SESSION['login'])) {
                     
                     <div class="form-group">
                         <label>Barang yang dipinjam</label>
-                        <input type="text" class="form-control" id="modal_nama_barang" readonly style="background-color: #e9ecef;">
+                        <input type="text" class="form-control modal-input-readonly" id="modal_nama_barang" readonly>
                     </div>
 
                     <div class="row">
@@ -125,7 +128,7 @@ if (!isset($_SESSION['login'])) {
 
                     <div class="modal-footer px-0 pb-0">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn text-white" style="background-color: #0f1429;">Ajukan Peminjaman</button>
+                        <button type="submit" class="btn modal-submit-dark">Ajukan Peminjaman</button>
                     </div>
                 </form>
             </div>
@@ -133,16 +136,4 @@ if (!isset($_SESSION['login'])) {
     </div>
 </div> -->
 
-<script>
-    $(document).ready(function() {
-        $('.btnPinjam').on('click', function() {
-            // Ambil data dari tombol yang diklik
-            const idBarang = $(this).data('id');
-            const namaBarang = $(this).data('nama');
-
-            // Masukkan ke dalam input field di modal
-            $('#modal_id_barang').val(idBarang);
-            $('#modal_nama_barang').val(namaBarang);
-        });
-    });
-</script>
+<script src="<?= BASEURL; ?>js/peminjaman_index.js"></script>

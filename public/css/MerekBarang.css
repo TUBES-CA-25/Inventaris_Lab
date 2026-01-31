@@ -249,3 +249,14 @@
     box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
     background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
 }
+
+/* Helpers */
+.lottie-player-size { width: 250px; height: 250px; margin: 0 auto; }
+.modal-text-confirm { color: #64748b; font-weight: 500; }
+.content-overflow-hidden { overflow: hidden; }
+.title-strong { font-weight: 700; color: #1e293b; }
+.flash-width { width: 40%; margin-left: 15px; }
+.action-btn-delete i { color: #dc2626; }
+.action-btn-edit i { color: #059669; }
+.modal-custom .close span { font-size: 1.5rem; }
+.table-full { width: 100%; margin-bottom: 0; }

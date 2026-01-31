@@ -1,6 +1,9 @@
 <div class="content">
     <div class="container-fluid p-4">
 
+    <meta name="base-url" content="<?= BASEURL; ?>">
+    <link rel="stylesheet" href="<?= BASEURL; ?>css/peminjamanLengkapi.css">
+
         <div class="page-header">
             <div class="row align-items-center">
                 <div class="col-md-9">
@@ -104,9 +107,9 @@
 
                             <?php if (!empty($data['detail_barang'])) : ?>
                                 <div class="item-list-header">
-                                    <div style="width: 30%;">NAMA BARANG</div>
-                                    <div style="width: 55%;">SPESIFIKASI</div>
-                                    <div style="width: 15%; text-align: right;">JUMLAH</div>
+                                    <div class="col-item-name">NAMA BARANG</div>
+                                    <div class="col-item-spec">SPESIFIKASI</div>
+                                    <div class="col-item-qty">JUMLAH</div>
                                 </div>
 
                                 <ul class="item-list-ul">
@@ -183,7 +186,7 @@
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
 
-                    <div class="upload-section" id="drop-zone" onclick="triggerUpload()">
+                            <div class="upload-section" id="drop-zone" onclick="triggerUpload()">
                         <input type="file"
                             class="file-input-hidden"
                             id="file_surat"
@@ -236,6 +239,8 @@
                 </form>
             </div>
         </div>
+
+            <script src="<?= BASEURL; ?>js/peminjaman_lengkapi.js"></script>
 
     </div>
 </div>

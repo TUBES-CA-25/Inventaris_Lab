@@ -16,6 +16,9 @@ $val_tgl_mulai  = $isEdit ? $headerData['tanggal_peminjaman'] : '';
 $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 ?>
 
+<meta name="base-url" content="<?= BASEURL; ?>">
+<link rel="stylesheet" href="<?= BASEURL; ?>css/peminjamanForm.css">
+
 <div class="content">
     <div class="container-fluid">
         <div class="form-card">
@@ -33,7 +36,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                             <label class="lbl">Tanggal pengajuan</label>
                             <div class="icon-wrap">
                                 <input type="date" name="tanggal_pengajuan" class="inp-custom" value="<?= $val_tgl_aju; ?>" required>
-                                <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                <i class="fa-regular fa-calendar icon-inside icon-calendar"></i>
                             </div>
                         </div>
 
@@ -42,14 +45,14 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                 <label class="lbl">Mulai dari tanggal</label>
                                 <div class="icon-wrap">
                                     <input type="date" name="tanggal_peminjaman" class="inp-custom" value="<?= $val_tgl_mulai; ?>" required>
-                                    <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                    <i class="fa-regular fa-calendar icon-inside icon-calendar"></i>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="lbl">Sampai tanggal</label>
                                 <div class="icon-wrap">
                                     <input type="date" name="tanggal_pengembalian" class="inp-custom" value="<?= $val_tgl_akhir; ?>" required>
-                                    <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                    <i class="fa-regular fa-calendar icon-inside icon-calendar"></i>
                                 </div>
                             </div>
                         </div>
@@ -69,7 +72,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                     </div>
                 </div>
 
-                <hr style="border-top: 2px dashed #e2e8f0; margin: 30px 0;">
+                <hr class="hr-dashed">
 
                 <div class="row">
                     <div class="col-12">
@@ -89,23 +92,22 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                     <div class="row row-item-grid align-items-end">
 
                                         <div class="col-md-5">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <label class="lbl mb-0">Jenis Barang</label>
-                                                <button type="button" class="btn-cancel-item"
-                                                    onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> <i class="fa-solid fa-circle-xmark"></i> Hapus
-</button>
-                                                </button>
-                                            </div>
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <label class="lbl mb-0">Jenis Barang</label>
+                                                            <button type="button" class="btn-cancel-item"
+                                                                onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> <i class="fa-solid fa-circle-xmark"></i> Hapus
+            </button>
+                                                        </div>
                                             <div class="icon-wrap">
                                                 <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
                                                 <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
-                                                <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
+                                                <i class="fa-solid fa-check icon-inside icon-check"></i>
                                             </div>
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="lbl">Jumlah</label>
-                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1" value="<?= $curr_jml; ?>" required style="text-align: center;">
+                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom text-center-input" min="1" value="<?= $curr_jml; ?>" required>
                                         </div>
 
                                         <div class="col-md-5">
@@ -127,7 +129,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 
                                                     <option value="Lainnya" <?= ($curr_unit == 'Lainnya') ? 'selected' : ''; ?>>Lainnya</option>
                                                 </select>
-                                                <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
+                                                <i class="fa-solid fa-caret-down icon-inside icon-caret"></i>
                                             </div>
                                         </div>
 
@@ -179,13 +181,4 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
     </div>
 </div>
 
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        var btn = document.getElementById('btnSubmitPeminjaman');
-        if (btn) {
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-            btn.style.opacity = '0.7';
-            btn.style.pointerEvents = 'none'; 
-        }
-    });
-</script>
+<script src="<?= BASEURL; ?>js/peminjaman_form.js"></script>

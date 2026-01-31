@@ -5,12 +5,16 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 }
 ?>
 
+<!-- Meta for base url -->
+<meta name="base-url" content="<?= BASEURL; ?>">
+<link rel="stylesheet" href="<?= BASEURL; ?>css/kelolaAkun.css">
+
 <div class="content">
     <div class="content-beranda">
 
         <h3 id="title">Kelola akun</h3>
 
-        <div class="flash" style="width: 100%; margin-bottom: 20px;">
+        <div class="flash flash-full">
             <?php Flasher::flash(); ?>
         </div>
 
@@ -57,7 +61,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
             </div>
         </div>
         <div class="table-responsive">
-            <table id="myTable" class="table table-hover" style="width:100%; margin-bottom: 0;">
+            <table id="myTable" class="table table-hover custom-table table-full">
                 <thead class="table-custom-header">
                     <tr>
                         <th>No</th>
@@ -74,16 +78,16 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                     <?php foreach ($data['dataTampilUser'] as $row): ?>
                         <tr>
                             <td><?= $i++; ?></td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span><?= $row['nama_user']; ?></span>
-                                </div>
-                            </td>
+                                <td>
+                                    <div class="flex-center-gap">
+                                        <span><?= $row['nama_user']; ?></span>
+                                    </div>
+                                </td>
                             <td><?= $row['email']; ?></td>
                             <td><?= $row['role']; ?></td>
                             <td><?= $row['no_hp_user']; ?></td>
                             <td><?= $row['alamat']; ?></td>
-                            <td style="text-align: center;">
+                            <td class="text-center">
                                 <button class="btn-action btnUbahRole" data-toggle="modal" data-target="#modalRole"
                                     onclick="setModalData('<?= IdObfuscator::encode($row['id_user']) ?>', '<?= $row['id_role'] //Asumsi ada id_role di row ?>')">
                                     <i class="fa-regular fa-pen-to-square" style="color: #30cc30;"></i>
@@ -97,15 +101,15 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                 <div class="modal fade" id="konfirmasiHapus<?= IdObfuscator::encode($row['id_user']) ?>"
                                     tabindex="-1" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
-                                        <div class="modal-content" style="border-radius: 15px;">
-                                            <div class="modal-body d-flex flex-column align-items-center">
-                                                <lottie-player
-                                                    src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
-                                                    background="##FFFFFF" speed="1" style="width: 250px; height: 250px" loop
-                                                    autoplay direction="1" mode="normal"></lottie-player>
-                                                <p style="color:#385161; opacity: 0.6; font-weight: 500;">Yakin ingin
-                                                    menghapus data ini?</p>
-                                            </div>
+                                        <div class="modal-content modal-rounded">
+                                                    <div class="modal-body d-flex flex-column align-items-center">
+                                                        <lottie-player
+                                                            src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
+                                                            background="##FFFFFF" speed="1" class="lottie-player-size" loop
+                                                            autoplay direction="1" mode="normal"></lottie-player>
+                                                        <p class="modal-text-confirm">Yakin ingin
+                                                            menghapus data ini?</p>
+                                                    </div>
                                             <div class="modal-footer border-0">
                                                 <button type="button" class="btn btn-light"
                                                     data-dismiss="modal">Batal</button>
@@ -126,7 +130,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 </div>
 
 <div class="modal fade" id="modalRole" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 700px;">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-lg-custom" role="document">
         <div class="modal-content modal-content-custom">
 
             <button type="button" class="close btn-close-custom" data-dismiss="modal" aria-label="Close">
@@ -173,16 +177,4 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
     </div>
 </div>
 
-<script>
-    // Fungsi ini dipanggil saat tombol edit diklik
-    // Pastikan Anda memanggil ini di tombol edit tabel: onclick="setModalData('ID_USER_DISINI')"
-    function setModalData(id) {
-        document.getElementById('id_user_modal').value = id;
-    }
-
-    // Opsional: Jika ingin jQuery untuk bootstrap modal events
-    $('.btnUbahRole').on('click', function () {
-        var id = $(this).data('user');
-        $('#id_user_modal').val(id);
-    });
-</script>
+<script src="<?= BASEURL; ?>js/kelola_akun.js"></script>

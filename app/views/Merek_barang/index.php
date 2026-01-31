@@ -5,20 +5,24 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 }
 ?>
 
+<!-- meta + css -->
+<meta name="base-url" content="<?= BASEURL; ?>">
+<link rel="stylesheet" href="<?= BASEURL; ?>css/merekBarang.css">
+
 <!-- modal keluar -->
 <div class="modal fade modal-custom" id="konfirmasiKeluar" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body text-center py-4">
-                <lottie-player 
+                <lottie-player
                     src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                    background="##FFFFFF" 
-                    speed="1" 
-                    style="width: 250px; height: 250px; margin: 0 auto;" 
-                    loop 
+                    background="##FFFFFF"
+                    speed="1"
+                    class="lottie-player-size"
+                    loop
                     autoplay>
                 </lottie-player>
-                <p class="mt-3 mb-0" style="color: #64748b; font-weight: 500;">
+                <p class="mt-3 mb-0 modal-text-confirm">
                     Apakah anda yakin ingin keluar?
                 </p>
             </div>
@@ -34,12 +38,12 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 
 <!-- Content -->
 <div class="content">
-    <div class="content-beranda" style="overflow: hidden;">
+    <div class="content-beranda content-overflow-hidden">
         <!-- Header -->
-        <h3 id="title" class="mb-4" style="font-weight: 700; color: #1e293b;">Merek Barang</h3>
+        <h3 id="title" class="mb-4 title-strong">Merek Barang</h3>
         
         <!-- Flash Message -->
-        <div class="flash mb-4" style="width: 40%; margin-left: 15px;">
+        <div class="flash mb-4 flash-width">
             <?php Flasher::flash(); ?>
         </div>
         
@@ -103,19 +107,19 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <!-- Delete Button -->
-                                    <a class="action-btn-custom action-btn-delete" 
+                                    <a class="action-btn-custom action-btn-delete"
                                        data-toggle="modal"
                                        data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_merek_barang']) ?>">
-                                        <i class="fa-solid fa-trash-can fa-lg" style="color: #dc2626;"></i>
+                                        <i class="fa-solid fa-trash-can fa-lg"></i>
                                     </a>
                                     
                                     <!-- Edit Button -->
                                     <a href="<?= BASEURL; ?>MerekBarang/ubah/<?= IdObfuscator::encode($row['id_merek_barang']); ?>"
                                        class="action-btn-custom action-btn-edit tampilMerekBarangUbah"
-                                       data-toggle="modal" 
-                                       data-target="#modalTambah" 
+                                       data-toggle="modal"
+                                       data-target="#modalTambah"
                                        data-id="<?= IdObfuscator::encode($row['id_merek_barang']); ?>">
-                                        <i class="fa-solid fa-pen-to-square fa-lg" style="color: #059669;"></i>
+                                        <i class="fa-solid fa-pen-to-square fa-lg"></i>
                                     </a>
                                 </div>
 
@@ -126,13 +130,13 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                                             <div class="modal-body text-center py-4">
                                                 <lottie-player
                                                     src="https://lottie.host/482b772b-9f0c-4065-b54d-dcc81da3b212/Dmb3I1o98u.json"
-                                                    background="##FFFFFF" 
-                                                    speed="1" 
-                                                    style="width: 250px; height: 250px; margin: 0 auto;" 
-                                                    loop 
+                                                    background="##FFFFFF"
+                                                    speed="1"
+                                                    class="lottie-player-size"
+                                                    loop
                                                     autoplay>
                                                 </lottie-player>
-                                                <p class="mt-3 mb-0" style="color: #64748b; font-weight: 500;">
+                                                <p class="mt-3 mb-0 modal-text-confirm">
                                                     Apakah anda yakin ingin menghapus item ini?
                                                 </p>
                                             </div>
@@ -162,7 +166,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                     <div class="modal-header">
                         <h5 class="modal-title title-merek">Tambah Merek Barang</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true" style="font-size: 1.5rem;">&times;</span>
+                            <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body body-merek">

@@ -165,3 +165,8 @@ table.dataTable tbody td {
         display: none;
     }
 }
+
+/* helper class to replace inline width styles */
+.table-full {
+    width: 100% !important;
+}
