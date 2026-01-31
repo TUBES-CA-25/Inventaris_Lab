@@ -233,6 +233,39 @@ class User_model
         return NULL;
     }
 
+    public function ubahPassword($id_user, $data)
+{
+    $old = $data['old_password'];
+    $new = $data['new_password'];
+    $confirm = $data['confirm_password'];
+
+    // cek konfirmasi
+    if ($new !== $confirm) {
+        return -2;
+    }
+
+    // ambil password lama
+    $this->db->query("SELECT password FROM trx_user WHERE id_user=:id");
+    $this->db->bind('id', $id_user);
+    $user = $this->db->single();
+
+    if (!$user || !password_verify($old, $user['password'])) {
+        return -1;
+    }
+
+    // hash password baru
+    $newHash = password_hash($new, PASSWORD_BCRYPT);
+
+    // update
+    $this->db->query("UPDATE trx_user SET password=:pass WHERE id_user=:id");
+    $this->db->bind('pass', $newHash);
+    $this->db->bind('id', $id_user);
+    $this->db->execute();
+
+    return 1;
+}
+
+
     public function profile($data)
     {
         $this->db->query("SELECT 

@@ -56,8 +56,33 @@ class Profil extends Controller {
             }
         }
 
+
         header('Location: ' . BASEURL . 'Profil');
         exit;
     }
+
+    public function ubahPassword()
+    {
+        if (!isset($_SESSION['id_user'])) {
+            header('Location: ' . BASEURL . 'Login');
+            exit;
+        }
+
+        $hasil = $this->userModel->ubahPassword($_SESSION['id_user'], $_POST);
+
+        if ($hasil == 1) {
+            Flasher::setFlash('Password', 'berhasil', 'diubah', 'success');
+        } elseif ($hasil == -1) {
+            Flasher::setFlash('Password', 'gagal', 'Password lama salah', 'danger');
+        } elseif ($hasil == -2) {
+            Flasher::setFlash('Password', 'gagal', 'Konfirmasi tidak cocok', 'danger');
+        } else {
+            Flasher::setFlash('Password', 'gagal', 'diubah', 'danger');
+        }
+
+        header('Location: ' . BASEURL . 'Profil');
+        exit;
+    }
+
     
 }

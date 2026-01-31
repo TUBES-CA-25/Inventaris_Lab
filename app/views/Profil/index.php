@@ -60,19 +60,25 @@
 
         <div class="profile-actions" style="display: flex; justify-content: center; gap: 15px; padding-bottom: 20px;">
 
-            <a href="<?= BASEURL; ?>Beranda" class="btn-back">
-                <i class="fa-solid fa-arrow-left"></i> Kembali
-            </a>
+        <a href="<?= BASEURL; ?>Beranda" class="btn-back">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+        </a>
 
-            <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
-                <button type="button" class="btn btn-navy"  onclick="openTTDModal()">
-                    <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
-                </button>
-            <?php endif; ?>
-
-            <button type="button" class="btn btn-navy btn-edit" onclick="openEditModal()">
-                <i class="fa-solid fa-pen-to-square"></i> Edit Profil
+        <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
+            <button type="button" class="btn btn-navy" onclick="openTTDModal()">
+                <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
             </button>
+        <?php endif; ?>
+
+        <button type="button" class="btn btn-navy btn-edit" onclick="openEditModal()">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Profil
+        </button>
+
+        <button type="button" class="btn btn-navy" onclick="openPasswordModal()">
+            <i class="fa-solid fa-key"></i> Ubah Password
+        </button>
+
+
         </div>
     </div>
 </div>
@@ -201,10 +207,47 @@
                     <button type="button" class="btn-back" onclick="closeEditModal()">Batal</button>
                     <button type="submit" class="btn btn-navy btn-edit">Simpan</button>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
+
+<div class="modal-overlay" id="passwordModal">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <h3>Ubah Kata Sandi</h3>
+            <button class="modal-close" onclick="closePasswordModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <form action="<?= BASEURL ?>Profil/ubahPassword" method="post">
+
+                <div class="modal-form-group">
+                    <label>Password Lama</label>
+                    <input type="password" name="old_password" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Password Baru</label>
+                    <input type="password" name="new_password" required minlength="8">
+                </div>
+
+                <div class="modal-form-group">
+                    <label>Konfirmasi Password Baru</label>
+                    <input type="password" name="confirm_password" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-back" onclick="closePasswordModal()">Batal</button>
+                    <button type="submit" class="btn btn-navy">Update</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <script>
     function openEditModal() {
@@ -264,4 +307,21 @@
             setTimeout(() => flashMessage.remove(), 500);
         }
     }, 3000);
+
+        function openPasswordModal(){
+        document.getElementById('passwordModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePasswordModal(){
+        document.getElementById('passwordModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById('passwordModal').addEventListener('click', function(e){
+        if(e.target === this){
+            closePasswordModal();
+        }
+    });
+
 </script>

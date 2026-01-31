@@ -409,7 +409,7 @@ CREATE TABLE `trx_pemeriksa_pengembalian` (
   KEY `fk_cek_pengem` (`id_pengembalian`),
   KEY `fk_cek_user` (`id_user`),
   CONSTRAINT `fk_cek_pengem` FOREIGN KEY (`id_pengembalian`) REFERENCES `trx_pengembalian` (`id_pengembalian`) ON DELETE CASCADE,
-  CONSTRAINT `fk_cek_user` FOREIGN KEY (`id_user`) REFERENCES `trx_data_user` (`id_user`) ON DELETE CASCADE
+  CONSTRAINT `fk_cek_user` FOREIGN KEY (`id_user`) REFERENCES `trx_user` (`id_user`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
