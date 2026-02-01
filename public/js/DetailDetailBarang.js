@@ -59,16 +59,8 @@ function hideQrUnit() {
 
 /* --- LOGIKA PAGINATION TABEL UNIT (DETAIL BARANG) --- */
 $(document).ready(function () {
-    // DEBUGGING: Log parameter URL saat halaman dimuat
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentPage = urlParams.get('p');
-    console.log('Detail Barang - Halaman Aktif:', currentPage || '1 (default)');
-
-    // Pastikan link pagination tidak ter-intercept
+    // Pastikan link pagination tidak ter-intercept oleh event listener lain
     $('.page-link').on('click', function (e) {
-        const href = $(this).attr('href');
-        console.log('Pagination link clicked:', href);
-
         // Jangan preventDefault, biarkan navigate normal
         // Hanya stop propagation agar tidak kena listener lain
         e.stopPropagation();
