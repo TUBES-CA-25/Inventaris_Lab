@@ -1,8 +1,8 @@
 <?php
-if (!isset($_SESSION['login'])) {
-    header("Location:" . BASEURL . "Login");
-    exit;
-}
+// if (!isset($_SESSION['login'])) {
+//     header("Location:" . BASEURL . "Login");
+//     exit;
+// }
 
 $isEdit = isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true;
 $headerData = $isEdit ? $_SESSION['edit_header'] : [];
@@ -78,11 +78,12 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                             <?php foreach ($data['barang_selected'] as $item):
                                 $id = $item['id_jenis_barang'];
                                 $curr_jml = 1;
-                                $curr_unit = ''; 
+                                $curr_unit = '';
 
-                                if ($isEdit && isset($detailMap[$id])) {
-                                    $curr_jml = $detailMap[$id]['jumlah'];
-                                    $curr_unit = $detailMap[$id]['keterangan'];
+                                if ($isEdit && isset($detailMap[$id]) && !empty($detailMap[$id])) {
+                                    $saved_data = array_shift($detailMap[$id]);
+                                    $curr_jml = $saved_data['jumlah'];
+                                    $curr_unit = $saved_data['keterangan'];
                                 }
                             ?>
                                 <div class="item-row">
@@ -93,12 +94,12 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                                 <label class="lbl mb-0">Jenis Barang</label>
                                                 <button type="button" class="btn-cancel-item"
                                                     onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> <i class="fa-solid fa-circle-xmark"></i> Hapus
-</button>
+                                                </button>
                                                 </button>
                                             </div>
                                             <div class="icon-wrap">
-                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
-                                                <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
+                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $unit['id_jenis_barang']; ?>">
+                                                <input type="text" class="inp-custom inp-readonly" value="<?= $unit['sub_barang']; ?>" readonly>
                                                 <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
                                             </div>
                                         </div>
@@ -118,7 +119,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                                         <?php foreach ($item['list_unit'] as $unit) : ?>
                                                             <option value="<?= $unit['id_barang']; ?>"
                                                                 <?= ($curr_unit == $unit['id_barang']) ? 'selected' : ''; ?>>
-                                                                <?= $unit['spesifikasi_barang']; ?> (<?= $unit['kondisi_barang']; ?>) - [<?= $unit['kode_barang']; ?>]
+                                                                Unit <?= $unit['spesifikasi_barang']; ?> - (<?= $unit['kondisi_barang']; ?>)
                                                             </option>
                                                         <?php endforeach; ?>
                                                     <?php else : ?>
@@ -135,17 +136,21 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                 </div>
                             <?php endforeach; ?>
 
-                            <div class="add-more-container">
-                                <a href="<?= BASEURL; ?>Peminjaman" class="btn-add-more" title="Tambah Barang Lain">
-                                    <i class="fa-solid fa-plus"></i>
-                                </a>
-                            </div>
+
+
+
 
                         <?php else: ?>
-                            <div class="alert alert-warning">
-                                Keranjang kosong. Silakan pilih barang di menu utama.
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-exclamation-triangle"></i> Data barang kosong. Silakan tambah barang.
                             </div>
                         <?php endif; ?>
+
+                        <div class="add-more-container" style="margin-top: 20px; text-align: center;">
+                            <a href="<?= BASEURL; ?>Peminjaman" class="btn btn-primary" title="Tambah Barang Lain" style="border-radius: 50px; padding: 10px 20px;">
+                                <i class="fa-solid fa-plus"></i> Tambah Barang
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -185,7 +190,19 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
         if (btn) {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
             btn.style.opacity = '0.7';
-            btn.style.pointerEvents = 'none'; 
+            btn.style.pointerEvents = 'none';
         }
     });
+
+    // Cek apakah ada data Flash dari Controller
+    <?php if (isset($_SESSION['flash'])) : ?>
+        Swal.fire({
+            title: "<?= $_SESSION['flash']['pesan']; ?>",
+            html: "<?= $_SESSION['flash']['aksi']; ?>", // Pakai HTML agar bisa bold
+            icon: "<?= $_SESSION['flash']['tipe']; ?>", // warning, error, success
+            confirmButtonColor: '#1250ba',
+            confirmButtonText: 'Oke, Saya Cek Lagi'
+        });
+        <?php unset($_SESSION['flash']); // Hapus session agar tidak muncul terus ?>
+    <?php endif; ?>
 </script>
