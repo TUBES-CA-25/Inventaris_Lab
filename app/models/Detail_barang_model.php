@@ -318,7 +318,41 @@ class Detail_barang_model
 
     public function getDataBarang()
     {
-        $this->db->query("SELECT * FROM detail_barang");
+        $query = "SELECT 
+                b.id_barang,
+                b.urutan_unit,
+                b.tgl_pengadaan_barang,
+                b.keterangan_label,
+                b.deskripsi_detail_lokasi,
+                b.status_peminjaman,
+                b.qr_code,
+                
+                -- Ambil data dari Master Spesifikasi
+                spek.kode_barang, 
+                spek.spesifikasi_barang,
+                spek.jumlah_total as jumlah_barang, -- Alias agar sesuai tampilan index.php
+                spek.foto_barang,
+
+                -- Data Master Lainnya
+                j.sub_barang,
+                m.nama_merek_barang,
+                s.nama_satuan,
+                k.kondisi_barang,
+                l.nama_lokasi_penyimpanan,
+                st.status
+
+              FROM trx_barang b
+              JOIN mst_spesifikasi spek ON b.id_spesifikasi = spek.id_spesifikasi
+              JOIN mst_jenis_barang j ON spek.id_jenis_barang = j.id_jenis_barang
+              JOIN mst_merek_barang m ON spek.id_merek_barang = m.id_merek_barang
+              JOIN mst_satuan s ON spek.id_satuan = s.id_satuan
+              LEFT JOIN mst_kondisi_barang k ON b.id_kondisi_barang = k.id_kondisi_barang
+              LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
+              LEFT JOIN mst_status st ON b.id_status = st.id_status
+              
+              ORDER BY b.id_barang DESC"; // Urutkan dari yang terbaru
+
+        $this->db->query($query);
         return $this->db->resultSet();
     }
 
@@ -628,15 +662,29 @@ class Detail_barang_model
     public function cariDataBarang()
     {
         $keyword = $_POST['keyword'];
-        $query = "SELECT * FROM detail_barang
-            WHERE 
-                sub_barang LIKE :keyword
-                OR nama_merek_barang LIKE :keyword
-                OR nama_lokasi_penyimpanan LIKE :keyword
-                OR status_peminjaman LIKE :keyword
-                OR tgl_pengadaan_barang LIKE :keyword
-                OR kondisi_barang LIKE :keyword
-                OR kode_barang LIKE :keyword";
+        $query = "SELECT 
+                b.id_barang, b.urutan_unit, b.tgl_pengadaan_barang, b.keterangan_label,
+                b.deskripsi_detail_lokasi, b.status_peminjaman, b.qr_code,
+                spek.kode_barang, spek.spesifikasi_barang, spek.jumlah_total as jumlah_barang, spek.foto_barang,
+                j.sub_barang, m.nama_merek_barang, s.nama_satuan,
+                k.kondisi_barang, l.nama_lokasi_penyimpanan, st.status
+              FROM trx_barang b
+              JOIN mst_spesifikasi spek ON b.id_spesifikasi = spek.id_spesifikasi
+              JOIN mst_jenis_barang j ON spek.id_jenis_barang = j.id_jenis_barang
+              JOIN mst_merek_barang m ON spek.id_merek_barang = m.id_merek_barang
+              JOIN mst_satuan s ON spek.id_satuan = s.id_satuan
+              LEFT JOIN mst_kondisi_barang k ON b.id_kondisi_barang = k.id_kondisi_barang
+              LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
+              LEFT JOIN mst_status st ON b.id_status = st.id_status
+              
+              WHERE 
+                j.sub_barang LIKE :keyword
+                OR m.nama_merek_barang LIKE :keyword
+                OR l.nama_lokasi_penyimpanan LIKE :keyword
+                OR b.status_peminjaman LIKE :keyword
+                OR b.tgl_pengadaan_barang LIKE :keyword
+                OR k.kondisi_barang LIKE :keyword
+                OR spek.kode_barang LIKE :keyword";
 
         $this->db->query($query);
         $this->db->bind('keyword', "%$keyword%");
@@ -647,7 +695,24 @@ class Detail_barang_model
     {
         $ids = is_array($data) ? $data : [$data];
         $placeholders = str_repeat('?,', count($ids) - 1) . '?';
-        $query = "SELECT * FROM detail_barang WHERE id_barang IN ($placeholders)";
+
+        $query = "SELECT 
+                b.id_barang, b.urutan_unit, b.tgl_pengadaan_barang, b.keterangan_label,
+                b.deskripsi_detail_lokasi, b.status_peminjaman, b.qr_code,
+                spek.kode_barang, spek.spesifikasi_barang, spek.jumlah_total as jumlah_barang, spek.foto_barang,
+                j.sub_barang, m.nama_merek_barang, s.nama_satuan,
+                k.kondisi_barang, l.nama_lokasi_penyimpanan, st.status
+              FROM trx_barang b
+              JOIN mst_spesifikasi spek ON b.id_spesifikasi = spek.id_spesifikasi
+              JOIN mst_jenis_barang j ON spek.id_jenis_barang = j.id_jenis_barang
+              JOIN mst_merek_barang m ON spek.id_merek_barang = m.id_merek_barang
+              JOIN mst_satuan s ON spek.id_satuan = s.id_satuan
+              LEFT JOIN mst_kondisi_barang k ON b.id_kondisi_barang = k.id_kondisi_barang
+              LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
+              LEFT JOIN mst_status st ON b.id_status = st.id_status
+              
+              WHERE b.id_barang IN ($placeholders)";
+
         $this->db->query($query);
         foreach ($ids as $k => $id) {
             $this->db->bind($k + 1, $id);
@@ -851,13 +916,13 @@ class Detail_barang_model
 
     // Fungsi baru untuk mengambil unit dengan limit (pagination)
     public function getUnitsBySpesifikasiPaged($id_spesifikasi, $limit, $offset)
-{
-    // Pastikan limit dan offset adalah integer murni
-    $limit = (int) $limit;
-    $offset = (int) $offset;
+    {
+        // Pastikan limit dan offset adalah integer murni
+        $limit = (int) $limit;
+        $offset = (int) $offset;
 
-    // Masukkan langsung ke query untuk menghindari error binding LIMIT/OFFSET di beberapa versi PDO
-    $query = "SELECT 
+        // Masukkan langsung ke query untuk menghindari error binding LIMIT/OFFSET di beberapa versi PDO
+        $query = "SELECT 
                 b.*, 
                 l.nama_lokasi_penyimpanan, 
                 k.kondisi_barang, 
@@ -868,12 +933,12 @@ class Detail_barang_model
               LEFT JOIN mst_status st ON b.id_status = st.id_status
               WHERE b.id_spesifikasi = :id
               ORDER BY b.urutan_unit ASC
-              LIMIT $limit OFFSET $offset"; 
+              LIMIT $limit OFFSET $offset";
 
-    $this->db->query($query);
-    $this->db->bind('id', $id_spesifikasi);
-    return $this->db->resultSet();
-}
+        $this->db->query($query);
+        $this->db->bind('id', $id_spesifikasi);
+        return $this->db->resultSet();
+    }
 
     // Fungsi untuk menghitung total unit agar kita tahu ada berapa halaman
     public function getTotalUnitsBySpesifikasi($id_spesifikasi)
