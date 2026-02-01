@@ -553,12 +553,21 @@ $(function () {
 });
 
 const selectAllCheckbox = document.getElementById("selectAllCheckbox");
-const checkboxes = document.querySelectorAll(".checkbox");
-selectAllCheckbox.addEventListener("change", function () {
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = selectAllCheckbox.checked;
-  });
-});
+if (selectAllCheckbox) { // Tambahkan pengecekan ini
+    const checkboxes = document.querySelectorAll(".checkbox");
+    selectAllCheckbox.addEventListener("change", function () {
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    });
+}
+
+// const checkboxes = document.querySelectorAll(".checkbox");
+// selectAllCheckbox.addEventListener("change", function () {
+//   checkboxes.forEach((checkbox) => {
+//     checkbox.checked = selectAllCheckbox.checked;
+//   });
+// });
 
 document.addEventListener("DOMContentLoaded", function () {
   let currentPath = window.location.pathname.replace(/^\/|\/$/g, "");
