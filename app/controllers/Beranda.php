@@ -27,7 +27,7 @@ class Beranda extends Controller {
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Beranda/index', $data);
-        $this->view('templates/footer');
+        $this->view('templates/footer1');
     }
 
     public function getAjaxStats() {

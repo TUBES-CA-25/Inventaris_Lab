@@ -100,7 +100,6 @@ if (!isset($_SESSION['login'])) {
                             <th class="p-3 text-center" style="width: 50px;">
                                 <input type="checkbox" id="selectAll" class="custom-checkbox">
                             </th>
-                            <th class="p-3 text-center">No</th>
                             <th class="p-3">Kode Barang</th>
                             <th class="p-3">Jenis</th>
                             <th class="p-3">Merek</th>
@@ -120,7 +119,7 @@ if (!isset($_SESSION['login'])) {
                                         value="<?= IdObfuscator::encode($row['id_barang']) ?>"
                                         class="custom-checkbox item-checkbox">
                                 </td>
-                                <td style="font-weight:600;"><?= $row['kode_barang']; ?></td>
+                                <td style="font-weight:600;"><?= $row['kode_barang'] . '/' . $row['jumlah_total']; ?></td>
                                 <td style="text-transform: capitalize;"><?= $row['sub_barang']; ?></td>
                                 <td style="text-transform: capitalize;"><?= $row['nama_merek_barang']; ?></td>
                                 <td><?= !empty($row['spesifikasi_barang']) ? $row['spesifikasi_barang'] : '-'; ?></td>

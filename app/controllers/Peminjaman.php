@@ -70,6 +70,15 @@ class Peminjaman extends Controller
 
     public function formPeminjaman()
     {
+        if (!isset($_SESSION)) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['login'])) {
+            header('Location: ' . BASEURL . 'Login');
+            exit;
+        }
+
         $data['judul'] = 'Form Pengajuan Peminjaman';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -107,26 +116,47 @@ class Peminjaman extends Controller
 
     public function prosesTambahPeminjaman()
     {
-        if (empty($_POST['id_jenis_barang'])) {
-            Flasher::setFlash('Tidak ada barang yang dipilih.', 'gagal', '', 'danger');
-            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
-            exit;
+        // 1. VALIDASI STOK SEBELUM SIMPAN
+        if (isset($_POST['unit_selected']) && is_array($_POST['unit_selected'])) {
+
+            foreach ($_POST['unit_selected'] as $index => $id_spesifikasi) {
+
+                // Skip jika user memilih "Lainnya" atau kosong (biasanya tidak dicek stok via sistem ini)
+                if ($id_spesifikasi == 'Lainnya' || empty($id_spesifikasi)) {
+                    continue;
+                }
+
+                $jumlah_pinjam = (int) $_POST['jumlah_peminjaman'][$index];
+
+                // Ambil Stok Tersedia (Baik & Bisa Dipinjam) dari Model
+                $stok_tersedia = $this->model('Peminjaman_model')->getStokTersediaBySpesifikasi($id_spesifikasi);
+
+                // LOGIKA PENGECEKAN
+                if ($jumlah_pinjam > $stok_tersedia) {
+
+                    // Ambil info barang untuk pesan error yang jelas
+                    $infoBarang = $this->model('Peminjaman_model')->getNamaBarangBySpesifikasi($id_spesifikasi);
+                    $namaLengkap = $infoBarang['sub_barang'] . ' (' . $infoBarang['spesifikasi_barang'] . ')';
+
+                    // Set Flash Message Khusus (Format SweetAlert)
+                    // Pastikan di footer/header Anda ada script untuk menangkap Flash ini
+                    Flasher::setFlash('Stok Tidak Cukup!', "Barang <b>$namaLengkap</b> hanya tersisa <b>$stok_tersedia</b> unit yang kondisinya BAIK. Anda meminta <b>$jumlah_pinjam</b>.",'warning');
+
+                    // Kembalikan user ke halaman form
+                    header('Location: ' . BASEURL . 'Peminjaman/form');
+                    exit;
+                }
+            }
         }
 
-        $dataUser['id_user'] = $_SESSION['id_user'];
-        $userProfile = $this->model('User_model')->profile($dataUser);
-
-        $dataPayload = $_POST;
-        $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
-
-        if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
-            unset($_SESSION['keranjang']);
-            Flasher::setFlash('Pengajuan berhasil! Silakan lengkapi surat.', 'berhasil', '', 'success');
-            header('Location: ' . BASEURL . 'Riwayat');
+        // 2. JIKA LOLOS VALIDASI, LANJUTKAN PROSES SIMPAN SEPERTI BIASA
+        if ($this->model('Peminjaman_model')->postDataPeminjaman($_POST) > 0) {
+            Flasher::setFlash('Berhasil', 'Peminjaman berhasil diajukan', 'success');
+            header('Location: ' . BASEURL . 'Peminjaman');
             exit;
         } else {
-            Flasher::setFlash('Gagal mengajukan peminjaman.', 'gagal', '', 'danger');
-            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            Flasher::setFlash('Gagal', 'Peminjaman gagal diajukan', 'error');
+            header('Location: ' . BASEURL . 'Peminjaman');
             exit;
         }
     }
@@ -185,7 +215,7 @@ class Peminjaman extends Controller
         foreach ($details as $item) {
             $_SESSION['keranjang'][] = $item['id_jenis_barang'];
 
-            $edit_details_map[$item['id_jenis_barang']] = [
+            $edit_details_map[$item['id_jenis_barang']][] = [
                 'jumlah'     => $item['jumlah'],
                 'keterangan' => $item['id_barang']
             ];

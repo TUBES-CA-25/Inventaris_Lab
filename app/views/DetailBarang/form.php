@@ -71,7 +71,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 
                         <div class="form-group mb-4">
                             <label class="form-label">Jumlah</label>
-                            <input type="number" name="jumlah_barang" class="form-input" min="1" required value="<?= $isEdit ? $barang['jumlah_barang'] : '1' ?>">
+                            <input type="number" name="jumlah_barang" class="form-input" min="1" required value="<?= $isEdit ? $barang['jumlah_total'] : '1' ?>">
                         </div>
 
                         <div class="form-group mb-4">
@@ -137,10 +137,10 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             </div>
                         </div>
                     </div>
-                        <!-- End Left Column -->
+                    <!-- End Left Column -->
 
-                        <div class="col-12 col-lg-6">
-                            <!-- Right Column -->
+                    <div class="col-12 col-lg-6">
+                        <!-- Right Column -->
                         <div class="form-group mb-4" id="group-merek">
                             <label class="form-label">Merek Barang</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
@@ -233,53 +233,47 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             <?php if ($isEdit && !empty($barang['foto_barang'])): ?>
                                 <small style="display:block; margin-top:5px;">File: <?= basename($barang['foto_barang']) ?></small>
                             <?php endif; ?>
+                        </div>
+                        <!-- End Right Column -->
                     </div>
-                    <!-- End Right Column -->
-                </div>
 
-                <?php if (!$isEdit): ?>
-                    <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <p style="font-size: 13px; font-weight: 600; color: #888;">Data Penomoran</p>
-                        <div class="row g-3">
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Barang Ke-</label>
-                                    <input type="number" name="barang_ke" class="form-input" placeholder="Contoh: 1" required>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Total Barang</label>
-                                    <input type="number" name="total_barang" class="form-input" placeholder="Contoh: 10" required>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Status Peminjaman</label>
-                                    <select name="status_pinjam" class="form-select">
-                                        <option value="Bisa">Bisa Dipinjam</option>
-                                        <option value="Tidak Bisa">Tidak Bisa</option>
-                                    </select>
+                    <?php if (!$isEdit): ?>
+                        <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Status Peminjaman Default</label>
+                                        <select name="status_pinjam" class="form-select">
+                                            <option value="Bisa">Bisa Dipinjam</option>
+                                            <option value="Tidak Bisa">Tidak Bisa</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <?php else: ?>
-                    <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="form-group">
-                                <label class="form-label">Status Peminjaman</label>
-                                <select name="status_pinjam" class="form-select">
-                                    <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
-                                    <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
-                                </select>
+
+                    <?php else: ?>
+                        <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Status Peminjaman</label>
+                                        <select name="status_pinjam" class="form-select">
+                                            <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
+                                            <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
 
-                <div class="btn-submit-container">
-                    <button type="submit" class="btn-submit"><?= $isEdit ? 'Simpan Perubahan' : 'Kirim Data' ?></button>
+                    <div class="btn-submit-container">
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-save me-2"></i>
+                            <?= $isEdit ? 'Simpan Perubahan Unit Ini' : 'Proses & Generate QR Code' ?>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>

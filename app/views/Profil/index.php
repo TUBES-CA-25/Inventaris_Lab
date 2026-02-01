@@ -2,13 +2,13 @@
     <div class="profile-card">
         <div class="profile-header">
             <img src="<?= BASEURL; ?>img/logo bg putih.svg" alt="logo" />
-            <div class="profile-header-text">
+            <!-- <div class="profile-header-text">
                 <h1>Sistem Inventori</h1>
                 <h2>Barang ICLabs</h2>
-            </div>
+            </div> -->
         </div>
 
-        <!-- Flash Message -->
+        <!-- Flash Message -->9
         <div class="row">
             <div class="col-12">
                 <?php Flasher::flash(); ?>
