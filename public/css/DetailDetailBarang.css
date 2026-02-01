@@ -340,182 +340,196 @@
     box-shadow: 0 6px 12px rgba(13, 26, 74, 0.3);
 }
 
-    #modalQR .modal-content {
-        border: none;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(13, 26, 74, 0.3);
-        background: linear-gradient(135deg, #0d1a4a 0%, #1a2d6e 100%);
+/* --- CSS MODAL BIRU GRADIENT (Untuk Unit #modalQR & Master #modalQRMaster) --- */
+#modalQR .modal-content,
+#modalQRMaster .modal-content {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(13, 26, 74, 0.3);
+    background: linear-gradient(135deg, #0d1a4a 0%, #1a2d6e 100%);
+}
+
+#modalQR .modal-header,
+#modalQRMaster .modal-header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+#modalQR .modal-title,
+#modalQRMaster .modal-title {
+    color: #ffffff !important;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+#modalQR .close:hover,
+#modalQRMaster .close:hover {
+    transform: rotate(90deg);
+    transition: 0.3s;
+}
+
+#modalQR .modal-body,
+#modalQRMaster .modal-body {
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #0d1a4a 0%, #1a2d6e 100%);
+}
+
+#modalQR .modal-body h4,
+#modalQRMaster .modal-body h4 {
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+#modalQR .qr-container,
+#modalQRMaster .qr-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 1rem;
+    display: inline-block;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+#modalQR .qr-container img,
+#modalQRMaster .qr-container img {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    display: block;
+}
+
+#modalQR .error-message,
+#modalQRMaster .error-message {
+    background: rgba(244, 67, 54, 0.1);
+    border: 2px solid rgba(244, 67, 54, 0.3);
+    border-radius: 15px;
+    padding: 2rem;
+    color: #ff5252;
+}
+
+#modalQR .text-muted,
+#modalQRMaster .text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+}
+
+#modalQR .modal-footer,
+#modalQRMaster .modal-footer {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.25rem 1.5rem;
+}
+
+#modalQR .btn-secondary,
+#modalQRMaster .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+#modalQR .btn-primary,
+#modalQRMaster .btn-primary {
+    background: linear-gradient(135deg, #4fc3f7 0%, #0288d1 100%);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+}
+
+/* --- KHUSUS MEMPERBESAR QR MASTER --- */
+#modalQRMaster .qr-container img {
+    width: 400px !important;
+    /* Paksa jadi 400px */
+    height: 400px !important;
+    /* Paksa jadi 400px */
+    max-width: 100%;
+    /* Agar responsif di HP kecil */
+}
+
+/* Agar container membungkus gambar besar dengan rapi */
+#modalQRMaster .qr-container {
+    padding: 1.5rem;
+    /* Tambah padding sedikit */
+}
+
+/* Perlebar Modal Master agar gambar muat */
+@media (min-width: 576px) {
+    #modalQRMaster .modal-dialog {
+        max-width: 600px;
+        /* Modal lebih lebar */
     }
+}
 
-    #modalQR .modal-header {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 1.5rem;
-        backdrop-filter: blur(10px);
-    }
+/* --- CUSTOM PAGINATION DATATABLES --- */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0 !important;
+    margin: 0 2px;
+    border: none !important;
+    background: none !important;
+}
 
-    #modalQR .modal-title {
-        color: #ffffff !important;
-        font-size: 1.4rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
+/* Warna tombol Pagination Aktif */
+.page-item.active .page-link {
+    background-color: #101a32 !important;
+    border-color: #101a32 !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
 
-    #modalQR .close {
-        color: #ffffff;
-        opacity: 0.8;
-        text-shadow: none;
-        transition: all 0.3s ease;
-    }
+/* Warna tombol Pagination Biasa */
+.page-link {
+    color: #101a32 !important;
+    border-radius: 4px;
+    margin: 0 2px;
+}
 
-    #modalQR .close:hover {
-        opacity: 1;
-        transform: rotate(90deg);
-    }
+.page-link:hover {
+    background-color: #f0f0f0 !important;
+    color: #1a2b50 !important;
+}
 
-    #modalQR .modal-body {
-        padding: 2.5rem;
-        background: linear-gradient(135deg, #0d1a4a 0%, #1a2d6e 100%);
-    }
 
-    #modalQR .modal-body h4 {
-        color: #ffffff;
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
 
-    #modalQR .qr-container {
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        border-radius: 20px;
-        padding: 2rem;
-        display: inline-block;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
+/* Styling Input Search & Length */
+.dataTables_filter input,
+.dataTables_length select {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    outline: none;
+    transition: 0.3s;
+}
 
-    #modalQR .qr-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-    }
+.dataTables_filter input:focus,
+.dataTables_length select:focus {
+    border-color: #101a32;
+    box-shadow: 0 0 0 2px rgba(16, 26, 50, 0.1);
+}
 
-    #modalQR .qr-container::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
-        background-size: 400%;
-        border-radius: 20px;
-        z-index: -1;
-        animation: gradientShift 3s ease infinite;
-    }
+/* Styling Dropdown Jumlah Data (Pojok Kiri Atas) */
+.dataTables_length {
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #101a32;
+}
 
-    @keyframes gradientShift {
+.dataTables_length select {
+    border: 1px solid #101a32; /* Border Biru Tua */
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin: 0 5px;
+    background-color: #fff;
+    cursor: pointer;
+    min-width: 60px;
+}
 
-        0%,
-        100% {
-            background-position: 0% 50%;
-        }
-
-        50% {
-            background-position: 100% 50%;
-        }
-    }
-
-    #modalQR .qr-container img {
-        border-radius: 10px;
-        display: block;
-    }
-
-    #modalQR .error-message {
-        background: rgba(244, 67, 54, 0.1);
-        border: 2px solid rgba(244, 67, 54, 0.3);
-        border-radius: 15px;
-        padding: 2rem;
-        color: #ff5252;
-    }
-
-    #modalQR .error-message i {
-        color: #ff5252;
-        margin-bottom: 0.5rem;
-    }
-
-    #modalQR .text-muted {
-        color: rgba(255, 255, 255, 0.7) !important;
-        font-size: 0.9rem;
-        margin-top: 1.5rem;
-        margin-bottom: 0;
-    }
-
-    #modalQR .modal-footer {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 1.25rem 1.5rem;
-        backdrop-filter: blur(10px);
-    }
-
-    #modalQR .btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #ffffff;
-        padding: 0.6rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    #modalQR .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    #modalQR .btn-primary {
-        background: linear-gradient(135deg, #4fc3f7 0%, #0288d1 100%);
-        border: none;
-        color: #ffffff;
-        padding: 0.6rem 1.5rem;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
-    }
-
-    #modalQR .btn-primary:hover {
-        background: linear-gradient(135deg, #29b6f6 0%, #0277bd 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
-    }
-
-    #modalQR .btn-primary i {
-        margin-right: 0.5rem;
-    }
-
-    /* Fade in animation */
-    #modalQR.show .modal-dialog {
-        animation: modalFadeIn 0.4s ease;
-    }
-
-    @keyframes modalFadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-50px) scale(0.9);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
+.dataTables_length select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(16, 26, 50, 0.2);
+}
