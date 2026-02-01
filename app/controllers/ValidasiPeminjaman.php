@@ -248,15 +248,27 @@ class ValidasiPeminjaman extends Controller
 
     public function selesaiValidasi($id_peminjaman)
     {
-        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
-        if (!$id_peminjaman) {
+        $id_peminjaman_decoded = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman_decoded) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
 
-        $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
-        $this->model('Peminjaman_model')->finalisasiValidasi($id_peminjaman) > 0;
+        // 1. JALANKAN OTOMATISASI BARANG
+        // Ini akan memecah request dan mengunci stok barang
+        $hasilOtomatis = $this->model('Peminjaman_model')->otomatisasiPilihBarang($id_peminjaman_decoded);
 
+        if ($hasilOtomatis == 0) {
+            Flasher::setFlash('Gagal', 'Stok barang fisik tidak mencukupi untuk disetujui otomatis.', '', 'danger');
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+            exit;
+        }
+
+        // 2. Finalisasi Status Peminjaman (Jadi 'Disetujui')
+        $this->model('Peminjaman_model')->finalisasiValidasi($id_peminjaman_decoded);
+
+        // 3. Hapus Backup Surat (Pembersihan)
+        $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman_decoded);
         if ($peminjaman) {
             $fileName = $peminjaman['file_surat'];
             $pathBackup = __DIR__ . '/../../public/files/surat-peminjaman/backup_' . $fileName;
@@ -266,7 +278,7 @@ class ValidasiPeminjaman extends Controller
             }
         }
 
-        Flasher::setFlash('Berhasil', 'Proses validasi selesai. Dokumen telah disimpan.', '', 'success');
+        Flasher::setFlash('Berhasil', 'Peminjaman disetujui. Barang telah dialokasikan otomatis.', '', 'success');
         header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
         exit;
     }
