@@ -1,4 +1,4 @@
-</div> 
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
@@ -26,15 +26,15 @@
 
 <script>
     // 1. Logika Menghilangkan Loader setelah halaman Load
-    $(window).on('load', function() {
-        setTimeout(function() {
+    $(window).on('load', function () {
+        setTimeout(function () {
             $('#loading-screen').addClass('hidden');
         }, 200);
     });
 
     // 2. Logika Memunculkan Loader saat navigasi fitur diklik
-    $(document).ready(function() {
-        $('.menu-item').on('click', function(e) {
+    $(document).ready(function () {
+        $('.menu-item').on('click', function (e) {
             const href = $(this).attr('href');
             const isModal = $(this).attr('data-toggle') === 'modal';
             const isLogout = $(this).hasClass('logout-link');
@@ -44,19 +44,27 @@
             }
         });
 
-        $('#konfirmasiKeluar .btn-danger').on('click', function() {
+        $('#konfirmasiKeluar .btn-danger').on('click', function () {
             $('#loading-screen').removeClass('hidden');
         });
-        
-        $('form').on('submit', function() {
+
+        $('form').on('submit', function () {
             if (!$(this).hasClass('no-loader')) {
                 $('#loading-screen').removeClass('hidden');
             }
+        });
+
+        // PERBAIKAN: Jangan trigger loader pada klik pagination
+        // Karena pagination akan navigate ke halaman yang sama dengan parameter berbeda
+        $(document).on('click', '.page-link', function (e) {
+            // Cegah event bubbling yang bisa memicu loader
+            e.stopPropagation();
         });
     });
 </script>
 
 </body>
+
 </html>
 
 <!-- </div>
