@@ -87,7 +87,7 @@ class Riwayat extends Controller
                 $namaFile = basename($rawFoto);
                 $item['foto_url_ready'] = BASEURL . 'img/foto-barang/' . $namaFile;
             } else {
-                $item['foto_url_ready'] = 'https://via.placeholder.com/150?text=No+Img';
+                $item['foto_url_ready'] = BASEURL . 'img/foto-barang/default_tools.png';
             }
 
             $item['spesifikasi_barang'] = $item['spesifikasi_barang'] ?? '-';
