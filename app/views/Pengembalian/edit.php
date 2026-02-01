@@ -271,8 +271,17 @@ if (!isset($_SESSION['login'])) {
                                                     </span>
                                                 </div>
 
-                                                <div class="item-code mb-2">
-                                                    <?= htmlspecialchars($item['kode_barang']); ?>
+                                                <div class="item-code mb-2" >
+                                                    
+                                                    <?php
+                                                    if (!empty($item['urutan_unit'])) {
+                                                        // TAMPILKAN FORMAT: BATCH / TOTAL / URUTAN
+                                                        echo htmlspecialchars($item['kode_barang'] . '/' . $item['jumlah_total'] . '/' . $item['urutan_unit']);
+                                                    } else {
+                                                        // Fallback jika belum ada unit
+                                                        echo htmlspecialchars($item['kode_barang']) . ' <span class="text-muted fw-normal" style="font-size: 0.8em;">(Unit Belum Ditentukan)</span>';
+                                                    }
+                                                    ?>
                                                 </div>
 
                                                 <?php if (!empty($item['spesifikasi_barang']) && $item['spesifikasi_barang'] != '-'): ?>
