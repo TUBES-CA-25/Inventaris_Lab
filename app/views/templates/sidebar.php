@@ -110,35 +110,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const sidebarMenu = document.getElementById('sidebarMenu');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        // Fungsi buka/tutup
-        function toggleSidebar() {
-            sidebarMenu.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-            
-            // Ubah icon hamburger jadi X (opsional)
-            const icon = hamburgerBtn.querySelector('i');
-            if (sidebarMenu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-            } else {
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
-        }
-
-        // Event Listeners
-        if(hamburgerBtn) {
-            hamburgerBtn.addEventListener('click', toggleSidebar);
-        }
-
-        if(sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', toggleSidebar); // Tutup saat klik luar
-        }
-    });
-</script>
+<script src="<?= BASEURL; ?>js/templates.js"></script>

@@ -130,3 +130,5 @@
     </div>
   </div>
 </form>
+
+<script src="<?= BASEURL; ?>js/register.js"></script>

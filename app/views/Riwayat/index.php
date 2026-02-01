@@ -177,9 +177,4 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
     </div>
 </div>
 
-<script>
-    $.fn.dataTable.ext.errMode = 'none';
-    $.fn.dataTable.ext.errMode = function(settings, helpPage, message) {
-        console.log("DataTables Error: ", message);
-    };
-</script>
+<script src="<?= BASEURL; ?>js/riwayat.js"></script>

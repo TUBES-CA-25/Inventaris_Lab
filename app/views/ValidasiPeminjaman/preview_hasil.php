@@ -1,24 +1,4 @@
-<style>
-    body {
-        background-color: #e3e6f0;
-        font-family: sans-serif;
-    }
-
-    .pdf-container {
-        width: 100%;
-        height: 75vh;
-        border: 1px solid #b7b9cc;
-        background: #525659;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-</style>
-
+<link rel="stylesheet" href="<?= BASEURL; ?>css/preview_hasil.css">
 
 <nav class="navbar navbar-light bg-white shadow mb-4">
     <div class="container-fluid">

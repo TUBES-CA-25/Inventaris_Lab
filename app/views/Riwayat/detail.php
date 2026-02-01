@@ -194,3 +194,5 @@ if (in_array($st, ['disetujui', 'diterima'])) {
     <img id="fullImage" class="modal-content-img" src="">
     <div id="imageCaption" class="image-caption"></div>
 </div>
+
+<script src="<?= BASEURL; ?>js/riwayat.js"></script>

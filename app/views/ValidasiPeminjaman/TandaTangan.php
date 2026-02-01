@@ -8,83 +8,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-    <style>
-        body {
-            background-color: #e3e6f0;
-            font-family: sans-serif;
-            overflow-x: hidden;
-        }
-
-        #pdf-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 850px;
-            margin: 20px auto;
-            background-color: #525659;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            /* Hapus overflow: hidden agar drag bisa lebih leluasa, tapi wrapper tetap membungkus */
-            min-height: 500px;
-        }
-
-        /* Container untuk menampung semua canvas halaman */
-        #pdf-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .pdf-page {
-            display: block;
-            width: 100%;
-            height: auto;
-            margin-bottom: 10px;
-            /* Jarak antar halaman */
-            background-color: white;
-        }
-
-        .drag-box {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 140px;
-            height: auto;
-            cursor: move;
-            z-index: 100;
-            background: transparent;
-            border: 1px dashed rgba(0, 0, 0, 0.2);
-            display: none;
-        }
-
-        .drag-box:active,
-        .drag-box:hover {
-            border: 1px dashed #007bff;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .drag-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            pointer-events: none;
-            filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
-        }
-
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= BASEURL; ?>css/tanda_tangan.css">
 </head>
 
 <body>
@@ -304,11 +228,6 @@
             let fatimah = calculatePosition('drag-fatimah');
             let huzain = calculatePosition('drag-huzain');
 
-            // --- LOGIKA HALAMAN ---
-            // Kita menggunakan halaman posisi Fatimah sebagai acuan 'page_target' utama
-            // Jika backend Anda mendukung multiple page, logic ini bisa disesuaikan.
-            // --- LOGIKA HALAMAN BARU ---
-            
             // Masukkan data halaman masing-masing ke input yang baru dibuat
             document.getElementById('fatimah_page').value = fatimah.page;
             document.getElementById('huzain_page').value = huzain.page;
@@ -335,6 +254,7 @@
             });
         }
     </script>
+
 </body>
 
 </html>
