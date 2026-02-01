@@ -37,6 +37,10 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         background: var(--navy-primary);
         color: white;
         border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
     }
 
     .btn-navy:hover {
@@ -50,6 +54,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         border: 2px solid var(--navy-primary);
         color: var(--navy-primary);
         background: transparent;
+        border-radius: 8px;
+        font-weight: 600;
     }
 
     .btn-outline-navy:hover {
@@ -62,6 +68,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         border-left: 4px solid var(--navy-primary);
         transition: all 0.3s ease;
         height: 100%;
+        border-radius: 12px;
+        background: white;
     }
 
     .stat-card:hover {
@@ -94,7 +102,20 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         color: white;
     }
 
-    /* Table Custom */
+    /* --- [PERBAIKAN UTAMA: TABLE STYLING] --- */
+    .table-responsive {
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        background: white;
+        overflow: hidden;
+    }
+
+    .table-navy {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
     .table-navy thead {
         background: var(--navy-primary);
         color: white;
@@ -104,19 +125,33 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         border: none;
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         letter-spacing: 0.5px;
-        padding: 1rem;
+        /* Padding header dibuat lega */
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
     }
 
     .table-navy tbody tr {
         transition: all 0.2s ease;
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+    .table-navy tbody td {
+        /* Padding body disamakan dengan header agar simetris */
+        padding: 1.2rem 1rem;
+        /* Rata tengah vertikal agar teks tidak menggantung */
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f2f5;
+        font-size: 0.95rem;
+    }
+
+    .table-navy tbody tr:last-child td {
+        border-bottom: none;
     }
 
     .table-navy tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        background-color: #f8faff;
     }
 
     /* Status Badges */
@@ -124,36 +159,37 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         padding: 0.5rem 1rem;
         border-radius: 50px;
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
     .badge-baik {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
     }
 
     .badge-rusak {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
     }
 
     .badge-hilang {
-        background: #e2e3e5;
-        color: #383d41;
-        border: 1px solid #d6d8db;
+        background: #f3f4f6;
+        color: #1f2937;
+        border: 1px solid #e5e7eb;
     }
 
     .badge-pinjam {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
     }
 
     /* Search Box */
@@ -166,6 +202,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         border-radius: 50px;
         border: 2px solid #e9ecef;
         transition: all 0.3s ease;
+        height: 45px;
     }
 
     .search-box-custom .form-control:focus {
@@ -181,7 +218,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         color: #6c757d;
     }
 
-    /* Info Box */
+    /* Info Box & Log */
     .info-box {
         background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
         border: 2px dashed #dee2e6;
@@ -190,15 +227,15 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
     }
 
     .petugas-avatar {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 20px;
         box-shadow: 0 4px 12px rgba(13, 27, 62, 0.2);
     }
 
@@ -210,18 +247,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
             font-size: 20px;
         }
 
-        .table-responsive {
-            border-radius: 8px;
-        }
-
         .info-box {
             padding: 1.5rem;
-        }
-
-        .petugas-avatar {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
         }
     }
 </style>
@@ -229,13 +256,12 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 <div class="content">
     <div class="container-fluid">
 
-        <!-- Header Card -->
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px; overflow: hidden;">
             <div class="card-body bg-navy-gradient text-white p-4">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <p class="mb-1 opacity-75">
-                            <i class="fas fa-hashtag"></i> ID Transaksi: <?= $data['detail']['id_peminjaman']; ?>
+                        <p class="mb-1 opacity-75 fw-medium">
+                            <i class="fas fa-hashtag me-1"></i> ID Transaksi: <?= $data['detail']['id_peminjaman']; ?>
                         </p>
                         <h3 class="mb-0 fw-bold">
                             <i class="fas fa-clipboard-check me-2"></i>
@@ -243,7 +269,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                         </h3>
                     </div>
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                        <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-light btn-lg">
+                        <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-light text-navy fw-bold px-4 py-2" style="border-radius: 50px;">
                             <i class="fas fa-arrow-left me-2"></i> Kembali
                         </a>
                     </div>
@@ -251,18 +277,19 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
             </div>
         </div>
 
-        <!-- Info Cards -->
-        <div class="row g-3 mb-4">
+        <div class="row g-4 mb-4">
             <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card stat-card shadow-sm border-0 h-100">
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon navy me-3">
                                 <i class="fas fa-clipboard-list"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted text-uppercase mb-1 small fw-semibold">Judul Kegiatan</p>
-                                <h6 class="mb-0 text-navy fw-bold"><?= htmlspecialchars($data['detail']['judul_kegiatan'] ?? '-'); ?></h6>
+                                <p class="text-muted text-uppercase mb-1 small fw-bold">Judul Kegiatan</p>
+                                <h6 class="mb-0 text-navy fw-bold" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4;">
+                                    <?= htmlspecialchars($data['detail']['judul_kegiatan'] ?? '-'); ?>
+                                </h6>
                             </div>
                         </div>
                     </div>
@@ -271,14 +298,16 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 
             <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card stat-card shadow-sm border-0 h-100">
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon navy me-3">
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted text-uppercase mb-1 small fw-semibold">Peminjam</p>
-                                <h6 class="mb-0 text-navy fw-bold"><?= htmlspecialchars($data['detail']['nama_peminjam'] ?? '-'); ?></h6>
+                                <p class="text-muted text-uppercase mb-1 small fw-bold">Peminjam</p>
+                                <h6 class="mb-0 text-navy fw-bold text-truncate">
+                                    <?= htmlspecialchars($data['detail']['nama_peminjam'] ?? '-'); ?>
+                                </h6>
                             </div>
                         </div>
                     </div>
@@ -287,14 +316,19 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 
             <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card stat-card shadow-sm border-0 h-100">
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon navy me-3">
                                 <i class="fas fa-calendar-alt"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted text-uppercase mb-1 small fw-semibold">Tanggal Pinjam</p>
-                                <h6 class="mb-0 text-navy fw-bold"><?= date('d M Y', strtotime($data['detail']['tanggal_peminjaman'])); ?></h6>
+                                <p class="text-muted text-uppercase mb-1 small fw-bold">Tanggal Pinjam</p>
+                                <div class="flex-grow-1">
+                                    <p class="text-muted text-uppercase mb-1 small fw-bold">Peminjam</p>
+                                    <h6 class="mb-0 text-navy fw-bold" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.4;">
+                                        <?= htmlspecialchars($data['detail']['nama_peminjam'] ?? '-'); ?>
+                                    </h6>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -303,13 +337,13 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 
             <div class="col-xl-3 col-lg-6 col-md-6">
                 <div class="card stat-card shadow-sm border-0 h-100 <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? 'active' : ''; ?>">
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? 'gold' : 'navy'; ?> me-3">
                                 <i class="fas <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? 'fa-check-circle' : 'fa-clock'; ?>"></i>
                             </div>
                             <div class="flex-grow-1">
-                                <p class="text-muted text-uppercase mb-1 small fw-semibold">Status</p>
+                                <p class="text-muted text-uppercase mb-1 small fw-bold">Status</p>
                                 <h6 class="mb-0 fw-bold" style="color: <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? 'var(--accent-gold)' : 'var(--navy-primary)'; ?>">
                                     <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? 'Selesai' : 'Berjalan'; ?>
                                 </h6>
@@ -320,9 +354,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
             </div>
         </div>
 
-        <!-- Table Section -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-bottom py-3">
+        <div class="card shadow-sm border-0" style="border-radius: 12px;">
+            <div class="card-header bg-white border-bottom py-4 px-4">
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <h5 class="mb-0 text-navy fw-bold">
@@ -345,10 +378,10 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                         <thead>
                             <tr>
                                 <th width="5%" class="text-center">No</th>
-                                <th width="15%">Kode Barang</th>
+                                <th width="18%">Kode Barang</th>
                                 <th width="25%">Nama Barang</th>
                                 <th width="10%" class="text-center">Jumlah</th>
-                                <th width="15%">Kondisi Akhir</th>
+                                <th width="15%" class="text-center">Kondisi Akhir</th>
                                 <th>Keterangan</th>
                             </tr>
                         </thead>
@@ -357,15 +390,13 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                             if (!empty($data['items_kembali'])):
                                 $no = 1;
                                 foreach ($data['items_kembali'] as $item):
-                                    // 1. Logic Kondisi
-                                    // Jika kondisi_barang kosong (belum dikembalikan), set 'Dipinjam'
+                                    // Logic Kondisi
                                     $kondisi = !empty($item['kondisi_barang']) ? $item['kondisi_barang'] : 'Dipinjam';
 
-                                    // 2. Logic Jumlah
-                                    // Jika jumlah_kembali kosong, tampilkan jumlah_pinjam
+                                    // Logic Jumlah
                                     $jumlah = !empty($item['jumlah_kembali']) ? $item['jumlah_kembali'] : $item['jumlah_pinjam'];
 
-                                    // 3. Styling Badge
+                                    // Logic Badge Warna
                                     $statusClass = 'badge-pinjam';
                                     $icon = 'fa-clock';
 
@@ -381,30 +412,51 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                     }
                             ?>
                                     <tr>
-                                        <td class="text-center fw-semibold"><?= $no++; ?></td>
+                                        <td class="text-center fw-bold text-muted"><?= $no++; ?></td>
+
                                         <td>
-                                            <code class="text-muted"><?= htmlspecialchars($item['kode_barang'] ?? '-'); ?></code>
+                                            <?php if (!empty($item['urutan_unit'])): ?>
+                                                <code class="text-navy fw-bold" style="background-color: #eef2ff; padding: 6px 10px; border-radius: 6px; border: 1px dashed #a5b4fc; display: inline-block;">
+                                                    <?= htmlspecialchars($item['kode_barang'] . '/' . $item['jumlah_total'] . '/' . $item['urutan_unit']); ?>
+                                                </code>
+                                            <?php else: ?>
+                                                <code class="text-muted"><?= htmlspecialchars($item['kode_barang'] ?? '-'); ?></code>
+                                            <?php endif; ?>
                                         </td>
-                                        <td class="fw-bold text-dark"><?= htmlspecialchars($item['nama_barang']); ?></td>
+
+                                        <td class="fw-bold text-dark" style="font-size: 1rem;">
+                                            <?= htmlspecialchars($item['nama_barang']); ?>
+                                        </td>
+
                                         <td class="text-center">
-                                            <span class="badge"><?= htmlspecialchars($jumlah); ?></span>
+                                            <span class="badge bg-light text-dark border px-3 py-2" style="font-size: 0.9rem;">
+                                                <?= htmlspecialchars($jumlah); ?>
+                                            </span>
                                         </td>
-                                        <td>
-                                            <span class="status-badge text-black <?= $statusClass ?>">
+
+                                        <td class="text-center">
+                                            <span class="status-badge <?= $statusClass ?>">
                                                 <i class="fas <?= $icon ?>"></i>
                                                 <?= ucfirst($kondisi); ?>
                                             </span>
                                         </td>
+
                                         <td>
                                             <?php if (!empty($item['keterangan_kondisi']) && $item['keterangan_kondisi'] != '-'): ?>
-                                                <small><?= htmlspecialchars($item['keterangan_kondisi']); ?></small>
+                                                <span class="text-dark"><i class="fas fa-info-circle me-1 text-muted"></i> <?= htmlspecialchars($item['keterangan_kondisi']); ?></span>
                                             <?php else: ?>
-                                                <small class="text-muted">-</small>
+                                                <span class="text-muted small font-italic">-</span>
                                             <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="text-center py-5 text-muted">
+                                        <i class="fas fa-box-open fa-3x mb-3 text-gray-300"></i>
+                                        <p class="mb-0">Tidak ada data barang yang ditemukan.</p>
+                                    </td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -413,82 +465,77 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
         </div>
 
         <?php if (!empty($data['detail']['id_pengembalian'])): ?>
-            <div class="card shadow-sm border-0 mt-4">
+            <div class="card shadow-sm border-0 mt-4" style="border-radius: 12px;">
                 <div class="card-body">
                     <div class="info-box">
-                        <div class="row">
-
-                            <div class="col-md-7 mb-4 mb-md-0">
-                                <p class="text-uppercase text-muted mb-3 fw-semibold small">
-                                    <i class="fas fa-history me-1"></i> Riwayat Pemeriksaan Asisten
-                                </p>
-
-                                <?php if (!empty($data['detail']['log_history'])): ?>
-                                    <div class="d-flex flex-column gap-3">
-                                        <?php
-                                        // Pecah string history
-                                        $logs = explode('||', $data['detail']['log_history']);
-                                        foreach ($logs as $log):
-                                            // Format: "25 January 2026 10:00 - Huzain"
-                                            // Kita pisahkan Waktu dan Nama agar bisa di-styling
-                                            $parts = explode(' - ', $log);
-                                            $waktu = $parts[0] ?? '-';
-                                            $nama  = $parts[1] ?? 'Asisten';
-                                        ?>
-                                            <div class="d-flex align-items-center p-2 rounded" style="background: #fff; border: 1px solid #e9ecef;">
-                                                <div class="petugas-avatar me-3" style="width: 40px; height: 40px; font-size: 16px;">
-                                                    <i class="fas fa-user-check"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0 text-navy fw-bold small"><?= htmlspecialchars($nama); ?></h6>
-                                                    <small class="text-muted" style="font-size: 0.75rem;">
-                                                        <i class="fas fa-clock me-1"></i> <?= $waktu; ?>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="text-muted small font-italic">Belum ada riwayat pemeriksaan.</div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="col-md-5 text-md-end border-start-md ps-md-4">
-                                <div class="mb-4">
-                                    <p class="text-muted mb-1 small">Status Terakhir:</p>
-                                    <h5 class="text-navy fw-bold">
-                                        <?= !empty($data['detail']['status_pengembalian']) ? $data['detail']['status_pengembalian'] : '-'; ?>
-                                    </h5>
-                                </div>
-
-                                <div class="mb-3">
-                                    <p class="text-muted mb-1 small">Tanggal Pengembalian:</p>
-                                    <h5 class="fw-bold mb-0 text-dark">
-                                        <i class="fas fa-calendar-day me-2" style="color: var(--accent-gold);"></i>
-                                        <?= !empty($data['detail']['tgl_pengembalian_aktual']) ? date('d F Y', strtotime($data['detail']['tgl_pengembalian_aktual'])) : '-'; ?>
-                                    </h5>
-                                </div>
-
-                                <?php if (!empty($data['detail']['bukti_foto'])): ?>
-                                    <div class="mt-3">
-                                        <a href="<?= BASEURL; ?>public/<?= $data['detail']['bukti_foto']; ?>" target="_blank" class="btn btn-outline-navy btn-sm w-100">
-                                            <i class="fas fa-image me-1"></i> Lihat Bukti Foto
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
+                        
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <p class="text-uppercase text-muted mb-0 fw-bold small">
+                                <i class="fas fa-history me-2"></i> Riwayat Pemeriksaan Asisten
+                            </p>
+                            
+                            <span class="badge bg-light text-navy border">
+                                Status Terakhir: <?= !empty($data['detail']['status_pengembalian']) ? $data['detail']['status_pengembalian'] : '-'; ?>
+                            </span>
                         </div>
+
+                        <?php if (!empty($data['logs'])): ?>
+                            <div class="d-flex flex-column gap-2">
+                                <?php foreach ($data['logs'] as $log): ?>
+                                    <div class="d-flex align-items-center justify-content-between p-3 rounded bg-white shadow-sm border border-light">
+                                        
+                                        <div class="d-flex align-items-center">
+                                            <div class="petugas-avatar me-3" style="width: 40px; height: 40px; font-size: 16px;">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                            <h6 class="mb-0 text-navy fw-bold small">
+                                                <?= htmlspecialchars($log['nama_user']); ?>
+                                            </h6>
+                                        </div>
+
+                                        <div class="d-flex align-items-center">
+                                            
+                                            <small class="text-muted fw-medium me-4 d-none d-md-block">
+                                                <i class="fas fa-clock me-1 text-warning"></i> 
+                                                <?= date('d M Y, H:i', strtotime($log['waktu_periksa'])); ?> WITA
+                                            </small>
+
+                                            <?php if (!empty($log['bukti_foto'])): ?>
+                                                <a href="<?= BASEURL; ?>public/<?= $log['bukti_foto']; ?>" target="_blank" 
+                                                   class="btn btn-sm btn-outline-navy d-flex align-items-center gap-2 px-3" 
+                                                   title="Lihat Bukti Foto"
+                                                   style="border-radius: 50px;">
+                                                   <i class="fas fa-image"></i>
+                                                   <span class="d-none d-sm-inline" style="font-size: 0.8rem;">Lihat Bukti</span>
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-muted small font-italic ms-2" style="font-size: 0.8rem; opacity: 0.6;">
+                                                    Tanpa Foto
+                                                </span>
+                                            <?php endif; ?>
+
+                                        </div>
+
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-muted small font-italic p-4 bg-light rounded border border-dashed text-center">
+                                <i class="fas fa-info-circle me-1"></i> Belum ada riwayat pemeriksaan yang tercatat.
+                            </div>
+                        <?php endif; ?>
 
                         <?php if (!empty($data['detail']['detail_masalah']) && $data['detail']['detail_masalah'] != '-'): ?>
                             <hr class="my-4">
-                            <div class="alert alert-warning mb-0 d-flex align-items-start border-0 shadow-sm">
-                                <i class="fas fa-exclamation-triangle me-3 mt-1 text-warning"></i>
+                            <div class="alert alert-warning mb-0 d-flex align-items-center border-0 shadow-sm" style="border-radius: 8px;">
+                                <i class="fas fa-exclamation-triangle me-3 text-warning" style="font-size: 1.5rem;"></i>
                                 <div>
-                                    <strong class="text-dark">Catatan Masalah:</strong><br>
+                                    <strong class="text-dark d-block mb-1">Catatan Masalah Terakhir:</strong>
                                     <span class="text-dark opacity-75"><?= htmlspecialchars($data['detail']['detail_masalah']); ?></span>
                                 </div>
                             </div>
                         <?php endif; ?>
+
                     </div>
                 </div>
             </div>
@@ -509,10 +556,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 
                 let visibleCount = 0;
                 rows.forEach(row => {
-                    if (row.cells.length === 1) {
-                        row.style.display = 'none';
-                        return;
-                    }
+                    // Skip jika baris 'no result'
+                    if (row.classList.contains('no-result-row')) return;
 
                     const kode = row.cells[1]?.textContent.toLowerCase() || '';
                     const nama = row.cells[2]?.textContent.toLowerCase() || '';
@@ -534,9 +579,9 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                         noResultRow = tbody.insertRow();
                         noResultRow.className = 'no-result-row';
                         noResultRow.innerHTML = `
-                        <td colspan="6" class="text-center py-5">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <p class="text-muted mb-0">Tidak ada hasil untuk "<strong>${filter}</strong>"</p>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-search fa-3x mb-3 text-gray-300"></i>
+                            <p class="mb-0">Tidak ada hasil untuk "<strong>${filter}</strong>"</p>
                         </td>
                     `;
                     }

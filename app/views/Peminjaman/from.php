@@ -76,6 +76,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                         <?php if (!empty($data['barang_selected'])): ?>
 
                             <?php foreach ($data['barang_selected'] as $item):
+                                // --- PERBAIKAN: Gunakan $item, bukan $unit ---
                                 $id = $item['id_jenis_barang'];
                                 $curr_jml = 1;
                                 $curr_unit = '';
@@ -93,13 +94,13 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="lbl mb-0">Jenis Barang</label>
                                                 <button type="button" class="btn-cancel-item"
-                                                    onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> <i class="fa-solid fa-circle-xmark"></i> Hapus
-                                                </button>
+                                                    onclick="konfirmasiHapus('<?= BASEURL; ?>Peminjaman/hapusItem/<?= $item['hapus_id']; ?>')"> 
+                                                    <i class="fa-solid fa-circle-xmark"></i> Hapus
                                                 </button>
                                             </div>
                                             <div class="icon-wrap">
-                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $unit['id_jenis_barang']; ?>">
-                                                <input type="text" class="inp-custom inp-readonly" value="<?= $unit['sub_barang']; ?>" readonly>
+                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
+                                                <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
                                                 <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
                                             </div>
                                         </div>
@@ -110,20 +111,22 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                         </div>
 
                                         <div class="col-md-5">
-                                            <label class="lbl">Pilih Spesifikasi Unit</label>
+                                            <label class="lbl">Pilih Spesifikasi</label>
                                             <div class="icon-wrap">
                                                 <select name="unit_selected[]" class="inp-custom" required>
-                                                    <option value="">-- Pilih Unit --</option>
+                                                    <option value="">-- Pilih Spesifikasi --</option>
 
                                                     <?php if (!empty($item['list_unit'])) : ?>
-                                                        <?php foreach ($item['list_unit'] as $unit) : ?>
-                                                            <option value="<?= $unit['id_barang']; ?>"
-                                                                <?= ($curr_unit == $unit['id_barang']) ? 'selected' : ''; ?>>
-                                                                Unit <?= $unit['spesifikasi_barang']; ?> - (<?= $unit['kondisi_barang']; ?>)
+                                                        <?php foreach ($item['list_unit'] as $spec) : ?>
+                                                            <option value="<?= $spec['id_spesifikasi']; ?>"
+                                                                <?= ($curr_unit == $spec['id_spesifikasi']) ? 'selected' : ''; ?>>
+
+                                                                <?= $spec['spesifikasi_barang']; ?>
+
                                                             </option>
                                                         <?php endforeach; ?>
                                                     <?php else : ?>
-                                                        <option value="" disabled>Tidak ada unit tersedia</option>
+                                                        <option value="" disabled>Tidak ada spesifikasi tersedia</option>
                                                     <?php endif; ?>
 
                                                     <option value="Lainnya" <?= ($curr_unit == 'Lainnya') ? 'selected' : ''; ?>>Lainnya</option>
@@ -135,10 +138,6 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-
-
-
-
 
                         <?php else: ?>
                             <div class="alert alert-warning text-center">
@@ -198,11 +197,20 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
     <?php if (isset($_SESSION['flash'])) : ?>
         Swal.fire({
             title: "<?= $_SESSION['flash']['pesan']; ?>",
-            html: "<?= $_SESSION['flash']['aksi']; ?>", // Pakai HTML agar bisa bold
-            icon: "<?= $_SESSION['flash']['tipe']; ?>", // warning, error, success
+            html: "<?= $_SESSION['flash']['aksi']; ?>", 
+            icon: "<?= $_SESSION['flash']['tipe']; ?>",
             confirmButtonColor: '#1250ba',
             confirmButtonText: 'Oke, Saya Cek Lagi'
         });
-        <?php unset($_SESSION['flash']); // Hapus session agar tidak muncul terus ?>
+        <?php unset($_SESSION['flash']); ?>
     <?php endif; ?>
+    
+    function konfirmasiHapus(url) {
+        document.getElementById('btnLinkHapus').href = url;
+        document.getElementById('modalHapus').style.display = 'flex';
+    }
+
+    function tutupModal() {
+        document.getElementById('modalHapus').style.display = 'none';
+    }
 </script>
