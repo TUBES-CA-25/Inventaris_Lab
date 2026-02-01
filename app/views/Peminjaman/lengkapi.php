@@ -113,9 +113,12 @@
                                     <?php foreach ($data['detail_barang'] as $item) : ?>
                                         <li class="item-list-row">
                                             <div class="item-content-wrapper">
-                                                
+
                                                 <div class="col-item-name">
                                                     <?= $item['nama_barang']; ?>
+                                                    <?php if (!empty($item['urutan_unit'])): ?>
+                                                        <br><small class="text-primary font-weight-bold">Unit: <?= $item['urutan_unit']; ?></small>
+                                                    <?php endif; ?>
                                                 </div>
 
                                                 <div class="col-item-spec">
@@ -181,59 +184,49 @@
                 </div>
 
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
+    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
+    
+    <input type="file"
+           id="file_surat"
+           name="file_surat"
+           required
+           accept=".pdf"
+           onchange="updateFileName(this)"
+           style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; z-index: -1;">
 
-                    <div class="upload-section" id="drop-zone" onclick="triggerUpload()">
-                        <input type="file"
-                            class="file-input-hidden"
-                            id="file_surat"
-                            name="file_surat"
-                            required
-                            accept=".pdf"
-                            onchange="updateFileName(this)">
+    <div class="upload-section" id="drop-zone" onclick="triggerUpload()" style="cursor: pointer;">
+        
+        <div id="view-default">
+            <div class="upload-icon-wrapper">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h5 class="upload-title">Klik atau Seret File ke Sini</h5>
+            <p class="upload-subtitle">Pilih file surat yang sudah ditandatangani</p>
+            <div class="file-types">
+                <span class="file-type-badge">📄 PDF</span>
+            </div>
+            <small class="d-block mt-3 text-muted">
+                <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
+            </small>
+        </div>
 
-                        <div id="view-default">
-                            <div class="upload-icon-wrapper">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
+        <div id="view-preview" class="upload-preview-wrapper" style="display: none;">
+            <div class="upload-icon-wrapper upload-icon-success">
+                <i class="fas fa-file-alt text-white"></i>
+            </div>
+            <h5 class="upload-title upload-title-success">File Siap Dikirim!</h5>
+            <p id="filename-display" class="filename-text">nama_file.pdf</p>
+            
+            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="resetUpload(event)" style="border-radius: 50px;">
+                <i class="fas fa-sync-alt mr-1"></i> Ganti File
+            </button>
+        </div>
+    </div>
 
-                            <h5 class="upload-title">
-                                Klik atau Seret File ke Sini
-                            </h5>
-                            <p class="upload-subtitle">
-                                Pilih file surat yang sudah ditandatangani
-                            </p>
-
-                            <div class="file-types">
-                                <span class="file-type-badge">📄 PDF</span>
-                            </div>
-
-                            <small class="d-block mt-3 text-muted">
-                                <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
-                            </small>
-                        </div>
-
-                        <div id="view-preview" class="upload-preview-wrapper">
-                            <div class="upload-icon-wrapper upload-icon-success">
-                                <i class="fas fa-file-alt text-white"></i>
-                            </div>
-
-                            <h5 class="upload-title upload-title-success">File Diupload!</h5>
-
-                            <p id="filename-display" class="filename-text">
-                                nama_file.pdf
-                            </p>
-
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-reset-upload" onclick="resetUpload(event)">
-                                <i class="fas fa-trash-alt mr-2"></i>Ganti File
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" name="submit_upload" class="btn-submit" id="btn-submit" disabled>
-                        <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
-                    </button>
-                </form>
+    <button type="submit" name="submit_upload" class="btn-submit mt-3" id="btn-submit" disabled>
+        <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
+    </button>
+</form>
             </div>
         </div>
 

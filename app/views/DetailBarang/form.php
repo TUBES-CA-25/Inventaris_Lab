@@ -68,7 +68,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 
                         <div class="form-group mb-4">
                             <label class="form-label">Jumlah</label>
-                            <input type="number" name="jumlah_barang" class="form-input" min="1" required value="<?= $isEdit ? $barang['jumlah_barang'] : '1' ?>">
+                            <input type="number" name="jumlah_barang" class="form-input" min="1" required value="<?= $isEdit ? $barang['jumlah_total'] : '1' ?>">
                         </div>
 
                         <div class="form-group mb-4">
@@ -134,10 +134,10 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             </div>
                         </div>
                     </div>
-                        <!-- End Left Column -->
+                    <!-- End Left Column -->
 
-                        <div class="col-12 col-lg-6">
-                            <!-- Right Column -->
+                    <div class="col-12 col-lg-6">
+                        <!-- Right Column -->
                         <div class="form-group mb-4" id="group-merek">
                             <label class="form-label">Merek Barang</label>
                             <div style="display: flex; gap: 10px; align-items: center;">
@@ -230,53 +230,47 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             <?php if ($isEdit && !empty($barang['foto_barang'])): ?>
                                 <small style="display:block; margin-top:5px;">File: <?= basename($barang['foto_barang']) ?></small>
                             <?php endif; ?>
+                        </div>
+                        <!-- End Right Column -->
                     </div>
-                    <!-- End Right Column -->
-                </div>
 
-                <?php if (!$isEdit): ?>
-                    <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <p style="font-size: 13px; font-weight: 600; color: #888;">Data Penomoran</p>
-                        <div class="row g-3">
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Barang Ke-</label>
-                                    <input type="number" name="barang_ke" class="form-input" placeholder="Contoh: 1" required>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Total Barang</label>
-                                    <input type="number" name="total_barang" class="form-input" placeholder="Contoh: 10" required>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6 col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-label" style="font-size: 13px;">Status Peminjaman</label>
-                                    <select name="status_pinjam" class="form-select">
-                                        <option value="Bisa">Bisa Dipinjam</option>
-                                        <option value="Tidak Bisa">Tidak Bisa</option>
-                                    </select>
+                    <?php if (!$isEdit): ?>
+                        <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Status Peminjaman Default</label>
+                                        <select name="status_pinjam" class="form-select">
+                                            <option value="Bisa">Bisa Dipinjam</option>
+                                            <option value="Tidak Bisa">Tidak Bisa</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <?php else: ?>
-                    <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
-                        <div class="col-12 col-sm-6 col-lg-4">
-                            <div class="form-group">
-                                <label class="form-label">Status Peminjaman</label>
-                                <select name="status_pinjam" class="form-select">
-                                    <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
-                                    <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
-                                </select>
+
+                    <?php else: ?>
+                        <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 20px;">
+                            <div class="row g-3">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-label">Status Peminjaman</label>
+                                        <select name="status_pinjam" class="form-select">
+                                            <option value="Bisa" <?= ($barang['status_peminjaman'] == 'Bisa') ? 'selected' : '' ?>>Bisa Dipinjam</option>
+                                            <option value="Tidak Bisa" <?= ($barang['status_peminjaman'] == 'Tidak Bisa') ? 'selected' : '' ?>>Tidak Bisa</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                <?php endif; ?>
+                    <?php endif; ?>
 
-                <div class="btn-submit-container">
-                    <button type="submit" class="btn-submit"><?= $isEdit ? 'Simpan Perubahan' : 'Kirim Data' ?></button>
+                    <div class="btn-submit-container">
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-save me-2"></i>
+                            <?= $isEdit ? 'Simpan Perubahan Unit Ini' : 'Proses & Generate QR Code' ?>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -288,156 +282,156 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 <script>
     const lastSelectValue = {};
 
-function checkSelection(type) {
-    const select = document.getElementById('select-' + type);
-    const inputContainer = document.getElementById('input-container-' + type);
-    const btnDelete = document.getElementById('btn-delete-' + type);
-
-    if (!select || !inputContainer || !btnDelete) {
-        console.error('Element tidak ditemukan untuk type:', type);
-        return;
-    }
-
-    const inputs = inputContainer.querySelectorAll('input');
-
-    if (select.value !== 'NEW' && select.value !== '') {
-        lastSelectValue[type] = select.value;
-    }
-
-    if (select.value === 'NEW') {
-        select.style.display = 'none';
-        btnDelete.style.display = 'none';
-        inputContainer.style.display = 'block';
-
-        inputs.forEach(input => {
-            input.disabled = false;
-            input.value = '';
-        });
-
-        if (inputs[0]) {
-            inputs[0].focus();
-        }
-        return;
-    }
-
-    inputContainer.style.display = 'none';
-    select.style.display = 'block';
-
-    if (select.value && select.value !== '') {
-        btnDelete.style.display = 'flex';
-    } else {
-        btnDelete.style.display = 'none';
-    }
-}
-
-function cancelInput(type) {
-    try {
-        console.log('cancelInput dipanggil untuk:', type);
-
-        const inputContainer = document.getElementById('input-container-' + type);
+    function checkSelection(type) {
         const select = document.getElementById('select-' + type);
+        const inputContainer = document.getElementById('input-container-' + type);
         const btnDelete = document.getElementById('btn-delete-' + type);
 
-        if (!inputContainer || !select || !btnDelete) {
-            console.error('Element tidak ditemukan:', {
-                inputContainer: !!inputContainer,
-                select: !!select,
-                btnDelete: !!btnDelete
-            });
-            return false;
-        }
-
-        inputContainer.style.display = 'none';
-
-        const inputs = inputContainer.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input) {
-                input.value = '';
-                input.disabled = true;
-            }
-        });
-
-        select.style.display = 'block';
-
-        if (lastSelectValue[type]) {
-            select.value = lastSelectValue[type];
-            btnDelete.style.display = 'flex';
-        } else {
-            select.value = '';
-            btnDelete.style.display = 'none';
-        }
-
-        console.log('Cancel berhasil, nilai dropdown:', select.value);
-        return false;
-
-    } catch (error) {
-        console.error('Error di cancelInput:', error);
-        return false;
-    }
-}
-
-function hapusMaster(type) {
-    try {
-        const select = document.getElementById('select-' + type);
-        if (!select || !select.value) {
-            console.error('Select tidak ditemukan atau tidak ada nilai');
+        if (!select || !inputContainer || !btnDelete) {
+            console.error('Element tidak ditemukan untuk type:', type);
             return;
         }
 
-        const id = select.value;
-        const text = select.options[select.selectedIndex].text.trim();
+        const inputs = inputContainer.querySelectorAll('input');
 
-        // Menggunakan SweetAlert2 sebagai pengganti confirm
-        Swal.fire({
-            title: 'Hapus Data Master?',
-            text: "Anda akan menghapus '" + text + "'. Data tidak bisa dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Arahkan ke URL penghapusan jika user klik Ya
-                window.location.href = "<?= BASEURL; ?>DetailBarang/hapusMaster/" + type + "/" + id;
+        if (select.value !== 'NEW' && select.value !== '') {
+            lastSelectValue[type] = select.value;
+        }
+
+        if (select.value === 'NEW') {
+            select.style.display = 'none';
+            btnDelete.style.display = 'none';
+            inputContainer.style.display = 'block';
+
+            inputs.forEach(input => {
+                input.disabled = false;
+                input.value = '';
+            });
+
+            if (inputs[0]) {
+                inputs[0].focus();
             }
-        });
+            return;
+        }
 
-    } catch (error) {
-        console.error('Error di hapusMaster:', error);
+        inputContainer.style.display = 'none';
+        select.style.display = 'block';
+
+        if (select.value && select.value !== '') {
+            btnDelete.style.display = 'flex';
+        } else {
+            btnDelete.style.display = 'none';
+        }
     }
-}
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log('DOM loaded, inisialisasi dropdown...');
+    function cancelInput(type) {
+        try {
+            console.log('cancelInput dipanggil untuk:', type);
 
-    const types = ['jenis', 'lokasi', 'status', 'merek', 'satuan'];
+            const inputContainer = document.getElementById('input-container-' + type);
+            const select = document.getElementById('select-' + type);
+            const btnDelete = document.getElementById('btn-delete-' + type);
 
-    types.forEach(type => {
+            if (!inputContainer || !select || !btnDelete) {
+                console.error('Element tidak ditemukan:', {
+                    inputContainer: !!inputContainer,
+                    select: !!select,
+                    btnDelete: !!btnDelete
+                });
+                return false;
+            }
+
+            inputContainer.style.display = 'none';
+
+            const inputs = inputContainer.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input) {
+                    input.value = '';
+                    input.disabled = true;
+                }
+            });
+
+            select.style.display = 'block';
+
+            if (lastSelectValue[type]) {
+                select.value = lastSelectValue[type];
+                btnDelete.style.display = 'flex';
+            } else {
+                select.value = '';
+                btnDelete.style.display = 'none';
+            }
+
+            console.log('Cancel berhasil, nilai dropdown:', select.value);
+            return false;
+
+        } catch (error) {
+            console.error('Error di cancelInput:', error);
+            return false;
+        }
+    }
+
+    function hapusMaster(type) {
         try {
             const select = document.getElementById('select-' + type);
-            const inputContainer = document.getElementById('input-container-' + type);
-
-            if (!select) {
-                console.warn('Select tidak ditemukan untuk:', type);
+            if (!select || !select.value) {
+                console.error('Select tidak ditemukan atau tidak ada nilai');
                 return;
             }
 
-            if (select.value && select.value !== 'NEW' && select.value !== '') {
-                lastSelectValue[type] = select.value;
-                console.log('Nilai awal ' + type + ':', select.value);
-            }
- 
-            if (inputContainer) {
-                inputContainer.style.display = 'none';
-            }
+            const id = select.value;
+            const text = select.options[select.selectedIndex].text.trim();
 
-            checkSelection(type);
+            // Menggunakan SweetAlert2 sebagai pengganti confirm
+            Swal.fire({
+                title: 'Hapus Data Master?',
+                text: "Anda akan menghapus '" + text + "'. Data tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Arahkan ke URL penghapusan jika user klik Ya
+                    window.location.href = "<?= BASEURL; ?>DetailBarang/hapusMaster/" + type + "/" + id;
+                }
+            });
 
         } catch (error) {
-            console.error('Error inisialisasi ' + type + ':', error);
+            console.error('Error di hapusMaster:', error);
         }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log('DOM loaded, inisialisasi dropdown...');
+
+        const types = ['jenis', 'lokasi', 'status', 'merek', 'satuan'];
+
+        types.forEach(type => {
+            try {
+                const select = document.getElementById('select-' + type);
+                const inputContainer = document.getElementById('input-container-' + type);
+
+                if (!select) {
+                    console.warn('Select tidak ditemukan untuk:', type);
+                    return;
+                }
+
+                if (select.value && select.value !== 'NEW' && select.value !== '') {
+                    lastSelectValue[type] = select.value;
+                    console.log('Nilai awal ' + type + ':', select.value);
+                }
+
+                if (inputContainer) {
+                    inputContainer.style.display = 'none';
+                }
+
+                checkSelection(type);
+
+            } catch (error) {
+                console.error('Error inisialisasi ' + type + ':', error);
+            }
+        });
     });
-});
 </script>
