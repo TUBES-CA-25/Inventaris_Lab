@@ -3,6 +3,10 @@ if (!isset($_SESSION['login'])) {
     header("Location:" . BASEURL . "Login");
     exit;
 }
+
+// --- [PERUBAHAN 1: Cek Session Langsung Di Sini] ---
+// Ini menjamin status edit terdeteksi, tidak peduli dari Controller mana asalnya
+$isEdit = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
 ?>
 
 <div class="content">
@@ -39,6 +43,7 @@ if (!isset($_SESSION['login'])) {
 
                             <div class="card-desc">
                                 <h6 class="barang-title"><?= $brg['sub_barang']; ?></h6>
+                                
                                 <a href="<?= BASEURL; ?>Peminjaman/tambahItem/<?= IdObfuscator::encode($brg['id_jenis_barang']); ?>"
                                     class="btn-pinjam-now">
                                     Pinjam
@@ -57,92 +62,73 @@ if (!isset($_SESSION['login'])) {
     </div>
 </div>
 
-<!-- <div class="modal fade" id="modalPinjam" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Form Peminjaman</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="<?= BASEURL ?>Peminjaman/tambahPeminjaman" method="post">
-                    
-                    <input type="hidden" name="id_jenis_barang" id="modal_id_barang">
-                    
-                    <div class="form-group">
-                        <label>Barang yang dipinjam</label>
-                        <input type="text" class="form-control" id="modal_nama_barang" readonly style="background-color: #e9ecef;">
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Judul Kegiatan</label>
-                                <input type="text" name="judul_kegiatan" class="form-control" required placeholder="Contoh: Praktikum Jaringan">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Nama Peminjam</label>
-                                <input type="text" name="nama_peminjam" class="form-control" required placeholder="Nama Anda">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Mulai Tanggal</label>
-                                <input type="date" name="tanggal_peminjaman" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Sampai Tanggal</label>
-                                <input type="date" name="tanggal_pengembalian" class="form-control" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Jumlah</label>
-                                <input type="number" name="jumlah_peminjaman" class="form-control" min="1" value="1" required>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="form-group">
-                                <label>Keterangan</label>
-                                <input type="text" name="keterangan_peminjaman" class="form-control" placeholder="Keterangan tambahan...">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" name="status" value="diproses">
-
-                    <div class="modal-footer px-0 pb-0">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn text-white" style="background-color: #0f1429;">Ajukan Peminjaman</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    $(document).ready(function() {
-        $('.btnPinjam').on('click', function() {
-            // Ambil data dari tombol yang diklik
-            const idBarang = $(this).data('id');
-            const namaBarang = $(this).data('nama');
+    // --- [PERUBAHAN 2: Javascript Menggunakan Variable PHP Diatas] ---
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // Ambil nilai dari variabel PHP $isEdit yang kita buat di baris atas tadi
+        const isEditMode = <?= json_encode($isEdit); ?>;
+        
+        console.log("Status Edit Mode:", isEditMode); // Cek console browser Anda
 
-            // Masukkan ke dalam input field di modal
-            $('#modal_id_barang').val(idBarang);
-            $('#modal_nama_barang').val(namaBarang);
-        });
+        if (isEditMode === true) {
+            
+            // Gunakan Event Delegation pada BODY agar menangkap klik di Sidebar juga
+            document.body.addEventListener('click', function(e) {
+                
+                // Cari elemen <a> (link) terdekat dari yang diklik
+                const link = e.target.closest('a');
+
+                // Jika bukan link, abaikan
+                if (!link) return;
+
+                const targetUrl = link.getAttribute('href');
+
+                // A. WHITELIST: Abaikan link kosong/hash/javascript
+                if (!targetUrl || targetUrl === '#' || targetUrl.startsWith('javascript')) return;
+
+                // B. WHITELIST: Tombol "Pinjam" (PENTING: Biarkan user menambah barang)
+                // Kita cek class 'btn-pinjam-now' yang ada di tombol pinjam
+                if (link.classList.contains('btn-pinjam-now')) return;
+
+                // C. WHITELIST: Tombol Logout / Modal (PENTING: Biarkan modal muncul)
+                if (link.hasAttribute('data-toggle') || link.hasAttribute('data-target')) return;
+                
+                // D. WHITELIST: Link ke Form Peminjaman sendiri
+                if (targetUrl.includes('Peminjaman/formPeminjaman')) return;
+
+                // --- BLOKIR NAVIGASI & TAMPILKAN POPUP ---
+                e.preventDefault();
+                e.stopImmediatePropagation(); // Hentikan script lain (seperti loader)
+
+                Swal.fire({
+                    title: 'Batal Memilih Barang?',
+                    text: "Anda sedang dalam mode Edit/Tambah barang. Keluar sekarang akan membatalkan proses pemilihan.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonColor: '#d33',     // Merah (Keluar)
+                    denyButtonColor: '#0d1b3e',     // Navy (Kembali ke Form)
+                    cancelButtonColor: '#6e7881',   // Abu (Tetap Disini)
+                    confirmButtonText: 'Keluar & Batal Edit',
+                    denyButtonText: 'Kembali ke Form',
+                    cancelButtonText: 'Tetap Disini'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // OPSI 1: KELUAR & HAPUS SESI EDIT
+                        window.location.href = '<?= BASEURL; ?>Peminjaman/batalEdit';
+                        
+                    } else if (result.isDenied) {
+                        // OPSI 2: BALIK KE FORM (Tanpa nambah barang)
+                        window.location.href = '<?= BASEURL; ?>Peminjaman/formPeminjaman';
+                        
+                    } else {
+                        // OPSI 3: DIAM (Tutup popup)
+                    }
+                });
+            }, true); // 'true' = Capture Phase (Prioritas Tinggi)
+        }
     });
 </script>

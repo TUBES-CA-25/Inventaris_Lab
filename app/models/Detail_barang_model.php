@@ -8,7 +8,6 @@ class Detail_barang_model
         $this->db = new Database;
     }
 
-    // --- GET DATA MASTER ---
     public function getSubBarang()
     {
         $this->db->query("SELECT * FROM mst_jenis_barang ORDER BY sub_barang");
@@ -92,7 +91,6 @@ class Detail_barang_model
 
     private function insertNewMasterData($table, $column, $value, $extraInput = null)
     {
-        // 1. Cek Data Ganda
         $check = "SELECT * FROM $table WHERE $column = :value";
         $this->db->query($check);
         $this->db->bind('value', $value);
@@ -104,18 +102,13 @@ class Detail_barang_model
         } else {
             $query = "";
 
-            // Logic Insert Berdasarkan Tabel
             if ($table == 'mst_jenis_barang') {
-                // Bersihkan input (Hanya huruf a-z, jadikan kapital)
                 $cleanVal = strtoupper(preg_replace("/[^A-Za-z]/", '', $value));
 
                 $grup = !empty($extraInput) ? strtoupper($extraInput) : 'C';
 
-                // [PERUBAHAN DI SINI]
-                // Mengambil 3 huruf pertama dari nama barang
                 $shortCode = substr($cleanVal, 0, 3);
 
-                // Penanganan jika nama barang kurang dari 3 huruf (Misal: "PC" -> "PCX")
                 if (strlen($shortCode) < 3) {
                     $shortCode = str_pad($shortCode, 3, 'X');
                 }
@@ -126,10 +119,9 @@ class Detail_barang_model
                 $this->db->bind('val', $value);
                 $this->db->bind('grup', $grup);
                 $this->db->bind('kodesub', $shortCode);
-                $this->db->bind('kodejenis', $grup . '/' . $shortCode); // Hasil: C/MOU
+                $this->db->bind('kodejenis', $grup . '/' . $shortCode);
 
             } else if ($table == 'mst_merek_barang') {
-                // ... (Kode Merek Tetap Sama) ...
                 $kodeMerek = !empty($extraInput) ? $extraInput : rand(100, 999);
                 $query = "INSERT INTO mst_merek_barang (nama_merek_barang, kode_merek_barang) 
                           VALUES (:val, :kode)";
@@ -157,7 +149,6 @@ class Detail_barang_model
 
     public function postDataBarang($data)
     {
-        // 1. INPUT MASTER DATA (Sama seperti sebelumnya)
         if ($data['sub_barang'] == 'NEW' && !empty($data['sub_barang_baru'])) {
             $manualGroup = !empty($data['grup_sub_baru']) ? $data['grup_sub_baru'] : null;
             $data['sub_barang'] = $this->insertNewMasterData('mst_jenis_barang', 'sub_barang', $data['sub_barang_baru'], $manualGroup);
@@ -176,13 +167,11 @@ class Detail_barang_model
             $data['satuan'] = $this->insertNewMasterData('mst_satuan', 'nama_satuan', $data['satuan_baru']);
         }
 
-        // 2. UPLOAD FOTO & PREPARE VARIABEL NAMA
         $ukuranFile = $_FILES['foto_barang']['size'];
         $limit = 2 * 1024 * 1024;
 
         if ($ukuranFile <= $limit) {
 
-            // Ambil Nama-nama untuk Label QR
             $this->db->query("SELECT * FROM mst_jenis_barang WHERE id_jenis_barang = :id");
             $this->db->bind('id', $data['sub_barang']);
             $rowJenis = $this->db->single();
@@ -199,19 +188,16 @@ class Detail_barang_model
             $this->db->bind('id', $data['lokasi_penyimpanan']);
             $namaLokasi = $this->db->single()['nama_lokasi_penyimpanan'];
 
-            // Ambil Kondisi Text (untuk list detail)
             $this->db->query("SELECT kondisi_barang FROM mst_kondisi_barang WHERE id_kondisi_barang = :id");
             $this->db->bind('id', $data['kondisi_barang']);
             $namaKondisi = $this->db->single()['kondisi_barang'];
 
-            // Upload
             $uploadDirectory = '../public/img/foto-barang/';
             $uploadedFile = $_FILES['foto_barang']['tmp_name'];
             $namaFileUnik = uniqid() . '_' . $_FILES['foto_barang']['name'];
             $fotoBarang = $uploadDirectory . $namaFileUnik;
             move_uploaded_file($uploadedFile, $fotoBarang);
 
-            // 3. INSERT HEADER (MST_SPESIFIKASI)
             $bulanAngka = date('m', strtotime($data['tgl_pengadaan_barang']));
             $tahun = date('Y', strtotime($data['tgl_pengadaan_barang']));
             $kodeInisial = $tahun . '/' . $bulanAngka . '/' . $kodeJenisString . '/' . $kodeMerekString;
@@ -234,10 +220,8 @@ class Detail_barang_model
 
             $idSpesifikasi = $this->db->lastInsertId();
 
-            // Variabel penampung string detail untuk QR Master
             $listDetailString = "";
 
-            // 4. LOOPING INSERT DETAIL & BUILD STRING
             $berhasil = 0;
             $pathQr = '../public/img/qr-code/';
             if (!file_exists($pathQr)) mkdir($pathQr, 0777, true);
@@ -271,11 +255,8 @@ class Detail_barang_model
                 $idbarang = $this->db->lastInsertId();
                 $berhasil += $this->db->rowCount();
 
-                // Generate QR Unit (Virtual Code)
                 $kodeLengkapVirtual = $kodeInisial . '/' . $totalInput . '/' . $i;
 
-                // Tambahkan info ke string list Master
-                // Format: "1. [Kode] - Kondisi - Lokasi"
                 $listDetailString .= $i . ". [" . $kodeLengkapVirtual . "] - " . $namaKondisi . " - " . $namaLokasi . "\n";
 
                 $qrContentUnit = "Kode: " . $kodeLengkapVirtual . "\n" .
@@ -292,15 +273,13 @@ class Detail_barang_model
                 $this->db->execute();
             }
 
-            // 5. GENERATE QR MASTER (LENGKAP DENGAN DATA ANAK)
-            // Dilakukan SETELAH loop agar string list lengkap
             $qrContentMaster = "=== BATCH MASTER ===\n" .
                 "Kode Batch: " . $kodeInisial . "\n" .
                 "Jenis: " . $namaJenis . " | " . $namaMerek . "\n" .
                 "Total: " . $totalInput . " Unit\n" .
                 "------------------------\n" .
                 "RINCIAN UNIT:\n" .
-                $listDetailString; // <--- Masukkan string panjang di sini
+                $listDetailString;
 
             $qrMasterName = "MASTER_" . uniqid() . ".png";
             QRcode::png($qrContentMaster, $pathQr . $qrMasterName, "M", 4, 4);
@@ -327,13 +306,11 @@ class Detail_barang_model
                 b.status_peminjaman,
                 b.qr_code,
                 
-                -- Ambil data dari Master Spesifikasi
                 spek.kode_barang, 
                 spek.spesifikasi_barang,
-                spek.jumlah_total as jumlah_barang, -- Alias agar sesuai tampilan index.php
+                spek.jumlah_total as jumlah_barang, 
                 spek.foto_barang,
 
-                -- Data Master Lainnya
                 j.sub_barang,
                 m.nama_merek_barang,
                 s.nama_satuan,
@@ -350,7 +327,7 @@ class Detail_barang_model
               LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
               LEFT JOIN mst_status st ON b.id_status = st.id_status
               
-              ORDER BY b.id_barang DESC"; // Urutkan dari yang terbaru
+              ORDER BY b.id_barang DESC";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -390,61 +367,48 @@ class Detail_barang_model
         return $this->db->single();
     }
 
-    // --- HAPUS SATU BATCH (SPESIFIKASI + SEMUA UNITNYA) ---
     public function hapusBarang($id_barang)
     {
         try {
-            // 1. Cari ID Spesifikasi dari barang yang dipilih
             $this->db->query("SELECT id_spesifikasi FROM trx_barang WHERE id_barang = :id");
             $this->db->bind("id", $id_barang);
             $row = $this->db->single();
 
             if (!$row) {
-                return 0; // Data tidak ditemukan
+                return 0;
             }
 
             $idSpesifikasi = $row['id_spesifikasi'];
 
-            // 2. Ambil Data File yang Harus Dihapus (Foto Barang & QR Master)
             $this->db->query("SELECT foto_barang, qr_code_spesifikasi FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataSpek = $this->db->single();
 
-            // 3. Ambil Semua QR Code Unit (Anak-anaknya)
             $this->db->query("SELECT qr_code FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataUnit = $this->db->resultSet();
 
-            // --- PROSES HAPUS FILE FISIK ---
-
-            // Hapus Foto Utama
             if (!empty($dataSpek['foto_barang']) && file_exists($dataSpek['foto_barang'])) {
                 @unlink($dataSpek['foto_barang']);
             }
-            // Hapus QR Master
             if (!empty($dataSpek['qr_code_spesifikasi']) && file_exists($dataSpek['qr_code_spesifikasi'])) {
                 @unlink($dataSpek['qr_code_spesifikasi']);
             }
-            // Hapus Semua QR Unit
             foreach ($dataUnit as $unit) {
                 if (!empty($unit['qr_code']) && file_exists($unit['qr_code'])) {
                     @unlink($unit['qr_code']);
                 }
             }
 
-            // --- PROSES HAPUS DATABASE ---
-
-            // 4. Hapus Semua Unit di trx_barang (Anak)
             $this->db->query("DELETE FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
 
-            // 5. Hapus Header di mst_spesifikasi (Induk)
             $this->db->query("DELETE FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
 
-            return $this->db->rowCount(); // Berhasil
+            return $this->db->rowCount();
 
         } catch (Exception $e) {
             error_log("Error hapusBarang: " . $e->getMessage());
@@ -720,7 +684,6 @@ class Detail_barang_model
         return $this->db->resultSet();
     }
 
-    // --- HAPUS DATA MASTER (Dengan Pengecekan) ---
     public function hapusDataMaster($table, $id)
     {
         $pkColumn = "";
@@ -757,7 +720,7 @@ class Detail_barang_model
         $result = $this->db->single();
 
         if ($result['count'] > 0) {
-            return -1; // Kode Error: Data sedang dipakai
+            return -1;
         }
 
         $deleteQuery = "DELETE FROM $table WHERE $pkColumn = :id";
@@ -787,9 +750,6 @@ class Detail_barang_model
         return $this->db->resultSet();
     }
 
-    // --- TAMBAHAN KHUSUS UNTUK EDIT UNIT (Copy paste di bagian paling bawah class) ---
-
-    // 1. Ambil data lengkap satu unit berdasarkan ID Barang (trx_barang)
     public function getUnitById($id_barang)
     {
         $query = "SELECT 
@@ -810,10 +770,8 @@ class Detail_barang_model
         return $this->db->single();
     }
 
-    // 2. Fungsi Update Unit (Hanya update data unit, bukan master spek)
     public function updateUnit($data)
     {
-        // Update data fisik unit
         $query = "UPDATE trx_barang SET 
                     id_kondisi_barang = :kondisi,
                     id_lokasi_penyimpanan = :lokasi,
@@ -834,11 +792,8 @@ class Detail_barang_model
 
         $this->db->execute();
 
-        // UPDATE QR CODE UNIT (Karena lokasi/kondisi mungkin berubah)
-        // Ambil data terbaru untuk generate QR
         $unit = $this->getUnitById($data['id_barang']);
 
-        // Ambil nama lokasi & kondisi baru (untuk text QR)
         $this->db->query("SELECT nama_lokasi_penyimpanan FROM mst_lokasi_penyimpanan WHERE id_lokasi_penyimpanan = :id");
         $this->db->bind('id', $data['id_lokasi_penyimpanan']);
         $namaLokasi = $this->db->single()['nama_lokasi_penyimpanan'];
@@ -847,7 +802,6 @@ class Detail_barang_model
         $this->db->bind('id', $data['id_kondisi_barang']);
         $namaKondisi = $this->db->single()['kondisi_barang'];
 
-        // Kode Unit (Contoh: 2026/01/C/LP1/401/30/5)
         $kodeFull = $unit['kode_barang'] . '/' . $unit['jumlah_total'] . '/' . $unit['urutan_unit'];
 
         $qrContent = "Kode: " . $kodeFull . "\n" .
@@ -855,42 +809,30 @@ class Detail_barang_model
             "Lokasi: " . $namaLokasi . "\n" .
             "Kondisi: " . $namaKondisi;
 
-        // Generate QR Baru (Overwrite file lama atau buat baru jika nama file random)
         $pathQr = '../public/img/qr-code/';
         $qrName = basename($unit['qr_code']);
 
-        // Jika belum ada QR sebelumnya, buat nama baru
         if (empty($qrName) || !file_exists($pathQr . $qrName)) {
             $qrName = uniqid("UNIT_UPD_") . ".png";
 
-            // Update path di DB jika file baru
             $this->db->query("UPDATE trx_barang SET qr_code = :qr WHERE id_barang = :id");
             $this->db->bind('qr', $pathQr . $qrName);
             $this->db->bind('id', $data['id_barang']);
             $this->db->execute();
         }
 
-        // Pastikan library QR Code sudah di-include di controller atau bootstrap
-        // Jika QRcode belum terload otomatis, uncomment baris di bawah:
-        // require_once '../app/core/phpqrcode/qrlib.php'; 
-
         QRcode::png($qrContent, $pathQr . $qrName, "M", 4, 4);
 
         return $this->db->rowCount();
     }
 
-    // --- KHUSUS CETAK PDF PER UNIT ---
     public function getDetailUnitForPrint($id_barang)
     {
-        // Kita perlu JOIN banyak tabel agar data di PDF lengkap (bukan cuma ID)
         $query = "SELECT 
                     b.*,
-                    -- Data dari Master Spesifikasi
                     spek.kode_barang AS kode_master,
                     spek.foto_barang,
                     spek.jumlah_total,
-                    
-                    -- Data Teks (Join)
                     j.sub_barang, 
                     m.nama_merek_barang, 
                     l.nama_lokasi_penyimpanan, 
@@ -903,7 +845,6 @@ class Detail_barang_model
                   JOIN mst_merek_barang m ON spek.id_merek_barang = m.id_merek_barang
                   JOIN mst_satuan s ON spek.id_satuan = s.id_satuan
                   
-                  -- Left Join untuk data unit yang mungkin kosong/berubah
                   LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
                   LEFT JOIN mst_kondisi_barang k ON b.id_kondisi_barang = k.id_kondisi_barang
                   
@@ -914,14 +855,11 @@ class Detail_barang_model
         return $this->db->single();
     }
 
-    // Fungsi baru untuk mengambil unit dengan limit (pagination)
     public function getUnitsBySpesifikasiPaged($id_spesifikasi, $limit, $offset)
     {
-        // Pastikan limit dan offset adalah integer murni
         $limit = (int) $limit;
         $offset = (int) $offset;
 
-        // Masukkan langsung ke query untuk menghindari error binding LIMIT/OFFSET di beberapa versi PDO
         $query = "SELECT 
                 b.*, 
                 l.nama_lokasi_penyimpanan, 
@@ -940,7 +878,6 @@ class Detail_barang_model
         return $this->db->resultSet();
     }
 
-    // Fungsi untuk menghitung total unit agar kita tahu ada berapa halaman
     public function getTotalUnitsBySpesifikasi($id_spesifikasi)
     {
         $this->db->query("SELECT COUNT(*) as total FROM trx_barang WHERE id_spesifikasi = :id");

@@ -5,7 +5,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="side-bar d-flex flex-column justify-content-between" id="sidebarMenu">
-    
+
     <div>
         <div class="logo-header p-10 d-flex align-items-center" style="margin: 15px; margin-bottom: 15px;">
             <img src="<?= BASEURL; ?>img/logo bg hitam.svg" alt="logo" />
@@ -87,15 +87,17 @@
     </div>
 
     <div class="menu-footer p-4">
-        <a href="#" data-toggle="modal" data-target="#konfirmasiKeluar" class="menu-item logout-link">
+        <a href="#"
+            data-toggle="modal" data-target="#konfirmasiKeluar"
+            data-bs-toggle="modal" data-bs-target="#konfirmasiKeluar"
+            class="menu-item logout-link">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             <span>Keluar</span>
         </a>
     </div>
 
 </div>
-
-<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 99999;">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="border-radius: 15px;">
             <div class="modal-body" style="text-align: center;">
@@ -103,42 +105,11 @@
                 <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal" data-bs-dismiss="modal">
+                    Batal
+                </button>
                 <button type="button" class="btn btn-danger" style="width: 100px;" onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const sidebarMenu = document.getElementById('sidebarMenu');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        // Fungsi buka/tutup
-        function toggleSidebar() {
-            sidebarMenu.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-            
-            // Ubah icon hamburger jadi X (opsional)
-            const icon = hamburgerBtn.querySelector('i');
-            if (sidebarMenu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-xmark');
-            } else {
-                icon.classList.remove('fa-xmark');
-                icon.classList.add('fa-bars');
-            }
-        }
-
-        // Event Listeners
-        if(hamburgerBtn) {
-            hamburgerBtn.addEventListener('click', toggleSidebar);
-        }
-
-        if(sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', toggleSidebar); // Tutup saat klik luar
-        }
-    });
-</script>

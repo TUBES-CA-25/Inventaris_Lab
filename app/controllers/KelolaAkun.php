@@ -48,10 +48,6 @@ class KelolaAkun extends Controller {
     }
 
     public function ubahUser(){
-        // Cek jika update berhasil (rowCount >= 0 karena bisa saja user simpan tanpa ubah data)
-        // Disarankan model return rowCount, tapi kadang 0 jika tidak ada perubahan
-        // Jadi logicnya: Asal tidak Error/False
-        
         if(isset($_POST['id_user'])) {
             $_POST['id_user'] = IdObfuscator::decode($_POST['id_user']);
         }
@@ -80,9 +76,6 @@ class KelolaAkun extends Controller {
     public function getRole(){
         $data = $this->userModel->getRole(IdObfuscator::decode($_POST['id_user']));
         if ($data) {
-             // Assuming getRole returns user data with 'id_user' or related
-             // If it returns role list, maybe no need. 
-             // But usually it returns the user's current role.
              if(isset($data['id_user'])) $data['id_user'] = IdObfuscator::encode($data['id_user']);
         }
         echo json_encode($data);

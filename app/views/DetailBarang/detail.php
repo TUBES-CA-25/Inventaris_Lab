@@ -23,11 +23,14 @@ $units = $data['listUnits'];
                             </div>
                             <div class="info-group">
                                 <label>Tanggal Pengadaan</label>
-                                <div class="value"><?= date('d/m/Y', strtotime($master['tgl_pengadaan_barang'])); ?></div>
+                                <div class="value"><?= date('d/m/Y', strtotime($master['tgl_pengadaan_barang'])); ?>
+                                </div>
                             </div>
                             <div class="info-group">
                                 <label>Detail Penyimpanan</label>
-                                <div class="value"><?= !empty($master['deskripsi_detail_lokasi']) ? $master['deskripsi_detail_lokasi'] : '-'; ?></div>
+                                <div class="value">
+                                    <?= !empty($master['deskripsi_detail_lokasi']) ? $master['deskripsi_detail_lokasi'] : '-'; ?>
+                                </div>
                             </div>
                             <div class="info-group">
                                 <label>Lokasi Penyimpanan</label>
@@ -43,7 +46,9 @@ $units = $data['listUnits'];
                             </div>
                             <div class="info-group">
                                 <label>Spesifikasi Barang</label>
-                                <div class="value"><?= !empty($master['spesifikasi_barang']) ? $master['spesifikasi_barang'] : '-'; ?></div>
+                                <div class="value">
+                                    <?= !empty($master['spesifikasi_barang']) ? $master['spesifikasi_barang'] : '-'; ?>
+                                </div>
                             </div>
                             <div class="info-group">
                                 <label>Keterangan Label</label>
@@ -62,9 +67,9 @@ $units = $data['listUnits'];
 
                     <div class="col-lg-4 right-panel">
                         <div class="product-image-container">
-                            <?php if (!empty($master['foto_barang'])) : ?>
+                            <?php if (!empty($master['foto_barang'])): ?>
                                 <img src="<?= BASEURL . $master['foto_barang']; ?>" alt="Foto Barang">
-                            <?php else : ?>
+                            <?php else: ?>
                                 <div class="no-image-placeholder">
                                     <i class="fa-solid fa-image fa-3x mb-2"></i>
                                     <span>No Image</span>
@@ -73,27 +78,30 @@ $units = $data['listUnits'];
                         </div>
 
                         <div class="action-buttons">
-                            <button type="button" class="btn-dark-blue" data-bs-toggle="modal" data-bs-target="#modalQRMaster">
+                            <button type="button" class="btn-dark-blue" data-bs-toggle="modal"
+                                data-bs-target="#modalQRMaster">
                                 <i class="fa-solid fa-qrcode"></i> Generate QR Code
                             </button>
 
-                            <form action="<?= BASEURL; ?>DetailBarang/cetak" method="post" target="_blank" style="width:100%;">
-                                <input type="hidden" name="id_barang[]" value="<?= IdObfuscator::encode($master['id_barang']); ?>">
+                            <form action="<?= BASEURL; ?>DetailBarang/cetak" method="post" target="_blank"
+                                style="width:100%;">
+                                <input type="hidden" name="id_barang[]"
+                                    value="<?= IdObfuscator::encode($master['id_barang']); ?>">
                                 <button type="submit" class="btn-dark-blue btn-action-custom">
                                     <i class="fa-solid fa-file-pdf"></i> Ekspor PDF
                                 </button>
                             </form>
 
-                            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) : ?>
-                                <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($master['id_barang']); ?>" class="btn-dark-blue btn-action-custom">
+                            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
+                                <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($master['id_barang']); ?>"
+                                    class="btn-dark-blue btn-action-custom">
                                     <i class="fa-solid fa-pen-to-square"></i> Edit
                                 </a>
                             <?php endif; ?>
 
-                            <a href="<?= BASEURL; ?>DetailBarang"
-                            class="btn-action-custom btn-gray-slide">
-                            <i class="fa-solid fa-arrow-left"></i> Kembali
-                        </a>
+                            <a href="<?= BASEURL; ?>DetailBarang" class="btn-action-custom btn-gray-slide">
+                                <i class="fa-solid fa-arrow-left"></i> Kembali
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -159,12 +167,10 @@ $units = $data['listUnits'];
                                             <i class="fa-solid fa-qrcode"></i>
                                         </button>
                                         <a href="<?= BASEURL; ?>DetailBarang/cetakUnit/<?= IdObfuscator::encode($unit['id_barang']); ?>"
-                                            target="_blank"
-                                            class="btn-icon-simple ms-2"
-                                            title="Cetak PDF Unit">
+                                            target="_blank" class="btn-icon-simple ms-2" title="Cetak PDF Unit">
                                             <i class="fa-solid fa-print"></i>
                                         </a>
-                                        <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2'])) : ?>
+                                        <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
                                             <a href="<?= BASEURL; ?>DetailBarang/ubahUnit/<?= IdObfuscator::encode($unit['id_barang']); ?>"
                                                 class="btn-icon-simple ms-2" title="Edit Unit">
                                                 <i class="fa-solid fa-pen"></i>
@@ -177,28 +183,44 @@ $units = $data['listUnits'];
                         </tbody>
                     </table>
                 </div>
-                <?php if ($data['totalHalaman'] > 1) : ?>
+                <?php if ($data['totalHalaman'] > 1): ?>
                     <nav aria-label="Page navigation" class="mt-4">
                         <ul class="pagination justify-content-center">
 
                             <li class="page-item <?= ($data['halamanAktif'] <= 1) ? 'disabled' : ''; ?>">
-                                <a class="page-link" href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= ($data['halamanAktif'] - 1); ?>">
-                                    <i class="fa-solid fa-angle-left"></i> Previous
-                                </a>
+                                <?php if ($data['halamanAktif'] <= 1): ?>
+                                    <span class="page-link">
+                                        <i class="fa-solid fa-angle-left"></i> Previous
+                                    </span>
+                                <?php else: ?>
+                                    <a class="page-link"
+                                        href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= ($data['halamanAktif'] - 1); ?>">
+                                        <i class="fa-solid fa-angle-left"></i> Previous
+                                    </a>
+                                <?php endif; ?>
                             </li>
 
-                            <?php for ($i = 1; $i <= $data['totalHalaman']; $i++) : ?>
+                            <?php for ($i = 1; $i <= $data['totalHalaman']; $i++): ?>
                                 <li class="page-item <?= ($i == $data['halamanAktif']) ? 'active' : ''; ?>">
-                                    <a class="page-link" href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= $i; ?>">
+                                    <a class="page-link"
+                                        href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= $i; ?>">
                                         <?= $i; ?>
                                     </a>
                                 </li>
                             <?php endfor; ?>
 
-                            <li class="page-item <?= ($data['halamanAktif'] >= $data['totalHalaman']) ? 'disabled' : ''; ?>">
-                                <a class="page-link" href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= ($data['halamanAktif'] + 1); ?>">
-                                    Next <i class="fa-solid fa-angle-right"></i>
-                                </a>
+                            <li
+                                class="page-item <?= ($data['halamanAktif'] >= $data['totalHalaman']) ? 'disabled' : ''; ?>">
+                                <?php if ($data['halamanAktif'] >= $data['totalHalaman']): ?>
+                                    <span class="page-link">
+                                        Next <i class="fa-solid fa-angle-right"></i>
+                                    </span>
+                                <?php else: ?>
+                                    <a class="page-link"
+                                        href="<?= BASEURL; ?>DetailBarang/detail/<?= $data['id_encoded']; ?>?p=<?= ($data['halamanAktif'] + 1); ?>">
+                                        Next <i class="fa-solid fa-angle-right"></i>
+                                    </a>
+                                <?php endif; ?>
                             </li>
 
                         </ul>
@@ -218,7 +240,8 @@ $units = $data['listUnits'];
                 <h5 class="modal-title">
                     <i class="fa-solid fa-qrcode me-2"></i> QR Code Barang
                 </h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background:none; border:none; color:white; opacity:0.8;">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"
+                    style="background:none; border:none; color:white; opacity:0.8;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -235,9 +258,9 @@ $units = $data['listUnits'];
                     $pathFisik = $_SERVER['DOCUMENT_ROOT'] . '/Inventaris_Lab1/public/' . $cleanQrPath;
                     ?>
 
-                    <?php if (!empty($qrCodePath) && file_exists($pathFisik)) : ?>
+                    <?php if (!empty($qrCodePath) && file_exists($pathFisik)): ?>
                         <img src="<?= BASEURL . $cleanQrPath; ?>" alt="QR Code">
-                    <?php else : ?>
+                    <?php else: ?>
                         <div class="error-message">
                             <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i><br>
                             QR Code File Tidak Ditemukan
@@ -257,7 +280,7 @@ $units = $data['listUnits'];
                     <i class="fa-solid fa-times me-1"></i> Tutup
                 </button>
 
-                <?php if (!empty($qrCodePath)) : ?>
+                <?php if (!empty($qrCodePath)): ?>
                     <a href="<?= BASEURL . $cleanQrPath; ?>"
                         download="QR_MASTER_<?= str_replace('/', '-', $master['kode_barang']); ?>.png"
                         class="btn btn-primary">
@@ -277,7 +300,8 @@ $units = $data['listUnits'];
                 <h5 class="modal-title">
                     <i class="fa-solid fa-qrcode me-2"></i> QR Code Barang (Unit)
                 </h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" style="background:none; border:none; color:white; opacity:0.8;">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"
+                    style="background:none; border:none; color:white; opacity:0.8;">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -320,171 +344,5 @@ $units = $data['listUnits'];
 
 <style>
     /* CSS tetap sama seperti sebelumnya */
-    .card-modern {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        overflow: hidden;
-        border: none;
-    }
-
-    .card-body-modern {
-        padding: 40px;
-    }
-
-    .section-title {
-        font-size: 22px;
-        font-weight: 800;
-        color: #101a32;
-        margin-bottom: 35px;
-    }
-
-    .left-panel {
-        padding-right: 40px;
-        border-right: 1px solid #e0e0e0;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        row-gap: 30px;
-        column-gap: 20px;
-    }
-
-    .info-group label {
-        font-size: 15px;
-        font-weight: 700;
-        color: #101a32;
-        margin-bottom: 6px;
-    }
-
-    .info-group .value {
-        font-size: 15px;
-        color: #8898aa;
-        font-weight: 400;
-    }
-
-    .right-panel {
-        padding-left: 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .product-image-container {
-        width: 100%;
-        max-width: 300px;
-        aspect-ratio: 4/3;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 25px;
-        padding: 10px;
-        border: 1px solid #f0f0f0;
-    }
-
-    .product-image-container img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-    }
-
-    .action-buttons {
-        width: 100%;
-        max-width: 300px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .btn-dark-blue {
-        background-color: #101a32;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 12px 20px;
-        font-size: 14px;
-        font-weight: 600;
-        text-align: left;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        transition: 0.3s;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .btn-dark-blue:hover {
-        background-color: #1a2b50;
-        color: #fff;
-        text-decoration: none;
-    }
-
-    .btn-icon-simple {
-        background: transparent;
-        border: 1px solid #e0e0e0;
-        color: #555;
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.2s;
-    }
-
-    .btn-icon-simple:hover {
-        background: #101a32;
-        color: #fff;
-        border-color: #101a32;
-    }
-
-    .badge-code {
-        font-family: monospace;
-        color: #101a32;
-        font-weight: 600;
-        background: #f6f9fc;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .bg-success-soft {
-        background: #e0f2f1;
-        color: #00695c !important;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 12px;
-    }
-
-    .bg-warning-soft {
-        background: #fff8e1;
-        color: #ff8f00 !important;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 12px;
-    }
-
-    @media (max-width: 992px) {
-        .left-panel {
-            padding-right: 0;
-            border-right: none;
-            margin-bottom: 40px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 40px;
-        }
-
-        .right-panel {
-            padding-left: 0;
-        }
-
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+    
 </style>

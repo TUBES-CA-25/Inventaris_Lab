@@ -2,30 +2,21 @@
 
 class ErrorPage extends Controller
 {
-    /**
-     * Validate error session - error pages hanya bisa diakses jika ada error
-     */
     private function validateErrorSession($requiredType = null)
     {
         if (!isset($_SESSION['has_error']) || $_SESSION['has_error'] !== true) {
-            // Tidak ada error session - redirect ke beranda
             header("Location: " . BASEURL . "Beranda");
             exit;
         }
 
-        // Jika required type specified, validasi type-nya
         if ($requiredType !== null && isset($_SESSION['error_type'])) {
             if ($_SESSION['error_type'] !== $requiredType) {
-                // Error type tidak sesuai - redirect ke beranda
                 header("Location: " . BASEURL . "Beranda");
                 exit;
             }
         }
     }
 
-    /**
-     * Clear error session setelah ditampilkan
-     */
     private function clearErrorSession()
     {
         unset($_SESSION['has_error']);
@@ -37,9 +28,6 @@ class ErrorPage extends Controller
         unset($_SESSION['error_trace']);
     }
 
-    /**
-     * Display 404 - Page Not Found error
-     */
     public function notFound()
     {
         $this->validateErrorSession('404');
@@ -52,9 +40,6 @@ class ErrorPage extends Controller
         $this->clearErrorSession();
     }
 
-    /**
-     * Display 403 - Access Denied error
-     */
     public function accessDenied()
     {
         $this->validateErrorSession('403');
@@ -67,9 +52,6 @@ class ErrorPage extends Controller
         $this->clearErrorSession();
     }
 
-    /**
-     * Display 401 - Unauthorized (belum login)
-     */
     public function unauthorized()
     {
         $this->validateErrorSession('401');
@@ -82,9 +64,6 @@ class ErrorPage extends Controller
         $this->clearErrorSession();
     }
 
-    /**
-     * Display 500 - Internal Server Error
-     */
     public function serverError()
     {
         $this->validateErrorSession('500');
@@ -93,7 +72,6 @@ class ErrorPage extends Controller
         $data['judul'] = '500 - Kesalahan Server';
         $data['error_details'] = '';
 
-        // Tampilkan detail error jika dalam mode development
         if (defined('DEVELOPMENT_MODE') && DEVELOPMENT_MODE === true) {
             $details = [];
             if (isset($_SESSION['error_message'])) {
@@ -112,9 +90,6 @@ class ErrorPage extends Controller
         $this->clearErrorSession();
     }
 
-    /**
-     * Display Database Connection Error
-     */
     public function databaseError()
     {
         $this->validateErrorSession('database');
@@ -123,7 +98,6 @@ class ErrorPage extends Controller
         $data['judul'] = 'Kesalahan Database';
         $data['db_error'] = '';
 
-        // Tampilkan detail error jika dalam mode development
         if (defined('DEVELOPMENT_MODE') && DEVELOPMENT_MODE === true) {
             $details = [];
             if (isset($_SESSION['error_message'])) {
@@ -142,9 +116,6 @@ class ErrorPage extends Controller
         $this->clearErrorSession();
     }
 
-    /**
-     * Display generic error page
-     */
     public function index()
     {
         $this->validateErrorSession();
@@ -158,7 +129,6 @@ class ErrorPage extends Controller
         $data['error_message'] = $_SESSION['error_message'] ?? 'Maaf, terjadi kesalahan yang tidak terduga.';
         $data['error_details'] = '';
 
-        // Tampilkan detail error jika dalam mode development
         if (defined('DEVELOPMENT_MODE') && DEVELOPMENT_MODE === true) {
             $details = [];
             if (isset($_SESSION['error_file']) && isset($_SESSION['error_line'])) {

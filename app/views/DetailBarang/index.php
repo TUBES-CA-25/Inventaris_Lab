@@ -5,23 +5,7 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content" style="border-radius: 15px;">
-            <div class="modal-body" style="text-align: center;">
-                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                    background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop
-                    autoplay></lottie-player>
-                <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" style="width: 100px;"
-                    onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <div class="content">
     <div class="content-beranda">

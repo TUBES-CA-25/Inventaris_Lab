@@ -16,45 +16,36 @@ class Riwayat extends Controller
         $riwayatModel = $this->model('Riwayat_model');
         $userModel = $this->model('User_model');
 
-        // Ambil data user login
         $dataUser['id_user'] = $_SESSION['id_user'];
         $currentUser = $userModel->profile($dataUser);
 
         $id_user_login = $_SESSION['id_user'];
         $id_role_login = $currentUser['id_role'];
 
-        // Role 7 = Mahasiswa/User Biasa
         $is_mahasiswa = ($id_role_login == 7);
 
-        // Variabel untuk menampung hasil statistik
         $stats = [];
 
         if ($is_mahasiswa) {
-            // Mode User Biasa: Ambil Data & Statistik Diri Sendiri
             $data['riwayat'] = $riwayatModel->getRiwayatByUser($id_user_login);
             $stats = $riwayatModel->getStatistik($id_user_login);
             
             $data['is_admin'] = false;
             $data['active_tab'] = 'me';
         } else {
-            // Mode Admin/Staff
             $data['is_admin'] = true;
 
             if ($filter == 'me') {
-                // Admin melihat riwayat sendiri
                 $data['riwayat'] = $riwayatModel->getRiwayatByUser($id_user_login);
                 $stats = $riwayatModel->getStatistik($id_user_login);
                 $data['active_tab'] = 'me';
             } else {
-                // Admin melihat semua riwayat
                 $data['riwayat'] = $riwayatModel->getAllRiwayat();
-                $stats = $riwayatModel->getStatistik(null); // Parameter null = hitung semua
+                $stats = $riwayatModel->getStatistik(null);
                 $data['active_tab'] = 'all';
             }
         }
 
-        // Masukkan hasil statistik ke $data agar bisa dibaca di View (index.php)
-        // Menggunakan operator null coalescing (?? 0) untuk mencegah error jika data kosong
         $data['total_disetujui'] = $stats['total_disetujui'] ?? 0;
         $data['total_diproses']  = $stats['total_diproses'] ?? 0;
         $data['total_ditolak']   = $stats['total_ditolak'] ?? 0;
@@ -79,7 +70,6 @@ class Riwayat extends Controller
         $data['info_peminjaman'] = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
         $rawDetailBarang = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
 
-        // Formatting data barang
         foreach ($rawDetailBarang as &$item) {
             $rawFoto = $item['foto_barang'] ?? '';
 
@@ -97,7 +87,6 @@ class Riwayat extends Controller
         $data['judul'] = 'Detail Peminjaman';
 
         $this->view('templates/header', $data);
-        // $this->view('templates/sidebar', $data);
         $this->view('Riwayat/detail', $data);
         $this->view('templates/footer');
     }

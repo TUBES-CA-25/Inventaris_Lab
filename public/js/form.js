@@ -1,4 +1,4 @@
-    const lastSelectValue = {};
+const lastSelectValue = {};
 
 function checkSelection(type) {
     const select = document.getElementById('select-' + type);
@@ -121,8 +121,7 @@ function hapusMaster(type) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    console.log('DOM loaded, inisialisasi dropdown...');
+document.addEventListener("DOMContentLoaded", function () {
 
     const types = ['jenis', 'lokasi', 'status', 'merek', 'satuan'];
 
@@ -131,16 +130,15 @@ document.addEventListener("DOMContentLoaded", function() {
             const select = document.getElementById('select-' + type);
             const inputContainer = document.getElementById('input-container-' + type);
 
+            // Skip jika select tidak ada (normal di halaman tanpa form)
             if (!select) {
-                console.warn('Select tidak ditemukan untuk:', type);
                 return;
             }
 
             if (select.value && select.value !== 'NEW' && select.value !== '') {
                 lastSelectValue[type] = select.value;
-                console.log('Nilai awal ' + type + ':', select.value);
             }
- 
+
             if (inputContainer) {
                 inputContainer.style.display = 'none';
             }

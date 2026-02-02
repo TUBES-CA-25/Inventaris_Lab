@@ -58,50 +58,11 @@ function hideQrUnit() {
 }
 
 /* --- LOGIKA PAGINATION TABEL UNIT (DETAIL BARANG) --- */
-$(document).ready(function() {
-    // Cek apakah elemen #tableUnit ada di halaman ini
-    // if ($('#tableUnit').length) {
-        
-    //     // Hancurkan inisialisasi lama jika ada
-    //     if ($.fn.DataTable.isDataTable('#tableUnit')) {
-    //         $('#tableUnit').DataTable().destroy();
-    //     }
-
-    //     // Inisialisasi DataTables
-    //     $('#tableUnit').DataTable({
-    //         // Konfigurasi Layout Bootstrap 5 (l = length menu, f = filter/search)
-    //         "dom": '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>',
-            
-    //         // 1. SETTING DEFAULT (5 Baris)
-    //         "pageLength": 5, 
-
-    //         // 2. SETTING PILIHAN USER (Bisa pilih berapapun)
-    //         // Baris pertama: Nilai logic (-1 artinya Semua)
-    //         // Baris kedua: Teks yang muncul di dropdown
-    //         "lengthMenu": [
-    //             [5, 10, 25, 50, 100, -1], 
-    //             [5, 10, 25, 50, 100, "Tampilkan Semua"]
-    //         ],
-
-    //         "language": {
-    //             "emptyTable": "Tidak ada unit barang tersedia",
-    //             "info": "Menampilkan _START_ - _END_ dari _TOTAL_ unit",
-    //             "infoEmpty": "Menampilkan 0 data",
-    //             "infoFiltered": "(difilter dari _MAX_ total unit)",
-    //             // Custom teks untuk dropdown length
-    //             "lengthMenu": "Tampilkan _MENU_ data per halaman",
-    //             "search": "Cari Unit:",
-    //             "zeroRecords": "Unit tidak ditemukan",
-    //             "paginate": {
-    //                 "first": '<i class="fa-solid fa-angles-left"></i>',
-    //                 "last": '<i class="fa-solid fa-angles-right"></i>',
-    //                 "next": '<i class="fa-solid fa-angle-right"></i>',
-    //                 "previous": '<i class="fa-solid fa-angle-left"></i>'
-    //             }
-    //         },
-    //         "ordering": false,
-    //         "autoWidth": false,
-    //         "responsive": true
-    //     });
-    // }
+$(document).ready(function () {
+    // Pastikan link pagination tidak ter-intercept oleh event listener lain
+    $('.page-link').on('click', function (e) {
+        // Jangan preventDefault, biarkan navigate normal
+        // Hanya stop propagation agar tidak kena listener lain
+        e.stopPropagation();
+    });
 });
