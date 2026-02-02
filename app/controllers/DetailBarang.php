@@ -34,7 +34,6 @@ class DetailBarang extends Controller
 
     public function detail($id_barang_encoded)
     {
-        // Simpan ID yang ter-encode untuk digunakan di link pagination
         $data['id_encoded'] = $id_barang_encoded;
 
         $id_barang = IdObfuscator::decode($id_barang_encoded);
@@ -47,9 +46,7 @@ class DetailBarang extends Controller
         $data['dataTampilDetailBarang'] = $DetailBarangModel->getDetailDataBarang($id_barang);
         $id_spesifikasi = $data['dataTampilDetailBarang']['id_spesifikasi'];
 
-        // --- LOGIKA PAGINATION ---
         $data['limit'] = 5;
-        // Pastikan halaman minimal adalah 1
         $data['halamanAktif'] = (isset($_GET['p']) && is_numeric($_GET['p'])) ? (int)$_GET['p'] : 1;
 
         $offset = ($data['halamanAktif'] - 1) * $data['limit'];
@@ -57,10 +54,8 @@ class DetailBarang extends Controller
         $data['totalData'] = $DetailBarangModel->getTotalUnitsBySpesifikasi($id_spesifikasi);
         $data['totalHalaman'] = ceil($data['totalData'] / $data['limit']);
 
-        // Ambil data yang sudah dipotong LIMIT & OFFSET
         $data['listUnits'] = $DetailBarangModel->getUnitsBySpesifikasiPaged($id_spesifikasi, $data['limit'], $offset);
 
-        // Kirim data ke View
         $data['judul'] = 'Detail Barang';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -242,7 +237,6 @@ class DetailBarang extends Controller
 
     public function hapusMaster($type, $id)
     {
-        // Mapping URL parameter ke Nama Tabel Database
         $tableMap = [
             'jenis'  => 'mst_jenis_barang',
             'merek'  => 'mst_merek_barang',
@@ -259,7 +253,6 @@ class DetailBarang extends Controller
 
         $table = $tableMap[$type];
 
-        // Panggil method hapusDataMaster di Model
         $result = $this->model('Detail_barang_model')->hapusDataMaster($table, $id);
 
         if ($result > 0) {
@@ -270,7 +263,6 @@ class DetailBarang extends Controller
             Flasher::setFlash('Data Master', 'gagal', ' dihapus', 'danger');
         }
 
-        // Kembali ke halaman form sebelumnya
         header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit;
     }
@@ -286,22 +278,17 @@ class DetailBarang extends Controller
         $data['judul'] = 'Ubah Unit Barang';
         $DetailModel = $this->model('Detail_barang_model');
 
-        // Ambil data unit
         $data['unit'] = $DetailModel->getUnitById($id_barang);
 
-        // Pastikan ID asli tersedia untuk dikirim ke view
         $data['unit']['id_barang_asli'] = $id_barang;
 
-        // Data user & profile
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        // Ambil data master untuk dropdown di form
         $data['kondisi'] = $DetailModel->getKondisiBarang();
         $data['lokasi'] = $DetailModel->getLokasiPenyimpanan();
         $data['status'] = $DetailModel->getStatus();
 
-        // Urutan view yang benar (header -> sidebar -> content -> footer)
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('DetailBarang/ubah_unit', $data);
@@ -315,34 +302,27 @@ class DetailBarang extends Controller
         } else {
             Flasher::setFlash('Unit Barang', 'gagal', 'diubah', 'danger');
         }
-        // Redirect kembali ke halaman detail Master (induknya)
         header('Location: ' . BASEURL . 'DetailBarang/detail/' . IdObfuscator::encode($_POST['id_spesifikasi']));
         exit;
     }
 
     public function cetakUnit($encoded_id)
     {
-        // 1. Decode ID Barang (Unit)
         $id_unit = IdObfuscator::decode($encoded_id);
 
         if (!$id_unit) {
-            // Jika ID tidak valid/hasil hack URL
             header('Location: ' . BASEURL . 'DetailBarang');
             exit;
         }
 
-        // 2. Ambil Data Lengkap dari Model yang baru kita buat
         $data['unit'] = $this->model('Detail_barang_model')->getDetailUnitForPrint($id_unit);
 
-        // Cek jika data ditemukan
         if (!$data['unit']) {
             Flasher::setFlash('Data Unit', 'tidak ditemukan', '', 'danger');
             header('Location: ' . BASEURL . 'DetailBarang');
             exit;
         }
 
-        // 3. Panggil View PrintUnit
-        // Pastikan nama file View nanti sesuai (PrintUnit.php)
         $this->view('DetailBarang/PrintUnit', $data);
     }
 }

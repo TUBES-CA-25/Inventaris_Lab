@@ -5,254 +5,6 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 }
 ?>
 
-<style>
-    :root {
-        --navy-primary: #0d1b3e;
-        --navy-secondary: #1a2d5a;
-        --navy-light: #2a3f6f;
-        --accent-gold: #f39c12;
-        --accent-orange: #e67e22;
-    }
-
-    .page-wrapper {
-        background: #f8f9fa;
-        min-height: 100vh;
-        padding: 20px 0;
-    }
-
-    /* Custom Navy Theme */
-    .bg-navy-gradient {
-        background: linear-gradient(135deg, var(--navy-primary) 0%, var(--navy-secondary) 100%);
-    }
-
-    .text-navy {
-        color: var(--navy-primary) !important;
-    }
-
-    .border-navy {
-        border-color: var(--navy-primary) !important;
-    }
-
-    .btn-navy {
-        background: var(--navy-primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-navy:hover {
-        background: var(--navy-secondary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(13, 27, 62, 0.3);
-    }
-
-    .btn-outline-navy {
-        border: 2px solid var(--navy-primary);
-        color: var(--navy-primary);
-        background: transparent;
-        border-radius: 8px;
-        font-weight: 600;
-    }
-
-    .btn-outline-navy:hover {
-        background: var(--navy-primary);
-        color: white;
-    }
-
-    /* Card Styling */
-    .stat-card {
-        border-left: 4px solid var(--navy-primary);
-        transition: all 0.3s ease;
-        height: 100%;
-        border-radius: 12px;
-        background: white;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .stat-card.active {
-        border-left-color: var(--accent-gold);
-        background: linear-gradient(145deg, #fff9e6 0%, #ffffff 100%);
-    }
-
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .stat-icon.navy {
-        background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
-        color: white;
-    }
-
-    .stat-icon.gold {
-        background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
-        color: white;
-    }
-
-    /* --- [PERBAIKAN UTAMA: TABLE STYLING] --- */
-    .table-responsive {
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        background: white;
-        overflow: hidden;
-    }
-
-    .table-navy {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table-navy thead {
-        background: var(--navy-primary);
-        color: white;
-    }
-
-    .table-navy thead th {
-        border: none;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        letter-spacing: 0.5px;
-        /* Padding header dibuat lega */
-        padding: 1.2rem 1rem;
-        vertical-align: middle;
-    }
-
-    .table-navy tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f0f2f5;
-    }
-
-    .table-navy tbody td {
-        /* Padding body disamakan dengan header agar simetris */
-        padding: 1.2rem 1rem;
-        /* Rata tengah vertikal agar teks tidak menggantung */
-        vertical-align: middle;
-        border-bottom: 1px solid #f0f2f5;
-        font-size: 0.95rem;
-    }
-
-    .table-navy tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .table-navy tbody tr:hover {
-        background-color: #f8faff;
-    }
-
-    /* Status Badges */
-    .status-badge {
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-
-    .badge-baik {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #a7f3d0;
-    }
-
-    .badge-rusak {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-    }
-
-    .badge-hilang {
-        background: #f3f4f6;
-        color: #1f2937;
-        border: 1px solid #e5e7eb;
-    }
-
-    .badge-pinjam {
-        background: #fffbeb;
-        color: #92400e;
-        border: 1px solid #fde68a;
-    }
-
-    /* Search Box */
-    .search-box-custom {
-        position: relative;
-    }
-
-    .search-box-custom .form-control {
-        padding-left: 2.5rem;
-        border-radius: 50px;
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
-        height: 45px;
-    }
-
-    .search-box-custom .form-control:focus {
-        border-color: var(--navy-primary);
-        box-shadow: 0 0 0 0.2rem rgba(13, 27, 62, 0.1);
-    }
-
-    .search-box-custom .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6c757d;
-    }
-
-    /* Info Box & Log */
-    .info-box {
-        background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
-        border: 2px dashed #dee2e6;
-        border-radius: 12px;
-        padding: 2rem;
-    }
-
-    .petugas-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 4px 12px rgba(13, 27, 62, 0.2);
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 768px) {
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-        }
-
-        .info-box {
-            padding: 1.5rem;
-        }
-    }
-</style>
-
 <div class="content">
     <div class="container-fluid">
 
@@ -390,13 +142,9 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                             if (!empty($data['items_kembali'])):
                                 $no = 1;
                                 foreach ($data['items_kembali'] as $item):
-                                    // Logic Kondisi
                                     $kondisi = !empty($item['kondisi_barang']) ? $item['kondisi_barang'] : 'Dipinjam';
-
-                                    // Logic Jumlah
                                     $jumlah = !empty($item['jumlah_kembali']) ? $item['jumlah_kembali'] : $item['jumlah_pinjam'];
 
-                                    // Logic Badge Warna
                                     $statusClass = 'badge-pinjam';
                                     $icon = 'fa-clock';
 
@@ -556,7 +304,6 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 
                 let visibleCount = 0;
                 rows.forEach(row => {
-                    // Skip jika baris 'no result'
                     if (row.classList.contains('no-result-row')) return;
 
                     const kode = row.cells[1]?.textContent.toLowerCase() || '';
@@ -570,7 +317,6 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                     }
                 });
 
-                // Show no result message
                 const tbody = table.querySelector('tbody');
                 let noResultRow = tbody.querySelector('.no-result-row');
 
@@ -592,7 +338,6 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                 }
             });
 
-            // Clear search on ESC
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     searchInput.value = '';

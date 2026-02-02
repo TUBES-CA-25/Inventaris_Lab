@@ -5,228 +5,7 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-<style>
-    /* Modern Item Card with Glassmorphism */
-    .item-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-        border: 1px solid rgba(13, 27, 62, 0.08);
-        border-radius: 16px;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .item-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(180deg, #0d1b3e 0%, #3498db 100%);
-        opacity: 0;
-        transition: opacity 0.4s ease;
-    }
-
-    .item-card:hover {
-        border-color: rgba(13, 27, 62, 0.2);
-        box-shadow: 0 8px 30px rgba(13, 27, 62, 0.12);
-        transform: translateY(-4px) scale(1.01);
-    }
-
-    .item-card:hover::before {
-        opacity: 1;
-    }
-
-    /* Modern Badge */
-    .qty-badge {
-        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(13, 27, 62, 0.2);
-        letter-spacing: 0.3px;
-    }
-
-    /* Item Info Section */
-    .item-info {
-        flex: 1;
-    }
-
-    .item-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #1a202c;
-        margin-bottom: 6px;
-        line-height: 1.3;
-    }
-
-    .item-code {
-        display: inline-flex;
-        align-items: center;
-        background: #f7fafc;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        color: #4a5568;
-        border: 1px solid #e2e8f0;
-        font-family: 'Courier New', monospace;
-        font-weight: 600;
-    }
-
-    .item-spec {
-        background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-        padding: 6px 12px;
-        border-radius: 8px;
-        margin-top: 8px;
-        border-left: 3px solid #3b82f6;
-    }
-
-    /* Modern Condition Panel */
-    .condition-panel {
-        background: #ffffff;
-        border: 2px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 18px;
-        transition: all 0.3s ease;
-    }
-
-    .condition-panel:hover {
-        border-color: #0d1b3e;
-        box-shadow: 0 4px 20px rgba(13, 27, 62, 0.08);
-    }
-
-    .form-label-sm {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #374151;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Modern Select Dropdown */
-    .modern-select {
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        background: #ffffff;
-    }
-
-    .modern-select:focus {
-        border-color: #0d1b3e;
-        box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
-        outline: none;
-    }
-
-    .modern-input {
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 10px 14px;
-        transition: all 0.3s ease;
-    }
-
-    .modern-input:focus {
-        border-color: #0d1b3e;
-        box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
-        outline: none;
-    }
-
-    /* Section Header */
-    .section-header {
-        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 14px;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 15px rgba(13, 27, 62, 0.2);
-    }
-
-    /* Enhanced Cards */
-    .info-card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-    }
-
-    .info-card .card-header {
-        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
-        border-bottom: 2px solid #e5e7eb;
-        padding: 18px 24px;
-
-    }
-
-    .finalize-card {
-        border-radius: 16px;
-        border: none;
-        box-shadow: 0 8px 30px rgba(13, 27, 62, 0.12);
-        border-top: 4px solid #0d1b3e;
-    }
-
-    /* Modern Button */
-    .btn-modern-primary {
-        background: linear-gradient(135deg, #0d1b3e 0%, #1e3a5f 100%);
-        border: none;
-        border-radius: 12px;
-        padding: 14px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(13, 27, 62, 0.3);
-    }
-
-    .btn-modern-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(13, 27, 62, 0.4);
-    }
-
-    /* Animation */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .item-card {
-        animation: fadeInUp 0.5s ease backwards;
-    }
-
-    .item-card:nth-child(1) {
-        animation-delay: 0.1s;
-    }
-
-    .item-card:nth-child(2) {
-        animation-delay: 0.2s;
-    }
-
-    .item-card:nth-child(3) {
-        animation-delay: 0.3s;
-    }
-
-    .item-card:nth-child(4) {
-        animation-delay: 0.4s;
-    }
-
-    .item-card:nth-child(5) {
-        animation-delay: 0.5s;
-    }
-
-    /* Preview Container */
-    #previewContainer img {
-        border-radius: 12px;
-        border: 3px solid #e5e7eb;
-    }
-</style>
+<link rel="stylesheet" href="<?= BASEURL; ?>css/edit.css">
 
 <div class="content">
     <div class="content-beranda">
@@ -275,10 +54,8 @@ if (!isset($_SESSION['login'])) {
                                                     
                                                     <?php
                                                     if (!empty($item['urutan_unit'])) {
-                                                        // TAMPILKAN FORMAT: BATCH / TOTAL / URUTAN
                                                         echo htmlspecialchars($item['kode_barang'] . '/' . $item['jumlah_total'] . '/' . $item['urutan_unit']);
                                                     } else {
-                                                        // Fallback jika belum ada unit
                                                         echo htmlspecialchars($item['kode_barang']) . ' <span class="text-muted fw-normal" style="font-size: 0.8em;">(Unit Belum Ditentukan)</span>';
                                                     }
                                                     ?>
@@ -493,7 +270,6 @@ if (!isset($_SESSION['login'])) {
 </div>
 
 <script>
-    // Preview Image with modern UX
     document.getElementById('buktiInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -517,7 +293,6 @@ if (!isset($_SESSION['login'])) {
         document.getElementById('previewContainer').style.display = 'none';
     }
 
-    // Form Validation with modern feedback
     (function() {
         'use strict';
         var forms = document.querySelectorAll('.needs-validation');

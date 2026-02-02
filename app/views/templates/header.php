@@ -28,7 +28,8 @@
     <link rel="stylesheet" href="<?= BASEURL; ?>/css/DetailDetailBarang.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="<?= BASEURL; ?>/css/FormDetailBarang.css?v=<?= time(); ?>">
     <link rel="stylesheet" href="<?= BASEURL; ?>/css/error.css?v=<?= time(); ?>">
-
+    <link rel="stylesheet" href="<?= BASEURL; ?>/css/FormPengembalian.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= BASEURL; ?>css/DetailPengembalian.css">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
