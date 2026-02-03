@@ -53,7 +53,7 @@ if (!isset($_SESSION['login'])) {
                                                     
                                                     <?php
                                                     if (!empty($item['urutan_unit'])) {
-                                                        echo htmlspecialchars($item['kode_barang'] . '/' . $item['jumlah_total'] . '/' . $item['urutan_unit']);
+                                                        echo htmlspecialchars($item['kode_barang'] . '/' . $item['urutan_unit'] . '/' . $item['jumlah_total']);
                                                     } else {
                                                         echo htmlspecialchars($item['kode_barang']) . ' <span class="text-muted fw-normal" style="font-size: 0.8em;">(Unit Belum Ditentukan)</span>';
                                                     }
