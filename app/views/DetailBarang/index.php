@@ -134,8 +134,8 @@ if (!isset($_SESSION['login'])) {
                                                 <i class="fa-regular fa-pen-to-square fa-lg"
                                                     style="color: var(--accent-green);"></i>
                                             </a> -->
-                                            <a data-toggle="modal"
-                                                data-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>"
+                                            <a data-bs-toggle="modal"
+                                                data-bs-target="#konfirmasiHapus<?= IdObfuscator::encode($row['id_barang']) ?>"
                                                 style="cursor: pointer;">
                                                 <i class="fa-regular fa-trash-can fa-lg" style="color: var(--accent-red);"></i>
                                             </a>

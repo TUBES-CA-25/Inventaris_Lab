@@ -338,11 +338,3 @@ $units = $data['listUnits'];
         </div>
     </div>
 </div>
-<script>
-
-</script>
-
-<style>
-    /* CSS tetap sama seperti sebelumnya */
-    
-</style>

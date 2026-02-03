@@ -1,0 +1,29 @@
+[33mcommit 91148fb80c3cd6f171824a8f69b415858ba92ce1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mRifqi[m[33m)[m
+Merge: 224b93d 7c966d3
+Author: AndiRRahman <13020230219@student.umi.ac.id>
+Date:   Tue Feb 3 02:06:10 2026 +0800
+
+    merge
+
+app/controllers/Beranda.php
+app/controllers/ErrorPage.php
+app/controllers/KelolaAkun.php
+app/controllers/Peminjaman.php
+app/controllers/Register.php
+app/controllers/Riwayat.php
+app/controllers/ValidasiPeminjaman.php
+app/models/Beranda_model.php
+app/models/Detail_barang_model.php
+app/models/Peminjaman_model.php
+app/models/Pengembalian_model.php
+app/models/Riwayat_model.php
+app/views/Beranda/index.php
+app/views/DetailBarang/detail.php
+app/views/DetailBarang/index.php
+app/views/Peminjaman/from.php
+app/views/Peminjaman/index.php
+app/views/templates/footer.php
+app/views/templates/sidebar.php
+public/css/DetailDetailBarang.css
+public/js/Beranda.js
+public/js/Sidebar.js

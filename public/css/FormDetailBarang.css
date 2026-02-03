@@ -152,3 +152,195 @@ body {
     background: #ffcdd2;
     transform: scale(1.05);
 }
+
+.content {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* .form-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    border-top: 5px solid #0d1b3e;
+} */
+
+.form-title {
+    font-weight: 700;
+    color: #0d1b3e;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f2f5;
+    padding-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #344767;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    color: #495057;
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: #0d1b3e;
+    box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
+    outline: none;
+}
+
+.input-group-custom {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-container-hidden {
+    display: none;
+    margin-top: 10px;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-2 {
+    flex: 2;
+}
+
+.btn-close-absolute {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #f8f9fa;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: 1px solid #e9ecef;
+}
+
+.btn-close-absolute:hover {
+    background: #e9ecef;
+    color: #dc3545;
+    transform: rotate(90deg);
+}
+
+.btn-delete-master {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-delete-master:hover {
+    background-color: #fca5a5;
+    transform: scale(1.05);
+}
+
+.btn-cancel-input {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-input:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+}
+
+.btn-submit-container {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #0d1b3e 0%, #1a2d5a 100%);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(13, 27, 62, 0.2);
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 27, 62, 0.3);
+}
+
+.section-separator {
+    margin-top: 20px;
+    border-top: 1px dashed #e0e6ed;
+    padding-top: 20px;
+}
+
+.option-new {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.file-note {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.btn-action-container {
+        display: flex;
+        justify-content: flex-end; /* Semua tombol rata kanan */
+        align-items: center;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
