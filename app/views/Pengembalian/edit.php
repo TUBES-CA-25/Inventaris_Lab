@@ -12,7 +12,7 @@ if (!isset($_SESSION['login'])) {
             <h3 class="fw-bold" style="color: #0d1b3e;">
                 Verifikasi Pengembalian
             </h3>
-            <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-secondary btn-sm rounded-pill px-4">
+            <a href="<?= BASEURL; ?>Pengembalian" class="btn-back btn-sm rounded-pill px-4">
                 Kembali
             </a>
         </div>
