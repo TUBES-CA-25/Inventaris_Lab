@@ -5,7 +5,6 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-<link rel="stylesheet" href="<?= BASEURL; ?>css/edit.css">
 
 <div class="content">
     <div class="content-beranda">
@@ -147,7 +146,7 @@ if (!isset($_SESSION['login'])) {
                                     <label class="small text-muted fw-bold mb-1">
                                         Tgl Pinjam
                                     </label>
-                                    <div class="badge bg-primary text-white px-3 py-2 w-100">
+                                    <div class="badge btn-send text-white px-3 py-2 w-100">
                                         <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_peminjaman'])); ?>
                                     </div>
                                 </div>
@@ -155,7 +154,7 @@ if (!isset($_SESSION['login'])) {
                                     <label class="small text-muted fw-bold mb-1">
                                         Jatuh Tempo
                                     </label>
-                                    <div class="badge bg-danger text-white px-3 py-2 w-100">
+                                    <div class="badge btn-back px-3 py-2 w-100" >
                                         <?= date('d/m/Y', strtotime($data['peminjaman']['tanggal_pengembalian'])); ?>
                                     </div>
                                 </div>

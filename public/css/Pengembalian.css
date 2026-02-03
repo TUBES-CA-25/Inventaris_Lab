@@ -1,0 +1,296 @@
+/* pengembalian.css */
+
+/* Table Hover Effect */
+#pengembalianTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Search Input Focus */
+#searchInput:focus {
+    outline: none;
+    border-color: #0d1b3e;
+    box-shadow: 0 0 0 3px rgba(13, 27, 62, 0.1);
+}
+
+/* Badge Animation */
+.badge {
+    transition: transform 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+
+/* Action Buttons Hover */
+.btn i {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover i {
+    transform: scale(1.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .content {
+        padding: 15px;
+    }
+
+    #searchInput {
+        width: 200px !important;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Custom Scrollbar for table */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #0d1b3e;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #1a2d5a;
+}
+
+.filter-dropdown {
+    display: none;
+    /* Hidden by default */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 300px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.filter-dropdown.active {
+    display: block;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   RESPONSIVE IMPROVEMENTS - tanpa ubah class existing
+   ========================================================================== */
+
+/* Header & kontrol atas (search + filter button) */
+@media (max-width: 992px) {
+    .content-beranda>.d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    h3.fw-bold {
+        font-size: 1.6rem;
+    }
+
+    .search-box {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+
+    #searchInput {
+        width: 100% !important;
+    }
+}
+
+/* Tombol Filter & Search di mobile */
+@media (max-width: 576px) {
+    .left-buttons.btn-custom-filter {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .d-flex.gap-2.flex-wrap {
+        width: 100%;
+        flex-direction: column;
+    }
+}
+
+/* Filter panel (card) */
+@media (max-width: 768px) {
+    #filterSection .row.g-3 {
+        row-gap: 1rem;
+    }
+
+    #filterSection .col-12.col-md-6.col-lg-4,
+    #filterSection .col-12.col-md-6.col-lg-8 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    #filterSection .d-flex.gap-2 {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #filterSection input[type="date"] {
+        width: 100%;
+    }
+}
+
+/* Tabel - yang paling krusial */
+@media (max-width: 992px) {
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #pengembalianTable {
+        min-width: 900px;
+        /* paksa horizontal scroll jika terlalu sempit */
+    }
+
+    /* Header tabel lebih ramping */
+    #pengembalianTable thead th {
+        font-size: 0.85rem;
+        padding: 0.75rem 0.5rem;
+    }
+
+    #pengembalianTable tbody td {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.5rem;
+    }
+
+    /* Kolom yang sering kepanjangan */
+    .col-judul {
+        min-width: 180px;
+        max-width: 220px;
+    }
+
+    .col-status .badge {
+        font-size: 0.75rem !important;
+        padding: 0.35em 0.65em !important;
+    }
+}
+
+/* Super kecil (≤ 576px = mobile portrait) */
+@media (max-width: 576px) {
+
+    #pengembalianTable thead th,
+    #pengembalianTable tbody td {
+        font-size: 0.82rem;
+        padding: 0.5rem 0.4rem;
+    }
+
+    .col-judul {
+        min-width: 140px;
+    }
+
+    /* Aksi buttons jadi lebih kecil & rapat */
+    .d-flex.justify-content-center.gap-2 {
+        gap: 0.75rem !important;
+    }
+
+    .btn.btn-sm [class*="fa-"] {
+        font-size: 1.1rem;
+    }
+
+    /* Pesan no data lebih rapi */
+    #noDataRow td,
+    #filterNoData td {
+        padding: 2.5rem 1rem !important;
+    }
+
+    #noDataRow i.fa-3x,
+    #filterNoData i.fa-3x {
+        font-size: 2.5rem;
+    }
+}
+
+/* Fix minor layout di beberapa browser mobile */
+@media (max-width: 768px) {
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .filter-dropdown {
+        width: 94vw;
+        right: 3vw;
+        left: 3vw;
+        margin: 0 auto;
+    }
+}
+
+/* Membuat table-responsive benar-benar bisa scroll horizontal di mobile */
+.table-responsive {
+    overflow-x: auto !important;           /* ini yang utama */
+    -webkit-overflow-scrolling: touch;     /* smooth scrolling di iOS */
+    scrollbar-width: thin;                 /* Firefox - scrollbar lebih rapi */
+    scrollbar-color: #0d1b3e #f1f1f1;      /* warna scrollbar Firefox */
+}
+
+/* Paksa tabel tidak mengecil terlalu ekstrem (minimal lebar konten) */
+#pengembalianTable {
+    min-width: 900px;                      /* sesuaikan dengan kebutuhan - coba 850-1100px */
+    width: 100%;
+}
+
+/* Scrollbar custom lebih bagus di semua browser (opsional tapi direkomendasikan) */
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #0d1b3e;
+    border-radius: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #1a2d5a;
+}
+
+/* Tablet & mobile kecil - kurangi padding agar lebih muat */
+@media (max-width: 768px) {
+    #pengembalianTable thead th,
+    #pengembalianTable tbody td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.92rem;
+    }
+    
+    /* Kolom judul biasanya paling panjang */
+    .col-judul {
+        min-width: 160px;
+    }
+    
+    /* Badge status jangan terlalu lebar */
+    .col-status .badge {
+        white-space: nowrap;
+        font-size: 0.78rem;
+        padding: 0.4em 0.7em;
+    }
+}

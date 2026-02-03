@@ -121,7 +121,7 @@ class Peminjaman extends Controller
             exit;
         }
 
-        // 3. Validasi Stok (Jika gagal, dia akan redirect otomatis di dalam fungsi ini)
+        // 3. Validasi Stok
         $this->cekValidasiStok($_POST);
 
         // 4. Pastikan User Login
@@ -136,6 +136,10 @@ class Peminjaman extends Controller
 
         $dataPayload = $_POST;
         $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
+        
+        // --- TAMBAHKAN BARIS INI (SOLUSI) ---
+        $dataPayload['id_user'] = $_SESSION['id_user']; 
+        // -------------------------------------
 
         // 6. Eksekusi Database
         if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
@@ -143,10 +147,7 @@ class Peminjaman extends Controller
             // BERHASIL: Bersihkan keranjang
             unset($_SESSION['keranjang']);
 
-            // Set Flash Message Sukses
             Flasher::setFlash('Berhasil!', 'Pengajuan peminjaman berhasil dibuat. Silakan cek riwayat.', '', 'success');
-
-            // Redirect ke Riwayat
             header('Location: ' . BASEURL . 'Riwayat');
             exit;
         } else {

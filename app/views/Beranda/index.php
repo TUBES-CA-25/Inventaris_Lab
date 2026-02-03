@@ -6,7 +6,7 @@ if (!isset($_SESSION['login'])) {
 ?>
 
 <div class="content">
-    <div class="beranda-container">
+    <div class="">
         
         <div class="beranda-header">
             <h2>Beranda</h2>
@@ -62,7 +62,7 @@ if (!isset($_SESSION['login'])) {
         </div>
         
         <div class="row g-4 mb-4">
-            <div class="col-12 col-md-6 col-lg-6">
+            <div class="col-12 col-md-6 col-lg-6 mb-4">
                 <div class="chart-card">
                     <div class="chart-header"><h3>Total Peminjaman</h3></div>
                     <div class="chart-container"><canvas id="chartPeminjaman"></canvas></div>

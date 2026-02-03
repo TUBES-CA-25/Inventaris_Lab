@@ -12,6 +12,15 @@ class Peminjaman_model
     {
         $this->db->beginTransaction();
 
+        if (empty($data['id_user'])) {
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+            if (isset($_SESSION['id_user'])) {
+                $data['id_user'] = $_SESSION['id_user'];
+            }
+        }
+
         try {
             $query = "INSERT INTO trx_peminjaman 
                       (id_user, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, keterangan_peminjaman, status) 

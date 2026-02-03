@@ -5,7 +5,6 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="side-bar d-flex flex-column justify-content-between" id="sidebarMenu">
-
     <div>
         <div class="logo-header p-10 d-flex align-items-center" style="margin: 15px; margin-bottom: 15px;">
             <img src="<?= BASEURL; ?>img/logo bg hitam.svg" alt="logo" />
@@ -15,9 +14,8 @@
             <div class="img-container mb-2">
                 <?php
                 $foto_profil = $data['profile']['foto'];
-                // Cek apakah foto default atau custom
-                $src = (strpos($foto_profil, 'user.svg') !== false || empty($foto_profil))
-                    ? BASEURL . 'img/foto-profile/user.svg'
+                $src = (strpos($foto_profil, 'PersonCircle.png') !== false || empty($foto_profil))
+                    ? BASEURL . 'img/foto-profile/PersonCircle.png'
                     : BASEURL . $foto_profil;
                 ?>
                 <img src="<?= $src; ?>" alt="profile" class="profile-img">

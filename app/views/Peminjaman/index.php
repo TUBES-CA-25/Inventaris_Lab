@@ -65,7 +65,6 @@ $isEdit = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    // --- [PERUBAHAN 2: Javascript Menggunakan Variable PHP Diatas] ---
     document.addEventListener("DOMContentLoaded", function() {
         
         // Ambil nilai dari variabel PHP $isEdit yang kita buat di baris atas tadi

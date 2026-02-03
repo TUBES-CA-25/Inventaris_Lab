@@ -161,7 +161,7 @@ if (!isset($_SESSION['login'])) {
                                                 </div>
                                                 <div class="modal-footer justify-content-center">
                                                     <button type="button" class="btn btn-light"
-                                                        data-dismiss="modal">Batal</button>
+                                                        data-bs-dismiss="modal">Batal</button>
                                                     <button type="button" class="btn btn-danger"
                                                         onclick="location.href='<?= BASEURL ?>DetailBarang/hapus/<?= IdObfuscator::encode($row['id_barang']) ?>'">Hapus</button>
                                                 </div>
