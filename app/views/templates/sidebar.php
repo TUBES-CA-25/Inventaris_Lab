@@ -11,15 +11,26 @@
         </div>
 
         <div class="profil text-center mb-4">
-            <div class="img-container mb-2">
-                <?php
-                $foto_profil = $data['profile']['foto'];
-                $src = (strpos($foto_profil, 'PersonCircle.png') !== false || empty($foto_profil))
-                    ? BASEURL . 'img/foto-profile/PersonCircle.png'
-                    : BASEURL . $foto_profil;
-                ?>
-                <img src="<?= $src; ?>" alt="profile" class="profile-img">
-            </div>
+            <div class="img-container mb-2" style="display: flex; justify-content: center; align-items: center; height: 80px;">
+    <?php
+    $foto_profil = $data['profile']['foto'] ?? '';
+    // Cek apakah user punya foto custom (tidak kosong & bukan file default lama)
+    $has_photo = !empty($foto_profil) && strpos($foto_profil, 'PersonCircle.png') === false;
+    ?>
+
+    <?php if ($has_photo) : ?>
+        <img src="<?= BASEURL . $foto_profil; ?>" 
+             alt="profile" 
+             class="profile-img"
+             style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+        
+        <i class="fa-solid fa-circle-user text-white" style="font-size: 60px; display: none;"></i>
+
+    <?php else : ?>
+        <i class="fa-solid fa-circle-user text-white" style="font-size: 60px;"></i>
+    <?php endif; ?>
+</div>
             <div class="profile-info1">
                 <?php if (isset($data['profile']['nama_user'])) : ?>
                     <h6 class="text-white font-weight-bold mb-0"><?= $data['profile']['nama_user']; ?></h6>
