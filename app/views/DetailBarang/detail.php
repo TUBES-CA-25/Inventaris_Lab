@@ -130,7 +130,7 @@ $units = $data['listUnits'];
                                     <td class="text-center fw-bold"><?= $unit['urutan_unit']; ?></td>
                                     <td>
                                         <span class="badge-code">
-                                            <?= $master['kode_barang'] . '/' . $master['jumlah_total'] . '/' . $unit['urutan_unit']; ?>
+                                            <?= $master['kode_barang'] . '/' . $unit['urutan_unit'] . '/' . $master['jumlah_total']; ?>
                                         </span>
                                     </td>
                                     <td><?= $unit['kondisi_barang']; ?></td>

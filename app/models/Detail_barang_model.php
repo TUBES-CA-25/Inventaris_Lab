@@ -40,6 +40,26 @@ class Detail_barang_model
         return $this->db->resultSet();
     }
 
+    // Helper function untuk konversi bulan ke romawi
+    private function getRomanMonth($monthNumber)
+    {
+        $romans = [
+            1 => 'I',
+            2 => 'II',
+            3 => 'III',
+            4 => 'IV',
+            5 => 'V',
+            6 => 'VI',
+            7 => 'VII',
+            8 => 'VIII',
+            9 => 'IX',
+            10 => 'X',
+            11 => 'XI',
+            12 => 'XII'
+        ];
+        return $romans[(int) $monthNumber] ?? 'I';
+    }
+
     public function getDataBarangByFilters($id_merek_barang, $id_jenis_barang, $id_lokasi)
     {
         $query = "SELECT 
@@ -83,9 +103,12 @@ class Detail_barang_model
 
         $this->db->query($query);
 
-        if (!empty($id_merek_barang)) $this->db->bind(':id_merek_barang', $id_merek_barang);
-        if (!empty($id_jenis_barang)) $this->db->bind(':id_jenis_barang', $id_jenis_barang);
-        if (!empty($id_lokasi)) $this->db->bind(':id_lokasi', $id_lokasi);
+        if (!empty($id_merek_barang))
+            $this->db->bind(':id_merek_barang', $id_merek_barang);
+        if (!empty($id_jenis_barang))
+            $this->db->bind(':id_jenis_barang', $id_jenis_barang);
+        if (!empty($id_lokasi))
+            $this->db->bind(':id_lokasi', $id_lokasi);
 
         return $this->db->resultSet();
     }
@@ -213,8 +236,9 @@ class Detail_barang_model
 
             // 3. INSERT HEADER (MST_SPESIFIKASI)
             $bulanAngka = date('m', strtotime($data['tgl_pengadaan_barang']));
+            $bulanRomawi = $this->getRomanMonth($bulanAngka);
             $tahun = date('Y', strtotime($data['tgl_pengadaan_barang']));
-            $kodeInisial = $tahun . '/' . $bulanAngka . '/' . $kodeJenisString . '/' . $kodeMerekString;
+            $kodeInisial = $tahun . '/' . $bulanRomawi . '/' . $kodeJenisString . '/' . $kodeMerekString;
             $totalInput = (int) $data['jumlah_barang'];
 
             $querySpek = "INSERT INTO mst_spesifikasi 
@@ -240,7 +264,8 @@ class Detail_barang_model
             // 4. LOOPING INSERT DETAIL & BUILD STRING
             $berhasil = 0;
             $pathQr = '../public/img/qr-code/';
-            if (!file_exists($pathQr)) mkdir($pathQr, 0777, true);
+            if (!file_exists($pathQr))
+                mkdir($pathQr, 0777, true);
 
             for ($i = 1; $i <= $totalInput; $i++) {
 
@@ -272,7 +297,7 @@ class Detail_barang_model
                 $berhasil += $this->db->rowCount();
 
                 // Generate QR Unit (Virtual Code)
-                $kodeLengkapVirtual = $kodeInisial . '/' . $totalInput . '/' . $i;
+                $kodeLengkapVirtual = $kodeInisial . '/' . $i . '/' . $totalInput;
 
                 // Tambahkan info ke string list Master
                 // Format: "1. [Kode] - Kondisi - Lokasi"
@@ -482,7 +507,8 @@ class Detail_barang_model
         $this->db->bind("id", $data['id_barang']);
         $curr = $this->db->single();
 
-        if (!$curr) return 0;
+        if (!$curr)
+            return 0;
         $idSpek = $curr['id_spesifikasi'];
         $oldTotal = (int) $curr['jumlah_total'];
         $newTotal = (int) $data['jumlah_barang'];
@@ -507,8 +533,9 @@ class Detail_barang_model
         $kodeMerekString = $this->db->single()['kode_merek_barang'] ?? '000';
 
         $bulanAngka = date('m', strtotime($data['tgl_pengadaan_barang']));
+        $bulanRomawi = $this->getRomanMonth($bulanAngka);
         $tahun = date('Y', strtotime($data['tgl_pengadaan_barang']));
-        $kodeBarangBaru = $tahun . '/' . $bulanAngka . '/' . $kodeJenisString . '/' . $kodeMerekString;
+        $kodeBarangBaru = $tahun . '/' . $bulanRomawi . '/' . $kodeJenisString . '/' . $kodeMerekString;
 
         $querySpek = "UPDATE mst_spesifikasi SET
         foto_barang = :foto,
@@ -547,7 +574,8 @@ class Detail_barang_model
         $this->db->execute();
 
         $pathQr = '../public/img/qr-code/';
-        if (!file_exists($pathQr)) mkdir($pathQr, 0777, true);
+        if (!file_exists($pathQr))
+            mkdir($pathQr, 0777, true);
 
         $this->db->query("SELECT sub_barang FROM mst_jenis_barang WHERE id_jenis_barang = :id");
         $this->db->bind('id', $data['sub_barang']);
@@ -583,7 +611,7 @@ class Detail_barang_model
 
                 $newId = $this->db->lastInsertId();
 
-                $kodeLengkapVirtual = $kodeBarangBaru . '/' . $newTotal . '/' . $i;
+                $kodeLengkapVirtual = $kodeBarangBaru . '/' . $i . '/' . $newTotal;
                 $qrContentUnit = "Kode: " . $kodeLengkapVirtual . "\n" .
                     "Jenis: " . $namaJenis . "\n" .
                     "Lokasi: " . $namaLokasi . "\n" .
@@ -601,7 +629,8 @@ class Detail_barang_model
             $this->db->bind('new_total', $newTotal);
             $toDelete = $this->db->resultSet();
             foreach ($toDelete as $row) {
-                if (!empty($row['qr_code']) && file_exists($row['qr_code'])) @unlink($row['qr_code']);
+                if (!empty($row['qr_code']) && file_exists($row['qr_code']))
+                    @unlink($row['qr_code']);
             }
 
             $this->db->query("DELETE FROM trx_barang WHERE id_spesifikasi = :id AND urutan_unit > :new_total");
@@ -611,9 +640,10 @@ class Detail_barang_model
         }
 
         $det = $this->getDetailDataBarang($data['id_barang']);
-        if (!empty($curr['qr_code']) && file_exists($curr['qr_code'])) @unlink($curr['qr_code']);
+        if (!empty($curr['qr_code']) && file_exists($curr['qr_code']))
+            @unlink($curr['qr_code']);
 
-        $kodeLengkapVirtual = $kodeBarangBaru . '/' . $newTotal . '/' . $det['urutan_unit'];
+        $kodeLengkapVirtual = $kodeBarangBaru . '/' . $det['urutan_unit'] . '/' . $newTotal;
 
         $qrContentUnit = "Kode: " . $kodeLengkapVirtual . "\n" .
             "Jenis: " . $det['sub_barang'] . "\n" .
@@ -789,7 +819,7 @@ class Detail_barang_model
             return $this->db->rowCount();
         } catch (PDOException $e) {
             // Tangkap error constraint database jika ada yang terlewat
-            return -1; 
+            return -1;
         }
     }
 

@@ -60,7 +60,17 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             <div id="input-container-jenis" class="input-container-hidden">
                                 <div class="input-row">
                                     <input type="text" name="sub_barang_baru" id="input-jenis" class="form-input flex-2" placeholder="Nama Jenis" disabled>
-                                    <input type="text" name="grup_sub_baru" id="input-grup-jenis" class="form-input flex-1" placeholder="Grup (A-Z)" maxlength="1" disabled>
+                                    <select name="grup_sub_baru" id="input-grup-jenis" class="form-select flex-1" disabled>
+                                        <option value="">-- Grup --</option>
+                                        <option value="M">M - MICRO</option>
+                                        <option value="T">T - TOOLS</option>
+                                        <option value="F">F - FURNITURE</option>
+                                        <option value="C">C - COMPUTER</option>
+                                        <option value="U">U - UTILITAS</option>
+                                        <option value="S">S - SERVER</option>
+                                        <option value="J">J - JARINGAN</option>
+                                        <option value="K">K - KONEKTOR</option>
+                                    </select>
                                     <button type="button" class="btn-cancel-input" onclick="cancelInput('jenis')" title="Batal"><i class="fa-solid fa-times"></i></button>
                                 </div>
                             </div>
@@ -283,7 +293,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
             return;
         }
 
-        const inputs = inputContainer.querySelectorAll('input');
+        const inputs = inputContainer.querySelectorAll('input, select');
 
         if (select.value !== 'NEW' && select.value !== '') {
             lastSelectValue[type] = select.value;
@@ -327,7 +337,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
 
             inputContainer.style.display = 'none';
 
-            const inputs = inputContainer.querySelectorAll('input');
+            const inputs = inputContainer.querySelectorAll('input, select');
             inputs.forEach(input => {
                 if (input) {
                     input.value = '';
