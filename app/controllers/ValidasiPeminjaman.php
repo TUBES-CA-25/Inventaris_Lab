@@ -63,57 +63,29 @@ class ValidasiPeminjaman extends Controller
         $this->view('templates/footer1', $data);
     }
 
-    
+
     public function accKalab()
-{
-    if ($_SESSION['id_role'] != '1') {
-        Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
-        header('Location: ' . BASEURL . 'ValidasiPeminjaman');
-        exit;
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Simpan ID asli yang terenkripsi untuk redirect nanti
-        $id_encoded = $_POST['id_peminjaman']; 
-        
-        // Decode untuk keperluan database
-        $id_decoded = IdObfuscator::decode($id_encoded);
-
-        if ($this->model('Peminjaman_model')->validasiKalab($id_decoded) > 0) {
-            Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
-        } else {
-            // Jika data tidak berubah (misal sudah diklik sebelumnya), beri info saja, jangan error
-            Flasher::setFlash('Info', 'Data sudah disetujui sebelumnya atau tidak ada perubahan.', '', 'info');
+    {
+        if ($_SESSION['id_role'] != '1') {
+            Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
         }
-        
-        // PERBAIKAN PENTING DI SINI:
-        // Kembalikan ke halaman detail menggunakan ID YANG TER-ENKRIPSI ($id_encoded)
-        header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
-        exit;
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $id_encoded = $_POST['id_peminjaman'];
+            $id_decoded = IdObfuscator::decode($id_encoded);
+
+            if ($this->model('Peminjaman_model')->validasiKalab($id_decoded) > 0) {
+                Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
+            } else {
+                Flasher::setFlash('Info', 'Data sudah disetujui sebelumnya atau tidak ada perubahan.', '', 'info');
+            }
+
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
+            exit;
+        }
     }
-}
-
-    // public function accKalab()
-    // {
-        
-    //     if ($_SESSION['id_role'] != '1') {
-    //         Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
-    //         header('Location: ' . BASEURL . 'ValidasiPeminjaman');
-    //         exit;
-    //     }
-
-    //     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    //         $id = IdObfuscator::decode($_POST['id_peminjaman']);
-
-    //         if ($this->model('Peminjaman_model')->validasiKalab($id) > 0) {
-    //             Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
-    //         } else {
-    //             Flasher::setFlash('Gagal', 'Terjadi kesalahan atau data sudah disetujui sebelumnya.', '', 'warning');
-    //         }
-    //         header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id);
-    //         exit;
-    //     }
-    // }
 
     public function viewValidasiPosisi($id_peminjaman)
     {
@@ -213,12 +185,9 @@ class ValidasiPeminjaman extends Controller
             if ($this->model('Peminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
                 Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
             } else {
-                // Info saja, mungkin status sudah sama sebelumnya
                 Flasher::setFlash('Info', 'Status diperbarui.', '', 'info');
             }
 
-            // 4. REDIRECT URL (Pakai ID Encoded / String Acak)
-            // Kita kembalikan user ke halaman detail dengan ID yang aman
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_encoded);
             exit;
         }
@@ -254,8 +223,6 @@ class ValidasiPeminjaman extends Controller
             exit;
         }
 
-        // 1. JALANKAN OTOMATISASI BARANG
-        // Ini akan memecah request dan mengunci stok barang
         $hasilOtomatis = $this->model('Peminjaman_model')->otomatisasiPilihBarang($id_peminjaman_decoded);
 
         if ($hasilOtomatis == 0) {
@@ -264,10 +231,8 @@ class ValidasiPeminjaman extends Controller
             exit;
         }
 
-        // 2. Finalisasi Status Peminjaman (Jadi 'Disetujui')
         $this->model('Peminjaman_model')->finalisasiValidasi($id_peminjaman_decoded);
 
-        // 3. Hapus Backup Surat (Pembersihan)
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman_decoded);
         if ($peminjaman) {
             $fileName = $peminjaman['file_surat'];

@@ -720,52 +720,77 @@ class Detail_barang_model
         return $this->db->resultSet();
     }
 
-    // --- HAPUS DATA MASTER (Dengan Pengecekan) ---
+    // --- HAPUS DATA MASTER (Updated by Andi's Assistant) ---
     public function hapusDataMaster($table, $id)
     {
         $pkColumn = "";
-        $fkColumn = "";
+        $queriesToCheck = []; // Array untuk menampung query pengecekan
 
         switch ($table) {
             case 'mst_jenis_barang':
                 $pkColumn = 'id_jenis_barang';
-                $fkColumn = 'id_jenis_barang';
+                // 1. Cek di tabel mst_spesifikasi (Header Barang)
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM mst_spesifikasi WHERE id_jenis_barang = :id";
+                // 2. Cek di tabel trx_detail_peminjaman (Transaksi Peminjaman)
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM trx_detail_peminjaman WHERE id_jenis_barang = :id";
                 break;
+
             case 'mst_merek_barang':
                 $pkColumn = 'id_merek_barang';
-                $fkColumn = 'id_merek_barang';
+                // Cek di tabel mst_spesifikasi
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM mst_spesifikasi WHERE id_merek_barang = :id";
                 break;
-            case 'mst_lokasi_penyimpanan':
-                $pkColumn = 'id_lokasi_penyimpanan';
-                $fkColumn = 'id_lokasi_penyimpanan';
-                break;
-            case 'mst_status':
-                $pkColumn = 'id_status';
-                $fkColumn = 'id_status';
-                break;
+
             case 'mst_satuan':
                 $pkColumn = 'id_satuan';
-                $fkColumn = 'id_satuan';
+                // Cek di tabel mst_spesifikasi
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM mst_spesifikasi WHERE id_satuan = :id";
                 break;
+
+            case 'mst_lokasi_penyimpanan':
+                $pkColumn = 'id_lokasi_penyimpanan';
+                // Cek di tabel trx_barang (Unit Fisik)
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM trx_barang WHERE id_lokasi_penyimpanan = :id";
+                break;
+
+            case 'mst_status':
+                $pkColumn = 'id_status';
+                // Cek di tabel trx_barang (Unit Fisik)
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM trx_barang WHERE id_status = :id";
+                break;
+
+            case 'mst_kondisi_barang':
+                $pkColumn = 'id_kondisi_barang';
+                // Cek di tabel trx_barang (Unit Fisik)
+                $queriesToCheck[] = "SELECT COUNT(*) as count FROM trx_barang WHERE id_kondisi_barang = :id";
+                break;
+
             default:
-                return 0;
+                return 0; // Tabel tidak dikenali
         }
 
-        $checkQuery = "SELECT COUNT(*) as count FROM trx_barang WHERE $fkColumn = :id";
-        $this->db->query($checkQuery);
-        $this->db->bind('id', $id);
-        $result = $this->db->single();
+        // --- PROSES PENGECEKAN DATA GANDA (RELASI) ---
+        foreach ($queriesToCheck as $query) {
+            $this->db->query($query);
+            $this->db->bind('id', $id);
+            $result = $this->db->single();
 
-        if ($result['count'] > 0) {
-            return -1; // Kode Error: Data sedang dipakai
+            if ($result['count'] > 0) {
+                return -1; // Kode Error: Data sedang dipakai (Constraint Fail)
+            }
         }
 
-        $deleteQuery = "DELETE FROM $table WHERE $pkColumn = :id";
-        $this->db->query($deleteQuery);
-        $this->db->bind('id', $id);
-        $this->db->execute();
-
-        return $this->db->rowCount();
+        // --- PROSES HAPUS JIKA AMAN ---
+        try {
+            $deleteQuery = "DELETE FROM $table WHERE $pkColumn = :id";
+            $this->db->query($deleteQuery);
+            $this->db->bind('id', $id);
+            $this->db->execute();
+            return $this->db->rowCount();
+        } catch (PDOException $e) {
+            // Tangkap error constraint database jika ada yang terlewat
+            return -1; 
+        }
     }
 
     public function getUnitsBySpesifikasi($id_spesifikasi)

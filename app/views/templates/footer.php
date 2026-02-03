@@ -1,11 +1,13 @@
 </div>
 
+
+
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
@@ -17,8 +19,11 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="<?= BASEURL; ?>js/script.js?v=<?= time(); ?>"></script>
+<script src="<?= BASEURL; ?>js/Beranda.js?v=<?= time(); ?>"></script>
+<script src="<?= BASEURL; ?>js/Sidebar.js?v=<?= time(); ?>"></script>
 <script src="<?= BASEURL; ?>js/form.js?v=<?= time(); ?>"></script>
 <script src="<?= BASEURL; ?>js/upload.js?v=<?= time(); ?>"></script>
 <script src="<?= BASEURL; ?>js/DetailDetailBarang.js?v=<?= time(); ?>"></script>

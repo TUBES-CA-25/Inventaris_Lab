@@ -21,6 +21,8 @@ class Peminjaman extends Controller
         $data['barang'] = $PeminjamanModel->getAllBarang();
         $data['sub_barang'] = $PeminjamanModel->getSubBarang();
 
+        $data['isEdit'] = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Peminjaman/index', $data);
@@ -70,15 +72,6 @@ class Peminjaman extends Controller
 
     public function formPeminjaman()
     {
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-        if (!isset($_SESSION['login'])) {
-            header('Location: ' . BASEURL . 'Login');
-            exit;
-        }
-
         $data['judul'] = 'Form Pengajuan Peminjaman';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
@@ -98,7 +91,9 @@ class Peminjaman extends Controller
                 if (isset($item_map[$sess_id_barang])) {
                     $item_data = $item_map[$sess_id_barang];
 
-                    $units = $this->model('Peminjaman_model')->getUnitBarangTersedia($sess_id_barang);
+                    // --- [PERBAIKAN 1: Ambil Spesifikasi, Bukan Unit] ---
+                    // Pastikan model getSpesifikasiByJenis sudah ada di Peminjaman_model.php
+                    $units = $this->model('Peminjaman_model')->getSpesifikasiByJenis($sess_id_barang);
                     $item_data['list_unit'] = $units;
 
                     $item_data['hapus_id'] = IdObfuscator::encode($index);
@@ -116,47 +111,49 @@ class Peminjaman extends Controller
 
     public function prosesTambahPeminjaman()
     {
-        // 1. VALIDASI STOK SEBELUM SIMPAN
-        if (isset($_POST['unit_selected']) && is_array($_POST['unit_selected'])) {
+        // 1. Wajib Start Session
+        if (!isset($_SESSION)) session_start();
 
-            foreach ($_POST['unit_selected'] as $index => $id_spesifikasi) {
-
-                // Skip jika user memilih "Lainnya" atau kosong (biasanya tidak dicek stok via sistem ini)
-                if ($id_spesifikasi == 'Lainnya' || empty($id_spesifikasi)) {
-                    continue;
-                }
-
-                $jumlah_pinjam = (int) $_POST['jumlah_peminjaman'][$index];
-
-                // Ambil Stok Tersedia (Baik & Bisa Dipinjam) dari Model
-                $stok_tersedia = $this->model('Peminjaman_model')->getStokTersediaBySpesifikasi($id_spesifikasi);
-
-                // LOGIKA PENGECEKAN
-                if ($jumlah_pinjam > $stok_tersedia) {
-
-                    // Ambil info barang untuk pesan error yang jelas
-                    $infoBarang = $this->model('Peminjaman_model')->getNamaBarangBySpesifikasi($id_spesifikasi);
-                    $namaLengkap = $infoBarang['sub_barang'] . ' (' . $infoBarang['spesifikasi_barang'] . ')';
-
-                    // Set Flash Message Khusus (Format SweetAlert)
-                    // Pastikan di footer/header Anda ada script untuk menangkap Flash ini
-                    Flasher::setFlash('Stok Tidak Cukup!', "Barang <b>$namaLengkap</b> hanya tersisa <b>$stok_tersedia</b> unit yang kondisinya BAIK. Anda meminta <b>$jumlah_pinjam</b>.",'warning');
-
-                    // Kembalikan user ke halaman form
-                    header('Location: ' . BASEURL . 'Peminjaman/form');
-                    exit;
-                }
-            }
+        // 2. Cek Data Kosong
+        if (empty($_POST['id_jenis_barang'])) {
+            Flasher::setFlash('Gagal', 'Tidak ada barang yang dipilih.', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
         }
 
-        // 2. JIKA LOLOS VALIDASI, LANJUTKAN PROSES SIMPAN SEPERTI BIASA
-        if ($this->model('Peminjaman_model')->postDataPeminjaman($_POST) > 0) {
-            Flasher::setFlash('Berhasil', 'Peminjaman berhasil diajukan', 'success');
-            header('Location: ' . BASEURL . 'Peminjaman');
+        // 3. Validasi Stok
+        $this->cekValidasiStok($_POST);
+
+        // 4. Pastikan User Login
+        if (!isset($_SESSION['id_user'])) {
+            header('Location: ' . BASEURL . 'Login');
+            exit;
+        }
+
+        // 5. Siapkan Data
+        $dataUser['id_user'] = $_SESSION['id_user'];
+        $userProfile = $this->model('User_model')->profile($dataUser);
+
+        $dataPayload = $_POST;
+        $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
+        
+        // --- TAMBAHKAN BARIS INI (SOLUSI) ---
+        $dataPayload['id_user'] = $_SESSION['id_user']; 
+        // -------------------------------------
+
+        // 6. Eksekusi Database
+        if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
+
+            // BERHASIL: Bersihkan keranjang
+            unset($_SESSION['keranjang']);
+
+            Flasher::setFlash('Berhasil!', 'Pengajuan peminjaman berhasil dibuat. Silakan cek riwayat.', '', 'success');
+            header('Location: ' . BASEURL . 'Riwayat');
             exit;
         } else {
-            Flasher::setFlash('Gagal', 'Peminjaman gagal diajukan', 'error');
-            header('Location: ' . BASEURL . 'Peminjaman');
+            // GAGAL
+            Flasher::setFlash('Gagal', 'Terjadi kesalahan saat menyimpan ke database.', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
             exit;
         }
     }
@@ -282,5 +279,56 @@ class Peminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
         }
+    }
+
+    private function cekValidasiStok($postData)
+    {
+        if (isset($postData['unit_selected']) && is_array($postData['unit_selected'])) {
+            foreach ($postData['unit_selected'] as $index => $id_spesifikasi) {
+
+                // Skip jika "Lainnya" atau kosong
+                if ($id_spesifikasi == 'Lainnya' || empty($id_spesifikasi)) {
+                    continue;
+                }
+
+                $jumlah_pinjam = (int) $postData['jumlah_peminjaman'][$index];
+
+                // Ambil Stok Tersedia (Baik & Bisa Dipinjam)
+                $stok_tersedia = $this->model('Peminjaman_model')->getStokTersediaBySpesifikasi($id_spesifikasi);
+
+                if ($jumlah_pinjam > $stok_tersedia) {
+
+                    $infoBarang = $this->model('Peminjaman_model')->getNamaBarangBySpesifikasi($id_spesifikasi);
+                    $namaLengkap = ($infoBarang) ? $infoBarang['sub_barang'] . ' (' . $infoBarang['spesifikasi_barang'] . ')' : 'Barang Terpilih';
+
+                    Flasher::setFlash(
+                        'Stok Tidak Cukup!',
+                        "Barang <b>$namaLengkap</b> hanya tersisa <b>$stok_tersedia</b> unit yang kondisinya BAIK. Anda meminta <b>$jumlah_pinjam</b>.",
+                        '', // <--- Tambahkan string kosong ini agar jumlah argumen jadi 4
+                        'warning'
+                    );
+
+                    header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+                    exit; // Stop proses dan kembali ke form
+                }
+            }
+        }
+        return false; // Lolos validasi (tidak ada error)
+    }
+
+    public function batalEdit()
+    {
+        if (!isset($_SESSION)) session_start();
+
+        // Hapus semua session terkait edit dan keranjang sementara
+        unset($_SESSION['keranjang']);
+        unset($_SESSION['edit_mode']);
+        unset($_SESSION['edit_id_peminjaman']);
+        unset($_SESSION['edit_header']);
+        unset($_SESSION['edit_details_map']);
+
+        // Redirect ke halaman Riwayat atau Peminjaman
+        header('Location: ' . BASEURL . 'Riwayat');
+        exit;
     }
 }

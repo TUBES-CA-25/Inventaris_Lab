@@ -1,95 +1,116 @@
+// Ambil elemen filter
 const filterMode = document.getElementById('filterMode');
-    const filterBulan = document.getElementById('filterBulan');
-    const filterTahun = document.getElementById('filterTahun');
+const filterBulan = document.getElementById('filterBulan'); // Select-nya
+const filterBulanWrapper = document.getElementById('filterBulanWrapper'); // Wrapper-nya (yang ada class d-none)
+const filterTahun = document.getElementById('filterTahun');
 
-    // Tampilkan/Sembunyikan dropdown bulan berdasarkan mode
-    filterMode.addEventListener('change', function() {
-        if (this.value === 'harian') {
-            filterBulan.style.display = 'block';
-            filterTahun.style.display = 'block';
-        } else if (this.value === 'bulanan') {
-            filterBulan.style.display = 'none';
-            filterTahun.style.display = 'block';
-        } else { // tahunan
-            filterBulan.style.display = 'none';
-            // filterTahun.style.display = 'none'; // Bisa dihide jika tahunan otomatis ambil range 5 tahun
-        }
+// Event Listener untuk Filter Mode
+filterMode.addEventListener('change', function() {
+    // Reset tampilan
+    if (filterBulanWrapper) filterBulanWrapper.classList.add('d-none');
+    
+    // Logika Tampilan
+    if (this.value === 'harian') {
+        // Tampilkan Wrapper Bulan
+        if (filterBulanWrapper) filterBulanWrapper.classList.remove('d-none');
+    } 
+    // Jika 'bulanan' atau 'tahunan', wrapper bulan tetap hidden (d-none)
+});
+
+// Setup Chart.js
+let charts = {}; 
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } }, 
+    scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+    }
+};
+
+function initChart(id, label, color) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return null; // Safety check jika elemen tidak ada
+
+    const ctx = canvas.getContext('2d');
+    return new Chart(ctx, {
+        type: 'line', // Tetap menggunakan Line sesuai file asli Anda
+        data: {
+            labels: [],
+            datasets: [{
+                label: label,
+                data: [],
+                borderColor: color,
+                backgroundColor: color.replace('rgb', 'rgba').replace(')', ', 0.2)'),
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: commonOptions
     });
+}
 
-    let charts = {}; 
+// Inisialisasi Chart
+charts.peminjaman = initChart('chartPeminjaman', 'Peminjaman', 'rgb(147, 112, 219)');
+charts.pengembalian = initChart('chartPengembalian', 'Pengembalian', 'rgb(255, 159, 64)');
+charts.bagus = initChart('chartBarangBagus', 'Barang Bagus', 'rgb(75, 192, 192)');
+charts.rusak = initChart('chartBarangRusak', 'Barang Rusak', 'rgb(255, 99, 132)');
 
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } }, // Hide legend karena cuma 1 dataset per grafik
-        scales: {
-            y: { beginAtZero: true, ticks: { precision: 0 } }
-        }
+// Fungsi Update Data
+function updateCharts() {
+    const payload = {
+        mode: filterMode.value,
+        tahun: filterTahun.value,
+        bulan: filterBulan.value
     };
 
-    function initChart(id, label, color) {
-        const ctx = document.getElementById(id).getContext('2d');
-        return new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: label,
-                    data: [],
-                    borderColor: color,
-                    backgroundColor: color.replace(')', ', 0.2)').replace('rgb', 'rgba'),
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: commonOptions
-        });
-    }
+    // PENTING: Gunakan variabel global 'baseUrl' yang didefinisikan di View
+    // Jika variabel belum ada, fallback ke string kosong (biar tidak error fatal)
+    const url = (typeof baseUrl !== 'undefined' ? baseUrl : '') + 'Beranda/getAjaxStats';
 
-    charts.peminjaman = initChart('chartPeminjaman', 'Peminjaman', 'rgb(147, 112, 219)');
-    charts.pengembalian = initChart('chartPengembalian', 'Pengembalian', 'rgb(255, 159, 64)');
-    charts.bagus = initChart('chartBarangBagus', 'Barang Bagus', 'rgb(75, 192, 192)');
-    charts.rusak = initChart('chartBarangRusak', 'Barang Rusak', 'rgb(255, 99, 132)');
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        // Update Semua Chart jika object chart berhasil dibuat
+        const labels = data.labels;
 
-    function updateCharts() {
-        const payload = {
-            mode: filterMode.value,
-            tahun: filterTahun.value,
-            bulan: filterBulan.value
-        };
-
-        // Fetch ke Controller
-        fetch('<?= BASEURL; ?>Beranda/getAjaxStats', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Update Labels (Sumbu X) untuk semua chart
-            const labels = data.labels;
-
-            // Update Data Chart 1
+        if (charts.peminjaman) {
             charts.peminjaman.data.labels = labels;
             charts.peminjaman.data.datasets[0].data = data.peminjaman;
             charts.peminjaman.update();
+        }
 
-            // Update Data Chart 2
+        if (charts.pengembalian) {
             charts.pengembalian.data.labels = labels;
             charts.pengembalian.data.datasets[0].data = data.pengembalian;
             charts.pengembalian.update();
+        }
 
-            // Update Data Chart 3
+        if (charts.bagus) {
             charts.bagus.data.labels = labels;
             charts.bagus.data.datasets[0].data = data.bagus;
             charts.bagus.update();
+        }
 
-            // Update Data Chart 4
+        if (charts.rusak) {
             charts.rusak.data.labels = labels;
             charts.rusak.data.datasets[0].data = data.rusak;
             charts.rusak.update();
-        })
-        .catch(err => console.error('Gagal mengambil data:', err));
-    }
+        }
+    })
+    .catch(err => console.error('Gagal mengambil data:', err));
+}
 
-    document.addEventListener('DOMContentLoaded', updateCharts);
+// Load awal saat halaman siap
+document.addEventListener('DOMContentLoaded', function() {
+    // Trigger change event manual agar tampilan filter sesuai state awal
+    filterMode.dispatchEvent(new Event('change'));
+    updateCharts();
+});

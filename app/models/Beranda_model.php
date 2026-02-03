@@ -26,110 +26,118 @@ class Beranda_model {
             'rusak' => []
         ];
 
-        // Tentukan format grouping dan range loop berdasarkan mode
+        // Konfigurasi Loop & Grouping
         if ($mode == 'harian') {
-            // Loop tanggal 1 sampai akhir bulan
             $jmlHari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
             $loopStart = 1;
             $loopEnd = $jmlHari;
             $groupBy = "DAY";
-            $dateCol = "$tahun-$bulan-"; // Prefix tanggal
         } elseif ($mode == 'bulanan') {
-            // Loop bulan 1 sampai 12
             $loopStart = 1;
             $loopEnd = 12;
             $groupBy = "MONTH";
         } else { // tahunan
-            // Loop 5 tahun ke belakang dari tahun yang dipilih
             $loopStart = $tahun - 4;
             $loopEnd = $tahun;
             $groupBy = "YEAR";
         }
 
-        // Siapkan array kosong (init 0) agar grafik tidak bolong
+        // Inisialisasi Array 0
         $labels = [];
+        $monthNames = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
         for ($i = $loopStart; $i <= $loopEnd; $i++) {
-            $labels[] = $i; // Label X-Axis (Tanggal, Bulan, atau Tahun)
+            // Jika bulanan, ubah angka jadi nama bulan
+            if ($mode == 'bulanan') {
+                $labels[] = $monthNames[$i];
+            } else {
+                $labels[] = $i;
+            }
+            
             $data['peminjaman'][$i] = 0;
             $data['pengembalian'][$i] = 0;
             $data['bagus'][$i] = 0;
             $data['rusak'][$i] = 0;
         }
 
-        // --- QUERY 1: Peminjaman ---
+        // --- QUERY 1: Peminjaman (trx_peminjaman) ---
         $sql = "SELECT $groupBy(tanggal_peminjaman) as waktu, COUNT(*) as total 
                 FROM trx_peminjaman WHERE 1=1 ";
         
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tanggal_peminjaman) = $bulan AND YEAR(tanggal_peminjaman) = $tahun ";
+            $sql .= "AND MONTH(tanggal_peminjaman) = '$bulan' AND YEAR(tanggal_peminjaman) = '$tahun' ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tanggal_peminjaman) = $tahun ";
+            $sql .= "AND YEAR(tanggal_peminjaman) = '$tahun' ";
         } else {
-            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN $loopStart AND $loopEnd ";
+            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN '$loopStart' AND '$loopEnd' ";
         }
         $sql .= "GROUP BY $groupBy(tanggal_peminjaman)";
 
         $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
-            $data['peminjaman'][$row['waktu']] = intval($row['total']);
+            $idx = intval($row['waktu']);
+            if(isset($data['peminjaman'][$idx])) $data['peminjaman'][$idx] = intval($row['total']);
         }
 
-        // --- QUERY 2: Pengembalian ---
-        // Asumsi: status 'Dikembalikan'
-        $sql = "SELECT $groupBy(tanggal_pengembalian) as waktu, COUNT(*) as total 
-                FROM trx_peminjaman 
-                WHERE status IN ('Dikembalikan', 'Disetujui') ";
+        // --- QUERY 2: Pengembalian (trx_pengembalian) ---
+        // Menggunakan tgl_pengembalian_aktual dari tabel trx_pengembalian
+        $sql = "SELECT $groupBy(tgl_pengembalian_aktual) as waktu, COUNT(*) as total 
+                FROM trx_pengembalian WHERE tgl_pengembalian_aktual IS NOT NULL ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tanggal_pengembalian) = $bulan AND YEAR(tanggal_pengembalian) = $tahun ";
+            $sql .= "AND MONTH(tgl_pengembalian_aktual) = '$bulan' AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tanggal_pengembalian) = $tahun ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
         } else {
-            $sql .= "AND YEAR(tanggal_pengembalian) BETWEEN $loopStart AND $loopEnd ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) BETWEEN '$loopStart' AND '$loopEnd' ";
         }
-        $sql .= "GROUP BY $groupBy(tanggal_pengembalian)";
+        $sql .= "GROUP BY $groupBy(tgl_pengembalian_aktual)";
 
         $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
-            $data['pengembalian'][$row['waktu']] = intval($row['total']);
+            $idx = intval($row['waktu']);
+            if(isset($data['pengembalian'][$idx])) $data['pengembalian'][$idx] = intval($row['total']);
         }
 
-        // --- QUERY 3: Barang Bagus (Berdasarkan Tgl Pengadaan) ---
-        $sql = "SELECT $groupBy(tgl_pengadaan_barang) as waktu, SUM(jumlah_barang) as total 
+        // --- QUERY 3: Barang Bagus (trx_barang) ---
+        // Menggunakan COUNT(*) karena 1 baris = 1 barang
+        $sql = "SELECT $groupBy(tgl_pengadaan_barang) as waktu, COUNT(*) as total 
                 FROM trx_barang 
-                WHERE id_kondisi_barang = 1 "; // 1 = Baik
+                WHERE id_kondisi_barang = 1 "; 
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengadaan_barang) = $bulan AND YEAR(tgl_pengadaan_barang) = $tahun ";
+            $sql .= "AND MONTH(tgl_pengadaan_barang) = '$bulan' AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) = $tahun ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
         } else {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN $loopStart AND $loopEnd ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN '$loopStart' AND '$loopEnd' ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengadaan_barang)";
 
         $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
-            $data['bagus'][$row['waktu']] = intval($row['total']);
+            $idx = intval($row['waktu']);
+            if(isset($data['bagus'][$idx])) $data['bagus'][$idx] = intval($row['total']);
         }
 
-        // --- QUERY 4: Barang Rusak ---
-        $sql = "SELECT $groupBy(tgl_pengadaan_barang) as waktu, SUM(jumlah_barang) as total 
+        // --- QUERY 4: Barang Rusak (trx_barang) ---
+        $sql = "SELECT $groupBy(tgl_pengadaan_barang) as waktu, COUNT(*) as total 
                 FROM trx_barang 
-                WHERE id_kondisi_barang != 1 "; // Rusak
+                WHERE id_kondisi_barang != 1 "; 
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengadaan_barang) = $bulan AND YEAR(tgl_pengadaan_barang) = $tahun ";
+            $sql .= "AND MONTH(tgl_pengadaan_barang) = '$bulan' AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) = $tahun ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
         } else {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN $loopStart AND $loopEnd ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN '$loopStart' AND '$loopEnd' ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengadaan_barang)";
 
         $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
-            $data['rusak'][$row['waktu']] = intval($row['total']);
+            $idx = intval($row['waktu']);
+            if(isset($data['rusak'][$idx])) $data['rusak'][$idx] = intval($row['total']);
         }
 
         return [

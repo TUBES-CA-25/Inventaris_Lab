@@ -35,7 +35,6 @@ class Riwayat_model
     
     public function getStatistik($id_user = null)
     {
-        // Query menggunakan Conditional Aggregation untuk menghitung semua status dalam 1 query
         $query = "SELECT 
             SUM(CASE WHEN status = 'Disetujui' OR status = 'Diterima' THEN 1 ELSE 0 END) as total_disetujui,
             SUM(CASE WHEN status = 'Diproses' THEN 1 ELSE 0 END) as total_diproses,
@@ -43,7 +42,6 @@ class Riwayat_model
             SUM(CASE WHEN status = 'Selesai' OR status = 'Dikembalikan' THEN 1 ELSE 0 END) as total_kembali
             FROM trx_peminjaman";
 
-        // Jika ada id_user (filter 'Riwayat Saya'), tambahkan WHERE
         if ($id_user != null) {
             $query .= " WHERE id_user = :id_user";
         }
@@ -54,6 +52,6 @@ class Riwayat_model
             $this->db->bind('id_user', $id_user);
         }
 
-        return $this->db->single(); // Mengembalikan 1 baris berisi total2
+        return $this->db->single(); 
     }
 }

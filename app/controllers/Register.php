@@ -16,12 +16,9 @@ class Register extends Controller
         // Model sekarang mengembalikan array atau kode status (-1, -2, -3, 0)
         $result = $this->model('User_model')->tambahUser($_POST);
 
-        // Jika registrasi berhasil (array dengan status 1)
         if (is_array($result) && $result['status'] === 1) {
-            // Get user data for email
             $userData = $this->model('User_model')->getUserEmailAndName($result['user_id']);
 
-            // Send verification email
             $emailHelper = new EmailHelper();
             $emailSent = $emailHelper->sendVerificationEmail(
                 $userData['email'],
