@@ -8,7 +8,7 @@
             </div> -->
         </div>
 
-        <!-- Flash Message -->9
+        <!-- Flash Message -->
         <div class="row">
             <div class="col-12">
                 <?php Flasher::flash(); ?>
@@ -73,6 +73,10 @@
             <button type="button" class="btn btn-navy rounded-pill btn-edit" onclick="openEditModal()">
                 <i class="fa-solid fa-pen-to-square"></i> Edit Profil
             </button>
+
+            <button type="button" class="btn btn-navy rounded-pill" onclick="openPassModal()">
+                <i class="fa-solid fa-key"></i> Ganti Password
+            </button>    
         </div>
     </div>
 </div>
@@ -150,8 +154,6 @@
         <div class="modal-body">
             <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
-
-                <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
                 <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
 
                 <div class="modal-form-group">
@@ -200,6 +202,35 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-back" onclick="closeEditModal()">Batal</button>
                     <button type="submit" class="btn btn-navy btn-edit">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="passModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Ganti Password</h3>
+            <button class="modal-close" onclick="closePassModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form action="<?= BASEURL ?>Profil/gantiPassword" method="post">
+                <div class="modal-form-group">
+                    <label>Password Saat Ini</label>
+                    <input type="password" name="currentPassword" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Password Baru</label>
+                    <input type="password" name="newPassword" required>
+                </div>
+                <div class="modal-form-group">
+                    <label>Konfirmasi Password Baru</label>
+                    <input type="password" name="confirmPassword" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-back" onclick="closePassModal()">Batal</button>
+                    <button type="submit" class="btn btn-navy">Update Password</button>
                 </div>
             </form>
         </div>
@@ -264,4 +295,30 @@
             setTimeout(() => flashMessage.remove(), 500);
         }
     }, 3000);
+
+    function openPassModal() {
+        document.getElementById('passModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePassModal() {
+        document.getElementById('passModal').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Tambahkan event listener untuk modal password
+    const passModal = document.getElementById('passModal');
+    if (passModal) {
+        passModal.addEventListener('click', function (e) {
+            if (e.target === this) closePassModal();
+        });
+    }
+
+    // Perbaiki event listener ESC agar mencakup semua modal
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeEditModal();
+            closeTTDModal();
+            if (typeof closePassModal === "function") closePassModal();
+        }
+    });
 </script>

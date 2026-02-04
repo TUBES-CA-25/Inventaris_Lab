@@ -364,4 +364,35 @@ class User_model
 
         return $countSuccess;
     }
+
+        public function gantiPasswordUser($data) {
+            $id_user = $_SESSION['id_user'];
+            $currentPassword = $data['currentPassword'];
+            $newPassword = $data['newPassword'];
+            $confirmPassword = $data['confirmPassword'];
+
+            // 1. Ambil password lama dari DB
+            $this->db->query("SELECT password FROM trx_user WHERE id_user = :id");
+            $this->db->bind('id', $id_user);
+            $user = $this->db->single();
+
+            // 2. Verifikasi password lama
+            if (!password_verify($currentPassword, $user['password'])) {
+                return 0; // Password lama salah
+            }
+
+            // 3. Cek konfirmasi password baru
+            if ($newPassword !== $confirmPassword) {
+                return 0; // Password tidak cocok
+            }
+
+            // 4. Update password baru
+            $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
+            $this->db->query("UPDATE trx_user SET password = :pass WHERE id_user = :id");
+            $this->db->bind('pass', $passwordHash);
+            $this->db->bind('id', $id_user);
+            $this->db->execute();
+
+            return $this->db->rowCount();
+    }
 }
