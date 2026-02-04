@@ -161,7 +161,7 @@
                 </div>
 
                 <div class="modal-form-group">
-                    <label>Email</label>
+                    <label>Email</label>`q
                     <input type="email" name="email" value="<?= htmlspecialchars($profile_data['email']); ?>"
                         placeholder="Masukkan email" readonly style="background-color: #f0f0f0;">
                     <small style="color: #888;">Email tidak dapat diubah di sini.</small>

@@ -37,21 +37,41 @@ $(document).ready(function () {
                 orientation: 'landscape',
                 pageSize: 'LEGAL',
                 exportOptions: {
-                    columns: ':visible',
-                    stripHtml: false,
-                    format: {
-                        body: function (data, row, column, node) {
-                            if ($(node).find('img').length > 0) {
-                                var img = $(node).find('img')[0];
-                                var canvas = document.createElement("canvas");
-                                canvas.width = img.naturalWidth || 50; canvas.height = img.naturalHeight || 50;
-                                var ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0);
-                                try { return 'IMAGE:' + canvas.toDataURL("image/png"); } catch (e) { return ''; }
-                            }
-                            return data.replace(/<[^>]+>/g, '').trim();
-                        }
-                    }
-                },
+    columns: ':visible',
+    stripHtml: false,
+    format: {
+        // Inside export.js -> buttons -> pdfHtml5 -> exportOptions -> format -> body
+body: function (data, row, column, node) {
+    if ($(node).find('img').length > 0) {
+        var img = $(node).find('img')[0];
+        
+        // 1. Check if image is actually loaded and has dimensions
+        // A broken image will have naturalWidth = 0
+        if (!img.complete || img.naturalWidth === 0) {
+            return ''; 
+        }
+
+        try {
+            var canvas = document.createElement("canvas");
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            var ctx = canvas.getContext("2d");
+            
+            // 2. Extra safety: Only draw if dimensions are valid
+            if (canvas.width > 0 && canvas.height > 0) {
+                ctx.drawImage(img, 0, 0);
+                return 'IMAGE:' + canvas.toDataURL("image/png");
+            }
+            return '';
+        } catch (e) {
+            console.warn("Skipping broken or restricted image at row " + row, e);
+            return ''; 
+        }
+    }
+    return data.replace(/<[^>]+>/g, '').trim();
+}
+    }
+},
                 customize: function (doc) {
                     // [PERUBAHAN] Logo PDF diperbesar (width: 250)
                     var headerContent = {

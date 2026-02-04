@@ -187,6 +187,7 @@ class DetailBarang extends Controller
 
             $this->view('templates/header', $data);
             $this->view('DetailBarang/print', $data);
+            $this->view('templates/footer');
         } else {
             Flasher::setFlash('Gagal', 'Pilih minimal satu data barang untuk dicetak.', '', 'danger');
             header('Location: ' . BASEURL . 'DetailBarang');

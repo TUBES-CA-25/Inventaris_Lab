@@ -9,23 +9,25 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
     <div class="container-fluid">
 
         <div class="card shadow-sm border-0 mb-4" style="border-radius: 16px; overflow: hidden;">
-            <div class="card-body bg-navy-gradient text-white p-4">
+            <div class="card-body bg-navy-gradient text-white">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <p class="mb-1 opacity-75 fw-medium">
-                            <i class="fas fa-hashtag me-1"></i> ID Transaksi: <?= $data['detail']['id_peminjaman']; ?>
-                        </p>
-                        <h3 class="mb-0 fw-bold">
-                            <i class="fas fa-clipboard-check me-2"></i>
+                        <h3 class="mb-0  fw-bold">
+                            <i class="fas fa-clipboard-check me-2 mr-1"></i>
                             Detail & Status Pengembalian
                         </h3>
                     </div>
+
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
                         <a href="<?= BASEURL; ?>Pengembalian" class="btn btn-light text-navy fw-bold px-4 py-2"
                             style="border-radius: 50px;">
                             <i class="fas fa-arrow-left me-2"></i> Kembali
                         </a>
                     </div>
+                </div>
+
+                <div class="flash">
+                    <?php Flasher::flash(); ?>
                 </div>
             </div>
         </div>
@@ -166,7 +168,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                         $statusClass = 'badge-hilang';
                                         $icon = 'fa-question-circle';
                                     }
-                                    ?>
+                            ?>
                                     <tr>
                                         <td class="text-center fw-bold text-muted"><?= $no++; ?></td>
 
@@ -174,8 +176,8 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                                             <?php if (!empty($item['urutan_unit'])): ?>
                                                 <code class="text-navy fw-bold"
                                                     style="background-color: #eef2ff; padding: 6px 10px; border-radius: 6px; border: 1px dashed #a5b4fc; display: inline-block;">
-                                                                <?= htmlspecialchars($item['kode_barang'] . '/' . $item['urutan_unit'] . '/' . $item['jumlah_total']); ?>
-                                                            </code>
+                                                    <?= htmlspecialchars($item['kode_barang'] . '/' . $item['urutan_unit'] . '/' . $item['jumlah_total']); ?>
+                                                </code>
                                             <?php else: ?>
                                                 <code
                                                     class="text-muted"><?= htmlspecialchars($item['kode_barang'] ?? '-'); ?></code>
@@ -308,12 +310,12 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('detailSearch');
         const table = document.querySelector('.table-navy');
 
         if (searchInput && table) {
-            searchInput.addEventListener('keyup', function () {
+            searchInput.addEventListener('keyup', function() {
                 const filter = searchInput.value.toLowerCase();
                 const rows = table.querySelectorAll('tbody tr');
 
@@ -353,7 +355,7 @@ if (!isset($_SESSION['login']) && !in_array($_SESSION['id_role'], ['3', '4'])) {
                 }
             });
 
-            searchInput.addEventListener('keydown', function (e) {
+            searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     searchInput.value = '';
                     searchInput.dispatchEvent(new Event('keyup'));

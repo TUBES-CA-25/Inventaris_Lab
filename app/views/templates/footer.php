@@ -28,6 +28,7 @@
 <script src="<?= BASEURL; ?>js/upload.js?v=<?= time(); ?>"></script>
 <script src="<?= BASEURL; ?>js/DetailDetailBarang.js?v=<?= time(); ?>"></script>
 <script src="<?= BASEURL; ?>js/ValidasiPeminjaman.js?v=<?= time(); ?>"></script>
+\<script src="<?= BASEURL; ?>js/IndexPengembalian.js?v=<?= time(); ?>"></script>
 
 <script>
     // 1. Logika Menghilangkan Loader setelah halaman Load
