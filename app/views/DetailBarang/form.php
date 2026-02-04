@@ -239,7 +239,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                         </div>
 
                         <div class="form-group mb-4">
-                            <label class="form-label">Upload Foto <?= $isEdit ? '(Opsional)' : '' ?></label>
+                            <label class="form-label">Upload Foto <?= $isEdit ? '' : '' ?></label>
                             <input type="file" name="foto_barang" class="form-input" accept="image/*">
                             <?php if ($isEdit && !empty($barang['foto_barang'])): ?>
                                 <small class="file-note">File: <?= basename($barang['foto_barang']) ?></small>
