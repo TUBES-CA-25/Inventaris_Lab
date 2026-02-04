@@ -83,14 +83,11 @@ $units = $data['listUnits'];
                                 <i class="fa-solid fa-qrcode"></i> Generate QR Code
                             </button>
 
-                            <form action="<?= BASEURL; ?>DetailBarang/cetak" method="post" target="_blank"
-                                style="width:100%;">
-                                <input type="hidden" name="id_barang[]"
-                                    value="<?= IdObfuscator::encode($master['id_barang']); ?>">
-                                <button type="submit" class="btn-dark-blue btn-action-custom">
-                                    <i class="fa-solid fa-file-pdf"></i> Ekspor PDF
-                                </button>
-                            </form>
+                            <a href="<?= BASEURL; ?>DetailBarang/cetakSatuan/<?= IdObfuscator::encode($master['id_barang']); ?>"
+                                class="btn-dark-blue btn-action-custom"
+                                style="display: flex; justify-content: center; align-items: center; width: 100%; text-decoration: none;">
+                                <i class="fa-solid fa-file-pdf me-2"></i> Ekspor PDF
+                            </a>
 
                             <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
                                 <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($master['id_barang']); ?>"

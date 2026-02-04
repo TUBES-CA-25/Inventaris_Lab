@@ -47,7 +47,7 @@ class DetailBarang extends Controller
         $id_spesifikasi = $data['dataTampilDetailBarang']['id_spesifikasi'];
 
         $data['limit'] = 5;
-        $data['halamanAktif'] = (isset($_GET['p']) && is_numeric($_GET['p'])) ? (int)$_GET['p'] : 1;
+        $data['halamanAktif'] = (isset($_GET['p']) && is_numeric($_GET['p'])) ? (int) $_GET['p'] : 1;
 
         $offset = ($data['halamanAktif'] - 1) * $data['limit'];
 
@@ -187,6 +187,7 @@ class DetailBarang extends Controller
 
             $this->view('templates/header', $data);
             $this->view('DetailBarang/print', $data);
+            $this->view('templates/footer');
         } else {
             Flasher::setFlash('Gagal', 'Pilih minimal satu data barang untuk dicetak.', '', 'danger');
             header('Location: ' . BASEURL . 'DetailBarang');
@@ -238,8 +239,8 @@ class DetailBarang extends Controller
     public function hapusMaster($type, $id)
     {
         $tableMap = [
-            'jenis'  => 'mst_jenis_barang',
-            'merek'  => 'mst_merek_barang',
+            'jenis' => 'mst_jenis_barang',
+            'merek' => 'mst_merek_barang',
             'lokasi' => 'mst_lokasi_penyimpanan',
             'status' => 'mst_status',
             'satuan' => 'mst_satuan'
@@ -324,5 +325,99 @@ class DetailBarang extends Controller
         }
 
         $this->view('DetailBarang/PrintUnit', $data);
+    }
+
+    public function cetakPdf()
+    {
+        if (isset($_POST['id_barang']) && !empty($_POST['id_barang'])) {
+            $ids_barang = $_POST['id_barang'];
+
+            // Handle if id_barang is a JSON string (from formCheckbox in script.js) or array
+            if (!is_array($ids_barang)) {
+                $decoded = json_decode($ids_barang, true);
+                if (is_array($decoded)) {
+                    $ids_barang = $decoded;
+                } else {
+                    // If basic comma separated string
+                    $ids_barang = explode(',', $ids_barang);
+                }
+            }
+
+            if (is_array($ids_barang)) {
+                $ids_barang = array_map(['IdObfuscator', 'decode'], $ids_barang);
+            }
+
+            // Filter out false values from decode
+            $ids_barang = array_filter($ids_barang);
+
+            if (empty($ids_barang)) {
+                header('Location: ' . BASEURL . 'DetailBarang');
+                exit;
+            }
+
+            $data['dataCetak'] = $this->model('Detail_barang_model')->cetak($ids_barang);
+            $data['judul'] = 'Laporan Detail Barang';
+
+            // Render view to variable
+            ob_start();
+            $this->view('DetailBarang/print_pdf', $data);
+            $html = ob_get_clean();
+
+            // Dompdf configuration
+            $options = new \Dompdf\Options();
+            $options->set('isRemoteEnabled', true);
+            $options->set('defaultFont', 'Helvetica');
+            $dompdf = new \Dompdf\Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('Legal', 'landscape');
+            $dompdf->render();
+            $dompdf->stream('Laporan_Inventaris_Barang.pdf', ["Attachment" => 1]);
+        } else {
+            // Fallback if accessed directly without POST
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
+    }
+
+    public function cetakExcel()
+    {
+        if (isset($_POST['id_barang']) && !empty($_POST['id_barang'])) {
+            $ids_barang = $_POST['id_barang'];
+
+            // Handle if id_barang is a JSON string or array (reuse logic)
+            if (!is_array($ids_barang)) {
+                $decoded = json_decode($ids_barang, true);
+                if (is_array($decoded)) {
+                    $ids_barang = $decoded;
+                } else {
+                    $ids_barang = explode(',', $ids_barang);
+                }
+            }
+
+            if (is_array($ids_barang)) {
+                $ids_barang = array_map(['IdObfuscator', 'decode'], $ids_barang);
+            }
+
+            $ids_barang = array_filter($ids_barang);
+
+            if (empty($ids_barang)) {
+                header('Location: ' . BASEURL . 'DetailBarang');
+                exit;
+            }
+
+            $data['dataCetak'] = $this->model('Detail_barang_model')->cetak($ids_barang);
+            $data['judul'] = 'Laporan Detail Barang';
+
+            // Set headers for Excel download
+            header("Content-Type: application/vnd.ms-excel");
+            header("Content-Disposition: attachment; filename=Laporan_Inventaris_Barang.xls");
+            header("Pragma: no-cache");
+            header("Expires: 0");
+
+            $this->view('DetailBarang/print_excel', $data);
+        } else {
+            header('Location: ' . BASEURL . 'DetailBarang');
+            exit;
+        }
     }
 }

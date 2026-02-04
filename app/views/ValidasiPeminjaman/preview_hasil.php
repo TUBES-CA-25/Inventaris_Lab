@@ -31,10 +31,10 @@
         <div class="col-lg-10">
 
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <!-- <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Hasil Stempel</h6>
                     <span class="badge badge-success px-3 py-2">Status: Disetujui</span>
-                </div>
+                </div> -->
 
                 <div class="card-body">
                     <div class="alert alert-warning text-center">

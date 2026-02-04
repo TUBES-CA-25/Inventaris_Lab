@@ -65,69 +65,96 @@ $isEdit = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    // --- UPDATE SCRIPT SWEETALERT (AUTO DETECT EDIT / NEW ITEM) ---
     document.addEventListener("DOMContentLoaded", function() {
         
-        // Ambil nilai dari variabel PHP $isEdit yang kita buat di baris atas tadi
-        const isEditMode = <?= json_encode($isEdit); ?>;
+        // 1. Ambil Status dari PHP
+        const isEditMode = <?= $isEdit ? 'true' : 'false'; ?>;
+        // Cek apakah array barang_selected tidak kosong
+        const hasItems   = <?= !empty($data['barang_selected']) ? 'true' : 'false'; ?>;
         
-        console.log("Status Edit Mode:", isEditMode); // Cek console browser Anda
-
-        if (isEditMode === true) {
+        // JALANKAN LOGIKA JIKA: (Sedang Edit) ATAU (Peminjaman Baru & Ada Barang)
+        if (isEditMode || hasItems) {
             
-            // Gunakan Event Delegation pada BODY agar menangkap klik di Sidebar juga
-            document.body.addEventListener('click', function(e) {
-                
-                // Cari elemen <a> (link) terdekat dari yang diklik
-                const link = e.target.closest('a');
+            const links = document.querySelectorAll('a');
+            const form = document.getElementById('formPeminjaman');
 
-                // Jika bukan link, abaikan
-                if (!link) return;
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const targetUrl = this.getAttribute('href');
 
-                const targetUrl = link.getAttribute('href');
+                    // --- FILTER LINK AMAN (YANG TIDAK PERLU DICEGAT) ---
+                    if (!targetUrl || targetUrl === '#' || targetUrl.startsWith('javascript')) return;
+                    if (this.hasAttribute('data-toggle') || this.hasAttribute('data-target')) return; // Modal Logout
+                    if (this.id === 'btnLinkHapus' || this.classList.contains('btn-modal-delete')) return; // Hapus Item
+                    if (targetUrl.includes('hapusItem')) return; // Aksi Hapus Item PHP
+                    if (this.classList.contains('btn-safe-action')) return; // Tombol Tambah Barang
+                    if (targetUrl === '<?= BASEURL; ?>Peminjaman' || targetUrl === '<?= BASEURL; ?>Peminjaman/') return; // Balik ke Katalog
 
-                // A. WHITELIST: Abaikan link kosong/hash/javascript
-                if (!targetUrl || targetUrl === '#' || targetUrl.startsWith('javascript')) return;
+                    // --- CEGAT NAVIGASI ---
+                    e.preventDefault(); 
+                    e.stopImmediatePropagation(); 
 
-                // B. WHITELIST: Tombol "Pinjam" (PENTING: Biarkan user menambah barang)
-                // Kita cek class 'btn-pinjam-now' yang ada di tombol pinjam
-                if (link.classList.contains('btn-pinjam-now')) return;
+                    // 2. TENTUKAN KONTEN SWEETALERT BERDASARKAN KONDISI
+                    let swalTitle, swalText, btnConfirmText, btnDenyText, denyUrl;
 
-                // C. WHITELIST: Tombol Logout / Modal (PENTING: Biarkan modal muncul)
-                if (link.hasAttribute('data-toggle') || link.hasAttribute('data-target')) return;
-                
-                // D. WHITELIST: Link ke Form Peminjaman sendiri
-                if (targetUrl.includes('Peminjaman/formPeminjaman')) return;
-
-                // --- BLOKIR NAVIGASI & TAMPILKAN POPUP ---
-                e.preventDefault();
-                e.stopImmediatePropagation(); // Hentikan script lain (seperti loader)
-
-                Swal.fire({
-                    title: 'Batal Memilih Barang?',
-                    text: "Anda sedang dalam mode Edit/Tambah barang. Keluar sekarang akan membatalkan proses pemilihan.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    showDenyButton: true,
-                    confirmButtonColor: '#d33',     // Merah (Keluar)
-                    denyButtonColor: '#0d1b3e',     // Navy (Kembali ke Form)
-                    cancelButtonColor: '#6e7881',   // Abu (Tetap Disini)
-                    confirmButtonText: 'Keluar & Batal Edit',
-                    denyButtonText: 'Kembali ke Form',
-                    cancelButtonText: 'Tetap Disini'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // OPSI 1: KELUAR & HAPUS SESI EDIT
-                        window.location.href = '<?= BASEURL; ?>Peminjaman/batalEdit';
+                    if (isEditMode) {
+                        // KONDISI A: SEDANG EDIT
+                        swalTitle      = 'Keluar dari Edit Mode?';
+                        swalText       = 'Perubahan yang belum disimpan akan hilang.';
                         
-                    } else if (result.isDenied) {
-                        // OPSI 2: BALIK KE FORM (Tanpa nambah barang)
-                        window.location.href = '<?= BASEURL; ?>Peminjaman/formPeminjaman';
-                        
+                        btnConfirmText = 'Simpan Perubahan'; // Tombol Navy
+                        btnDenyText    = 'Batal Edit';       // Tombol Putih
+                        denyUrl        = '<?= BASEURL; ?>Peminjaman/batalEdit'; // Reset Edit
+
                     } else {
-                        // OPSI 3: DIAM (Tutup popup)
+                        // KONDISI B: PEMINJAMAN BARU (ADA BARANG)
+                        swalTitle      = 'Batalkan Peminjaman?';
+                        swalText       = 'Anda sudah memilih barang. Keluar sekarang akan menghapus daftar barang.';
+                        
+                        btnConfirmText = 'Ajukan Sekarang';  // Tombol Navy
+                        btnDenyText    = 'Hapus Daftar';     // Tombol Putih
+                        denyUrl        = '<?= BASEURL; ?>Peminjaman/batal'; // Reset Keranjang (Fungsi baru di Langkah 1)
                     }
+
+                    // 3. TAMPILKAN SWEETALERT CUSTOM
+                    Swal.fire({
+                        title: swalTitle,
+                        text: swalText,
+                        icon: 'warning',
+                        
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        showConfirmButton: true,
+                        
+                        confirmButtonText: btnConfirmText,
+                        denyButtonText: btnDenyText,
+                        cancelButtonText: 'Kembali', // Tetap di halaman (X)
+
+                        // Matikan Style Bawaan
+                        buttonsStyling: false,
+                        
+                        // CLASS CSS (Menggunakan class tombol asli Anda)
+                        customClass: {
+                            confirmButton: 'btn-send', // Navy (Class tombol Submit Anda)
+                            denyButton: 'btn-back',    // Putih (Class tombol Kembali Anda)
+                            cancelButton: 'btn btn-secondary', 
+                            actions: 'gap-2'           // Jarak antar tombol (Bootstrap 5)
+                        }
+
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // TOMBOL NAVY -> KIRIM FORM
+                            if(form) form.submit();
+                        } else if (result.isDenied) {
+                            // TOMBOL PUTIH -> RESET / BATALKAN
+                            window.location.href = denyUrl;
+                        } else {
+                            // TOMBOL CANCEL -> DIAM
+                        }
+                    });
                 });
-            }, true); // 'true' = Capture Phase (Prioritas Tinggi)
+            });
         }
     });
 </script>

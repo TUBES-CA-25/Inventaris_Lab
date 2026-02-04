@@ -331,4 +331,12 @@ class Peminjaman extends Controller
         header('Location: ' . BASEURL . 'Riwayat');
         exit;
     }
+
+    public function batal()
+    {
+        if (!isset($_SESSION)) session_start();
+        unset($_SESSION['keranjang']);
+        header('Location: ' . BASEURL . 'Peminjaman');
+        exit;
+    }
 }
