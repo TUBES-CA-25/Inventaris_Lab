@@ -59,5 +59,16 @@ class Profil extends Controller {
         header('Location: ' . BASEURL . 'Profil');
         exit;
     }
+
+    public function gantiPassword() {
+        if ($this->model('User_model')->gantiPasswordUser($_POST) > 0) {
+            Flasher::setFlash('Password', 'berhasil', 'diubah', 'success');
+        } else {
+            // Pesan error akan diatur oleh model (misal: password lama salah)
+            Flasher::setFlash('Password', 'gagal', 'diubah', 'danger');
+        }
+        header('Location: ' . BASEURL . 'Profil');
+        exit;
+    }
     
 }

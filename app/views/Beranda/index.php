@@ -55,7 +55,7 @@ if (!isset($_SESSION['login'])) {
                     </div>
 
                     <div class="col-12 col-sm-auto">
-                        <button class="btn btn-primary w-100" onclick="updateCharts()">Tampilkan</button>
+                        <button class="btn-back w-100" onclick="updateCharts()">Tampilkan</button>
                     </div>
                 </div>
             </div>
