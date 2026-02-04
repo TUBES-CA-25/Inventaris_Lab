@@ -217,14 +217,12 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
         document.getElementById('modalHapus').style.display = 'none';
     }
 
-    // --- FITUR INTERCEPT NAVIGASI (EDIT MODE & UNSAVED ITEMS) ---
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Cek Status
+        
         const isEditMode = <?= $isEdit ? 'true' : 'false'; ?>;
-        // Cek apakah ada barang yang sudah dipilih (array tidak kosong)
+
         const hasItems = <?= !empty($data['barang_selected']) ? 'true' : 'false'; ?>;
 
-        // Aktifkan intercept jika sedang Edit ATAU ada barang di list (tapi bukan mode edit)
         if (isEditMode || hasItems) {
 
             const links = document.querySelectorAll('a');
@@ -260,7 +258,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                         // KONDISI 2: MAU PINJAM (ADA BARANG)
                         swalTitle = 'Belum Mengajukan Barang!';
                         swalText = 'Anda memiliki barang di daftar. Ingin ajukan sekarang atau hapus daftar?';
-                        btnConfirmText = 'Ajukan Sekarang'; // Tombol Navy
+                        btnConfirmText = 'Pinjam'; // Tombol Navy
                         btnDenyText = 'Hapus Daftar'; // Tombol Putih
                         denyUrl = '<?= BASEURL; ?>Peminjaman/batal'; // Method untuk reset session barang (Pastikan method ini ada!)
                     }

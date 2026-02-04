@@ -5,8 +5,6 @@ if (!isset($_SESSION['login'])) {
 }
 ?>
 
-
-
 <div class="content">
     <div class="content-beranda">
         <h1 id="title">Detail Barang</h1>
@@ -130,7 +128,7 @@ if (!isset($_SESSION['login'])) {
 
                                 <td class="text-center">
                                     <div style="display: flex; justify-content: center; gap: 10px;">
-                                        <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])): ?>
+                                        <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3'])): ?>
                                             <!-- <a href="<?= BASEURL; ?>DetailBarang/ubah/<?= IdObfuscator::encode($item['id_barang']); ?>"
                                                 data-toggle="modal" data-target="#modalTambah"
                                                 data-id="<?= IdObfuscator::encode($row['id_barang']); ?>">

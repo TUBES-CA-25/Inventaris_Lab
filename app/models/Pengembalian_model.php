@@ -56,7 +56,7 @@ class Pengembalian_model
             LEFT JOIN trx_data_user u ON tu.id_user = u.id_user
             WHERE p.id_peminjaman = :id
             LIMIT 1");
-            
+
         $this->db->bind('id', $id_peminjaman);
         return $this->db->single();
     }
@@ -69,19 +69,19 @@ class Pengembalian_model
             $this->db->query("SELECT id_pengembalian FROM trx_pengembalian WHERE id_peminjaman = :id");
             $this->db->bind('id', $data['id_peminjaman']);
             $existing = $this->db->single();
-            
+
             $id_pengembalian = null;
 
             if ($existing) {
                 $id_pengembalian = $existing['id_pengembalian'];
-                
+
                 $query = "UPDATE trx_pengembalian SET 
                           tgl_pengembalian_aktual = :tgl, 
                           status_pengembalian = :st, 
                           keterangan = :ket,
                           detail_masalah = :detail
                           WHERE id_pengembalian = :id";
-                
+
                 $this->db->query($query);
                 $this->db->bind('tgl', $data['tgl_pengembalian_aktual']);
                 $this->db->bind('st', $data['status_pengembalian']);
@@ -94,7 +94,7 @@ class Pengembalian_model
                 $query = "INSERT INTO trx_pengembalian 
                           (id_peminjaman, tgl_pengembalian_aktual, status_pengembalian, keterangan, detail_masalah) 
                           VALUES (:idp, :tgl, :st, :ket, :detail)";
-                
+
                 $this->db->query($query);
                 $this->db->bind('idp', $data['id_peminjaman']);
                 $this->db->bind('tgl', $data['tgl_pengembalian_aktual']);
@@ -106,7 +106,7 @@ class Pengembalian_model
             }
 
             $id_petugas_aksi = isset($data['id_petugas']) ? $data['id_petugas'] : $_SESSION['id_user'];
-            
+
             $foto_log = !empty($data['bukti_foto']) ? 'uploads/pengembalian/' . $data['bukti_foto'] : null;
 
             $queryLog = "INSERT INTO trx_pemeriksa_pengembalian (id_pengembalian, id_user, bukti_foto) 
@@ -120,7 +120,7 @@ class Pengembalian_model
             if (isset($data['kondisi']) && is_array($data['kondisi'])) {
                 foreach ($data['kondisi'] as $id_detail_pinjam => $kondisi_item) {
                     $ket_item = $data['ket_item'][$id_detail_pinjam] ?? '-';
-                    
+
                     $this->db->query("SELECT id_detail_pengembalian FROM trx_detail_pengembalian WHERE id_pengembalian = :id_peng AND id_detail_peminjaman = :id_dp");
                     $this->db->bind('id_peng', $id_pengembalian);
                     $this->db->bind('id_dp', $id_detail_pinjam);
@@ -230,7 +230,8 @@ class Pengembalian_model
 
     public function getLogRiwayat($id_pengembalian)
     {
-        if (empty($id_pengembalian)) return [];
+        if (empty($id_pengembalian))
+            return [];
 
         $query = "SELECT 
                     tpp.waktu_periksa,
@@ -246,5 +247,47 @@ class Pengembalian_model
         return $this->db->resultSet();
     }
 
-    
+
+    public function simpanTolakPengembalian($id_peminjaman, $alasan)
+    {
+        try {
+            $this->db->beginTransaction();
+
+            $queryMain = "UPDATE trx_peminjaman SET 
+                          status = 'Tolak Pengembalian', 
+                          keterangan_tolak = :ket 
+                          WHERE id_peminjaman = :id";
+
+            $pesan_lengkap = "[MASALAH PENGEMBALIAN] " . $alasan;
+
+            $this->db->query($queryMain);
+            $this->db->bind('ket', $pesan_lengkap);
+            $this->db->bind('id', $id_peminjaman);
+            $this->db->execute();
+
+            $this->db->query("SELECT id_pengembalian FROM trx_pengembalian WHERE id_peminjaman = :id");
+            $this->db->bind('id', $id_peminjaman);
+            $existing = $this->db->single();
+
+            $id_pengembalian = null;
+
+            if ($existing) {
+                $id_pengembalian = $existing['id_pengembalian'];
+                $this->db->query("UPDATE trx_pengembalian SET status_pengembalian = 'Periksa Ulang' WHERE id_pengembalian = :id");
+                $this->db->bind('id', $id_pengembalian);
+                $this->db->execute();
+            } else {
+                $this->db->query("INSERT INTO trx_pengembalian (id_peminjaman, status_pengembalian) VALUES (:id, 'Periksa Ulang')");
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+                $id_pengembalian = $this->db->lastInsertId();
+            }
+
+            $this->db->commit();
+            return 1;
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            return 0;
+        }
+    }
 }

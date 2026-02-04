@@ -45,14 +45,14 @@
                 <span>Beranda</span>
             </a>
 
-            <?php if (isset($_SESSION['login'])) : ?>
+            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2', '3', '4'])) : ?>
                 <a href="<?= BASEURL; ?>DetailBarang" class="menu-item <?= ($data['judul'] == 'Detail Barang') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-boxes-stacked"></i>
                     <span>Detail Barang</span>
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login'])) : ?>
+            <?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['3', '4', '5', '6', '7'])) : ?>
                 <a href="<?= BASEURL; ?>Peminjaman" class="menu-item <?= ($data['judul'] == 'Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-receipt"></i>
                     <span>Peminjaman</span>

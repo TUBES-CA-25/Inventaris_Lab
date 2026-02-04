@@ -127,18 +127,14 @@ class Detail_barang_model
         } else {
             $query = "";
 
-            // Logic Insert Berdasarkan Tabel
             if ($table == 'mst_jenis_barang') {
                 // Bersihkan input (Hanya huruf a-z, jadikan kapital)
                 $cleanVal = strtoupper(preg_replace("/[^A-Za-z]/", '', $value));
 
                 $grup = !empty($extraInput) ? strtoupper($extraInput) : 'C';
 
-                // [PERUBAHAN DI SINI]
-                // Mengambil 3 huruf pertama dari nama barang
                 $shortCode = substr($cleanVal, 0, 3);
 
-                // Penanganan jika nama barang kurang dari 3 huruf (Misal: "PC" -> "PCX")
                 if (strlen($shortCode) < 3) {
                     $shortCode = str_pad($shortCode, 3, 'X');
                 }
@@ -321,7 +317,7 @@ class Detail_barang_model
                 "Total: " . $totalInput . " Unit\n" .
                 "------------------------\n" .
                 "RINCIAN UNIT:\n" .
-                $listDetailString; 
+                $listDetailString;
 
             $qrMasterName = "MASTER_" . uniqid() . ".png";
             QRcode::png($qrContentMaster, $pathQr . $qrMasterName, "M", 4, 4);
@@ -411,11 +407,9 @@ class Detail_barang_model
         return $this->db->single();
     }
 
-    // --- HAPUS SATU BATCH (SPESIFIKASI + SEMUA UNITNYA) ---
     public function hapusBarang($id_barang)
     {
         try {
-            // 1. Cari ID Spesifikasi dari barang yang dipilih
             $this->db->query("SELECT id_spesifikasi FROM trx_barang WHERE id_barang = :id");
             $this->db->bind("id", $id_barang);
             $row = $this->db->single();
@@ -426,19 +420,14 @@ class Detail_barang_model
 
             $idSpesifikasi = $row['id_spesifikasi'];
 
-            // 2. Ambil Data File yang Harus Dihapus (Foto Barang & QR Master)
             $this->db->query("SELECT foto_barang, qr_code_spesifikasi FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataSpek = $this->db->single();
 
-            // 3. Ambil Semua QR Code Unit (Anak-anaknya)
             $this->db->query("SELECT qr_code FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataUnit = $this->db->resultSet();
 
-            // --- PROSES HAPUS FILE FISIK ---
-
-            // Hapus Foto Utama
             if (!empty($dataSpek['foto_barang']) && file_exists($dataSpek['foto_barang'])) {
                 @unlink($dataSpek['foto_barang']);
             }
@@ -453,14 +442,9 @@ class Detail_barang_model
                 }
             }
 
-            // --- PROSES HAPUS DATABASE ---
-
-            // 4. Hapus Semua Unit di trx_barang (Anak)
             $this->db->query("DELETE FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
-
-            // 5. Hapus Header di mst_spesifikasi (Induk)
             $this->db->query("DELETE FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
@@ -686,9 +670,9 @@ class Detail_barang_model
     }
 
     public function cariDataBarang()
-{
-    $keyword = $_POST['keyword'];
-    $query = "SELECT 
+    {
+        $keyword = $_POST['keyword'];
+        $query = "SELECT 
                 MAX(b.id_barang) as id_barang, 
                 spek.kode_barang, 
                 j.sub_barang, 
@@ -708,12 +692,12 @@ class Detail_barang_model
                 OR m.nama_merek_barang LIKE :keyword
                 OR spek.spesifikasi_barang LIKE :keyword
                 OR spek.kode_barang LIKE :keyword
-              GROUP BY spek.id_spesifikasi"; 
+              GROUP BY spek.id_spesifikasi";
 
-    $this->db->query($query);
-    $this->db->bind('keyword', "%$keyword%");
-    return $this->db->resultSet();
-}
+        $this->db->query($query);
+        $this->db->bind('keyword', "%$keyword%");
+        return $this->db->resultSet();
+    }
 
     public function cetak($data)
     {
