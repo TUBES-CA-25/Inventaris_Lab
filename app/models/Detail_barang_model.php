@@ -299,8 +299,6 @@ class Detail_barang_model
                 // Generate QR Unit (Virtual Code)
                 $kodeLengkapVirtual = $kodeInisial . '/' . $i . '/' . $totalInput;
 
-                // Tambahkan info ke string list Master
-                // Format: "1. [Kode] - Kondisi - Lokasi"
                 $listDetailString .= $i . ". [" . $kodeLengkapVirtual . "] - " . $namaKondisi . " - " . $namaLokasi . "\n";
 
                 $qrContentUnit = "Kode: " . $kodeLengkapVirtual . "\n" .
@@ -317,15 +315,13 @@ class Detail_barang_model
                 $this->db->execute();
             }
 
-            // 5. GENERATE QR MASTER (LENGKAP DENGAN DATA ANAK)
-            // Dilakukan SETELAH loop agar string list lengkap
             $qrContentMaster = "=== BATCH MASTER ===\n" .
                 "Kode Batch: " . $kodeInisial . "\n" .
                 "Jenis: " . $namaJenis . " | " . $namaMerek . "\n" .
                 "Total: " . $totalInput . " Unit\n" .
                 "------------------------\n" .
                 "RINCIAN UNIT:\n" .
-                $listDetailString; // <--- Masukkan string panjang di sini
+                $listDetailString; 
 
             $qrMasterName = "MASTER_" . uniqid() . ".png";
             QRcode::png($qrContentMaster, $pathQr . $qrMasterName, "M", 4, 4);
@@ -355,7 +351,7 @@ class Detail_barang_model
                 -- Ambil data dari Master Spesifikasi
                 spek.kode_barang, 
                 spek.spesifikasi_barang,
-                spek.jumlah_total as jumlah_barang, -- Alias agar sesuai tampilan index.php
+                spek.jumlah_total as jumlah_barang, 
                 spek.foto_barang,
 
                 -- Data Master Lainnya
@@ -690,36 +686,34 @@ class Detail_barang_model
     }
 
     public function cariDataBarang()
-    {
-        $keyword = $_POST['keyword'];
-        $query = "SELECT 
-                b.id_barang, b.urutan_unit, b.tgl_pengadaan_barang, b.keterangan_label,
-                b.deskripsi_detail_lokasi, b.status_peminjaman, b.qr_code,
-                spek.kode_barang, spek.spesifikasi_barang, spek.jumlah_total as jumlah_barang, spek.foto_barang,
-                j.sub_barang, m.nama_merek_barang, s.nama_satuan,
-                k.kondisi_barang, l.nama_lokasi_penyimpanan, st.status
+{
+    $keyword = $_POST['keyword'];
+    $query = "SELECT 
+                MAX(b.id_barang) as id_barang, 
+                spek.kode_barang, 
+                j.sub_barang, 
+                m.nama_merek_barang, 
+                spek.spesifikasi_barang,
+                spek.jumlah_total,
+                n.nama_satuan,
+                MAX(k.kondisi_barang) as kondisi_barang
               FROM trx_barang b
               JOIN mst_spesifikasi spek ON b.id_spesifikasi = spek.id_spesifikasi
               JOIN mst_jenis_barang j ON spek.id_jenis_barang = j.id_jenis_barang
               JOIN mst_merek_barang m ON spek.id_merek_barang = m.id_merek_barang
-              JOIN mst_satuan s ON spek.id_satuan = s.id_satuan
+              JOIN mst_satuan n ON spek.id_satuan = n.id_satuan
               LEFT JOIN mst_kondisi_barang k ON b.id_kondisi_barang = k.id_kondisi_barang
-              LEFT JOIN mst_lokasi_penyimpanan l ON b.id_lokasi_penyimpanan = l.id_lokasi_penyimpanan
-              LEFT JOIN mst_status st ON b.id_status = st.id_status
-              
               WHERE 
                 j.sub_barang LIKE :keyword
                 OR m.nama_merek_barang LIKE :keyword
-                OR l.nama_lokasi_penyimpanan LIKE :keyword
-                OR b.status_peminjaman LIKE :keyword
-                OR b.tgl_pengadaan_barang LIKE :keyword
-                OR k.kondisi_barang LIKE :keyword
-                OR spek.kode_barang LIKE :keyword";
+                OR spek.spesifikasi_barang LIKE :keyword
+                OR spek.kode_barang LIKE :keyword
+              GROUP BY spek.id_spesifikasi"; 
 
-        $this->db->query($query);
-        $this->db->bind('keyword', "%$keyword%");
-        return $this->db->resultSet();
-    }
+    $this->db->query($query);
+    $this->db->bind('keyword', "%$keyword%");
+    return $this->db->resultSet();
+}
 
     public function cetak($data)
     {

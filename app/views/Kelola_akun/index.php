@@ -129,7 +129,7 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 700px;">
         <div class="modal-content modal-content-custom">
 
-            <button type="button" class="close btn-close-custom" data-dismiss="modal" aria-label="Close">
+            <button type="button" class="close btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
 

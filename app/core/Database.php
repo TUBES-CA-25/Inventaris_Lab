@@ -121,7 +121,7 @@ class Database
     }
 
     public function beginTransaction()
-    {
+    {   
         return $this->dbh->beginTransaction();
     }
 

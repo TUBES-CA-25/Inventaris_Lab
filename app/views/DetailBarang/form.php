@@ -10,13 +10,6 @@ $title = $isEdit ? "Ubah Data Barang" : "Tambah Barang Baru";
 $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailBarang/tambahBarang";
 ?>
 
-<link rel="stylesheet" href="<?= BASEURL; ?>css/form.css">
-
-<style>
-
-
-</style>
-
 <div class="content">
     <div class="container-fluid p-4">
 
@@ -58,7 +51,7 @@ $formAction = $isEdit ? BASEURL . "DetailBarang/ubahBarang" : BASEURL . "DetailB
                             </div>
 
                             <div id="input-container-jenis" class="input-container-hidden">
-                                <div class="input-row">
+                                                <div class="input-row">
                                     <input type="text" name="sub_barang_baru" id="input-jenis" class="form-input flex-2" placeholder="Nama Jenis" disabled>
                                     <select name="grup_sub_baru" id="input-grup-jenis" class="form-select flex-1" disabled>
                                         <option value="">-- Grup --</option>

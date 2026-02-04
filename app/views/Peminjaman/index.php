@@ -157,4 +157,22 @@ $isEdit = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
             });
         }
     });
+
+    document.getElementById('customSearch').addEventListener('keyup', function() {
+    let keyword = this.value;
+    
+    // Gunakan Fetch API untuk mengirim keyword ke Controller
+    fetch('<?= BASEURL ?>DetailBarang/cari', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'keyword=' + encodeURIComponent(keyword)
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Ganti isi tbody dengan hasil pencarian
+        document.querySelector('#myTable tbody').innerHTML = html;
+    });
+});
 </script>

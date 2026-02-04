@@ -32,8 +32,11 @@ if (!isset($_SESSION['login'])) {
             </div>
 
             <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="customSearch" class="search-input" placeholder="Cari barang...">
+                <form action="<?= BASEURL ?>DetailBarang/cari" method="POST" style="display: flex; align-items: center; width: 100%;">
+                    <i class="fa-solid fa-magnifying-glass " style="margin-left: 10px;"></i>
+                    <input type="text" name="keyword" id="customSearch" class="ml-3 search-input" placeholder="Cari barang..." value="<?= isset($_POST['keyword']) ? $_POST['keyword'] : '' ?>">
+                    <button type="submit" style="display: none;"></button>
+                </form>
             </div>
         </div>
 
@@ -108,7 +111,7 @@ if (!isset($_SESSION['login'])) {
                                 <td style="text-transform: capitalize;"><?= $row['sub_barang']; ?></td>
                                 <td style="text-transform: capitalize;"><?= $row['nama_merek_barang']; ?></td>
                                 <td><?= !empty($row['spesifikasi_barang']) ? $row['spesifikasi_barang'] : '-'; ?></td>
-                                <td class="text-center"><?= $row['jumlah_barang'] ?? '0'; ?></td>
+                                <td class="text-center"><?= $row['jumlah_total'] ?? '0'; ?></td>
                                 <td class="text-center"><?= $row['nama_satuan'] ?? '-'; ?></td>
 
                                 <td class="text-center">
