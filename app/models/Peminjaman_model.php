@@ -347,7 +347,7 @@ class Peminjaman_model
 
         $this->db->execute();
 
-        if ($status == 'dikembalikan') {
+        if ($status == 'dikembalikan' || $status == 'tolak peminjaman') {
 
             $this->db->query("SELECT id_barang FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
             $this->db->bind('id', $id_peminjaman);

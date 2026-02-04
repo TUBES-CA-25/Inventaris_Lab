@@ -298,12 +298,14 @@ class DetailBarang extends Controller
 
     public function prosesUbahUnit()
     {
+        $id_spesifikasi = $_POST['id_spesifikasi'];
         if ($this->model('Detail_barang_model')->updateUnit($_POST) > 0) {
             Flasher::setFlash('Unit Barang', 'berhasil', 'diubah', 'success');
         } else {
             Flasher::setFlash('Unit Barang', 'gagal', 'diubah', 'danger');
         }
-        header('Location: ' . BASEURL . 'DetailBarang/detail/' . IdObfuscator::encode($_POST['id_spesifikasi']));
+        // header('Location: ' . BASEURL . 'DetailBarang/detail/' . IdObfuscator::encode($id_spesifikasi));
+        header('Location: ' . BASEURL . 'DetailBarang/index');
         exit;
     }
 
