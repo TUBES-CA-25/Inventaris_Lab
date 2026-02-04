@@ -28,4 +28,3 @@ define('MAIL_USERNAME', 'andiahsanashuri@gmail.com'); // TODO: Ganti dengan emai
 define('MAIL_PASSWORD', 'jkdm otvp mwul jhbt');    // TODO: Ganti dengan App Password dari Google
 define('MAIL_FROM_NAME', 'InventarisLab_Email');
 define('VERIFICATION_LINK_EXPIRY', 24); // Durasi expired token dalam jam
-
