@@ -81,6 +81,11 @@
                 display: none !important;
             }
         }
+
+        /* Hide DataTables generated buttons as we use custom server-side forms */
+        .dt-buttons {
+            display: none !important;
+        }
     </style>
 </head>
 
