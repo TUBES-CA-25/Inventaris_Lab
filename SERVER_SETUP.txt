@@ -1,0 +1,55 @@
+# Panduan Setup Otomatisasi Email di Server (Linux/cPanel)
+
+Jika aplikasi ini di-hosting di server (Linux/Ubuntu/CentOS) atau Hosting CPanel, Anda tidak menggunakan Windows Task Scheduler. Sebagai gantinya, gunakan **Cron Job**.
+
+## 0. Cara Paling Mudah (Linux/Ubuntu/VPS)
+Saya sudah membuatkan script otomatis untuk Anda.
+1. Upload semua file project ke server.
+2. Buka terminal (SSH) dan masuk ke folder `app/services`:
+   ```bash
+   cd app/services
+   chmod +x install_cron.sh
+   ./install_cron.sh
+   ```
+Script ini akan otomatis mendeteksi lokasi PHP, mengatur permission, dan mendaftarkan jadwal email otomatis jam 8 pagi setiap hari.
+
+## 1. Setup Manual (Jika Cara 0 Gagal)
+Jika Anda ingin mengatur sendiri secara manual atau menggunakan cPanel:
+Script otomatisasi ada di:
+`/path/to/your/project/app/services/cron_job.php`
+
+## 2. Setup di cPanel (Hosting Biasa)
+1. Login ke cPanel hosting Anda.
+2. Cari menu **Cron Jobs** (biasanya di bagian Advanced).
+3. Di bagian "Add New Cron Job":
+   - **Common Settings**: Pilih "Once Per Day" (atau set jam 08:00 AM).
+   - **Command**: Masukkan perintah berikut (sesuaikan path):
+     ```bash
+     /usr/local/bin/php /home/username/public_html/Inventaris_Lab1/app/services/cron_job.php
+     ```
+   - *Catatan*: Path `/usr/local/bin/php` bisa berbeda tergantung hosting. Coba `/usr/bin/php` atau tanya support hosting.
+   - Path `/home/username/...` sesuaikan dengan lokasi file Anda di File Manager.
+
+## 3. Setup di VPS (Ubuntu/CentOS)
+1. Login via SSH.
+2. Ketik `crontab -e` untuk mengedit jadwal.
+3. Tambahkan baris ini di paling bawah (untuk jalan jam 8 pagi setiap hari):
+   ```bash
+   0 8 * * * /usr/bin/php /var/www/html/Inventaris_Lab1/app/services/cron_job.php >> /var/log/cron_inventaris.log 2>&1
+   ```
+4. Simpan dan keluar (Ctrl+X, Y, Enter).
+
+## 4. Test Manual di Server
+Anda bisa mencoba menjalankannya via terminal SSH untuk memastikan tidak ada error (Jalankan dari root project atau folder services, pastikan path benar):
+```bash
+php /var/www/html/Inventaris_Lab1/app/services/cron_job.php
+```
+Jika muncul output "[SUKSES]" atau "[SKIP]", berarti script berjalan lancar.
+
+## FAQ: Bedanya cron_job.php dan install_cron.sh?
+1. **cron_job.php (Si Pekerja)**:
+   - Ini adalah skript utama yang melakukan tugas (cek database, kirim email).
+   - Lokasi: `app/services/cron_job.php`
+2. **install_cron.sh (Si Tukang Setup)**:
+   - Ini hanya alat bantu untuk mendaftarkan jadwal (sekali pakai).
+   - Lokasi: `app/services/install_cron.sh`

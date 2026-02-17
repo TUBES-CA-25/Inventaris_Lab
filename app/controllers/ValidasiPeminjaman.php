@@ -6,7 +6,7 @@ class ValidasiPeminjaman extends Controller
         if (!isset($_SESSION))
             session_start();
 
-        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
+        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
@@ -67,7 +67,7 @@ class ValidasiPeminjaman extends Controller
 
     public function accKalab()
     {
-        if ($_SESSION['id_role'] != '1') {
+        if ($_SESSION['id_role'] != ROLE_KALAB) {
             Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
@@ -97,7 +97,7 @@ class ValidasiPeminjaman extends Controller
         }
         $role = $_SESSION['id_role'];
 
-        if ($role != '1' && $role != '2') {
+        if ($role != ROLE_KALAB && $role != ROLE_LABORAN) {
             Flasher::setFlash('Akses Ditolak', 'Anda tidak memiliki wewenang tanda tangan.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
@@ -105,7 +105,7 @@ class ValidasiPeminjaman extends Controller
 
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
-        if ($role == '1') {
+        if ($role == ROLE_KALAB) {
             $label_box = "TTD Kepala Lab (Huzain)";
             $warna_box = "rgba(78, 115, 223, 0.6)";
             $border_box = "#4e73df";
@@ -156,7 +156,7 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
-        if (!in_array($_SESSION['id_role'], ['1', '2'])) {
+        if (!in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
@@ -246,6 +246,24 @@ class ValidasiPeminjaman extends Controller
 
         Flasher::setFlash('Berhasil', 'Peminjaman disetujui. Barang telah dialokasikan otomatis.', '', 'success');
         header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+        exit;
+    }
+    public function kirimNotifikasi()
+    {
+        if (!in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
+
+        $jumlahTerikirm = $this->model('Notification_model')->prosesNotifikasiOtomatis();
+
+        if ($jumlahTerikirm > 0) {
+            Flasher::setFlash('Berhasil', "Total $jumlahTerikirm email notifikasi berhasil dikirim.", '', 'success');
+        } else {
+            Flasher::setFlash('Info', 'Tidak ada peminjaman yang perlu dinotifikasi saat ini.', '', 'info');
+        }
+
+        header('Location: ' . BASEURL . 'ValidasiPeminjaman');
         exit;
     }
 }

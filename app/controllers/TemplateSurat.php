@@ -41,7 +41,7 @@ class TemplateSurat extends Controller
         $data['id_peminjaman'] = $id_peminjaman;
 
         $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
-        $data['peminjaman'] = $this->peminjamanModel->getDetailValidasiDataPeminjaman($id_peminjaman);
+        $data['peminjaman'] = $this->model('ValidasiPeminjaman_model')->getDetailValidasiDataPeminjaman($id_peminjaman);
         $data['details'] = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
 
         if (!$data['peminjaman']) {

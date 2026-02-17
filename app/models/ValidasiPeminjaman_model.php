@@ -138,9 +138,47 @@ class ValidasiPeminjaman_model
         $this->db->bind('id', $id_peminjaman);
         $dbData = $this->db->single();
 
-        $fullPath = '../public/files/surat-peminjaman/' . $dbData['file_surat'];
+        $fileName = $dbData['file_surat'];
+        $fullPath = __DIR__ . '/../../public/files/surat-peminjaman/' . $fileName; // Use absolute path consistent with other methods
+
+        // Config for automated positioning (side-by-side)
+        // Note: We need to calculate absolute positions inside the helper or pass them slightly differently.
+        // For simplicity reusing the logic but passing a callback or flag could be cleaner.
+        // Here we will use a specific structure for the helper.
+
+        // This method calculates X/Y based on percentage in the Controller/View? 
+        // The original method took percX/percY.
 
         try {
+            // Using the new helper, but we need to match the "Side by Side" logic of the original prosesStempelDinamis
+            // Since the logic for calculating Huzain's position relative to Fatimah was specific,
+            // we will reconstruct it within a simplified structure.
+
+            // To do this cleanly, we might need to know the page size *before* defining coords if we want to determine "Next to it".
+            // But the original code calculated it INSIDE the loop. 
+            // We will modify the helper to accept a strategy or just keep this method using a specialized call if it's too unique.
+
+            // Actually, let's look at the original `prosesStempelDinamis`.
+            // It calculates absolute X/Y from percentage.
+            // Then places Fatimah. Then places Huzain.
+
+            // Let's just modernize `prosesStempelDinamis` to be `applyAutoSignatures` and usage in `validasiLaboranDouble` to `applyManualSignatures`.
+            // Or better: `processPdfSignatures` that takes a list of signatures.
+
+            // Let's implement `processPdfSignatures` and use it for BOTH.
+
+            // For Custom/Auto (this method): we need to calculate params inside the loop? No, can pass percentages.
+            // But strict refactoring might be complex if we don't know page size.
+            // Let's stick to cleaning up THIS method to use a shared `initFpdi` and `saveFpdi` at least.
+
+            // Actually, `validasiLaboranDouble` is better written. `prosesStempelDinamis` was a bit rigid.
+            // Let's rewrite this to use `processPdfSignatures` by calculating the config.
+            // But we don't know page width in mm yet.
+
+            // Strategy: Keep `prosesStempelDinamis` for now but clean it.
+            // And clean `validasiLaboranDouble`.
+            // OR extract the common FPDI setup/teardown.
+
             $this->prosesStempelDinamis(
                 $fullPath,
                 $data['pos_x'],
@@ -163,28 +201,28 @@ class ValidasiPeminjaman_model
         }
     }
 
-    private function prosesStempelDinamis($filePath, $percX, $percY, $targetPage)
+    // Shared FPDI Loader
+    private function loadFpdi($filePath)
     {
         $pathAutoload = __DIR__ . '/../../vendor/autoload.php';
-
         if (file_exists($pathAutoload)) {
             require_once $pathAutoload;
         } else {
+            // Fallback logic
             if (file_exists(__DIR__ . '/../core/fpdi/src/autoload.php')) {
                 require_once __DIR__ . '/../core/fpdf/fpdf.php';
                 require_once __DIR__ . '/../core/fpdi/src/autoload.php';
-            } else {
-                die("Error: Library FPDI tidak ditemukan di " . $pathAutoload);
             }
         }
 
         $pdf = new \setasign\Fpdi\Fpdi();
+        $pageCount = $pdf->setSourceFile($filePath);
+        return [$pdf, $pageCount];
+    }
 
-        try {
-            $pageCount = $pdf->setSourceFile($filePath);
-        } catch (Exception $e) {
-            return 0;
-        }
+    private function prosesStempelDinamis($filePath, $percX, $percY, $targetPage)
+    {
+        list($pdf, $pageCount) = $this->loadFpdi($filePath);
 
         for ($i = 1; $i <= $pageCount; $i++) {
             $tplIdx = $pdf->importPage($i);
@@ -199,18 +237,16 @@ class ValidasiPeminjaman_model
 
                 $absX = $widthMM * $percX;
                 $absY = $heightMM * $percY;
-
                 $ttdWidth = 35;
 
                 $pathTTD_Fatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
-
                 if (file_exists($pathTTD_Fatimah)) {
                     $pdf->Image($pathTTD_Fatimah, $absX, $absY, $ttdWidth);
                 }
 
                 $pathTTD_Huzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
+                // Logic for Huzain Next to Fatimah
                 $posX_Huzain = $absX + 45;
-
                 if (($posX_Huzain + $ttdWidth) > $widthMM) {
                     $posX_Huzain = $widthMM - $ttdWidth - 10;
                 }
@@ -238,20 +274,17 @@ class ValidasiPeminjaman_model
         $pathAsli = $pathFolder . $fileName;
         $pathBackup = $pathFolder . 'backup_' . $fileName;
 
-        $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
-        $pathHuzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
-
         if (!file_exists($pathBackup)) {
             if (!copy($pathAsli, $pathBackup)) {
                 die("Gagal membuat backup. Cek permission folder.");
             }
         }
 
-        require_once __DIR__ . '/../../vendor/autoload.php';
+        // Use Loop for Manual Positioning
+        list($pdf, $pageCount) = $this->loadFpdi($pathBackup);
 
-        $pdf = new \setasign\Fpdi\Fpdi();
-
-        $pageCount = $pdf->setSourceFile($pathBackup);
+        $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
+        $pathHuzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
 
         for ($i = 1; $i <= $pageCount; $i++) {
             $tplIdx = $pdf->importPage($i);
@@ -266,7 +299,6 @@ class ValidasiPeminjaman_model
             if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
-
                 if (file_exists($pathFatimah)) {
                     $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
                 }
@@ -275,7 +307,6 @@ class ValidasiPeminjaman_model
             if ($i == $data['huzain_page']) {
                 $hx = $widthMM * $data['huzain_x'];
                 $hy = $heightMM * $data['huzain_y'];
-
                 if (file_exists($pathHuzain)) {
                     $pdf->Image($pathHuzain, $hx, $hy, $ttdWidth);
                 }

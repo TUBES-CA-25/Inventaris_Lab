@@ -1,242 +1,179 @@
-# SOP Pengerjaan Project Menggunakan Git
+# Inventaris Lab
 
-## Struktur Branch
+**Inventaris Lab** adalah aplikasi berbasis web untuk manajemen peminjaman dan inventarisasi aset laboratorium. Aplikasi ini memudahkan pengelolaan barang, peminjaman oleh mahasiswa/dosen, serta validasi dan pelaporan oleh kepala laboratorium dan laboran.
 
-* **main** : Branch utama (hasil akhir / stabil)
-* **ahsan** : Backend Developer
-* **rifki** : Frontend Developer
-* **farah** : Frontend Developer
+---
 
-## Aturan Utama
+## 🌟 Fitur Utama
 
-1. Tidak boleh mengerjakan atau commit langsung di branch `main`.
-2. Setiap developer hanya bekerja di branch masing-masing.
-3. Branch `main` hanya diisi hasil merge dari branch `ahsan`, `rifki`, dan `farah`.
-4. Selalu update dari `main` sebelum mulai mengerjakan fitur.
+*   **Manajemen Aset**: Pencatatan barang masuk, kondisi barang (baik/rusak), dan lokasi penyimpanan.
+*   **Peminjaman & Pengembalian**: Alur peminjaman yang terstruktur mulai dari pengajuan, validasi, hingga pengembalian.
+*   **Validasi Berjenjang**: Persetujuan peminjaman oleh Laboran dan Kepala Laboratorium.
+*   **Notifikasi Otomatis**: Integrasi WhatsApp (Fonnte) dan Email (PHPMailer) untuk notifikasi status peminjaman.
+*   **Laporan & Cetak**: Cetak bukti peminjaman (PDF) dan laporan inventaris (Excel/PDF).
+*   **Log Aktivitas**: Rekam jejak aktivitas pengguna untuk keamanan dan audit.
+*   **Role-Based Access Control**: Hak akses yang berbeda untuk setiap role (Admin/Kepala Lab, Laboran, Dosen, Mahasiswa).
 
-## Pembagian Tugas
+---
 
-### Backend (ahsan)
+## 🛠️ Teknologi yang Digunakan
 
-* Controller
-* Model
-* Database
-* Logic dan validasi
+*   **Bahasa Pemrograman**: PHP Native (Konsep MVC)
+*   **Frontend**:
+    *   HTML5, CSS3, JavaScript
+    *   Bootstrap 4 & Tailwind CSS
+    *   jQuery & DataTables
+*   **Database**: MySQL
+*   **Library Pendukung**:
+    *   `dompdf/dompdf`: Untuk export PDF.
+    *   `phpoffice/phpword`: Untuk manipulasi dokumen Word.
+    *   `phpmailer/phpmailer`: Untuk pengiriman email.
 
-### Frontend (rifki & farah)
+---
 
-* View
-* UI / UX
-* CSS
-* JavaScript
+## � Struktur Project
 
-## Alur Kerja Harian (WAJIB)
-
-### 1. Update Branch dari `main` (Sebelum Ngoding)
-
-Backend:
-
-```bash
-git checkout ahsan
-git fetch origin
-git merge origin/main
-```
-
-Frontend:
-
-```bash
-git checkout rifki   # atau farah
-git fetch origin
-git merge origin/main
-```
-
-### 2. Proses Development
-
-* Kerjakan fitur di branch masing-masing.
-* Jangan mengedit file milik branch lain tanpa koordinasi.
-* Lakukan commit kecil dengan pesan yang jelas.
-
-Contoh commit:
-
-```bash
-git add .
-git commit -m "feat: tambah fitur peminjaman"
-git commit -m "ui: perbaikan tampilan halaman"
-```
-
-### 3. Push ke Branch Masing-Masing
-
-```bash
-git push origin ahsan
-git push origin rifki
-git push origin farah
-```
-
-## Proses Penggabungan ke `main`
-
-### 1. Pastikan Branch Sudah Update dari `main`
-
-```bash
-git checkout ahsan   # atau rifki / farah
-git fetch origin
-git merge origin/main
-```
-
-### 2. Merge ke `main` (Dilakukan Bergantian)
-
-```bash
-git checkout main
-git merge ahsan
-git merge rifki
-git merge farah
-```
-
-### 3. Push Branch `main`
-
-```bash
-git push origin main
-```
-
-## Aturan Konflik
-
-* Konflik diselesaikan oleh pemilik file.
-* Jangan asal memilih versi.
-* Jika ragu, diskusikan terlebih dahulu.
-
-## Larangan
-
-* Commit langsung ke `main`.
-* Push tanpa update dari `main`.
-* Commit besar tanpa pesan jelas.
-* Mengubah file milik developer lain tanpa izin.
-
-## SOP Database (WAJIB DIIKUTI)
-
-### Kesepakatan Database
-
-* Port MySQL: **3306**
-* Nama database: **inventori_db**
-* Database dijalankan secara lokal (masing-masing developer)
-
-### Prinsip Utama Database
-
-1. Database **tidak di-push ke GitHub**.
-2. Yang disinkronkan adalah **struktur database (schema)**, bukan isi data.
-3. Semua perubahan database harus dicatat dalam file SQL.
-4. Backend (**ahsan**) bertanggung jawab atas perubahan database.
-
-### Folder Database (WAJIB ADA DI REPO)
+Berikut adalah struktur direktori utama aplikasi:
 
 ```
-(inventori_lab.sql berada di root repository)
+Inventaris_Lab1/
+├── app/                    # Core Logic Aplikasi (MVC)
+│   ├── config/             # Konfigurasi Database & Konstanta
+│   ├── controllers/        # Controller (Menangani Request)
+│   ├── core/               # Core System (App, Controller, Database Wrapper)
+│   ├── models/             # Model (Interaksi ke Database)
+│   ├── services/           # Service Tambahan (Cron Job, Scheduler)
+│   └── views/              # View (Tampilan Antarmuka)
+├── public/                 # File Publik yang Dapat Diakses Langsung
+│   ├── css/                # Stylesheet
+│   ├── img/                # Gambar & Aset Statis
+│   ├── js/                 # JavaScript Client-side
+│   ├── uploads/            # File Upload User (Foto, Dokumen)
+│   └── index.php           # Entry Point Aplikasi
+├── vendor/                 # Library Composer
+├── inventori_db12.sql      # Database Schema
+├── cron_job.php            # Script Cron Job
+└── README.md               # Dokumentasi Project
 ```
 
-database/
-├── ```
+---
 
-### Aturan Perubahan Database
+## �💾 Struktur Database
 
-* Tambah tabel → **tidak perlu hapus database**
-* Tambah kolom → **tidak perlu hapus database**
-* Ubah tipe kolom → **tidak perlu hapus database**
-* Hapus tabel / kolom → **harus diskusi tim**
-* Perubahan besar (reset struktur) → **boleh drop database dengan kesepakatan**
+Aplikasi ini menggunakan database `inventori_db12` dengan beberapa tabel utama:
 
-### Cara Sinkron Database
+### 1. **Pengguna & Autentikasi**
+*   **`users`**: Menyimpan akun login (email, password hash, role).
+*   **`trx_data_user`**: Menyimpan profil detail pengguna (NIM/NIP, No HP, Alamat, Foto).
+*   **`mst_role`**: Daftar hak akses (Kepala Lab, Laboran, Mahasiswa, dll).
 
-Jika ada update database:
+### 2. **Master Data Barang**
+*   **`mst_jenis_barang`**: Kategori barang (e.g., Laptop, Kamera).
+*   **`mst_merek_barang`**: Merek barang (e.g., ASUS, Lenovo).
+*   **`mst_spesifikasi`**: Detail spesifikasi barang yang bersifat umum (Master Spesifikasi).
+*   **`trx_barang`**: Unit fisik barang (Unique ID per unit/QR Code) yang mengacu pada spesifikasi.
 
-1. Pull repository terbaru
-2. Import file `inventori_lab.sql` melalui phpMyAdmin
-3. Jika disepakati reset total:
+### 3. **Transaksi**
+*   **`trx_peminjaman`**: Header transaksi peminjaman (Tanggal pinjam, status, validasi).
+*   **`trx_detail_peminjaman`**: Detail barang yang dipinjam dalam satu transaksi.
+*   **`trx_pengembalian`**: Data pengembalian barang.
+*   **`trx_detail_pengembalian`**: Mencatat kondisi barang saat dikembalikan (Baik/Rusak).
 
-```sql
-DROP DATABASE IF EXISTS inventori_db;
-CREATE DATABASE inventori_db;
-USE inventori_db;
-```
+---
 
-### File Database Utama
+## 🚀 Panduan Instalasi
 
-File database utama yang digunakan adalah **satu file saja** dan berada di root repository:
+### Prasyarat
+*   Web Server (Apache/XAMPP) dengan PHP >= 7.4.
+*   MySQL Database.
+*   Composer (untuk manajemen dependensi).
 
-```
-inventori_lab.sql
-```
+### Langkah Instalasi
+1.  **Clone Repository**
+    ```bash
+    git clone https://github.com/username/Inventaris_Lab1.git
+    cd Inventaris_Lab1
+    ```
 
-File ini menjadi **satu-satunya sumber database** untuk project.
+2.  **Install Dependensi**
+    Jalankan perintah berikut di terminal root project:
+    ```bash
+    composer install
+    ```
 
-```sqlsql
--- RESET DATABASE (hanya jika disepakati)
-DROP DATABASE IF EXISTS inventori_db;
-CREATE DATABASE inventori_db;
-USE inventori_db;
+3.  **Setup Database**
+    *   Buat database baru bernama `inventori_db12` di phpMyAdmin.
+    *   Import file `inventori_db12.sql` yang ada di root direktori project.
 
--- ======================
--- TABEL USERS
--- ======================
-CREATE TABLE users (
-    id_user INT AUTO_INCREMENT PRIMARY KEY,
-    nama VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(255),
-    role ENUM('admin','user') DEFAULT 'user'
-);
+4.  **Konfigurasi Aplikasi**
+    *   Buka file `app/config/config.php`.
+    *   Sesuaikan `BASEURL` dengan URL lokal Anda.
+    *   Sesuaikan konfigurasi database (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`).
+    *   (Opsional) Atur konfigurasi Email dan WhatsApp Gateway jika diperlukan.
 
--- ======================
--- TABEL TRANSAKSI PEMINJAMAN
--- ======================
-CREATE TABLE trx_peminjaman (
-    id_trx INT AUTO_INCREMENT PRIMARY KEY,
-    id_user INT,
-    tanggal_pinjam DATE,
-    status ENUM('dipinjam','dikembalikan') DEFAULT 'dipinjam',
-    FOREIGN KEY (id_user) REFERENCES users(id_user)
-);
+---
 
--- ======================
--- DATA ADMIN (LOGIN)
--- ======================
--- Password sudah di-hash (bcrypt)
-INSERT INTO users (nama, email, password, role) VALUES
-('Julisa', 'julisa@gmail.com', '$2y$10$8QX5p3ZqQZJ4fM1GkZyJHu4QJZpZpQ9z7xZ6eZQ4h5xC6WJ3JvQpW', 'admin'),
-('Dewi Ernita Rahma', 'dewiernitarahma@gmail.com', '$2y$10$9FJZpKZl1p1ZK3XQvGzYHu7Fh1kQ9R8yZJkQ2kJpJ5VZ6XGZ1mZ9G', 'admin');
-```
+## 📖 Panduan Penggunaan
 
-Catatan:
+### 1. Login
+Masuk menggunakan akun yang sudah terdaftar. Berikut adalah akun default untuk administrator:
 
-* Login menggunakan **email + password**
-* Password di atas adalah hasil `password_hash()` PHP
-* Verifikasi login wajib menggunakan `password_verify()`
+| Role | Email | Password (Default) |
+| :--- | :--- | :--- |
+| **Kepala Lab** | `keplab@gmail.com` | *Tanya Admin* |
+| **Laboran** | `laboran@gmail.com` | *Tanya Admin* |
+| **Koordinator Lab** | `korlab@gmail.com` | *Tanya Admin* |
 
-### Akun Admin Sementara (UNTUK DEVELOPMENT)
+*(Catatan: Password di-hash menggunakan bcrypt. Untuk reset, gunakan fitur lupa password atau hubungi administrator database)*
 
-Untuk keperluan testing dan development, sementara dapat login sebagai **admin** menggunakan akun berikut:
+### 2. Alur Peminjaman (Mahasiswa)
+1.  Login sebagai Mahasiswa.
+2.  Masuk ke menu **Peminjaman**.
+3.  Pilih barang yang tersedia, masukkan ke keranjang peminjaman.
+4.  Isi formulir peminjaman (Tanggal pinjam, Tanggal kembali, Keperluan).
+5.  Upload **Surat Permohonan** (PDF).
+6.  Klik **Ajukan Peminjaman**. Status akan menjadi `Diproses`.
 
-* Email: `julisa@gmail.com`
-  Password: `julisa123`
+### 3. Alur Validasi (Admin/Laboran)
+1.  Login sebagai **Laboran** atau **Kepala Lab**.
+2.  Masuk ke menu **Validasi Peminjaman**.
+3.  Lihat detail pengajuan.
+4.  Klik **Setujui** jika syarat lengkap, atau **Tolak** jika tidak sesuai.
+5.  Jika disetujui, Mahasiswa akan mendapat notifikasi dan bisa mengambil barang.
 
-* Email: `dewiernitarahma@gmail.com`
-  Password: `Dewicomel28`
+### 4. Alur Pengembalian
+1.  Saat barang dikembalikan, Laboran masuk ke menu **Pengembalian**.
+2.  Cari transaksi peminjaman terkait.
+3.  Cek kondisi fisik barang satu per satu.
+4.  Update status barang di sistem (Baik/Rusak).
+5.  Selesaikan transaksi pengembalian.
 
-Catatan:
+---
 
-* Akun ini **hanya untuk development**, bukan production
-* Password **boleh diganti** setelah fitur login stabil()`
+## 🤝 SOP Development & Kontribusi
 
-Aturan Penting
+Berikut adalah aturan pengerjaan project (Diambil dari SOP Internal Tim):
 
-* Jangan mengubah database langsung tanpa update `- Jangan export database penuh dari phpMyAdmin lalu push ke repo.
-* Jangan drop database tanpa kesepakatan tim.
+### Struktur Branch
+*   **main**: Branch utama (Production/Stabil).
+*   **ahsan**: Backend Developer.
+*   **rifki/farah**: Frontend Developer.
 
-## Ringkasan Alur
+### Workflow
+1.  **Selalu Update**: Lakukan `git pull origin main` sebelum mulai bekerja.
+2.  **Kerja di Branch Sendiri**: Jangan commit langsung ke `main`.
+    ```bash
+    git checkout ahsan  # Ganti dengan nama branch Anda
+    git merge main      # Sinkronisasi dengan main terbaru
+    ```
+3.  **Commit Pesan Jelas**: Gunakan format `feat: ...` atau `fix: ...`.
+4.  **Push & Merge**: Push ke branch masing-masing, lalu merge ke `main` secara bergantian.
 
-Pull dari `main` → kerja di branch masing-masing → commit → push → merge ke `main` → sinkron database bila ada perubahan.
+### Aturan Database
+1.  **Jangan Push Database**: File database `.sql` di-ignore atau dikelola manual.
+2.  **Update Struktur**: Jika mengubah struktur tabel, update file `inventori_db12.sql` di root folder.
+3.  **Sinkronisasi**: Beritahu tim jika ada perubahan struktur database agar mereka bisa import ulang.
 
-## Syarat Running Project
-* Import Database yang Up to Date
-* Lakukan penginstalan Composer
-```
-composer install
-```
+---
 
+**Inventaris Lab Team &copy; 2026**

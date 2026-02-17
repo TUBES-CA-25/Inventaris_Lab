@@ -83,6 +83,36 @@ class Peminjaman_model
             }
 
             $this->db->commit();
+
+            // --- NOTIFIKASI WHATSAPP KE GROUP ADMIN ---
+            try {
+                // 1. Ambil data Peminjam (untuk info nama)
+                require_once __DIR__ . '/User_model.php';
+                $userModel = new User_model();
+                $peminjam = $userModel->profile(['id_user' => $data['id_user']]);
+
+                // 2. Cek Konfigurasi Group ID
+                if (defined('FONNTE_GROUP_ID') && FONNTE_GROUP_ID != 'ID_GRUP_WHATSAPP_DISINI') {
+                    require_once __DIR__ . '/WhatsApp_model.php';
+                    $wa = new WhatsApp_model();
+
+                    // 3. Susun Pesan
+                    $message = "*PENGAJUAN PEMINJAMAN BARU*\n\n";
+                    $message .= "Halo Tim Admin, ada pengajuan barang baru.\n\n";
+                    $message .= "Nama Peminjam: " . $peminjam['nama_user'] . "\n";
+                    $message .= "Tanggal: " . date('d-m-Y', strtotime($data['tanggal_peminjaman'])) . "\n";
+                    $message .= "Kegiatan: " . $data['judul_kegiatan'] . "\n\n";
+                    $message .= "Mohon dicek di website: " . BASEURL . "\n";
+                    $message .= "Terima Kasih.";
+
+                    // 4. Kirim ke Group
+                    $wa->send(FONNTE_GROUP_ID, $message);
+                }
+            } catch (Exception $e) {
+                // Silent fail agar transaksi tidak batal
+            }
+            // ------------------------------------
+
             return $this->db->rowCount();
         } catch (Exception $e) {
             $this->db->rollBack();

@@ -6,11 +6,16 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
 }
 ?>
 
-<div class="content">
+<main class="content">
     <div class="content-beranda">
-        <h1 class="page-title">Validasi Peminjaman</h1>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="page-title mb-0">Validasi Peminjaman</h1>
+            <a href="<?= BASEURL; ?>ValidasiPeminjaman/kirimNotifikasi" class="btn btn-navy">
+                <i class="fas fa-envelope mr-2"></i>Kirim Notifikasi Email
+            </a>
+        </div>
 
-        <div class="row g-4">
+        <section class="stats-overview row g-4">
             <div class="col-12 col-md-6 col-xl-3">
                 <div class="stat-card bg-navy">
                     <div>
@@ -60,9 +65,9 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="table-responsive mt-4   ">
+        <section class="table-responsive mt-4">
             <table id="myTable" class="table table-hover" style="width:100%; margin-bottom: 0;">
                 <thead class="table-custom-header">
                     <tr>
@@ -95,19 +100,40 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
                                     // Badge logic tetap menggunakan warna asli Bootstrap/Anda
                                     $status = strtolower($pinjam['status']);
                                     $badgeClass = 'bg-secondary';
+                                    $is_overdue = false;
+
+                                    // Cek Keterlambatan
+                                    // Jika belum dikembalikan/ditolak DAN hari ini > tgl_pengembalian
+                                    if (!in_array($status, ['dikembalikan', 'ditolak', 'tolak peminjaman'])) {
+                                        $tgl_kembali = strtotime($pinjam['tanggal_pengembalian']);
+                                        $today = strtotime(date('Y-m-d')); // Bandingkan per hari ini
+                            
+                                        if ($today > $tgl_kembali) {
+                                            $is_overdue = true;
+                                        }
+                                    }
 
                                     if ($status == 'diproses')
                                         $badgeClass = 'bg-warning text-dark';
                                     elseif ($status == 'disetujui')
                                         $badgeClass = 'bg-success';
-                                    elseif ($status == 'ditolak')
+                                    elseif ($status == 'ditolak' || $status == 'tolak peminjaman')
                                         $badgeClass = 'bg-danger';
                                     elseif ($status == 'dikembalikan')
                                         $badgeClass = 'bg-primary';
                                     ?>
-                                    <span class="badge text-white rounded-pill <?= $badgeClass; ?> px-3 py-2">
-                                        <?= ucfirst($pinjam['status']); ?>
-                                    </span>
+
+                                    <div class="d-flex flex-column align-items-center gap-1">
+                                        <span class="badge text-white rounded-pill <?= $badgeClass; ?> px-3 py-2">
+                                            <?= ucfirst($pinjam['status']); ?>
+                                        </span>
+
+                                        <?php if ($is_overdue): ?>
+                                            <span class="badge bg-danger rounded-pill px-2 py-1 mt-1" style="font-size: 0.75rem;">
+                                                <i class="fas fa-exclamation-circle"></i> Terlambat
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
 
                                 <td><?= !empty($pinjam['keterangan_peminjaman']) ? $pinjam['keterangan_peminjaman'] : '-'; ?>
@@ -124,6 +150,6 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
+        </section>
     </div>
-</div>
+</main>

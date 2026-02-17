@@ -365,34 +365,50 @@ class User_model
         return $countSuccess;
     }
 
-        public function gantiPasswordUser($data) {
-            $id_user = $_SESSION['id_user'];
-            $currentPassword = $data['currentPassword'];
-            $newPassword = $data['newPassword'];
-            $confirmPassword = $data['confirmPassword'];
+    public function gantiPasswordUser($data)
+    {
+        $id_user = $_SESSION['id_user'];
+        $currentPassword = $data['currentPassword'];
+        $newPassword = $data['newPassword'];
+        $confirmPassword = $data['confirmPassword'];
 
-            // 1. Ambil password lama dari DB
-            $this->db->query("SELECT password FROM trx_user WHERE id_user = :id");
-            $this->db->bind('id', $id_user);
-            $user = $this->db->single();
+        // 1. Ambil password lama dari DB
+        $this->db->query("SELECT password FROM trx_user WHERE id_user = :id");
+        $this->db->bind('id', $id_user);
+        $user = $this->db->single();
 
-            // 2. Verifikasi password lama
-            if (!password_verify($currentPassword, $user['password'])) {
-                return 0; // Password lama salah
-            }
+        // 2. Verifikasi password lama
+        if (!password_verify($currentPassword, $user['password'])) {
+            return 0; // Password lama salah
+        }
 
-            // 3. Cek konfirmasi password baru
-            if ($newPassword !== $confirmPassword) {
-                return 0; // Password tidak cocok
-            }
+        // 3. Cek konfirmasi password baru
+        if ($newPassword !== $confirmPassword) {
+            return 0; // Password tidak cocok
+        }
 
-            // 4. Update password baru
-            $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
-            $this->db->query("UPDATE trx_user SET password = :pass WHERE id_user = :id");
-            $this->db->bind('pass', $passwordHash);
-            $this->db->bind('id', $id_user);
-            $this->db->execute();
+        // 4. Update password baru
+        $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
+        $this->db->bind('id', $id_user);
+        $this->db->execute();
 
-            return $this->db->rowCount();
+        return $this->db->rowCount();
+    }
+
+    public function getAdminPhoneNumbers()
+    {
+        // Ambil No HP dari Role KALAB (1) dan LABORAN (2)
+        $query = "SELECT d.no_hp_user, d.nama_user 
+                  FROM trx_data_user d
+                  JOIN trx_user u ON d.id_user = u.id_user
+                  WHERE u.id_role IN (:role_kalab, :role_laboran) 
+                  AND d.no_hp_user IS NOT NULL 
+                  AND d.no_hp_user != ''";
+
+        $this->db->query($query);
+        $this->db->bind('role_kalab', ROLE_KALAB);
+        $this->db->bind('role_laboran', ROLE_LABORAN);
+
+        return $this->db->resultSet();
     }
 }

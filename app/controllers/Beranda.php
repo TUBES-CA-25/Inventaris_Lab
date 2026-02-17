@@ -1,6 +1,7 @@
 <?php
 
-class Beranda extends Controller {
+class Beranda extends Controller
+{
 
     public function __construct()
     {
@@ -9,18 +10,19 @@ class Beranda extends Controller {
             exit;
         }
     }
-    
-    public function index() {
+
+    public function index()
+    {
         $data['judul'] = 'Beranda';
         $berandaModel = $this->model('Beranda_model');
         $stats = $berandaModel->getAllCounts();
 
-        $data['jumlah_jenis_barang']  = $stats['jml_jenis'];
-        $data['jumlah_peminjaman']    = $stats['jml_peminjaman'];
-        $data['jumlah_merek_barang']  = $stats['jml_merek'];
-        $data['jumlah_detail_barang'] = $stats['jml_barang']; 
-        $data['jumlah_pengembalian']  = $stats['jml_pengembalian'];
-        
+        $data['jumlah_jenis_barang'] = $stats['jml_jenis'];
+        $data['jumlah_peminjaman'] = $stats['jml_peminjaman'];
+        $data['jumlah_merek_barang'] = $stats['jml_merek'];
+        $data['jumlah_detail_barang'] = $stats['jml_barang'];
+        $data['jumlah_pengembalian'] = $stats['jml_pengembalian'];
+
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
@@ -30,7 +32,8 @@ class Beranda extends Controller {
         $this->view('templates/footer');
     }
 
-    public function getAjaxStats() {
+    public function getAjaxStats()
+    {
         $json = file_get_contents('php://input');
         $input = json_decode($json, true);
 
@@ -39,7 +42,7 @@ class Beranda extends Controller {
         $bulan = $input['bulan'] ?? date('m');
 
         $data = $this->model('Beranda_model')->getChartDataFiltered($mode, $tahun, $bulan);
-        
+
         echo json_encode($data);
     }
 }
