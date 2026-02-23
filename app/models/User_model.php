@@ -44,6 +44,7 @@ class User_model
 
     public function tambahUser($data)
     {
+        // 1. Cek duplikasi email
         $this->db->query("SELECT id_user FROM trx_user WHERE email = :email");
         $this->db->bind('email', $data['email']);
         $this->db->execute();
@@ -51,16 +52,48 @@ class User_model
             return -1;
         }
 
+        // 2. Cek password
         if ($data['password'] !== $data['konfirmasi-password']) {
             return -2;
         }
 
-        $fotoPath = $this->uploadFoto();
-        if (!$fotoPath) {
-            return -3;
+        // 3. Validasi Berdasarkan Asal Instansi & Tentukan Role Otomatis
+        $asal = $data['asal_instansi'] ?? '';
+        $nim_nip = $data['nim_nip'] ?? '';
+        $id_role = 7; // Default: User Luar FIKOM
+
+        if ($asal === 'fikom') {
+            // Mahasiswa (130/131, 11 digit)
+            if ((strpos($nim_nip, '130') === 0 || strpos($nim_nip, '131') === 0) && strlen($nim_nip) === 11) {
+                $id_role = '6'; // MHS
+            }
+            // Dosen (09, 10 digit)
+            elseif (strpos($nim_nip, '09') === 0 && strlen($nim_nip) === 10) {
+                $id_role = '5'; // DOSEN
+            } else {
+                // Input FIKOM tidak valid
+                return -4;
+            }
+        } else {
+            // Luar FIKOM - Pastikan tidak pakai pattern FIKOM (opsional, tapi user minta strict)
+            if ((strpos($nim_nip, '130') === 0 || strpos($nim_nip, '131') === 0) && strlen($nim_nip) === 11) {
+                return -5; // Error: Pakai NIM FIKOM di Luar FIKOM
+            }
+            if (strpos($nim_nip, '09') === 0 && strlen($nim_nip) === 10) {
+                return -5; // Error: Pakai NIDN FIKOM di Luar FIKOM
+            }
+            $id_role = 7;
         }
 
-        // Generate verification token
+        // 4. Handle Foto (Optional, Base64 from Cropper)
+        $fotoPath = '../public/img/foto-profile/user.svg'; // Default
+        if (!empty($data['cropped_foto'])) {
+            $fotoPath = $this->saveBase64Image($data['cropped_foto']);
+            if (!$fotoPath) {
+                return -3; // Upload error
+            }
+        }
+
         $verificationToken = bin2hex(random_bytes(32));
         $tokenExpiry = date('Y-m-d H:i:s', strtotime('+' . VERIFICATION_LINK_EXPIRY . ' hours'));
 
@@ -72,7 +105,7 @@ class User_model
             $this->db->query($queryUser);
             $this->db->bind('email', $data['email']);
             $this->db->bind('password', password_hash($data['password'], PASSWORD_BCRYPT));
-            $this->db->bind('id_role', $data['id_role'] ?? 7);
+            $this->db->bind('id_role', $id_role);
             $this->db->bind('token', $verificationToken);
             $this->db->bind('expiry', $tokenExpiry);
             $this->db->execute();
@@ -86,7 +119,7 @@ class User_model
             $this->db->bind('id_user', $newUserId);
             $this->db->bind('foto', $fotoPath);
             $this->db->bind('nama_user', $data['nama_user']);
-            $this->db->bind('nim_nip', $data['nim_nip']);
+            $this->db->bind('nim_nip', $nim_nip);
             $this->db->bind('no_hp_user', $data['no_hp_user']);
             $this->db->bind('jenis_kelamin', $data['jenis_kelamin']);
             $this->db->bind('alamat', $data['alamat']);
@@ -94,7 +127,6 @@ class User_model
 
             $this->db->query('COMMIT');
 
-            // Return success with token for email verification
             return [
                 'status' => 1,
                 'user_id' => $newUserId,
@@ -210,11 +242,56 @@ class User_model
             return false;
         }
 
-        $namaFileBaru = uniqid() . '.' . $ekstensiGambar;
+        $namaFileBaru = uniqid() . '.webp'; // Convert to webp
         $targetDir = '../public/img/foto-profile/';
-        move_uploaded_file($tmpName, $targetDir . $namaFileBaru);
 
-        return $targetDir . $namaFileBaru;
+        // Convert to WebP using GD
+        if ($ekstensiGambar === 'png') {
+            $img = imagecreatefrompng($tmpName);
+        } else {
+            $img = imagecreatefromjpeg($tmpName);
+        }
+
+        if ($img) {
+            // Keep transparency if needed, but for profile usually not
+            imagewebp($img, $targetDir . $namaFileBaru, 80);
+            imagedestroy($img);
+            return $targetDir . $namaFileBaru;
+        }
+
+        return false;
+    }
+
+    /**
+     * Save Base64 Cropped Image as WebP
+     */
+    private function saveBase64Image($base64Data)
+    {
+        try {
+            // data:image/png;base64,xxxx
+            list($type, $data) = explode(';', $base64Data);
+            list(, $data) = explode(',', $data);
+            $data = base64_decode($data);
+
+            $targetDir = '../public/img/foto-profile/';
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0777, true);
+            }
+
+            $fileName = uniqid() . '.webp';
+            $filePath = $targetDir . $fileName;
+
+            $img = imagecreatefromstring($data);
+            if ($img) {
+                // Save as WebP
+                imagewebp($img, $filePath, 80);
+                imagedestroy($img);
+                return $filePath;
+            }
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function getUser($email, $password)
@@ -406,8 +483,8 @@ class User_model
                   AND d.no_hp_user != ''";
 
         $this->db->query($query);
-        $this->db->bind('role_kalab', ROLE_KALAB);
-        $this->db->bind('role_laboran', ROLE_LABORAN);
+        $this->db->bind('role_kalab', '1');
+        $this->db->bind('role_laboran', '2');
 
         return $this->db->resultSet();
     }
