@@ -41,8 +41,6 @@
         <div class="menu-list">
             <?php
             $role = $_SESSION['id_role'] ?? '';
-            $is_admin_access = in_array($role, [ROLE_KALAB, ROLE_LABORAN]);
-            $is_academic = in_array($role, [ROLE_DOSEN, ROLE_MAHASISWA]);
             ?>
 
             <a href="<?= BASEURL; ?>Beranda" class="menu-item <?= ($data['judul'] == 'Beranda') ? 'active' : ''; ?>">
@@ -50,7 +48,7 @@
                 <span>Beranda</span>
             </a>
 
-            <?php if (isset($_SESSION['login']) && ($is_admin_access || $is_academic)): ?>
+            <?php if (isset($_SESSION['login']) && (in_array($role, ['1', '2', '3', '4']))): ?>
                 <a href="<?= BASEURL; ?>DetailBarang"
                     class="menu-item <?= ($data['judul'] == 'Detail Barang') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-boxes-stacked"></i>
@@ -58,7 +56,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && (in_array($role, [ROLE_DOSEN, ROLE_MAHASISWA, '5', '6', '7']))): ?>
+            <?php if (isset($_SESSION['login']) && (in_array($role, ['4', '5', '6', '7']))): ?>
                 <a href="<?= BASEURL; ?>Peminjaman"
                     class="menu-item <?= ($data['judul'] == 'Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-receipt"></i>
@@ -66,7 +64,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && ($is_academic)): ?>
+            <?php if (isset($_SESSION['login']) && in_array($role, ['3', '4'])): ?>
                 <a href="<?= BASEURL; ?>Pengembalian"
                     class="menu-item <?= ($data['judul'] == 'Pengembalian') ? 'active' : ''; ?>">
                     <i class="fas fa-exchange-alt"></i>
@@ -82,7 +80,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && $is_admin_access): ?>
+            <?php if (isset($_SESSION['login']) && in_array($role, ['1', '2', '5'])): ?>
                 <a href="<?= BASEURL; ?>ValidasiPeminjaman"
                     class="menu-item <?= ($data['judul'] == 'Validasi Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-file-circle-check"></i>
@@ -90,7 +88,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && ($is_admin_access || $role == ROLE_DOSEN)): ?>
+            <?php if (isset($_SESSION['login']) && in_array($role, ['1', '2', '3'])): ?>
                 <a href="<?= BASEURL; ?>KelolaAkun"
                     class="menu-item <?= ($data['judul'] == 'Kelola Akun') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-users-gear"></i>
@@ -115,24 +113,23 @@
     </div>
 
 </nav>
-    <div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-hidden="true"
-        style="z-index: 99999;">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content" style="border-radius: 15px;">
-                <div class="modal-body" style="text-align: center;">
-                    <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
-                        background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop
-                        autoplay></lottie-player>
-                    <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal"
-                        data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <button type="button" class="btn btn-danger" style="width: 100px;"
-                        onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
-                </div>
+<div class="modal fade" id="konfirmasiKeluar" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 99999;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-body" style="text-align: center;">
+                <lottie-player src="https://lottie.host/48c004f8-57cd-4acb-a04a-de46793ba7dc/jUGVFL9qIO.json"
+                    background="transparent" speed="1" style="width: 250px; height: 250px; margin: 0 auto;" loop
+                    autoplay></lottie-player>
+                <p style="color:#385161; opacity: 0.6; font-weight: 500;">Apakah anda yakin ingin keluar?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-light" style="width: 100px;" data-dismiss="modal"
+                    data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-danger" style="width: 100px;"
+                    onclick="location.href='<?= BASEURL; ?>Logout'">Keluar</button>
             </div>
         </div>
     </div>
+</div>
