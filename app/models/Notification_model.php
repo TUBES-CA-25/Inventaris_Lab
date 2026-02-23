@@ -57,6 +57,7 @@ class Notification_model
     /**
      * Cari peminjaman yang akan berakhir BESOK (H-1)
      * Status harus 'disetujui' (sedang dipinjam)
+     * DAN belum dikirimi notifikasi HARI INI
      */
     public function cekHampirHabis()
     {
@@ -68,7 +69,8 @@ class Notification_model
                   JOIN trx_user u ON p.id_user = u.id_user
                   JOIN trx_data_user d ON p.id_user = d.id_user
                   WHERE p.status = 'disetujui' 
-                  AND DATEDIFF(p.tanggal_pengembalian, '$today') BETWEEN 0 AND 3";
+                  AND DATEDIFF(p.tanggal_pengembalian, '$today') BETWEEN 0 AND 3
+                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -77,15 +79,18 @@ class Notification_model
     /**
      * Cari peminjaman yang SUDAH terlambat
      * Tanggal pengembalian < Hari Ini
+     * DAN belum dikirimi notifikasi HARI INI
      */
     public function cekTerlambat()
     {
+        $today = date('Y-m-d');
         $query = "SELECT p.*, d.nama_user, u.email 
                   FROM trx_peminjaman p
                   JOIN trx_user u ON p.id_user = u.id_user
                   JOIN trx_data_user d ON p.id_user = d.id_user
                   WHERE p.status = 'disetujui' 
-                  AND p.tanggal_pengembalian < CURDATE()";
+                  AND p.tanggal_pengembalian < CURDATE()
+                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -208,6 +213,8 @@ class Notification_model
             $body = $this->getHtmlTemplate("Peringatan Pengembalian", $message, $details, false);
 
             if ($this->sendEmail($item['email'], $subject, $body)) {
+                // Update Timestamp
+                $this->updateLastNotification($item['id_peminjaman']);
                 $countSent++;
             }
         }
@@ -233,35 +240,33 @@ class Notification_model
             $body = $this->getHtmlTemplate("Terlambat Mengembalikan", $message, $details, true);
 
             if ($this->sendEmail($item['email'], $subject, $body)) {
+                // Update Timestamp
+                $this->updateLastNotification($item['id_peminjaman']);
                 $countSent++;
             }
         }
 
         return $countSent;
     }
+
+    private function updateLastNotification($id_peminjaman)
+    {
+        $query = "UPDATE trx_peminjaman SET last_notification_sent = NOW() WHERE id_peminjaman = :id";
+        $this->db->query($query);
+        $this->db->bind('id', $id_peminjaman);
+        $this->db->execute();
+    }
+
     /**
      * Cek apakah notifikasi hari ini sudah dijalankan (System-Wide)
-     * Menggunakan File Lock agar hanya jalan 1x sehari, siapapun yang login.
+     * !! REVISI: Sekarang menggunakan pengecekan per-item di database,
+     * jadi lock file tidak lagi diperlukan tapi method ini tetap dipanggil oleh cron.
      */
     public function checkAndRunDaily()
     {
-        $lockFile = __DIR__ . '/../../app/config/last_email_run.txt'; // Path ke file lock
-        $today = date('Y-m-d');
-
-        // 1. Cek file lock
-        if (file_exists($lockFile)) {
-            $lastRun = file_get_contents($lockFile);
-            if (trim($lastRun) == $today) {
-                // Sudah jalan hari ini, skip
-                return false;
-            }
-        }
-
-        // 2. Belum jalan hari ini, jalankan
-        $this->prosesNotifikasiOtomatis();
-
-        // 3. Update file lock
-        file_put_contents($lockFile, $today);
-        return true;
+        // Langsung jalankan, karena di dalam prosesNotifikasiOtomatis()
+        // sudah ada filter `last_notification_sent != Today`.
+        // Jadi aman dijalankan berkali-kali dalam sehari.
+        return $this->prosesNotifikasiOtomatis();
     }
 }
