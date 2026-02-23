@@ -20,23 +20,24 @@
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-<script src="<?= BASEURL; ?>js/script.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/Beranda.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/Sidebar.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/form.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/upload.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/DetailDetailBarang.js?v=<?= time(); ?>"></script>
-<script src="<?= BASEURL; ?>js/ValidasiPeminjaman.js?v=<?= time(); ?>"></script>
+<script src="<?= BASEURL; ?>js/script.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/Beranda.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/Sidebar.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/form.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/upload.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/DetailDetailBarang.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/ValidasiPeminjaman.js?v=<?= APP_VERSION; ?>"></script>
 \
-<script src="<?= BASEURL; ?>js/IndexPengembalian.js?v=<?= time(); ?>"></script>
+<script src="<?= BASEURL; ?>js/IndexPengembalian.js?v=<?= APP_VERSION; ?>"></script>
 
 <script>
     // 1. Logika Menghilangkan Loader setelah halaman Load
     $(window).on('load', function () {
         setTimeout(function () {
             $('#loading-screen').addClass('hidden');
-        }, 200);
+        }, 0);
     });
 
     // 2. Logika Memunculkan Loader saat navigasi fitur diklik
