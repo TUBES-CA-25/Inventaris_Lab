@@ -27,9 +27,14 @@ class Peminjaman_model
                       VALUES 
                       (:id_user, :judul_kegiatan, :tanggal_pengajuan, :tanggal_peminjaman, :tanggal_pengembalian, :keterangan_peminjaman, :status)";
 
+            $judul = $data['judul_kegiatan'];
+            if ($judul === 'Lain-lain' && !empty($data['tujuan_lain'])) {
+                $judul = 'Lain-lain: ' . $data['tujuan_lain'];
+            }
+
             $this->db->query($query);
             $this->db->bind('id_user', $data['id_user']);
-            $this->db->bind('judul_kegiatan', $data['judul_kegiatan']);
+            $this->db->bind('judul_kegiatan', $judul);
             $this->db->bind('tanggal_pengajuan', $data['tanggal_pengajuan']);
             $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
             $this->db->bind('tanggal_pengembalian', $data['tanggal_pengembalian']);
@@ -214,6 +219,11 @@ class Peminjaman_model
             ? implode(", ", $data['keterangan_peminjaman'])
             : (isset($data['keterangan_peminjaman']) ? $data['keterangan_peminjaman'] : "-");
 
+        $judul = $data['judul_kegiatan'];
+        if ($judul === 'Lain-lain' && !empty($data['tujuan_lain'])) {
+            $judul = 'Lain-lain: ' . $data['tujuan_lain'];
+        }
+
         $queryPeminjaman = "UPDATE trx_peminjaman 
                             SET 
                                 judul_kegiatan = :judul_kegiatan, 
@@ -224,7 +234,7 @@ class Peminjaman_model
                             WHERE id_peminjaman = :id_peminjaman";
 
         $this->db->query($queryPeminjaman);
-        $this->db->bind('judul_kegiatan', $data['judul_kegiatan']);
+        $this->db->bind('judul_kegiatan', $judul);
         $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
         $this->db->bind('tanggal_pengembalian', $data['tanggal_pengembalian']);
         $this->db->bind('keterangan_peminjaman', $ket_header);
@@ -298,6 +308,14 @@ class Peminjaman_model
                  WHERE ms.id_jenis_barang = mjb.id_jenis_barang 
                  LIMIT 1) as foto_barang
               FROM mst_jenis_barang mjb
+              WHERE EXISTS (
+                  SELECT 1 FROM trx_barang tb
+                  JOIN mst_spesifikasi ms ON tb.id_spesifikasi = ms.id_spesifikasi
+                  JOIN mst_kondisi_barang mkb ON tb.id_kondisi_barang = mkb.id_kondisi_barang
+                  WHERE ms.id_jenis_barang = mjb.id_jenis_barang
+                  AND tb.status_peminjaman = 'Bisa'
+                  AND mkb.kondisi_barang = 'Baik'
+              )
               ORDER BY mjb.sub_barang ASC";
 
         $this->db->query($query);
@@ -313,7 +331,15 @@ class Peminjaman_model
                  WHERE tb.id_jenis_barang = mjb.id_jenis_barang 
                  LIMIT 1) as foto_barang
               FROM mst_jenis_barang mjb
-              WHERE mjb.sub_barang LIKE :keyword";
+              WHERE mjb.sub_barang LIKE :keyword
+              AND EXISTS (
+                  SELECT 1 FROM trx_barang tb
+                  JOIN mst_spesifikasi ms ON tb.id_spesifikasi = ms.id_spesifikasi
+                  JOIN mst_kondisi_barang mkb ON tb.id_kondisi_barang = mkb.id_kondisi_barang
+                  WHERE ms.id_jenis_barang = mjb.id_jenis_barang
+                  AND tb.status_peminjaman = 'Bisa'
+                  AND mkb.kondisi_barang = 'Baik'
+              )";
 
         $this->db->query($query);
         $this->db->bind('keyword', "%$keyword%");
