@@ -3,14 +3,18 @@
 
 $isEdit = isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true;
 $headerData = $isEdit ? $_SESSION['edit_header'] : [];
-$detailMap  = $isEdit ? $_SESSION['edit_details_map'] : [];
+$detailMap = $isEdit ? $_SESSION['edit_details_map'] : [];
 
 $formAction = $isEdit ? BASEURL . 'Peminjaman/prosesUpdatePeminjaman' : BASEURL . 'Peminjaman/prosesTambahPeminjaman';
 
-$val_judul      = $isEdit ? $headerData['judul_kegiatan'] : '';
-$val_tgl_aju    = $isEdit ? $headerData['tanggal_pengajuan'] : date('Y-m-d');
-$val_tgl_mulai  = $isEdit ? $headerData['tanggal_peminjaman'] : '';
-$val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
+// --- DATA RESTORATION (PRIORITIZE CONTROLLER DATA) ---
+$val_judul = !empty($data['val_judul']) ? $data['val_judul'] : ($isEdit ? $headerData['judul_kegiatan'] : '');
+$val_tgl_aju = !empty($data['val_tgl_aju']) ? $data['val_tgl_aju'] : ($isEdit ? $headerData['tanggal_pengajuan'] : date('Y-m-d'));
+$val_tgl_mulai = !empty($data['val_tgl_mulai']) ? $data['val_tgl_mulai'] : ($isEdit ? $headerData['tanggal_peminjaman'] : '');
+$val_tgl_akhir = !empty($data['val_tgl_akhir']) ? $data['val_tgl_akhir'] : ($isEdit ? $headerData['tanggal_pengembalian'] : '');
+$val_ket = !empty($data['val_ket']) ? $data['val_ket'] : ($isEdit && isset($headerData['keterangan_peminjaman']) ? $headerData['keterangan_peminjaman'] : '');
+$val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
+// ------------------------------------------------------
 ?>
 
 <div class="content">
@@ -25,15 +29,40 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                         </div>
 
                         <div class="gap-row">
-                            <label class="lbl">Judul kegiatan</label>
-                            <input type="text" name="judul_kegiatan" class="inp-custom" value="<?= $val_judul; ?>" required>
+                            <?php if ($_SESSION['id_role'] == '6'): ?>
+                                <label class="lbl">Tujuan Peminjaman</label>
+                                <div class="icon-wrap">
+                                    <select name="judul_kegiatan" id="judul_kegiatan" class="inp-custom" required
+                                        onchange="toggleTujuanLain(this.value)">
+                                        <option value="">-- Pilih Tujuan --</option>
+                                        <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir') ? 'selected' : ''; ?>>
+                                            Tugas Akhir</option>
+                                        <option value="Riset" <?= ($val_judul == 'Riset') ? 'selected' : ''; ?>>Riset</option>
+                                        <option value="Peminjaman Biasa" <?= ($val_judul == 'Peminjaman Biasa') ? 'selected' : ''; ?>>Peminjaman Biasa</option>
+                                        <option value="Lain-lain" <?= ($val_judul == 'Lain-lain') ? 'selected' : ''; ?>>
+                                            Lain-lain</option>
+                                    </select>
+                                    <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
+                                </div>
+                                <div id="wrap_tujuan_lain"
+                                    style="display: <?= ($val_judul == 'Lain-lain') ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    <label class="lbl">Detail Tujuan Lainnya</label>
+                                    <input type="text" name="tujuan_lain" id="tujuan_lain" class="inp-custom"
+                                        value="<?= $val_tujuan_lain; ?>" placeholder="Masukkan tujuan lainnya...">
+                                </div>
+                            <?php else: ?>
+                                <label class="lbl">Judul kegiatan</label>
+                                <input type="text" name="judul_kegiatan" class="inp-custom" value="<?= $val_judul; ?>"
+                                    required>
+                            <?php endif; ?>
                         </div>
 
                         <div class="gap-row">
                             <label class="lbl">Tanggal pengajuan</label>
-                            <div class="icon-wrap">
-                                <input type="date" name="tanggal_pengajuan" class="inp-custom" value="<?= $val_tgl_aju; ?>" required>
-                                <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                            <div class="inp-custom d-flex align-items-center"
+                                style="background-color: #f1f5f9; cursor: default; color: #64748b;">
+                                <?= date('d-m-Y', strtotime($val_tgl_aju)); ?>
+                                <input type="hidden" name="tanggal_pengajuan" value="<?= $val_tgl_aju; ?>">
                             </div>
                         </div>
 
@@ -41,14 +70,18 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                             <div class="col-md-6">
                                 <label class="lbl">Mulai dari tanggal</label>
                                 <div class="icon-wrap">
-                                    <input type="date" name="tanggal_peminjaman" class="inp-custom" value="<?= $val_tgl_mulai; ?>" required>
+                                    <input type="date" name="tanggal_peminjaman" id="tanggal_peminjaman"
+                                        class="inp-custom" value="<?= $val_tgl_mulai; ?>" min="<?= date('Y-m-d'); ?>"
+                                        required onclick="this.showPicker()" onchange="updateReturnDateConstraints()">
                                     <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="lbl">Sampai tanggal</label>
                                 <div class="icon-wrap">
-                                    <input type="date" name="tanggal_pengembalian" class="inp-custom" value="<?= $val_tgl_akhir; ?>" required>
+                                    <input type="date" name="tanggal_pengembalian" id="tanggal_pengembalian"
+                                        class="inp-custom" value="<?= $val_tgl_akhir; ?>" min="<?= date('Y-m-d'); ?>"
+                                        required onclick="this.showPicker()">
                                     <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
                                 </div>
                             </div>
@@ -56,14 +89,16 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 
                         <div class="gap-row">
                             <label class="lbl">Komentar / Keterangan Peminjaman</label>
-                            <textarea name="keterangan_peminjaman" class="inp-custom" rows="3" placeholder="Contoh: Untuk keperluan praktikum..."><?= $isEdit && isset($headerData['keterangan_peminjaman']) ? $headerData['keterangan_peminjaman'] : ''; ?></textarea>
+                            <textarea name="keterangan_peminjaman" class="inp-custom" rows="3"
+                                placeholder="Contoh: Untuk keperluan praktikum..."><?= $val_ket; ?></textarea>
                         </div>
 
                     </div>
 
                     <div class="col-md-5 right-section1">
                         <div class="content-figure">
-                            <img id="img-figure-daftar" src="<?= BASEURL ?>img/happy robot assistant.svg" alt="figure" />
+                            <img id="img-figure-daftar" src="<?= BASEURL ?>img/happy robot assistant.svg"
+                                alt="figure" />
                             <div class="hello-text">Hello! 👋</div>
                         </div>
                     </div>
@@ -86,7 +121,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                     $curr_jml = $saved_data['jumlah'];
                                     $curr_unit = $saved_data['keterangan'];
                                 }
-                            ?>
+                                ?>
                                 <div class="item-row">
                                     <div class="row row-item-grid align-items-end">
 
@@ -99,15 +134,19 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                                 </button>
                                             </div>
                                             <div class="icon-wrap">
-                                                <input type="hidden" name="id_jenis_barang[]" value="<?= $item['id_jenis_barang']; ?>">
-                                                <input type="text" class="inp-custom inp-readonly" value="<?= $item['sub_barang']; ?>" readonly>
-                                                <i class="fa-solid fa-check icon-inside" style="color: #22c55e; font-size: 18px;"></i>
+                                                <input type="hidden" name="id_jenis_barang[]"
+                                                    value="<?= $item['id_jenis_barang']; ?>">
+                                                <input type="text" class="inp-custom inp-readonly"
+                                                    value="<?= $item['sub_barang']; ?>" readonly>
+                                                <i class="fa-solid fa-check icon-inside"
+                                                    style="color: #22c55e; font-size: 18px;"></i>
                                             </div>
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="lbl">Jumlah</label>
-                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1" value="<?= $curr_jml; ?>" required style="text-align: center;">
+                                            <input type="number" name="jumlah_peminjaman[]" class="inp-custom" min="1"
+                                                value="<?= $curr_jml; ?>" required style="text-align: center;">
                                         </div>
 
                                         <div class="col-md-5">
@@ -116,8 +155,8 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                                                 <select name="unit_selected[]" class="inp-custom" required>
                                                     <option value="">-- Pilih Spesifikasi --</option>
 
-                                                    <?php if (!empty($item['list_unit'])) : ?>
-                                                        <?php foreach ($item['list_unit'] as $spec) : ?>
+                                                    <?php if (!empty($item['list_unit'])): ?>
+                                                        <?php foreach ($item['list_unit'] as $spec): ?>
                                                             <option value="<?= $spec['id_spesifikasi']; ?>"
                                                                 <?= ($curr_unit == $spec['id_spesifikasi']) ? 'selected' : ''; ?>>
 
@@ -125,7 +164,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 
                                                             </option>
                                                         <?php endforeach; ?>
-                                                    <?php else : ?>
+                                                    <?php else: ?>
                                                         <option value="" disabled>Tidak ada spesifikasi tersedia</option>
                                                     <?php endif; ?>
                                                 </select>
@@ -144,9 +183,10 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
                         <?php endif; ?>
 
                         <div class="add-more-container" style="margin-top: 20px; text-align: center;">
-                            <a href="<?= BASEURL; ?>Peminjaman" class="btn btn-primary btn-safe-action" title="Tambah Barang Lain" style="border-radius: 50px; padding: 10px 20px;">
+                            <button type="button" onclick="submitDraft()" class="btn btn-primary btn-safe-action"
+                                title="Tambah Barang Lain" style="border-radius: 50px; padding: 10px 20px;">
                                 <i class="fa-solid fa-plus"></i> Tambah Barang
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -182,10 +222,74 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
 </div>
 
 <script>
+    function toggleTujuanLain(value) {
+        const wrap = document.getElementById('wrap_tujuan_lain');
+        const input = document.getElementById('tujuan_lain');
+        if (value === 'Lain-lain') {
+            wrap.style.display = 'block';
+            input.setAttribute('required', 'required');
+        } else {
+            wrap.style.display = 'none';
+            input.removeAttribute('required');
+        }
+    }
+
+    function submitDraft() {
+        const form = document.getElementById('formPeminjaman');
+        // Ubah action sementara ke simpanDraft
+        const originalAction = form.action;
+        form.action = '<?= BASEURL; ?>Peminjaman/simpanDraft';
+
+        // Remove 'required' temporarily if needed, but it's better to keep it
+        // so user fills header first. However if they just want to add items,
+        // we might allow empty headers? User said "inputan tidak hilang", 
+        // implying they WANT to keep what's there.
+
+        form.submit();
+    }
+
+    function updateReturnDateConstraints() {
+        const tglMulai = document.getElementById('tanggal_peminjaman');
+        const tglSampai = document.getElementById('tanggal_pengembalian');
+
+        if (tglMulai.value) {
+            // Set min untuk tanggal sampai (minimal sama dengan tanggal mulai)
+            tglSampai.min = tglMulai.value;
+            tglSampai.disabled = false;
+            tglSampai.style.opacity = "1";
+            tglSampai.style.cursor = "pointer";
+
+            // Hitung max (2 bulan dari tanggal mulai)
+            let dateObj = new Date(tglMulai.value);
+            dateObj.setMonth(dateObj.getMonth() + 2);
+
+            // Format YYYY-MM-DD
+            let y = dateObj.getFullYear();
+            let m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            let d = String(dateObj.getDate()).padStart(2, '0');
+            tglSampai.max = `${y}-${m}-${d}`;
+
+            // Reset jika tanggal sampai sebelumnya sudah terpilih tapi di luar range baru
+            if (tglSampai.value && (tglSampai.value < tglSampai.min || tglSampai.value > tglSampai.max)) {
+                tglSampai.value = "";
+            }
+        } else {
+            tglSampai.disabled = true;
+            tglSampai.value = "";
+            tglSampai.style.opacity = "0.6";
+            tglSampai.style.cursor = "not-allowed";
+        }
+    }
+
+    // Jalankan saat load untuk menangani data draf
+    document.addEventListener('DOMContentLoaded', function () {
+        updateReturnDateConstraints();
+    });
+
     const formPeminjaman = document.getElementById('formPeminjaman');
 
     if (formPeminjaman) {
-        formPeminjaman.addEventListener('submit', function(e) {
+        formPeminjaman.addEventListener('submit', function (e) {
             var btn = document.getElementById('btnSubmitPeminjaman');
             if (btn) {
                 // Ubah teks tombol jadi loading
@@ -197,7 +301,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
     }
 
     // Cek apakah ada data Flash dari Controller
-    <?php if (isset($_SESSION['flash'])) : ?>
+    <?php if (isset($_SESSION['flash'])): ?>
         Swal.fire({
             title: "<?= $_SESSION['flash']['pesan']; ?>",
             html: "<?= $_SESSION['flash']['aksi']; ?>",
@@ -217,8 +321,8 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
         document.getElementById('modalHapus').style.display = 'none';
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        
+    document.addEventListener("DOMContentLoaded", function () {
+
         const isEditMode = <?= $isEdit ? 'true' : 'false'; ?>;
 
         const hasItems = <?= !empty($data['barang_selected']) ? 'true' : 'false'; ?>;
@@ -229,7 +333,7 @@ $val_tgl_akhir  = $isEdit ? $headerData['tanggal_pengembalian'] : '';
             const form = document.getElementById('formPeminjaman');
 
             links.forEach(link => {
-                link.addEventListener('click', function(e) {
+                link.addEventListener('click', function (e) {
                     const targetUrl = this.getAttribute('href');
 
                     // Filter link yang aman (tidak perlu dicegat)
