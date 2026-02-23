@@ -31,7 +31,8 @@ class Peminjaman extends Controller
 
     public function cari()
     {
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
         $data['judul'] = 'Pencarian Barang';
         $data['profile'] = $this->model("User_model")->profile(['id_user' => $_SESSION['id_user']]);
@@ -58,7 +59,8 @@ class Peminjaman extends Controller
             header('Location: ' . BASEURL . 'Peminjaman');
             exit;
         }
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
         if (!isset($_SESSION['keranjang'])) {
             $_SESSION['keranjang'] = [];
@@ -75,6 +77,16 @@ class Peminjaman extends Controller
         $data['judul'] = 'Form Pengajuan Peminjaman';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
+
+        // --- RESTORE DRAFT DATA ---
+        $draft = $_SESSION['peminjaman_draft'] ?? [];
+        $data['val_judul'] = $draft['judul_kegiatan'] ?? '';
+        $data['val_tgl_aju'] = $draft['tanggal_pengajuan'] ?? date('Y-m-d');
+        $data['val_tgl_mulai'] = $draft['tanggal_peminjaman'] ?? '';
+        $data['val_tgl_akhir'] = $draft['tanggal_pengembalian'] ?? '';
+        $data['val_ket'] = $draft['keterangan_peminjaman'] ?? '';
+        $data['val_tujuan_lain'] = $draft['tujuan_lain'] ?? '';
+        // ---------------------------
 
         $data['barang_selected'] = [];
 
@@ -112,7 +124,8 @@ class Peminjaman extends Controller
     public function prosesTambahPeminjaman()
     {
         // 1. Wajib Start Session
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
         // 2. Cek Data Kosong
         if (empty($_POST['id_jenis_barang'])) {
@@ -121,7 +134,8 @@ class Peminjaman extends Controller
             exit;
         }
 
-        // 3. Validasi Stok
+        // 3. Validasi Stok & Tanggal
+        $this->cekValidasiTanggal($_POST);
         $this->cekValidasiStok($_POST);
 
         // 4. Pastikan User Login
@@ -136,16 +150,16 @@ class Peminjaman extends Controller
 
         $dataPayload = $_POST;
         $dataPayload['nama_peminjam'] = $userProfile['nama_user'];
-        
-        // --- TAMBAHKAN BARIS INI (SOLUSI) ---
-        $dataPayload['id_user'] = $_SESSION['id_user']; 
+        $dataPayload['tanggal_pengajuan'] = date('Y-m-d'); // Otomatis hari ini
+        $dataPayload['id_user'] = $_SESSION['id_user'];
         // -------------------------------------
 
         // 6. Eksekusi Database
         if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
 
-            // BERHASIL: Bersihkan keranjang
+            // BERHASIL: Bersihkan keranjang dan draft
             unset($_SESSION['keranjang']);
+            unset($_SESSION['peminjaman_draft']);
 
             Flasher::setFlash('Berhasil!', 'Pengajuan peminjaman berhasil dibuat. Silakan cek riwayat.', '', 'success');
             header('Location: ' . BASEURL . 'Riwayat');
@@ -162,7 +176,8 @@ class Peminjaman extends Controller
     {
         $index = IdObfuscator::decode($encoded_index);
 
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
         if ($index !== false && isset($_SESSION['keranjang'][$index])) {
 
@@ -172,6 +187,22 @@ class Peminjaman extends Controller
         }
 
         header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+        exit;
+    }
+
+    public function simpanDraft()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_SESSION['peminjaman_draft'] = [
+                'judul_kegiatan' => $_POST['judul_kegiatan'] ?? '',
+                'tujuan_lain' => $_POST['tujuan_lain'] ?? '',
+                'tanggal_pengajuan' => $_POST['tanggal_pengajuan'] ?? '',
+                'tanggal_peminjaman' => $_POST['tanggal_peminjaman'] ?? '',
+                'tanggal_pengembalian' => $_POST['tanggal_pengembalian'] ?? '',
+                'keterangan_peminjaman' => $_POST['keterangan_peminjaman'] ?? ''
+            ];
+        }
+        header('Location: ' . BASEURL . 'Peminjaman');
         exit;
     }
 
@@ -213,7 +244,7 @@ class Peminjaman extends Controller
             $_SESSION['keranjang'][] = $item['id_jenis_barang'];
 
             $edit_details_map[$item['id_jenis_barang']][] = [
-                'jumlah'     => $item['jumlah'],
+                'jumlah' => $item['jumlah'],
                 'keterangan' => $item['id_barang']
             ];
         }
@@ -248,6 +279,7 @@ class Peminjaman extends Controller
             unset($_SESSION['edit_id_peminjaman']);
             unset($_SESSION['edit_header']);
             unset($_SESSION['edit_details_map']);
+            unset($_SESSION['peminjaman_draft']);
 
             Flasher::setFlash('Data peminjaman berhasil diperbarui.', 'berhasil', '', 'success');
             header('Location: ' . BASEURL . 'Riwayat');
@@ -268,7 +300,7 @@ class Peminjaman extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
-            $alasan        = $_POST['alasan_penolakan'];
+            $alasan = $_POST['alasan_penolakan'];
 
             if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
                 Flasher::setFlash('Berhasil', 'Pengembalian ditolak. Alasan tersimpan.', '', 'warning');
@@ -278,6 +310,36 @@ class Peminjaman extends Controller
 
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
+        }
+    }
+
+    private function cekValidasiTanggal($postData)
+    {
+        $today = date('Y-m-d');
+        if (isset($postData['tanggal_peminjaman']) && $postData['tanggal_peminjaman'] < $today) {
+            Flasher::setFlash('Tanggal Tidak Valid', 'Tanggal mulai peminjaman tidak boleh tanggal kemarin.', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+        if (isset($postData['tanggal_pengembalian']) && $postData['tanggal_pengembalian'] < $postData['tanggal_peminjaman']) {
+            Flasher::setFlash('Tanggal Tidak Valid', 'Tanggal pengembalian tidak boleh sebelum tanggal mulai.', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+
+        // Validasi Maksimal 2 Bulan
+        if (isset($postData['tanggal_peminjaman']) && isset($postData['tanggal_pengembalian'])) {
+            $tglStart = new DateTime($postData['tanggal_peminjaman']);
+            $tglEnd = new DateTime($postData['tanggal_pengembalian']);
+            $interval = $tglStart->diff($tglEnd);
+
+            // Cek jika lebih dari 2 bulan atau (1 bulan + sisa hari yang membuat total > ~60 hari)
+            // PHP DateTime diff->m (months) and diff->y (years) helps
+            if ($interval->y > 0 || $interval->m > 2 || ($interval->m == 2 && $interval->d > 0)) {
+                Flasher::setFlash('Batas Waktu Terlampaui', 'Durasi peminjaman maksimal adalah 2 bulan.', '', 'danger');
+                header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+                exit;
+            }
         }
     }
 
@@ -318,7 +380,8 @@ class Peminjaman extends Controller
 
     public function batalEdit()
     {
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
         // Hapus semua session terkait edit dan keranjang sementara
         unset($_SESSION['keranjang']);
@@ -334,7 +397,8 @@ class Peminjaman extends Controller
 
     public function batal()
     {
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
         unset($_SESSION['keranjang']);
         header('Location: ' . BASEURL . 'Peminjaman');
         exit;
