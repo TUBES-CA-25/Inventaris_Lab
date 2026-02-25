@@ -22,27 +22,54 @@ class Peminjaman_model
         }
 
         try {
+            // Determine Loan Type based on Role
+            $id_role = $_SESSION['id_role'] ?? 7; // Default to USER if missing
+            $jenisId = ($id_role == 6) ? 1 : 2; // 1=Akademik, 2=Internal (Map from mst_jenis_peminjaman)
+
             $query = "INSERT INTO trx_peminjaman 
-                      (id_user, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, keterangan_peminjaman, status) 
+                      (id_user, id_jenis_peminjaman, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, keterangan_peminjaman, id_status_peminjaman) 
                       VALUES 
-                      (:id_user, :judul_kegiatan, :tanggal_pengajuan, :tanggal_peminjaman, :tanggal_pengembalian, :keterangan_peminjaman, :status)";
+                      (:id_user, :id_jenis_peminjaman, :judul_kegiatan, :tanggal_pengajuan, :tanggal_peminjaman, :tanggal_pengembalian, :keterangan_peminjaman, :id_status_peminjaman)";
 
             $judul = $data['judul_kegiatan'];
-            if ($judul === 'Lain-lain' && !empty($data['tujuan_lain'])) {
-                $judul = 'Lain-lain: ' . $data['tujuan_lain'];
+
+            // Clean up titles (don't inject category prefix anymore)
+            if ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
+                $judul = $data['tujuan_ta'];
+            } elseif ($data['judul_kegiatan'] === 'Riset' && !empty($data['tujuan_riset'])) {
+                $judul = $data['tujuan_riset'];
+            } elseif ($data['judul_kegiatan'] === 'Lain-lain' && !empty($data['tujuan_lain'])) {
+                $judul = $data['tujuan_lain'];
             }
 
             $this->db->query($query);
             $this->db->bind('id_user', $data['id_user']);
+            $this->db->bind('id_jenis_peminjaman', $jenisId);
             $this->db->bind('judul_kegiatan', $judul);
             $this->db->bind('tanggal_pengajuan', $data['tanggal_pengajuan']);
             $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
             $this->db->bind('tanggal_pengembalian', $data['tanggal_pengembalian']);
             $this->db->bind('keterangan_peminjaman', $data['keterangan_peminjaman']);
-            $this->db->bind('status', 'Melengkapi Surat');
+            $this->db->bind('id_status_peminjaman', 1); // 1 = Melengkapi Surat
 
             $this->db->execute();
             $id_peminjaman = $this->db->lastInsertId();
+
+            // --- TPT ROUTING ---
+            if ($jenisId === 1) { // Akademik
+                $queryAkademik = "INSERT INTO trx_peminjaman_akademik (id_peminjaman, kategori_kegiatan, dosen_pembimbing) 
+                                  VALUES (:id, :kat, :dosen)";
+                $this->db->query($queryAkademik);
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->bind('kat', $data['judul_kegiatan']); // e.g. 'Tugas Akhir'
+                $this->db->bind('dosen', $data['dosen_pembimbing'] ?? '-');
+                $this->db->execute();
+            } else {
+                $queryInternal = "INSERT INTO trx_peminjaman_internal (id_peminjaman) VALUES (:id)";
+                $this->db->query($queryInternal);
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+            }
 
             $merged_items = [];
 
@@ -127,9 +154,11 @@ class Peminjaman_model
 
     public function getPeminjamanBarang()
     {
-        $query = "SELECT trx_peminjaman.*, mst_jenis_barang.sub_barang 
-                  FROM trx_peminjaman 
-                  JOIN mst_jenis_barang ON trx_peminjaman.id_jenis_barang = mst_jenis_barang.id_jenis_barang";
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
+                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
+                         mst_jenis_barang.sub_barang 
+                  FROM trx_peminjaman tp
+                  JOIN mst_jenis_barang ON tp.id_jenis_peminjaman = mst_jenis_barang.id_jenis_peminjaman";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -145,25 +174,28 @@ class Peminjaman_model
     {
         $query = "SELECT 
             b.id_peminjaman,
-            b.nama_peminjam,
+            d.nama_user AS nama_peminjam,
             b.judul_kegiatan,
             b.tanggal_pengajuan,
             b.tanggal_peminjaman,
             b.tanggal_pengembalian,
             j.sub_barang,
-            b.jumlah_peminjaman,
+            dt.jumlah as jumlah_peminjaman,
             b.keterangan_peminjaman,
-            b.status
+            msp.nama_status AS status
         FROM trx_peminjaman b
-        JOIN mst_jenis_barang j ON b.id_jenis_barang = j.id_jenis_barang
+        JOIN trx_data_user d ON b.id_user = d.id_user
+        JOIN trx_detail_peminjaman dt ON b.id_peminjaman = dt.id_peminjaman
+        JOIN mst_jenis_barang j ON dt.id_jenis_barang = j.id_jenis_barang
+        JOIN mst_status_peminjaman msp ON b.id_status_peminjaman = msp.id_status_peminjaman
         WHERE 1=1";
 
         if (!empty($id_jenis_barang)) {
-            $query .= " AND b.id_jenis_barang = :id_jenis_barang";
+            $query .= " AND dt.id_jenis_barang = :id_jenis_barang";
         }
 
         if (!empty($status)) {
-            $query .= " AND b.status = :status";
+            $query .= " AND msp.nama_status = :status";
         }
 
         $query .= " ORDER BY b.tanggal_pengajuan DESC";
@@ -192,9 +224,19 @@ class Peminjaman_model
 
     public function getPeminjamanById($id_peminjaman)
     {
-        $query = "SELECT tp.*, tdu.nama_user AS nama_peminjam, tdu.nim_nip
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
+                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
+                         tp.keterangan_peminjaman, tp.keterangan_tolak, tp.id_status_peminjaman, 
+                         tp.file_surat, tp.validasi_kalab,
+                         tdu.nama_user AS nama_peminjam, tdu.nim_nip, 
+                         tpa.dosen_pembimbing, tpa.kategori_kegiatan,
+                         msp.nama_status AS status,
+                         mjp.nama_jenis_peminjaman AS jenis_peminjaman
                   FROM trx_peminjaman tp
                   JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
+                  JOIN mst_jenis_peminjaman mjp ON tp.id_jenis_peminjaman = mjp.id_jenis_peminjaman
+                  LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
                   WHERE tp.id_peminjaman = :id_peminjaman";
 
         $this->db->query($query);
@@ -206,7 +248,10 @@ class Peminjaman_model
 
     public function getUbah($id_peminjaman)
     {
-        $tampilView = "SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman;";
+        $tampilView = "SELECT id_peminjaman, id_user, id_jenis_peminjaman, judul_kegiatan, 
+                              tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, 
+                              keterangan_peminjaman, id_status_peminjaman, file_surat 
+                       FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman;";
         $this->db->query($tampilView);
         $this->db->bind("id_peminjaman", $id_peminjaman);
 
@@ -220,8 +265,14 @@ class Peminjaman_model
             : (isset($data['keterangan_peminjaman']) ? $data['keterangan_peminjaman'] : "-");
 
         $judul = $data['judul_kegiatan'];
-        if ($judul === 'Lain-lain' && !empty($data['tujuan_lain'])) {
-            $judul = 'Lain-lain: ' . $data['tujuan_lain'];
+
+        // Clean up titles (don't inject category prefix anymore)
+        if ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
+            $judul = $data['tujuan_ta'];
+        } elseif ($data['judul_kegiatan'] === 'Riset' && !empty($data['tujuan_riset'])) {
+            $judul = $data['tujuan_riset'];
+        } elseif ($data['judul_kegiatan'] === 'Lain-lain' && !empty($data['tujuan_lain'])) {
+            $judul = $data['tujuan_lain'];
         }
 
         $queryPeminjaman = "UPDATE trx_peminjaman 
@@ -230,7 +281,7 @@ class Peminjaman_model
                                 tanggal_peminjaman = :tanggal_peminjaman, 
                                 tanggal_pengembalian = :tanggal_pengembalian, 
                                 keterangan_peminjaman = :keterangan_peminjaman, 
-                                status = :status 
+                                id_status_peminjaman = :id_status 
                             WHERE id_peminjaman = :id_peminjaman";
 
         $this->db->query($queryPeminjaman);
@@ -238,11 +289,24 @@ class Peminjaman_model
         $this->db->bind('tanggal_peminjaman', $data['tanggal_peminjaman']);
         $this->db->bind('tanggal_pengembalian', $data['tanggal_pengembalian']);
         $this->db->bind('keterangan_peminjaman', $ket_header);
-        $this->db->bind('status', $data['status']);
+        $this->db->bind('id_status', $data['id_status_peminjaman'] ?? 1);
         $this->db->bind('id_peminjaman', $data['id_peminjaman']);
 
         $this->db->execute();
         $rowCountHeader = $this->db->rowCount();
+
+        // --- UPDATE SUB-TABLE (TPT) ---
+        $info = $this->getPeminjamanById($data['id_peminjaman']);
+        if ($info['jenis_peminjaman'] === 'Akademik') {
+            $queryAkademik = "UPDATE trx_peminjaman_akademik 
+                              SET dosen_pembimbing = :dosen, kategori_kegiatan = :kat
+                              WHERE id_peminjaman = :id";
+            $this->db->query($queryAkademik);
+            $this->db->bind('dosen', $data['dosen_pembimbing'] ?? '-');
+            $this->db->bind('kat', $data['judul_kegiatan']);
+            $this->db->bind('id', $data['id_peminjaman']);
+            $this->db->execute();
+        }
 
         $this->db->query("DELETE FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $data['id_peminjaman']);
@@ -294,7 +358,10 @@ class Peminjaman_model
 
     public function getDetailDataPeminjaman($id_peminjaman)
     {
-        $this->db->query("SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
+        $this->db->query("SELECT id_peminjaman, id_user, id_jenis_peminjaman, judul_kegiatan, 
+                                 tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, 
+                                 keterangan_peminjaman, id_status_peminjaman 
+                          FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman");
         $this->db->bind("id_peminjaman", $id_peminjaman);
         return $this->db->single();
     }
@@ -302,7 +369,7 @@ class Peminjaman_model
     public function getAllBarang()
     {
         $query = "SELECT 
-                mjb.*, 
+                mjb.id_jenis_barang, mjb.sub_barang, mjb.grup_sub, mjb.kode_sub, mjb.kode_jenis_barang,
                 (SELECT ms.foto_barang 
                  FROM mst_spesifikasi ms 
                  WHERE ms.id_jenis_barang = mjb.id_jenis_barang 
@@ -325,7 +392,7 @@ class Peminjaman_model
     public function cariBarang($keyword)
     {
         $query = "SELECT 
-                mjb.*, 
+                mjb.id_jenis_barang, mjb.sub_barang, mjb.grup_sub, mjb.kode_sub, mjb.kode_jenis_barang,
                 (SELECT tb.foto_barang 
                  FROM trx_barang tb 
                  WHERE tb.id_jenis_barang = mjb.id_jenis_barang 
@@ -353,7 +420,7 @@ class Peminjaman_model
 
         $placeholders = implode(',', array_fill(0, count($id_array), '?'));
 
-        $query = "SELECT * FROM mst_jenis_barang WHERE id_jenis_barang IN ($placeholders)";
+        $query = "SELECT id_jenis_barang, sub_barang, grup_sub, kode_sub, kode_jenis_barang FROM mst_jenis_barang WHERE id_jenis_barang IN ($placeholders)";
         $this->db->query($query);
 
         foreach ($id_array as $k => $id) {
@@ -372,12 +439,14 @@ class Peminjaman_model
 
     public function getPeminjamanTerbaruUser($id_user)
     {
-        $query = "SELECT tp.*, GROUP_CONCAT(mjb.sub_barang) as sub_barang 
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.judul_kegiatan, tp.tanggal_pengajuan, 
+                         tp.tanggal_peminjaman, tp.tanggal_pengembalian, tp.id_status_peminjaman,
+                         GROUP_CONCAT(mjb.sub_barang) as sub_barang 
                 FROM trx_peminjaman tp
                 JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
                 WHERE tp.id_user = :id_user 
-                AND tp.status = 'Melengkapi Surat'
+                AND tp.id_status_peminjaman = 1
                 GROUP BY tp.id_peminjaman
                 ORDER BY tp.id_peminjaman DESC";
 
@@ -388,7 +457,20 @@ class Peminjaman_model
 
     public function getDetailPeminjaman($id_peminjaman)
     {
-        $query = "SELECT * FROM trx_peminjaman WHERE id_peminjaman = :id";
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
+                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
+                         tp.keterangan_peminjaman, tp.keterangan_tolak, tp.id_status_peminjaman, 
+                         tp.file_surat, tp.validasi_kalab,
+                         tdu.nama_user AS nama_peminjam, tdu.nim_nip, 
+                         tpa.dosen_pembimbing, tpa.kategori_kegiatan,
+                         msp.nama_status AS status,
+                         mjp.nama_jenis_peminjaman AS jenis_peminjaman
+                  FROM trx_peminjaman tp
+                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
+                  JOIN mst_jenis_peminjaman mjp ON tp.id_jenis_peminjaman = mjp.id_jenis_peminjaman
+                  LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                  WHERE tp.id_peminjaman = :id";
 
         $this->db->query($query);
         $this->db->bind('id', $id_peminjaman);
@@ -397,7 +479,7 @@ class Peminjaman_model
 
     public function getUserProfile($id_user)
     {
-        $query = "SELECT du.*, u.email 
+        $query = "SELECT du.*, u.email, u.id_role 
                   FROM trx_data_user du
                   JOIN trx_user u ON du.id_user = u.id_user
                   WHERE u.id_user = :id_user";
@@ -411,7 +493,7 @@ class Peminjaman_model
     {
         $query = "UPDATE trx_peminjaman SET 
                     file_surat = :file, 
-                    status = 'diproses' 
+                    id_status_peminjaman = 2 
                   WHERE id_peminjaman = :id";
 
         $this->db->query($query);
@@ -453,7 +535,7 @@ class Peminjaman_model
             if (!empty($row['id_barang']) && !empty($row['id_spesifikasi_db'])) {
                 $row['id_spesifikasi'] = $row['id_spesifikasi_db'];
                 $row['spesifikasi_barang'] = $row['spesifikasi_db'];
-            } else if (strpos($row['keterangan_barang'], 'REQ_SPEC:') !== false) {
+            } else if (!is_null($row['keterangan_barang']) && strpos($row['keterangan_barang'], 'REQ_SPEC:') !== false) {
                 $parts = explode(':', $row['keterangan_barang']);
                 $specId = end($parts);
 
@@ -534,7 +616,7 @@ class Peminjaman_model
 
     public function otomatisasiPilihBarang($id_peminjaman)
     {
-        $this->db->query("SELECT * FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
+        $this->db->query("SELECT id_detail, id_peminjaman, id_jenis_barang, id_barang, jumlah, keterangan_barang FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
         $this->db->bind('id', $id_peminjaman);
         $request_details = $this->db->resultSet();
 
