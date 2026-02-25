@@ -21,8 +21,8 @@
                 $profile_data = $data['profile'];
                 $foto_profil = $profile_data['foto'];
 
-                if ($foto_profil == "../public/img/foto-profile/" || empty($foto_profil) || !file_exists(str_replace('../public/', '', $foto_profil))) {
-                    echo '<img class="profile-photo" src="' . BASEURL . 'img/foto-profile/user.svg" alt="profile">';
+                if (empty($foto_profil) || $foto_profil == "../public/img/foto-profile/" || !file_exists(str_replace('../public/', '', $foto_profil))) {
+                    echo '<i class="fa-solid fa-circle-user profile-photo" style="font-size: 220px; color: #1e293b; display: flex; justify-content: center; align-items: center; background: white; border: none;"></i>';
                 } else {
                     echo '<img class="profile-photo" src="' . BASEURL . $foto_profil . '" alt="profile">';
                 }
@@ -65,7 +65,7 @@
             </a>
 
             <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
-                <button type="button" class="btn btn-navy rounded-pill"  onclick="openTTDModal()">
+                <button type="button" class="btn btn-navy rounded-pill" onclick="openTTDModal()">
                     <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
                 </button>
             <?php endif; ?>
@@ -76,7 +76,7 @@
 
             <button type="button" class="btn btn-navy rounded-pill" onclick="openPassModal()">
                 <i class="fa-solid fa-key"></i> Ganti Password
-            </button>    
+            </button>
         </div>
     </div>
 </div>

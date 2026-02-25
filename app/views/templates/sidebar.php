@@ -15,8 +15,8 @@
                 style="display: flex; justify-content: center; align-items: center; height: 80px;">
                 <?php
                 $foto_profil = $data['profile']['foto'] ?? '';
-                // Cek apakah user punya foto custom (tidak kosong & bukan file default lama)
-                $has_photo = !empty($foto_profil) && strpos($foto_profil, 'PersonCircle.png') === false;
+                // Cek apakah user punya foto custom yang valid
+                $has_photo = !empty($foto_profil) && $foto_profil != "../public/img/foto-profile/" && file_exists(str_replace('../public/', '', $foto_profil));
                 ?>
 
                 <?php if ($has_photo): ?>
@@ -27,7 +27,7 @@
                     <i class="fa-solid fa-circle-user text-white" style="font-size: 60px; display: none;"></i>
 
                 <?php else: ?>
-                    <i class="fa-solid fa-circle-user text-white" style="font-size: 60px;"></i>
+                    <i class="fa-solid fa-circle-user text-white" style="font-size: 80px;"></i>
                 <?php endif; ?>
             </div>
             <div class="profile-info1">
