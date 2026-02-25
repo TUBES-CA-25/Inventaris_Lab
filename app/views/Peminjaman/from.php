@@ -14,6 +14,9 @@ $val_tgl_mulai = !empty($data['val_tgl_mulai']) ? $data['val_tgl_mulai'] : ($isE
 $val_tgl_akhir = !empty($data['val_tgl_akhir']) ? $data['val_tgl_akhir'] : ($isEdit ? $headerData['tanggal_pengembalian'] : '');
 $val_ket = !empty($data['val_ket']) ? $data['val_ket'] : ($isEdit && isset($headerData['keterangan_peminjaman']) ? $headerData['keterangan_peminjaman'] : '');
 $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
+$val_tujuan_ta = $data['val_tujuan_ta'] ?? '';
+$val_tujuan_riset = $data['val_tujuan_riset'] ?? '';
+$val_dosen = $data['val_dosen'] ?? '';
 // ------------------------------------------------------
 ?>
 
@@ -33,22 +36,43 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
                                 <label class="lbl">Tujuan Peminjaman</label>
                                 <div class="icon-wrap">
                                     <select name="judul_kegiatan" id="judul_kegiatan" class="inp-custom" required
-                                        onchange="toggleTujuanLain(this.value)">
+                                        onchange="toggleTujuanDetail(this.value)">
                                         <option value="">-- Pilih Tujuan --</option>
-                                        <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir') ? 'selected' : ''; ?>>
+                                        <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir' || strpos($val_judul, 'Tugas Akhir:') !== false) ? 'selected' : ''; ?>>
                                             Tugas Akhir</option>
-                                        <option value="Riset" <?= ($val_judul == 'Riset') ? 'selected' : ''; ?>>Riset</option>
-                                        <option value="Peminjaman Biasa" <?= ($val_judul == 'Peminjaman Biasa') ? 'selected' : ''; ?>>Peminjaman Biasa</option>
-                                        <option value="Lain-lain" <?= ($val_judul == 'Lain-lain') ? 'selected' : ''; ?>>
+                                        <option value="Riset" <?= ($val_judul == 'Riset' || strpos($val_judul, 'Riset:') !== false) ? 'selected' : ''; ?>>Riset</option>
+                                        <option value="Lain-lain" <?= ($val_judul == 'Lain-lain' || strpos($val_judul, 'Lain-lain:') !== false) ? 'selected' : ''; ?>>
                                             Lain-lain</option>
                                     </select>
                                     <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
                                 </div>
+
+                                <div id="wrap_tujuan_ta"
+                                    style="display: <?= ($val_judul == 'Tugas Akhir' || strpos($val_judul, 'Tugas Akhir:') !== false) ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    <label class="lbl">Judul Tugas Akhir</label>
+                                    <input type="text" name="tujuan_ta" id="tujuan_ta" class="inp-custom"
+                                        value="<?= $val_tujuan_ta; ?>" placeholder="Masukkan judul tugas akhir...">
+                                </div>
+
+                                <div id="wrap_tujuan_riset"
+                                    style="display: <?= ($val_judul == 'Riset' || strpos($val_judul, 'Riset:') !== false) ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    <label class="lbl">Judul Riset</label>
+                                    <input type="text" name="tujuan_riset" id="tujuan_riset" class="inp-custom"
+                                        value="<?= $val_tujuan_riset; ?>" placeholder="Masukkan judul riset...">
+                                </div>
+
                                 <div id="wrap_tujuan_lain"
-                                    style="display: <?= ($val_judul == 'Lain-lain') ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    style="display: <?= ($val_judul == 'Lain-lain' || strpos($val_judul, 'Lain-lain:') !== false) ? 'block' : 'none'; ?>; margin-top: 10px;">
                                     <label class="lbl">Detail Tujuan Lainnya</label>
                                     <input type="text" name="tujuan_lain" id="tujuan_lain" class="inp-custom"
                                         value="<?= $val_tujuan_lain; ?>" placeholder="Masukkan tujuan lainnya...">
+                                </div>
+
+                                <div id="wrap_dosen"
+                                    style="display: <?= ($val_judul && $val_judul != 'Peminjaman Biasa') ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    <label class="lbl">Nama Dosen Pembimbing</label>
+                                    <input type="text" name="dosen_pembimbing" id="dosen_pembimbing" class="inp-custom"
+                                        value="<?= $val_dosen; ?>" placeholder="Masukkan nama dosen pembimbing...">
                                 </div>
                             <?php else: ?>
                                 <label class="lbl">Judul kegiatan</label>
@@ -66,6 +90,52 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
                             </div>
                         </div>
 
+                        <style>
+                            .date-tooltip-wrapper {
+                                position: relative;
+                            }
+
+                            .date-info-tooltip {
+                                visibility: hidden;
+                                width: 220px;
+                                background-color: #0c1740;
+                                color: #fff;
+                                text-align: center;
+                                border-radius: 10px;
+                                padding: 10px 15px;
+                                position: absolute;
+                                z-index: 1000;
+                                bottom: 125%;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                opacity: 0;
+                                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                                font-size: 13px;
+                                line-height: 1.4;
+                                pointer-events: none;
+                                box-shadow: 0 10px 20px rgba(12, 23, 64, 0.2);
+                                font-weight: 500;
+                            }
+
+                            .date-info-tooltip::after {
+                                content: "";
+                                position: absolute;
+                                top: 100%;
+                                left: 50%;
+                                margin-left: -6px;
+                                border-width: 6px;
+                                border-style: solid;
+                                border-color: #0c1740 transparent transparent transparent;
+                            }
+
+                            /* Tampilkan tooltip hanya jika dalam keadaan 'locked' (belum ada tgl mulai) */
+                            .date-tooltip-wrapper.is-locked:hover .date-info-tooltip {
+                                visibility: visible;
+                                opacity: 1;
+                                bottom: 135%;
+                            }
+                        </style>
+
                         <div class="row row-item-grid gap-row">
                             <div class="col-md-6">
                                 <label class="lbl">Mulai dari tanggal</label>
@@ -78,11 +148,16 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
                             </div>
                             <div class="col-md-6">
                                 <label class="lbl">Sampai tanggal</label>
-                                <div class="icon-wrap">
-                                    <input type="date" name="tanggal_pengembalian" id="tanggal_pengembalian"
-                                        class="inp-custom" value="<?= $val_tgl_akhir; ?>" min="<?= date('Y-m-d'); ?>"
-                                        required onclick="this.showPicker()">
-                                    <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                <div class="date-tooltip-wrapper is-locked" id="return_date_wrapper">
+                                    <div class="date-info-tooltip">
+                                        <i class="fas fa-info-circle mr-1"></i> Silakan masukkan tanggal mulai peminjaman terlebih dahulu
+                                    </div>
+                                    <div class="icon-wrap">
+                                        <input type="date" name="tanggal_pengembalian" id="tanggal_pengembalian"
+                                            class="inp-custom" value="<?= $val_tgl_akhir; ?>" min="<?= date('Y-m-d'); ?>"
+                                            required onclick="this.showPicker()">
+                                        <i class="fa-regular fa-calendar icon-inside" style="color: #1e293b;"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -222,15 +297,32 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
 </div>
 
 <script>
-    function toggleTujuanLain(value) {
-        const wrap = document.getElementById('wrap_tujuan_lain');
-        const input = document.getElementById('tujuan_lain');
-        if (value === 'Lain-lain') {
-            wrap.style.display = 'block';
-            input.setAttribute('required', 'required');
-        } else {
-            wrap.style.display = 'none';
-            input.removeAttribute('required');
+    function toggleTujuanDetail(value) {
+        // Reset all
+        document.getElementById('wrap_tujuan_ta').style.display = 'none';
+        document.getElementById('tujuan_ta').removeAttribute('required');
+        document.getElementById('wrap_tujuan_riset').style.display = 'none';
+        document.getElementById('tujuan_riset').removeAttribute('required');
+        document.getElementById('wrap_tujuan_lain').style.display = 'none';
+        document.getElementById('tujuan_lain').removeAttribute('required');
+        document.getElementById('wrap_dosen').style.display = 'none';
+        document.getElementById('dosen_pembimbing').removeAttribute('required');
+
+        if (value === 'Tugas Akhir') {
+            document.getElementById('wrap_tujuan_ta').style.display = 'block';
+            document.getElementById('tujuan_ta').setAttribute('required', 'required');
+            document.getElementById('wrap_dosen').style.display = 'block';
+            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
+        } else if (value === 'Riset') {
+            document.getElementById('wrap_tujuan_riset').style.display = 'block';
+            document.getElementById('tujuan_riset').setAttribute('required', 'required');
+            document.getElementById('wrap_dosen').style.display = 'block';
+            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
+        } else if (value === 'Lain-lain') {
+            document.getElementById('wrap_tujuan_lain').style.display = 'block';
+            document.getElementById('tujuan_lain').setAttribute('required', 'required');
+            document.getElementById('wrap_dosen').style.display = 'block';
+            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         }
     }
 
@@ -251,8 +343,12 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
     function updateReturnDateConstraints() {
         const tglMulai = document.getElementById('tanggal_peminjaman');
         const tglSampai = document.getElementById('tanggal_pengembalian');
+        const wrapper = document.getElementById('return_date_wrapper');
 
         if (tglMulai.value) {
+            // UNLOCK
+            if (wrapper) wrapper.classList.remove('is-locked');
+            
             // Set min untuk tanggal sampai (minimal sama dengan tanggal mulai)
             tglSampai.min = tglMulai.value;
             tglSampai.disabled = false;
@@ -274,6 +370,9 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
                 tglSampai.value = "";
             }
         } else {
+            // LOCK
+            if (wrapper) wrapper.classList.add('is-locked');
+            
             tglSampai.disabled = true;
             tglSampai.value = "";
             tglSampai.style.opacity = "0.6";
@@ -324,86 +423,74 @@ $val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
     document.addEventListener("DOMContentLoaded", function () {
 
         const isEditMode = <?= $isEdit ? 'true' : 'false'; ?>;
-
         const hasItems = <?= !empty($data['barang_selected']) ? 'true' : 'false'; ?>;
 
         if (isEditMode || hasItems) {
+            document.body.addEventListener('click', function (e) {
+                const link = e.target.closest('a');
+                if (!link) return;
 
-            const links = document.querySelectorAll('a');
-            const form = document.getElementById('formPeminjaman');
+                const targetUrl = link.getAttribute('href');
 
-            links.forEach(link => {
-                link.addEventListener('click', function (e) {
-                    const targetUrl = this.getAttribute('href');
+                // Filter link yang aman (tidak perlu dicegat)
+                if (!targetUrl || targetUrl === '#' || targetUrl.startsWith('javascript')) return;
+                if (link.hasAttribute('data-toggle') || link.hasAttribute('data-target')) return;
+                if (link.id === 'btnLinkHapus' || link.classList.contains('btn-modal-delete')) return;
+                if (targetUrl.includes('hapusItem')) return;
+                if (link.classList.contains('btn-safe-action')) return;
+                if (targetUrl === '<?= BASEURL; ?>Peminjaman' || targetUrl === '<?= BASEURL; ?>Peminjaman/') return;
 
-                    // Filter link yang aman (tidak perlu dicegat)
-                    if (!targetUrl || targetUrl === '#' || targetUrl.startsWith('javascript')) return;
-                    if (this.hasAttribute('data-toggle') || this.hasAttribute('data-target')) return;
-                    if (this.id === 'btnLinkHapus' || this.classList.contains('btn-modal-delete')) return;
-                    if (targetUrl.includes('hapusItem')) return;
-                    if (this.classList.contains('btn-safe-action')) return;
-                    if (targetUrl === '<?= BASEURL; ?>Peminjaman' || targetUrl === '<?= BASEURL; ?>Peminjaman/') return;
+                // --- CEGAT NAVIGASI ---
+                e.preventDefault();
+                e.stopImmediatePropagation();
 
-                    // --- CEGAT NAVIGASI ---
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
+                let swalTitle, swalText, btnConfirmText, btnDenyText, denyUrl;
 
-                    // 2. Tentukan Teks & Aksi Berdasarkan Kondisi
-                    let swalTitle, swalText, btnConfirmText, btnDenyText, denyUrl;
+                if (isEditMode) {
+                    swalTitle = 'Keluar dari Edit Mode?';
+                    swalText = 'Perubahan yang belum disimpan akan hilang. Simpan sekarang atau batalkan edit?';
+                    btnConfirmText = 'Simpan Perubahan';
+                    btnDenyText = 'Batal Edit';
+                    denyUrl = '<?= BASEURL; ?>Peminjaman/batalEdit';
+                } else {
+                    swalTitle = 'Belum Mengajukan Barang!';
+                    swalText = 'Anda memiliki barang di daftar. Ingin ajukan sekarang atau hapus daftar?';
+                    btnConfirmText = 'Ajukan Sekarang';
+                    btnDenyText = 'Hapus Daftar';
+                    denyUrl = '<?= BASEURL; ?>Peminjaman/batal';
+                }
 
-                    if (isEditMode) {
-                        // KONDISI 1: SEDANG EDIT
-                        swalTitle = 'Keluar dari Edit Mode?';
-                        swalText = 'Perubahan yang belum disimpan akan hilang.';
-                        btnConfirmText = 'Simpan Perubahan';
-                        btnDenyText = 'Batal Edit';
-                        denyUrl = '<?= BASEURL; ?>Peminjaman/batalEdit'; // Method untuk reset session edit
-                    } else {
-                        // KONDISI 2: MAU PINJAM (ADA BARANG)
-                        swalTitle = 'Belum Mengajukan Barang!';
-                        swalText = 'Anda memiliki barang di daftar. Ingin ajukan sekarang atau hapus daftar?';
-                        btnConfirmText = 'Pinjam'; // Tombol Navy
-                        btnDenyText = 'Hapus Daftar'; // Tombol Putih
-                        denyUrl = '<?= BASEURL; ?>Peminjaman/batal'; // Method untuk reset session barang (Pastikan method ini ada!)
+                Swal.fire({
+                    title: swalTitle,
+                    text: swalText,
+                    icon: 'warning',
+                    width: '700px',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    showConfirmButton: true,
+                    confirmButtonText: btnConfirmText,
+                    denyButtonText: btnDenyText,
+                    cancelButtonText: 'Kembali',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn-send px-4 py-2',
+                        denyButton: 'btn-back px-4 py-2',
+                        cancelButton: 'btn-back px-4 py-2',
+                        actions: 'gap-2 mt-3'
                     }
-
-                    // 3. Tampilkan SweetAlert
-                    Swal.fire({
-                        title: swalTitle,
-                        text: swalText,
-                        icon: 'warning', // Gunakan icon warning agar lebih 'alert'
-
-                        showCancelButton: true,
-                        showDenyButton: true,
-                        showConfirmButton: true,
-
-                        confirmButtonText: btnConfirmText,
-                        denyButtonText: btnDenyText,
-                        cancelButtonText: 'Kembali', // Tetap di halaman
-
-                        buttonsStyling: false,
-
-                        // CLASS BUTTON SAMA SEPERTI PERMINTAAN
-                        customClass: {
-                            confirmButton: 'btn btn-swal-simpan', // Navy (Submit)
-                            denyButton: 'btn-back', // Putih (Reset/Discard)
-                            cancelButton: 'btn-back',
-                            actions: 'gap-2'
-                        }
-
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // TOMBOL NAVY (Kirim Form)
-                            if (form) form.submit();
-                        } else if (result.isDenied) {
-                            // TOMBOL PUTIH (Batal/Reset)
-                            window.location.href = denyUrl;
-                        } else {
-                            // TOMBOL KEMBALI (Diam di tempat)
-                        }
-                    });
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // KIRIM FORM
+                        const form = document.getElementById('formPeminjaman');
+                        if (form) form.submit();
+                    } else if (result.isDenied) {
+                        // RESET & LANJUT
+                        fetch(denyUrl).then(() => {
+                            window.location.href = targetUrl;
+                        });
+                    }
                 });
-            });
+            }, true);
         }
     });
 </script>
