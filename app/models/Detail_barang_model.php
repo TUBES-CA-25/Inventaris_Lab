@@ -11,32 +11,32 @@ class Detail_barang_model
     // --- GET DATA MASTER ---
     public function getSubBarang()
     {
-        $this->db->query("SELECT * FROM mst_jenis_barang ORDER BY sub_barang");
+        $this->db->query("SELECT id_jenis_barang, sub_barang, grup_sub, kode_sub, kode_jenis_barang FROM mst_jenis_barang ORDER BY sub_barang");
         return $this->db->resultSet();
     }
     public function getMerekBarang()
     {
-        $this->db->query("SELECT * FROM mst_merek_barang ORDER BY nama_merek_barang");
+        $this->db->query("SELECT id_merek_barang, nama_merek_barang, kode_merek_barang FROM mst_merek_barang ORDER BY nama_merek_barang");
         return $this->db->resultSet();
     }
     public function getKondisiBarang()
     {
-        $this->db->query("SELECT * FROM mst_kondisi_barang ORDER BY kondisi_barang");
+        $this->db->query("SELECT id_kondisi_barang, kondisi_barang FROM mst_kondisi_barang ORDER BY kondisi_barang");
         return $this->db->resultSet();
     }
     public function getSatuan()
     {
-        $this->db->query("SELECT * FROM mst_satuan ORDER BY nama_satuan");
+        $this->db->query("SELECT id_satuan, nama_satuan FROM mst_satuan ORDER BY nama_satuan");
         return $this->db->resultSet();
     }
     public function getStatus()
     {
-        $this->db->query("SELECT * FROM mst_status ORDER BY status");
+        $this->db->query("SELECT id_status, status FROM mst_status ORDER BY status");
         return $this->db->resultSet();
     }
     public function getLokasiPenyimpanan()
     {
-        $this->db->query("SELECT * FROM mst_lokasi_penyimpanan ORDER BY nama_lokasi_penyimpanan");
+        $this->db->query("SELECT id_lokasi_penyimpanan, nama_lokasi_penyimpanan FROM mst_lokasi_penyimpanan ORDER BY nama_lokasi_penyimpanan");
         return $this->db->resultSet();
     }
 
@@ -116,7 +116,8 @@ class Detail_barang_model
     private function insertNewMasterData($table, $column, $value, $extraInput = null)
     {
         // 1. Cek Data Ganda
-        $check = "SELECT * FROM $table WHERE $column = :value";
+        $pk = "id_" . str_replace("mst_", "", $table);
+        $check = "SELECT $pk FROM $table WHERE $column = :value";
         $this->db->query($check);
         $this->db->bind('value', $value);
         $existing = $this->db->single();
@@ -202,13 +203,13 @@ class Detail_barang_model
         if ($ukuranFile <= $limit) {
 
             // Ambil Nama-nama untuk Label QR
-            $this->db->query("SELECT * FROM mst_jenis_barang WHERE id_jenis_barang = :id");
+            $this->db->query("SELECT sub_barang, kode_jenis_barang FROM mst_jenis_barang WHERE id_jenis_barang = :id");
             $this->db->bind('id', $data['sub_barang']);
             $rowJenis = $this->db->single();
             $namaJenis = $rowJenis['sub_barang'];
             $kodeJenisString = $rowJenis['kode_jenis_barang'] ?? 'XXX';
 
-            $this->db->query("SELECT * FROM mst_merek_barang WHERE id_merek_barang = :id");
+            $this->db->query("SELECT nama_merek_barang, kode_merek_barang FROM mst_merek_barang WHERE id_merek_barang = :id");
             $this->db->bind('id', $data['nama_merek_barang']);
             $rowMerek = $this->db->single();
             $namaMerek = $rowMerek['nama_merek_barang'];
@@ -376,7 +377,9 @@ class Detail_barang_model
     public function getDetailDataBarang($id_barang)
     {
         $query = "SELECT 
-                    b.*,
+                    b.id_barang, b.id_spesifikasi, b.id_kondisi_barang, b.urutan_unit,
+                    b.tgl_pengadaan_barang, b.keterangan_label, b.id_lokasi_penyimpanan,
+                    b.deskripsi_detail_lokasi, b.id_status, b.status_peminjaman, b.qr_code,
                     spek.id_jenis_barang, 
                     spek.id_merek_barang, 
                     spek.id_satuan,
@@ -460,7 +463,9 @@ class Detail_barang_model
     public function getUbah($id_barang)
     {
         $query = "SELECT 
-                    b.*, 
+                    b.id_barang, b.id_spesifikasi, b.id_kondisi_barang, b.urutan_unit,
+                    b.tgl_pengadaan_barang, b.keterangan_label, b.id_lokasi_penyimpanan,
+                    b.deskripsi_detail_lokasi, b.id_status, b.status_peminjaman, b.qr_code, 
                     spek.id_jenis_barang, 
                     spek.id_merek_barang, 
                     spek.id_satuan,
