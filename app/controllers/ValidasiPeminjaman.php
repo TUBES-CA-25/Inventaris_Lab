@@ -6,7 +6,7 @@ class ValidasiPeminjaman extends Controller
         if (!isset($_SESSION))
             session_start();
 
-        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
+        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
@@ -67,7 +67,7 @@ class ValidasiPeminjaman extends Controller
 
     public function accKalab()
     {
-        if ($_SESSION['id_role'] != ROLE_KALAB) {
+        if ($_SESSION['id_role'] != '1') {
             Flasher::setFlash('Akses Ditolak', 'Hanya Kepala Lab yang bisa menyetujui tahap ini.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
@@ -97,7 +97,7 @@ class ValidasiPeminjaman extends Controller
         }
         $role = $_SESSION['id_role'];
 
-        if ($role != ROLE_KALAB && $role != ROLE_LABORAN) {
+        if ($role != '1' && $role != '2') {
             Flasher::setFlash('Akses Ditolak', 'Anda tidak memiliki wewenang tanda tangan.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
@@ -105,7 +105,7 @@ class ValidasiPeminjaman extends Controller
 
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
 
-        if ($role == ROLE_KALAB) {
+        if ($role == '1') {
             $label_box = "TTD Kepala Lab (Huzain)";
             $warna_box = "rgba(78, 115, 223, 0.6)";
             $border_box = "#4e73df";
@@ -156,7 +156,7 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
-        if (!in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
+        if (!in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
@@ -250,7 +250,7 @@ class ValidasiPeminjaman extends Controller
     }
     public function kirimNotifikasi()
     {
-        if (!in_array($_SESSION['id_role'], [ROLE_KALAB, ROLE_LABORAN])) {
+        if (!in_array($_SESSION['id_role'], ['1', '2'])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }

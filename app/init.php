@@ -36,7 +36,9 @@ set_exception_handler(function ($exception) {
     $_SESSION['error_trace'] = $exception->getTraceAsString();
 
     // Redirect ke 500 error page
-    header("Location: " . BASEURL . "ErrorPage/serverError");
+    if (!headers_sent()) {
+        header("Location: " . BASEURL . "ErrorPage/serverError");
+    }
     exit;
 });
 
@@ -80,7 +82,9 @@ register_shutdown_function(function () {
         $_SESSION['error_file'] = $error['file'];
         $_SESSION['error_line'] = $error['line'];
 
-        header("Location: " . BASEURL . "ErrorPage/serverError");
+        if (!headers_sent()) {
+            header("Location: " . BASEURL . "ErrorPage/serverError");
+        }
         exit;
     }
 });

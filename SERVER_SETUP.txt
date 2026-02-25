@@ -11,7 +11,7 @@ Saya sudah membuatkan script otomatis untuk Anda.
    chmod +x install_cron.sh
    ./install_cron.sh
    ```
-Script ini akan otomatis mendeteksi lokasi PHP, mengatur permission, dan mendaftarkan jadwal email otomatis jam 8 pagi setiap hari.
+Script ini akan otomatis mendeteksi lokasi PHP, mengatur permission, dan mendaftarkan jadwal email otomatis jam 5 pagi setiap hari.
 
 ## 1. Setup Manual (Jika Cara 0 Gagal)
 Jika Anda ingin mengatur sendiri secara manual atau menggunakan cPanel:
@@ -22,7 +22,7 @@ Script otomatisasi ada di:
 1. Login ke cPanel hosting Anda.
 2. Cari menu **Cron Jobs** (biasanya di bagian Advanced).
 3. Di bagian "Add New Cron Job":
-   - **Common Settings**: Pilih "Once Per Day" (atau set jam 08:00 AM).
+   - **Common Settings**: Pilih "Once Per Day" (atau set jam 05:00 AM).
    - **Command**: Masukkan perintah berikut (sesuaikan path):
      ```bash
      /usr/local/bin/php /home/username/public_html/Inventaris_Lab1/app/services/cron_job.php
@@ -33,9 +33,9 @@ Script otomatisasi ada di:
 ## 3. Setup di VPS (Ubuntu/CentOS)
 1. Login via SSH.
 2. Ketik `crontab -e` untuk mengedit jadwal.
-3. Tambahkan baris ini di paling bawah (untuk jalan jam 8 pagi setiap hari):
+3. Tambahkan baris ini di paling bawah (untuk jalan jam 5 pagi setiap hari):
    ```bash
-   0 8 * * * /usr/bin/php /var/www/html/Inventaris_Lab1/app/services/cron_job.php >> /var/log/cron_inventaris.log 2>&1
+   0 5 * * * /usr/bin/php /var/www/html/Inventaris_Lab1/app/services/cron_job.php >> /var/log/cron_inventaris.log 2>&1
    ```
 4. Simpan dan keluar (Ctrl+X, Y, Enter).
 

@@ -296,7 +296,7 @@ class User_model
 
     public function getUser($email, $password)
     {
-        $this->db->query("SELECT * FROM trx_user WHERE email = :email");
+        $this->db->query("SELECT id_user, email, password, id_role, email_verified FROM trx_user WHERE email = :email");
         $this->db->bind("email", $email);
         $user = $this->db->single();
 
@@ -334,7 +334,7 @@ class User_model
 
     public function getRole($id_user)
     {
-        $this->db->query("SELECT * FROM trx_user WHERE id_user = :id_user");
+        $this->db->query("SELECT id_user, id_role FROM trx_user WHERE id_user = :id_user");
         $this->db->bind("id_user", $id_user);
         return $this->db->single();
     }
@@ -366,7 +366,7 @@ class User_model
      */
     public function verifyEmailToken($token)
     {
-        $this->db->query("SELECT * FROM trx_user 
+        $this->db->query("SELECT id_user, email, id_role FROM trx_user 
                           WHERE verification_token = :token 
                           AND token_expiry > NOW()");
         $this->db->bind('token', $token);
@@ -466,6 +466,8 @@ class User_model
 
         // 4. Update password baru
         $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
+        $this->db->query("UPDATE trx_user SET password = :password WHERE id_user = :id");
+        $this->db->bind('password', $passwordHash);
         $this->db->bind('id', $id_user);
         $this->db->execute();
 

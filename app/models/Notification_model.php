@@ -68,7 +68,7 @@ class Notification_model
                   FROM trx_peminjaman p
                   JOIN trx_user u ON p.id_user = u.id_user
                   JOIN trx_data_user d ON p.id_user = d.id_user
-                  WHERE p.status = 'disetujui' 
+                  WHERE p.id_status_peminjaman = 3 
                   AND DATEDIFF(p.tanggal_pengembalian, '$today') BETWEEN 0 AND 3
                   AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
 
@@ -88,7 +88,7 @@ class Notification_model
                   FROM trx_peminjaman p
                   JOIN trx_user u ON p.id_user = u.id_user
                   JOIN trx_data_user d ON p.id_user = d.id_user
-                  WHERE p.status = 'disetujui' 
+                  WHERE p.id_status_peminjaman = 3 
                   AND p.tanggal_pengembalian < CURDATE()
                   AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
 

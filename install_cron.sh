@@ -25,9 +25,9 @@ fi
 # Beri permission execute ke cron_job.php
 chmod +x "$CRON_SCRIPT"
 
-# 2. Siapkan Perintah Cron (Jalan setiap hari jam 08:00 Pagi)
-# Format: 0 8 * * * /path/to/php /path/to/script >> /path/to/log 2>&1
-CRON_CMD="0 8 * * * $PHP_PATH $CRON_SCRIPT >> $LOG_FILE 2>&1"
+# 2. Siapkan Perintah Cron (Jalan setiap hari jam 05:00 Pagi)
+# Format: 0 5 * * * /path/to/php /path/to/script >> /path/to/log 2>&1
+CRON_CMD="0 5 * * * $PHP_PATH $CRON_SCRIPT >> $LOG_FILE 2>&1"
 
 # 3. Cek apakah cron job sudah ada sebelumnya untuk menghindari duplikasi
 EXISTING_CRON=$(crontab -l 2>/dev/null | grep "$CRON_SCRIPT")
@@ -41,7 +41,7 @@ else
     (crontab -l 2>/dev/null; echo "$CRON_CMD") | crontab -
     
     echo "[SUKSES] Cron job berhasil ditambahkan!"
-    echo "Email otomatis akan dikirim setiap hari pukul 08:00 pagi."
+    echo "Email otomatis akan dikirim setiap hari pukul 05:00 pagi."
     echo "Log output dapat dilihat di: $LOG_FILE"
     echo "Perintah yang ditambahkan:"
     echo "$CRON_CMD"

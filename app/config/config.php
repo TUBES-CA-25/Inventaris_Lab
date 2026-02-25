@@ -12,12 +12,8 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'inventori_db13');
 
-// User Roles
-define('ROLE_KALAB', '1');
-define('ROLE_LABORAN', '2');
-define('ROLE_DOSEN', '3');
-define('ROLE_MAHASISWA', '4');
-// IDs 5, 6, 7 are other variations (e.g. Mahasiswa Luar, Umum, etc.)
+// User Roles (Direct IDs)
+// 1: KEPLAB, 2: LABORAN, 3: KORLAB, 4: ASISTEN, 5: DOSEN, 6: MHS, 7: USER
 
 
 // ID Encryption Keys
@@ -43,4 +39,7 @@ define('VERIFICATION_LINK_EXPIRY', 24); // Durasi expired token dalam jam
 // WhatsApp Gateway (Fonnte) Configuration
 define('FONNTE_API_TOKEN', 'TOKEN_FONNTE_ANDA_DISINI'); // TODO: Ganti dengan Token dari https://fonnte.com
 define('FONNTE_GROUP_ID', 'ID_GRUP_WHATSAPP_DISINI'); // TODO: Ganti dengan ID Grup (biasanya diakhiri @g.us)
+
+// Application Versioning (for asset caching)
+define('APP_VERSION', '1.0.1');
 

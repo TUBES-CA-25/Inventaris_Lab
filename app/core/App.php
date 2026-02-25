@@ -8,14 +8,6 @@ class App
 
     public function __construct()
     {
-        // --- SYSTEM-WIDE AUTOMATION (Daily Email Check) ---
-        // Runs on EVERY page load (Lazy Cron), but restricted to 1x/day by file lock.
-        if (file_exists('../app/models/Notification_model.php')) {
-            require_once '../app/models/Notification_model.php';
-            $notify = new Notification_model();
-            $notify->checkAndRunDaily();
-        }
-        // --------------------------------------------------
 
         $url = $this->parseURL();
 
