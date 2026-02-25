@@ -15,7 +15,7 @@ $isRejected = in_array($st, ['tolak peminjaman', 'tolak pengembalian', 'ditolak'
 if (in_array($st, ['disetujui', 'diterima'])) {
     $statusClass = 'status-success';
     $statusIcon = 'fa-check-circle';
-} elseif ($isRejected) { 
+} elseif ($isRejected) {
     $statusClass = 'status-danger';
     $statusIcon = 'fa-times-circle';
 } elseif (in_array($st, ['melengkapi surat', 'melengkapi'])) {
@@ -33,12 +33,12 @@ if (in_array($st, ['disetujui', 'diterima'])) {
             <a href="<?= BASEURL ?>Riwayat/index" class="btn-modern btn-back">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            
+
             <?php if (!$isRejected): ?>
-            <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= IdObfuscator::encode($data['info_peminjaman']['id_peminjaman']) ?>"
-                target="_blank" class="btn-modern btn-pdf">
-                <i class="fas fa-file-pdf"></i> Cetak Bukti
-            </a>
+                <a href="<?= BASEURL ?>Riwayat/cetakPdf/<?= IdObfuscator::encode($data['info_peminjaman']['id_peminjaman']) ?>"
+                    target="_blank" class="btn-modern btn-pdf">
+                    <i class="fas fa-file-pdf"></i> Cetak Bukti
+                </a>
             <?php endif; ?>
         </div>
     </div>
@@ -61,7 +61,8 @@ if (in_array($st, ['disetujui', 'diterima'])) {
 
         <?php if ($isRejected): ?>
             <div class="mx-4 mt-4">
-                <div class="alert alert-danger border-0 shadow-sm" role="alert" style="background-color: #ffeef0; color: #e74a3b;">
+                <div class="alert alert-danger border-0 shadow-sm" role="alert"
+                    style="background-color: #ffeef0; color: #e74a3b;">
                     <h5 class="alert-heading fw-bold mb-2">
                         <i class="fas fa-exclamation-triangle me-2"></i>Alasan Penolakan
                     </h5>
@@ -99,8 +100,8 @@ if (in_array($st, ['disetujui', 'diterima'])) {
                     <div class="detail-card-label">Durasi Peminjaman</div>
                     <?php
                     $start = new DateTime($data['info_peminjaman']['tanggal_peminjaman'] ?? 'now');
-                    $end   = new DateTime($data['info_peminjaman']['tanggal_pengembalian'] ?? 'now');
-                    $diff  = $start->diff($end);
+                    $end = new DateTime($data['info_peminjaman']['tanggal_pengembalian'] ?? 'now');
+                    $diff = $start->diff($end);
                     ?>
                     <div class="detail-card-value duration-highlight">
                         <?= $diff->days ?> Hari
@@ -112,6 +113,15 @@ if (in_array($st, ['disetujui', 'diterima'])) {
                         </small>
                     </div>
                 </div>
+
+                <?php if (!empty($data['info_peminjaman']['dosen_pembimbing'])): ?>
+                    <div class="detail-card">
+                        <div class="detail-card-label">Dosen Pembimbing</div>
+                        <div class="detail-card-value">
+                            <?= htmlspecialchars($data['info_peminjaman']['dosen_pembimbing']) ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
             </div>
         </div>
@@ -157,9 +167,9 @@ if (in_array($st, ['disetujui', 'diterima'])) {
                             <tr>
                                 <td><?= $no++ ?></td>
                                 <td>
-                                    <div class="img-zoom-container" onclick="showImageModal('<?= $item['foto_url_ready'] ?>', '<?= htmlspecialchars($item['nama_barang'] ?? '-') ?>')">
-                                        <img src="<?= $item['foto_url_ready'] ?>"
-                                            alt="Foto" class="item-thumb"
+                                    <div class="img-zoom-container"
+                                        onclick="showImageModal('<?= $item['foto_url_ready'] ?>', '<?= htmlspecialchars($item['nama_barang'] ?? '-') ?>')">
+                                        <img src="<?= $item['foto_url_ready'] ?>" alt="Foto" class="item-thumb"
                                             onerror="this.onerror=null; this.src='<?= BASEURL; ?>img/foto-barang/default_tools.png';">
                                         <div class="zoom-overlay"><i class="fas fa-search-plus"></i></div>
                                     </div>
