@@ -10,21 +10,27 @@ class ValidasiPeminjaman_model
 
     public function getDetailValidasiDataPeminjaman($id_peminjaman)
     {
-        $query = "SELECT tp.*, 
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
+                        tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
+                        tp.keterangan_peminjaman, tp.keterangan_tolak, tp.id_status_peminjaman, 
+                        tp.file_surat, tp.validasi_kalab,
                         tdu.nama_user, 
                         tdu.nim_nip,
+                        tpa.dosen_pembimbing, tpa.kategori_kegiatan,
                         GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
                         SUM(tdp.jumlah) as jumlah_peminjaman,
                         tp.keterangan_peminjaman as alasan_penolakan,
-                        peng.status_pengembalian
+                        mspg.nama_status_pengembalian AS status_pengembalian
                 FROM trx_peminjaman tp
                 JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
                 LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
+                LEFT JOIN mst_status_pengembalian mspg ON peng.id_status_pengembalian = mspg.id_status_pengembalian
                 
                 WHERE tp.id_peminjaman = :id_peminjaman
-                GROUP BY tp.id_peminjaman, tdu.nama_user, tdu.nim_nip, peng.status_pengembalian";
+                GROUP BY tp.id_peminjaman, tdu.nama_user, tdu.nim_nip, mspg.nama_status_pengembalian, tpa.dosen_pembimbing, tpa.kategori_kegiatan";
 
         $this->db->query($query);
         $this->db->bind("id_peminjaman", $id_peminjaman);
@@ -33,19 +39,30 @@ class ValidasiPeminjaman_model
 
     public function updateStatusValidasi($id_peminjaman, $status, $catatan = null)
     {
-        $query = "UPDATE trx_peminjaman SET status = :status";
+        $statusMap = [
+            'melengkapi surat' => 1,
+            'diproses' => 2,
+            'disetujui' => 3,
+            'tolak peminjaman' => 4,
+            'dikembalikan' => 5,
+            'tolak pengembalian' => 6
+        ];
 
-        if ($status == 'tolak peminjaman') {
+        $statusId = $statusMap[strtolower($status)] ?? 2;
+
+        $query = "UPDATE trx_peminjaman SET id_status_peminjaman = :statusId";
+
+        if ($statusId == 4) { // Tolak
             $query .= ", keterangan_tolak = :keterangan";
         }
 
         $query .= " WHERE id_peminjaman = :id_peminjaman";
 
         $this->db->query($query);
-        $this->db->bind('status', $status);
+        $this->db->bind('statusId', $statusId);
         $this->db->bind('id_peminjaman', $id_peminjaman);
 
-        if ($status == 'tolak peminjaman') {
+        if ($statusId == 4) {
             $pesan = empty($catatan) ? '-' : $catatan;
             $this->db->bind('keterangan', $pesan);
         }
@@ -78,23 +95,26 @@ class ValidasiPeminjaman_model
 
     public function getValidasiGabungan()
     {
-        $query = "SELECT tp.*, 
+        $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
+                        tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
                         tdu.nama_user, 
+                        msp.nama_status AS status,
                         GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
                 FROM trx_peminjaman tp
                 JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
                 
                 WHERE 
-                    tp.status IN ('diproses', 'disetujui', 'Tolak Pengembalian') 
+                    tp.id_status_peminjaman IN (2, 3, 6) 
                 
-                GROUP BY tp.id_peminjaman, tdu.nama_user
+                GROUP BY tp.id_peminjaman, tdu.nama_user, msp.nama_status
                 
                 ORDER BY 
                     CASE 
-                        WHEN tp.status = 'diproses' THEN 1 
-                        WHEN tp.status = 'disetujui' THEN 2 
+                        WHEN tp.id_status_peminjaman = 2 THEN 1 
+                        WHEN tp.id_status_peminjaman = 3 THEN 2 
                         ELSE 3
                     END ASC,
                     tp.tanggal_pengajuan DESC";
@@ -105,8 +125,19 @@ class ValidasiPeminjaman_model
 
     public function hitungStatus($status)
     {
-        $this->db->query("SELECT COUNT(*) as total FROM trx_peminjaman WHERE status = :status");
-        $this->db->bind('status', $status);
+        $statusMap = [
+            'melengkapi surat' => 1,
+            'diproses' => 2,
+            'disetujui' => 3,
+            'tolak peminjaman' => 4,
+            'ditolak' => 4,
+            'dikembalikan' => 5,
+            'tolak pengembalian' => 6
+        ];
+        $statusId = $statusMap[strtolower($status)] ?? 0;
+
+        $this->db->query("SELECT COUNT(*) as total FROM trx_peminjaman WHERE id_status_peminjaman = :sid");
+        $this->db->bind('sid', $statusId);
 
         $result = $this->db->single();
 
@@ -188,7 +219,7 @@ class ValidasiPeminjaman_model
 
             $query = "UPDATE trx_peminjaman SET 
                       validasi_laboran = '1', 
-                      status = 'disetujui' 
+                      id_status_peminjaman = 3 
                       WHERE id_peminjaman = :id";
 
             $this->db->query($query);
@@ -323,7 +354,7 @@ class ValidasiPeminjaman_model
         $query = "UPDATE trx_peminjaman SET 
                     validasi_kalab = '1', 
                     validasi_laboran = '1', 
-                    status = 'disetujui' 
+                    id_status_peminjaman = 3 
                     WHERE id_peminjaman = :id";
 
         $this->db->query($query);

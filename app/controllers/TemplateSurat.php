@@ -76,7 +76,16 @@ class TemplateSurat extends Controller
             exit;
         }
 
-        $id_user = $_SESSION['id_user'];
+        // --- SECURITY CHECK: Restricted user can only access their own ---
+        $id_user_login = $_SESSION['id_user'];
+        $id_role_login = $_SESSION['id_role']; // Assuming this is set in session
+
+        if (($id_role_login == 4 || $id_role_login == 6 || $id_role_login == 7) && $peminjaman['id_user'] != $id_user_login) {
+            echo "Akses Ditolak: Anda tidak memiliki hak akses untuk dokumen ini.";
+            exit;
+        }
+
+        $id_user = $peminjaman['id_user'];
         $user = $this->peminjamanModel->getUserProfile($id_user);
 
         $pathKop = '../public/img/kop_surat.png';
@@ -89,7 +98,12 @@ class TemplateSurat extends Controller
         }
 
         ob_start();
-        require_once '../app/views/peminjaman/surat_pdf.php';
+        // Cek Role untuk memilih Template
+        if ($user['id_role'] == '6') {
+            require_once '../app/views/Peminjaman/suratPdfMHS.php';
+        } else {
+            require_once '../app/views/peminjaman/surat_pdf.php';
+        }
         $htmlContent = ob_get_clean();
 
         $options = new Options();
