@@ -22,6 +22,7 @@ class Peminjaman extends Controller
         $data['sub_barang'] = $PeminjamanModel->getSubBarang();
 
         $data['isEdit'] = (isset($_SESSION['edit_mode']) && $_SESSION['edit_mode'] === true);
+        $data['cart_count'] = isset($_SESSION['keranjang']) ? count($_SESSION['keranjang']) : 0;
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -45,6 +46,7 @@ class Peminjaman extends Controller
         }
 
         $data['sub_barang'] = $PeminjamanModel->getSubBarang();
+        $data['cart_count'] = isset($_SESSION['keranjang']) ? count($_SESSION['keranjang']) : 0;
 
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
@@ -86,6 +88,9 @@ class Peminjaman extends Controller
         $data['val_tgl_akhir'] = $draft['tanggal_pengembalian'] ?? '';
         $data['val_ket'] = $draft['keterangan_peminjaman'] ?? '';
         $data['val_tujuan_lain'] = $draft['tujuan_lain'] ?? '';
+        $data['val_tujuan_ta'] = $draft['tujuan_ta'] ?? '';
+        $data['val_tujuan_riset'] = $draft['tujuan_riset'] ?? '';
+        $data['val_dosen'] = $draft['dosen_pembimbing'] ?? '';
         // ---------------------------
 
         $data['barang_selected'] = [];
@@ -196,6 +201,9 @@ class Peminjaman extends Controller
             $_SESSION['peminjaman_draft'] = [
                 'judul_kegiatan' => $_POST['judul_kegiatan'] ?? '',
                 'tujuan_lain' => $_POST['tujuan_lain'] ?? '',
+                'tujuan_ta' => $_POST['tujuan_ta'] ?? '',
+                'tujuan_riset' => $_POST['tujuan_riset'] ?? '',
+                'dosen_pembimbing' => $_POST['dosen_pembimbing'] ?? '',
                 'tanggal_pengajuan' => $_POST['tanggal_pengajuan'] ?? '',
                 'tanggal_peminjaman' => $_POST['tanggal_peminjaman'] ?? '',
                 'tanggal_pengembalian' => $_POST['tanggal_pengembalian'] ?? '',
@@ -265,6 +273,11 @@ class Peminjaman extends Controller
             exit;
         }
 
+        // --- VALIDASI DATA ---
+        $this->cekValidasiTanggal($_POST);
+        $this->cekValidasiStok($_POST);
+        // ---------------------
+
         $dataUser['id_user'] = $_SESSION['id_user'];
         $userProfile = $this->model('User_model')->profile($dataUser);
 
@@ -318,6 +331,11 @@ class Peminjaman extends Controller
         $today = date('Y-m-d');
         if (isset($postData['tanggal_peminjaman']) && $postData['tanggal_peminjaman'] < $today) {
             Flasher::setFlash('Tanggal Tidak Valid', 'Tanggal mulai peminjaman tidak boleh tanggal kemarin.', '', 'danger');
+            header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
+            exit;
+        }
+        if (isset($postData['tanggal_pengembalian']) && $postData['tanggal_pengembalian'] < $today) {
+            Flasher::setFlash('Tanggal Tidak Valid', 'Tanggal pengembalian tidak boleh tanggal kemarin.', '', 'danger');
             header('Location: ' . BASEURL . 'Peminjaman/formPeminjaman');
             exit;
         }
