@@ -22,6 +22,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
+<script>window.baseUrl = '<?= BASEURL; ?>';</script>
 <script src="<?= BASEURL; ?>js/script.js?v=<?= APP_VERSION; ?>"></script>
 <script src="<?= BASEURL; ?>js/Beranda.js?v=<?= APP_VERSION; ?>"></script>
 <script src="<?= BASEURL; ?>js/Sidebar.js?v=<?= APP_VERSION; ?>"></script>
@@ -31,6 +32,7 @@
 <script src="<?= BASEURL; ?>js/ValidasiPeminjaman.js?v=<?= APP_VERSION; ?>"></script>
 \
 <script src="<?= BASEURL; ?>js/IndexPengembalian.js?v=<?= APP_VERSION; ?>"></script>
+<script src="<?= BASEURL; ?>js/DashboardChartsPremium.js?v=<?= APP_VERSION; ?>"></script>
 
 <script>
     // 1. Logika Menghilangkan Loader setelah halaman Load
