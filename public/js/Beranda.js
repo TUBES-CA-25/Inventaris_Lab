@@ -5,26 +5,44 @@ const filterBulanWrapper = document.getElementById('filterBulanWrapper'); // Wra
 const filterTahun = document.getElementById('filterTahun');
 
 // Event Listener untuk Filter Mode
-filterMode.addEventListener('change', function() {
+filterMode.addEventListener('change', function () {
     // Reset tampilan
     if (filterBulanWrapper) filterBulanWrapper.classList.add('d-none');
-    
+
+    // Toggle Year Filter
+    const filterTahunWrapper = document.getElementById('filterTahunWrapper');
+    if (filterTahunWrapper) {
+        if (this.value === 'tahunan') filterTahunWrapper.classList.add('d-none');
+        else filterTahunWrapper.classList.remove('d-none');
+    }
+
     // Logika Tampilan
     if (this.value === 'harian') {
         // Tampilkan Wrapper Bulan
         if (filterBulanWrapper) filterBulanWrapper.classList.remove('d-none');
-    } 
+    }
     // Jika 'bulanan' atau 'tahunan', wrapper bulan tetap hidden (d-none)
 });
 
 // Setup Chart.js
-let charts = {}; 
+let charts = {};
 const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false } }, 
+    plugins: { legend: { display: false } },
     scales: {
-        y: { beginAtZero: true, ticks: { precision: 0 } }
+        x: {
+            grid: { display: false },
+            ticks: { maxTicksLimit: 20 }
+        },
+        y: {
+            beginAtZero: true,
+            suggestedMax: 10,
+            ticks: {
+                precision: 0,
+                stepSize: 2
+            }
+        }
     }
 };
 
@@ -73,43 +91,43 @@ function updateCharts() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
-        return response.json();
-    })
-    .then(data => {
-        // Update Semua Chart jika object chart berhasil dibuat
-        const labels = data.labels;
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            // Update Semua Chart jika object chart berhasil dibuat
+            const labels = data.labels;
 
-        if (charts.peminjaman) {
-            charts.peminjaman.data.labels = labels;
-            charts.peminjaman.data.datasets[0].data = data.peminjaman;
-            charts.peminjaman.update();
-        }
+            if (charts.peminjaman) {
+                charts.peminjaman.data.labels = labels;
+                charts.peminjaman.data.datasets[0].data = data.peminjaman;
+                charts.peminjaman.update();
+            }
 
-        if (charts.pengembalian) {
-            charts.pengembalian.data.labels = labels;
-            charts.pengembalian.data.datasets[0].data = data.pengembalian;
-            charts.pengembalian.update();
-        }
+            if (charts.pengembalian) {
+                charts.pengembalian.data.labels = labels;
+                charts.pengembalian.data.datasets[0].data = data.pengembalian;
+                charts.pengembalian.update();
+            }
 
-        if (charts.bagus) {
-            charts.bagus.data.labels = labels;
-            charts.bagus.data.datasets[0].data = data.bagus;
-            charts.bagus.update();
-        }
+            if (charts.bagus) {
+                charts.bagus.data.labels = labels;
+                charts.bagus.data.datasets[0].data = data.bagus;
+                charts.bagus.update();
+            }
 
-        if (charts.rusak) {
-            charts.rusak.data.labels = labels;
-            charts.rusak.data.datasets[0].data = data.rusak;
-            charts.rusak.update();
-        }
-    })
-    .catch(err => console.error('Gagal mengambil data:', err));
+            if (charts.rusak) {
+                charts.rusak.data.labels = labels;
+                charts.rusak.data.datasets[0].data = data.rusak;
+                charts.rusak.update();
+            }
+        })
+        .catch(err => console.error('Gagal mengambil data:', err));
 }
 
 // Load awal saat halaman siap
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Trigger change event manual agar tampilan filter sesuai state awal
     filterMode.dispatchEvent(new Event('change'));
     updateCharts();
