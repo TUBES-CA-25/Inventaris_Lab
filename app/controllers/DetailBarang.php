@@ -91,6 +91,15 @@ class DetailBarang extends Controller
     public function tambahBarang()
     {
         if ($this->model('Detail_barang_model')->postDataBarang($_POST) > 0) {
+            // Log Activity for Assistant
+            if (in_array($_SESSION['id_role'], [3, 4])) {
+                $this->model('Beranda_model')->logActivity(
+                    $_SESSION['id_user'],
+                    'TAMBAH_BARANG',
+                    'Menambahkan barang baru: ' . ($_POST['spesifikasi_barang'] ?? 'Unit Baru')
+                );
+            }
+
             Flasher::setFlash('Barang', 'berhasil', ' diTambahkan', 'success');
             header('Location: ' . BASEURL . 'DetailBarang');
             exit;

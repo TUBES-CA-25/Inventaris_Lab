@@ -174,6 +174,13 @@ class Pengembalian extends Controller
         $result = $this->model('Pengembalian_model')->updateOrInsertPengembalian($_POST);
 
         if ($result > 0) {
+            // Log Activity for Assistant
+            $this->model('Beranda_model')->logActivity(
+                $_SESSION['id_user'],
+                'VERIFIKASI_PENGEMBALIAN',
+                'Memverifikasi pengembalian untuk ID Peminjaman: ' . $_POST['id_peminjaman']
+            );
+
             Flasher::setFlash('Status Pengembalian', 'berhasil', ' diperbarui', 'success');
         } else {
             Flasher::setFlash('Status Pengembalian', 'gagal', ' diperbarui', 'danger');

@@ -162,6 +162,15 @@ class Peminjaman extends Controller
         // 6. Eksekusi Database
         if ($this->model('Peminjaman_model')->postDataPeminjaman($dataPayload) > 0) {
 
+            // Log Activity for Assistant/Korlab
+            if (in_array($_SESSION['id_role'], [3, 4])) {
+                $this->model('Beranda_model')->logActivity(
+                    $_SESSION['id_user'],
+                    'MEMINJAM',
+                    'Melakukan peminjaman barang untuk kegiatan: ' . ($dataPayload['judul_kegiatan'] ?? '-')
+                );
+            }
+
             // BERHASIL: Bersihkan keranjang dan draft
             unset($_SESSION['keranjang']);
             unset($_SESSION['peminjaman_draft']);
