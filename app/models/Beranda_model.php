@@ -203,9 +203,9 @@ class Beranda_model
      */
     public function getPeminjamanPending($limit = 5)
     {
-        $query = "SELECT tp.id_peminjaman, tp.judul_kegiatan, tp.tanggal_pengajuan, tdu.nama_user as peminjam
+        $query = "SELECT tp.id_peminjaman, tp.judul_kegiatan, tp.tanggal_pengajuan, tu.nama_user as peminjam
                   FROM trx_peminjaman tp
-                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN trx_user tu ON tp.id_user = tu.id_user
                   WHERE tp.id_status_peminjaman = 2
                   ORDER BY tp.tanggal_pengajuan ASC
                   LIMIT :limit";
@@ -220,10 +220,10 @@ class Beranda_model
      */
     public function getPengembalianVerified($limit = 5)
     {
-        $query = "SELECT tp.id_peminjaman, tp.judul_kegiatan, peng.tgl_pengembalian_aktual, tdu.nama_user as peminjam
+        $query = "SELECT tp.id_peminjaman, tp.judul_kegiatan, peng.tgl_pengembalian_aktual, tu.nama_user as peminjam
                   FROM trx_peminjaman tp
                   JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
-                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN trx_user tu ON tp.id_user = tu.id_user
                   WHERE peng.id_status_pengembalian = 1 AND tp.id_status_peminjaman IN (3, 6)
                   ORDER BY peng.tgl_pengembalian_aktual ASC
                   LIMIT :limit";
@@ -391,7 +391,7 @@ class Beranda_model
     {
         $query = "SELECT log.action_type, log.details, log.created_at, u.nama_user 
                   FROM trx_log_activity log
-                  JOIN trx_data_user u ON log.id_user = u.id_user
+                  JOIN trx_user u ON log.id_user = u.id_user
                   ORDER BY log.created_at DESC 
                   LIMIT :limit";
         $this->db->query($query);

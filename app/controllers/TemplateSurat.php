@@ -88,6 +88,12 @@ class TemplateSurat extends Controller
         $id_user = $peminjaman['id_user'];
         $user = $this->peminjamanModel->getUserProfile($id_user);
 
+        // Fetch Supervisor Profile (for NIDN/NIP)
+        $supervisor = null;
+        if (!empty($peminjaman['dosen_pembimbing'])) {
+            $supervisor = $this->model('User_model')->getUserByName($peminjaman['dosen_pembimbing']);
+        }
+
         $pathKop = '../public/img/kop_surat.png';
         $gambar_kop = '';
 

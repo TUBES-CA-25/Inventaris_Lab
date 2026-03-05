@@ -22,7 +22,7 @@ class ValidasiPeminjaman_model
                         tp.keterangan_peminjaman as alasan_penolakan,
                         mspg.nama_status_pengembalian AS status_pengembalian
                 FROM trx_peminjaman tp
-                JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                JOIN trx_user tdu ON tp.id_user = tdu.id_user  
                 LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
@@ -101,7 +101,7 @@ class ValidasiPeminjaman_model
                         msp.nama_status AS status,
                         GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang 
                 FROM trx_peminjaman tp
-                JOIN trx_data_user tdu ON tp.id_user = tdu.id_user  
+                JOIN trx_user tdu ON tp.id_user = tdu.id_user  
                 JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang

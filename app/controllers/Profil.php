@@ -1,10 +1,12 @@
 <?php
 
-class Profil extends Controller {
-    
+class Profil extends Controller
+{
+
     private $userModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         if (!isset($_SESSION['login'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
@@ -12,7 +14,8 @@ class Profil extends Controller {
         $this->userModel = $this->model('User_model');
     }
 
-    public function index(){
+    public function index()
+    {
         $data['judul'] = 'Profil';
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->userModel->profile($data);
@@ -22,17 +25,19 @@ class Profil extends Controller {
         $this->view('templates/footer');
     }
 
-    public function getUbah(){
+    public function getUbah()
+    {
         echo json_encode($this->userModel->getUbah($_POST['id_user']));
     }
 
-    public function ubah(){
-        if($this->userModel->ubah($_POST) >= 0){
-             Flasher::setFlash('Profil', 'berhasil', 'diubah', 'success');
+    public function ubah()
+    {
+        if ($this->userModel->ubah($_POST) >= 0) {
+            Flasher::setFlash('Profil', 'berhasil', 'diubah', 'success');
         } else {
-             Flasher::setFlash('Profil', 'gagal', 'diubah', 'danger');
+            Flasher::setFlash('Profil', 'gagal', 'diubah', 'danger');
         }
-        header('Location: '. BASEURL . 'Profil');
+        header('Location: ' . BASEURL . 'Profil');
         exit;
     }
 
@@ -44,7 +49,7 @@ class Profil extends Controller {
         }
 
         if (isset($_FILES['ttd_kalab']) || isset($_FILES['ttd_laboran'])) {
-            
+
             $hasil = $this->userModel->updateTTDSpesifik($_FILES);
 
             if ($hasil > 0) {
@@ -60,7 +65,8 @@ class Profil extends Controller {
         exit;
     }
 
-    public function gantiPassword() {
+    public function gantiPassword()
+    {
         if ($this->model('User_model')->gantiPasswordUser($_POST) > 0) {
             Flasher::setFlash('Password', 'berhasil', 'diubah', 'success');
         } else {
@@ -70,5 +76,5 @@ class Profil extends Controller {
         header('Location: ' . BASEURL . 'Profil');
         exit;
     }
-    
+
 }

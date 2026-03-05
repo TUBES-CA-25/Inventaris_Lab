@@ -157,8 +157,8 @@ class Peminjaman_model
         $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
                          tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
                          mst_jenis_barang.sub_barang 
-                  FROM trx_peminjaman tp
-                  JOIN mst_jenis_barang ON tp.id_jenis_peminjaman = mst_jenis_barang.id_jenis_peminjaman";
+                   FROM trx_peminjaman tp
+                   JOIN mst_jenis_barang ON tp.id_jenis_peminjaman = mst_jenis_barang.id_jenis_peminjaman";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -184,7 +184,7 @@ class Peminjaman_model
             b.keterangan_peminjaman,
             msp.nama_status AS status
         FROM trx_peminjaman b
-        JOIN trx_data_user d ON b.id_user = d.id_user
+        JOIN trx_user d ON b.id_user = d.id_user
         JOIN trx_detail_peminjaman dt ON b.id_peminjaman = dt.id_peminjaman
         JOIN mst_jenis_barang j ON dt.id_jenis_barang = j.id_jenis_barang
         JOIN mst_status_peminjaman msp ON b.id_status_peminjaman = msp.id_status_peminjaman
@@ -233,7 +233,7 @@ class Peminjaman_model
                          msp.nama_status AS status,
                          mjp.nama_jenis_peminjaman AS jenis_peminjaman
                   FROM trx_peminjaman tp
-                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN trx_user tdu ON tp.id_user = tdu.id_user
                   JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                   JOIN mst_jenis_peminjaman mjp ON tp.id_jenis_peminjaman = mjp.id_jenis_peminjaman
                   LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
@@ -249,8 +249,8 @@ class Peminjaman_model
     public function getUbah($id_peminjaman)
     {
         $tampilView = "SELECT id_peminjaman, id_user, id_jenis_peminjaman, judul_kegiatan, 
-                              tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, 
-                              keterangan_peminjaman, id_status_peminjaman, file_surat 
+                               tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, 
+                               keterangan_peminjaman, id_status_peminjaman, file_surat 
                        FROM trx_peminjaman WHERE id_peminjaman = :id_peminjaman;";
         $this->db->query($tampilView);
         $this->db->bind("id_peminjaman", $id_peminjaman);
@@ -466,7 +466,7 @@ class Peminjaman_model
                          msp.nama_status AS status,
                          mjp.nama_jenis_peminjaman AS jenis_peminjaman
                   FROM trx_peminjaman tp
-                  JOIN trx_data_user tdu ON tp.id_user = tdu.id_user
+                  JOIN trx_user tdu ON tp.id_user = tdu.id_user
                   JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                   JOIN mst_jenis_peminjaman mjp ON tp.id_jenis_peminjaman = mjp.id_jenis_peminjaman
                   LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
@@ -479,10 +479,9 @@ class Peminjaman_model
 
     public function getUserProfile($id_user)
     {
-        $query = "SELECT du.*, u.email, u.id_role 
-                  FROM trx_data_user du
-                  JOIN trx_user u ON du.id_user = u.id_user
-                  WHERE u.id_user = :id_user";
+        $query = "SELECT du.*
+                  FROM trx_user du
+                  WHERE du.id_user = :id_user";
 
         $this->db->query($query);
         $this->db->bind('id_user', $id_user);
@@ -631,11 +630,11 @@ class Peminjaman_model
                 $jumlah_diminta = (int) $row['jumlah'];
 
                 $queryCari = "SELECT id_barang FROM trx_barang 
-                              WHERE id_spesifikasi = :spec 
-                              AND status_peminjaman = 'Bisa'
-                              AND id_kondisi_barang = 1 
-                              ORDER BY urutan_unit ASC
-                              LIMIT $jumlah_diminta";
+                               WHERE id_spesifikasi = :spec 
+                               AND status_peminjaman = 'Bisa'
+                               AND id_kondisi_barang = 1 
+                               ORDER BY urutan_unit ASC
+                               LIMIT $jumlah_diminta";
 
                 $this->db->query($queryCari);
                 $this->db->bind('spec', $id_spesifikasi);
@@ -685,5 +684,20 @@ class Peminjaman_model
         }
 
         return ($berhasil > 0) ? 1 : 0;
+    }
+
+    public function getHistoryUser($id_user)
+    {
+        $query = "SELECT tp.id_peminjaman, tp.tanggal_peminjaman, tp.tanggal_pengembalian, tp.judul_kegiatan, 
+                         tpa.dosen_pembimbing, msp.nama_status AS status
+                  FROM trx_peminjaman tp
+                  LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                  JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
+                  WHERE tp.id_user = :id_user
+                  ORDER BY tp.tanggal_peminjaman DESC";
+
+        $this->db->query($query);
+        $this->db->bind('id_user', $id_user);
+        return $this->db->resultSet();
     }
 }

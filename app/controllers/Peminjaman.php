@@ -120,6 +120,9 @@ class Peminjaman extends Controller
             }
         }
 
+        // Fetch Lecturers (Role ID 5)
+        $data['list_dosen'] = $this->model('User_model')->getUsersByRole(5);
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Peminjaman/from', $data);

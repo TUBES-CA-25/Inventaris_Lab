@@ -66,8 +66,7 @@ class Notification_model
         $today = date('Y-m-d');
         $query = "SELECT p.*, d.nama_user, u.email 
                   FROM trx_peminjaman p
-                  JOIN trx_user u ON p.id_user = u.id_user
-                  JOIN trx_data_user d ON p.id_user = d.id_user
+                  JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
                   AND DATEDIFF(p.tanggal_pengembalian, '$today') BETWEEN 0 AND 3
                   AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
@@ -85,9 +84,7 @@ class Notification_model
     {
         $today = date('Y-m-d');
         $query = "SELECT p.*, d.nama_user, u.email 
-                  FROM trx_peminjaman p
-                  JOIN trx_user u ON p.id_user = u.id_user
-                  JOIN trx_data_user d ON p.id_user = d.id_user
+                  JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
                   AND p.tanggal_pengembalian < CURDATE()
                   AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";

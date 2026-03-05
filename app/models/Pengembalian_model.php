@@ -28,8 +28,7 @@ class Pengembalian_model
                     ELSE 'Belum Di-ACC'
                 END as status_acc
             FROM " . $this->table . " p
-            LEFT JOIN trx_user tu ON p.id_user = tu.id_user
-            LEFT JOIN trx_data_user u ON tu.id_user = u.id_user
+            LEFT JOIN trx_user u ON p.id_user = u.id_user
             LEFT JOIN trx_pengembalian pen ON p.id_peminjaman = pen.id_peminjaman
             JOIN mst_status_peminjaman msp ON p.id_status_peminjaman = msp.id_status_peminjaman
             LEFT JOIN mst_status_pengembalian mspg ON pen.id_status_pengembalian = mspg.id_status_pengembalian
@@ -61,8 +60,7 @@ class Pengembalian_model
                 u.nama_user as nama_peminjam
             FROM trx_peminjaman p
             LEFT JOIN trx_pengembalian pen ON p.id_peminjaman = pen.id_peminjaman
-            LEFT JOIN trx_user tu ON p.id_user = tu.id_user
-            LEFT JOIN trx_data_user u ON tu.id_user = u.id_user
+            LEFT JOIN trx_user u ON p.id_user = u.id_user
             JOIN mst_status_peminjaman msp ON p.id_status_peminjaman = msp.id_status_peminjaman
             LEFT JOIN mst_status_pengembalian mspg ON pen.id_status_pengembalian = mspg.id_status_pengembalian
             LEFT JOIN mst_keterangan_pengembalian mkp ON pen.id_keterangan_pengembalian = mkp.id_keterangan_pengembalian
@@ -270,7 +268,7 @@ class Pengembalian_model
                     tpp.bukti_foto,
                     tdu.nama_user
                   FROM trx_pemeriksa_pengembalian tpp
-                  LEFT JOIN trx_data_user tdu ON tpp.id_user = tdu.id_user
+                  LEFT JOIN trx_user tdu ON tpp.id_user = tdu.id_user
                   WHERE tpp.id_pengembalian = :id
                   ORDER BY tpp.waktu_periksa DESC";
 

@@ -17,7 +17,7 @@ class Riwayat_model
                          p.file_surat, p.validasi_kalab,
                          d.nama_user, d.nim_nip, msp.nama_status AS status
               FROM trx_peminjaman p
-              JOIN trx_data_user d ON p.id_user = d.id_user
+              JOIN trx_user d ON p.id_user = d.id_user
               JOIN mst_status_peminjaman msp ON p.id_status_peminjaman = msp.id_status_peminjaman
               WHERE msp.nama_status != :status_exclude
               ORDER BY p.tanggal_pengajuan DESC";
@@ -35,7 +35,7 @@ class Riwayat_model
                          p.file_surat, p.validasi_kalab,
                          d.nama_user, msp.nama_status AS status
               FROM trx_peminjaman p
-              JOIN trx_data_user d ON p.id_user = d.id_user
+              JOIN trx_user d ON p.id_user = d.id_user
               JOIN mst_status_peminjaman msp ON p.id_status_peminjaman = msp.id_status_peminjaman
               WHERE p.id_user = :id_user 
               ORDER BY p.tanggal_pengajuan DESC";
