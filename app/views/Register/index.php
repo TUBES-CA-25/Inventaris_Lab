@@ -27,14 +27,8 @@
           <label>Asal Instansi</label>
           <div class="jenis-kelamin">
             <div class="fikom">
-              <input type="radio" name="asal_instansi" id="fikom" value="fikom" checked onchange="updateLabel(this)"
-                required />
+              <input type="radio" name="asal_instansi" id="fikom" value="fikom" checked required />
               <span for="fikom">FIKOM</span>
-            </div>
-            <div class="luar-fikom">
-              <input type="radio" name="asal_instansi" id="luar_fikom" value="luar_fikom" onchange="updateLabel(this)"
-                required />
-              <span for="luar_fikom">Luar FIKOM</span>
             </div>
           </div>
         </div>
@@ -133,17 +127,6 @@
   const croppedInput = document.getElementById('cropped_foto');
   const form = document.getElementById('form-register');
 
-  function updateLabel(radio) {
-    const label = document.getElementById('label_nim_nip');
-    const input = document.getElementById('nim_nip');
-    if (radio.value === 'fikom') {
-      label.innerText = 'NIM / NIDN';
-      input.placeholder = 'Masukkan NIM atau NIDN anda';
-    } else {
-      label.innerText = 'NIK';
-      input.placeholder = 'Masukkan NIK anda';
-    }
-  }
 
   function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -241,16 +224,6 @@
         e.preventDefault();
         $('#loading-screen').addClass('hidden');
         Swal.fire('Format Tidak Valid', 'FIKOM hanya boleh NIM (Prefix 130/131, 11 digit) atau NIDN (Prefix 09, 10 digit).', 'warning');
-        return;
-      }
-    } else {
-      // Luar FIKOM - cannot use FIKOM patterns
-      const isFIKOMPattern = ((nim_nip.startsWith('130') || nim_nip.startsWith('131')) && nim_nip.length === 11) || (nim_nip.startsWith('09') && nim_nip.length === 10);
-
-      if (isFIKOMPattern) {
-        e.preventDefault();
-        $('#loading-screen').addClass('hidden');
-        Swal.fire('Format Salah', 'Data FIKOM dideteksi. Silakan pilih "Asal Instansi: FIKOM" atau masukkan NIK yang benar.', 'warning');
         return;
       }
     }

@@ -64,7 +64,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Kembali
             </a>
 
-            <?php if ($profile_data['id_role'] == 1 || $profile_data['id_role'] == 2): ?>
+            <?php if (in_array($profile_data['id_role'], [1, 2, 4, 5, 6])): ?>
                 <button type="button" class="btn btn-navy rounded-pill" onclick="openTTDModal()">
                     <i class="fa-solid fa-file-signature"></i> Kelola Tanda Tangan
                 </button>
@@ -81,65 +81,105 @@
     </div>
 </div>
 
-<?php if (isset($_SESSION['login']) && in_array($_SESSION['id_role'], ['1', '2'])): ?>
+<?php if (isset($_SESSION['login']) && in_array($profile_data['id_role'], [1, 2, 4, 5, 6])): ?>
     <div class="modal-overlay" id="ttdModal">
-        <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-content"
+            style="max-width: <?= in_array($profile_data['id_role'], [1, 2]) ? '700px' : '500px' ?>;">
             <div class="modal-header">
-                <h3>Manajemen Tanda Tangan Digital</h3>
+                <h3><?= in_array($profile_data['id_role'], [1, 2]) ? 'Manajemen Tanda Tangan Digital' : 'Tanda Tangan Saya' ?>
+                </h3>
                 <button class="modal-close" onclick="closeTTDModal()">&times;</button>
             </div>
 
             <div class="modal-body">
-                <form action="<?= BASEURL ?>Profil/updateTTD" method="post" enctype="multipart/form-data">
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3" style="border-right: 1px solid #eee;">
-                            <h5 class="text-primary font-weight-bold text-center mb-3">Kepala Laboratorium</h5>
-
-                            <div class="text-center p-3 mb-3"
-                                style="background: #f8f9fc; border: 2px dashed #4e73df; border-radius: 8px;">
-                                <img src="<?= BASEURL; ?>img/ttd/ttd_huzain.png?t=<?= time(); ?>" alt="TTD Huzain"
-                                    class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                    onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
+                <?php if (in_array($profile_data['id_role'], [1, 2])): ?>
+                    <form action="<?= BASEURL ?>Profil/updateTTD" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3" style="border-right: 1px solid #eee;">
+                                <h5 class="text-primary font-weight-bold text-center mb-3">Kepala Laboratorium</h5>
+                                <div class="text-center p-3 mb-3"
+                                    style="background: #f8f9fc; border: 2px dashed #4e73df; border-radius: 8px;">
+                                    <img src="<?= BASEURL; ?>img/ttd/ttd_huzain.png?t=<?= time(); ?>" alt="TTD Huzain"
+                                        class="img-fluid" style="max-height: 100px; object-fit: contain;"
+                                        onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
+                                </div>
+                                <div class="form-group">
+                                    <label class="small font-weight-bold">Ganti TTD Kepala Lab (.png)</label>
+                                    <input type="file" name="ttd_kalab" accept="image/png"
+                                        class="form-control-file border p-1 rounded">
+                                </div>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <h5 class="text-success font-weight-bold text-center mb-3">Laboran</h5>
+                                <div class="text-center p-3 mb-3"
+                                    style="background: #f0fdf4; border: 2px dashed #1cc88a; border-radius: 8px;">
+                                    <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah"
+                                        class="img-fluid" style="max-height: 100px; object-fit: contain;"
+                                        onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
+                                </div>
+                                <div class="form-group">
+                                    <label class="small font-weight-bold">Ganti TTD Laboran (.png)</label>
+                                    <input type="file" name="ttd_laboran" accept="image/png"
+                                        class="form-control-file border p-1 rounded">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small mt-2">
+                            <i class="fa-solid fa-info-circle"></i>
+                            Upload file baru hanya jika ingin mengubah tanda tangan. Wajib format <b>.PNG Transparan</b>.
+                        </div>
+                        <div class="modal-actions mt-3">
+                            <button type="button" class="btn btn-back" onclick="closeTTDModal()">Batal</button>
+                            <button type="submit" class="btn btn-edit" style="background-color: #4e73df;">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan & Update TTD
+                            </button>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
+                        <input type="hidden" name="nama_user" value="<?= $profile_data['nama_user']; ?>">
+                        <input type="hidden" name="nim_nip" value="<?= $profile_data['nim_nip']; ?>">
+                        <input type="hidden" name="no_hp_user" value="<?= $profile_data['no_hp_user']; ?>">
+                        <input type="hidden" name="jenis_kelamin" value="<?= $profile_data['jenis_kelamin']; ?>">
+                        <input type="hidden" name="alamat" value="<?= $profile_data['alamat']; ?>">
+                        <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
+                        <input type="hidden" name="file_ttdLama" value="<?= $profile_data['file_ttd']; ?>">
 
-                            <div class="form-group">
-                                <label class="small font-weight-bold">Ganti TTD Kepala Lab (.png)</label>
-                                <input type="file" name="ttd_kalab" accept="image/png"
-                                    class="form-control-file border p-1 rounded">
+                        <div class="text-center mb-4">
+                            <p class="small text-muted mb-2">Tanda Tangan Saat Ini:</p>
+                            <div class="p-3 mb-3 mx-auto"
+                                style="max-width: 300px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                                <?php if (!empty($profile_data['file_ttd']) && file_exists('../public/img/ttd/' . $profile_data['file_ttd'])): ?>
+                                    <img src="<?= BASEURL; ?>img/ttd/<?= $profile_data['file_ttd']; ?>?t=<?= time(); ?>"
+                                        alt="TTD Saya" class="img-fluid" style="max-height: 100px; object-fit: contain;">
+                                <?php else: ?>
+                                    <div class="text-center">
+                                        <i class="fa-solid fa-file-signature text-muted mb-2" style="font-size: 2rem;"></i>
+                                        <div class="small font-italic text-muted">Belum ada tanda tangan</div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <h5 class="text-success font-weight-bold text-center mb-3">Laboran</h5>
-
-                            <div class="text-center p-3 mb-3"
-                                style="background: #f0fdf4; border: 2px dashed #1cc88a; border-radius: 8px;">
-                                <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah"
-                                    class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                    onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="small font-weight-bold">Ganti TTD Laboran (.png)</label>
-                                <input type="file" name="ttd_laboran" accept="image/png"
-                                    class="form-control-file border p-1 rounded">
-                            </div>
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold mb-2">Upload Tanda Tangan Baru (.png)</label>
+                            <input type="file" name="file_ttd" accept="image/png" class="form-control border p-2 rounded"
+                                required>
+                            <small class="text-muted d-block mt-2">
+                                <i class="fa-solid fa-circle-info"></i> Pastikan gambar memiliki latar belakang
+                                <b>transparan</b>.
+                            </small>
                         </div>
-                    </div>
 
-                    <div class="alert alert-info small mt-2">
-                        <i class="fa-solid fa-info-circle"></i>
-                        Upload file baru hanya jika ingin mengubah tanda tangan. Wajib format <b>.PNG Transparan</b>.
-                    </div>
-
-                    <div class="modal-actions mt-3">
-                        <button type="button" class="btn btn-back" onclick="closeTTDModal()">Batal</button>
-                        <button type="submit" class="btn btn-edit" style="background-color: #4e73df;">
-                            <i class="fa-solid fa-floppy-disk"></i> Simpan & Update TTD
-                        </button>
-                    </div>
-                </form>
+                        <div class="modal-actions mt-4">
+                            <button type="button" class="btn btn-back" onclick="closeTTDModal()">Batal</button>
+                            <button type="submit" class="btn btn-navy" style="padding: 10px 25px;">
+                                <i class="fa-solid fa-upload"></i> Unggah Tanda Tangan
+                            </button>
+                        </div>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -155,6 +195,7 @@
             <form action="<?= BASEURL ?>Profil/ubah" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?= $profile_data['id_user']; ?>">
                 <input type="hidden" name="fotoLama" value="<?= $profile_data['foto']; ?>">
+                <input type="hidden" name="file_ttdLama" value="<?= $profile_data['file_ttd']; ?>">
 
                 <div class="modal-form-group">
                     <label>Nama Lengkap</label>
