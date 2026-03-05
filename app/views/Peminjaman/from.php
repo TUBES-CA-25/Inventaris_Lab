@@ -20,6 +20,91 @@ $val_dosen = $data['val_dosen'] ?? '';
 // ------------------------------------------------------
 ?>
 
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    /* Premium Select2 Custom Styling */
+    .select2-container--default .select2-selection--single {
+        background-color: #F2F5F9;
+        border: none;
+        border-radius: 12px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #334155;
+        padding-left: 15px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 48px;
+        right: 15px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #0c1740 transparent transparent transparent;
+        border-width: 6px 5px 0 5px;
+    }
+
+    .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+        border-color: transparent transparent #0c1740 transparent;
+        border-width: 0 5px 6px 5px;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(12, 23, 64, 0.1);
+    }
+
+    .select2-results__options {
+        max-height: 200px !important; /* Limit height to approx 5 items */
+    }
+
+    .select2-dropdown {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(12, 23, 64, 0.15);
+        overflow: hidden;
+        background: #fff;
+        margin-top: 8px;
+        animation: select2Reveal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes select2Reveal {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .select2-search--dropdown .select2-search__field {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 12px;
+        outline: none;
+    }
+
+    .select2-results__option {
+        padding: 10px 15px;
+        font-size: 14px;
+        color: #475569;
+    }
+
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: #0c1740 !important;
+        color: #fff !important;
+    }
+
+    .select2-results__option[aria-selected=true] {
+        background-color: #f1f5f9;
+        color: #0c1740;
+        font-weight: 600;
+    }
+</style>
+
 <div class="content">
     <div class="container-fluid">
         <div class="form-card">
@@ -35,7 +120,7 @@ $val_dosen = $data['val_dosen'] ?? '';
                             <?php if ($_SESSION['id_role'] == '6'): ?>
                                 <label class="lbl">Tujuan Peminjaman</label>
                                 <div class="icon-wrap">
-                                    <select name="judul_kegiatan" id="judul_kegiatan" class="inp-custom" required
+                                    <select name="judul_kegiatan" id="judul_kegiatan" class="inp-custom select2-basic" required
                                         onchange="toggleTujuanDetail(this.value)">
                                         <option value="">-- Pilih Tujuan --</option>
                                         <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir' || strpos($val_judul, 'Tugas Akhir:') !== false) ? 'selected' : ''; ?>>
@@ -44,7 +129,6 @@ $val_dosen = $data['val_dosen'] ?? '';
                                         <option value="Lain-lain" <?= ($val_judul == 'Lain-lain' || strpos($val_judul, 'Lain-lain:') !== false) ? 'selected' : ''; ?>>
                                             Lain-lain</option>
                                     </select>
-                                    <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
                                 </div>
 
                                 <div id="wrap_tujuan_ta"
@@ -71,8 +155,18 @@ $val_dosen = $data['val_dosen'] ?? '';
                                 <div id="wrap_dosen"
                                     style="display: <?= ($val_judul && $val_judul != 'Peminjaman Biasa') ? 'block' : 'none'; ?>; margin-top: 10px;">
                                     <label class="lbl">Nama Dosen Pembimbing</label>
-                                    <input type="text" name="dosen_pembimbing" id="dosen_pembimbing" class="inp-custom"
-                                        value="<?= $val_dosen; ?>" placeholder="Masukkan nama dosen pembimbing...">
+                                    <div class="icon-wrap">
+                                        <select name="dosen_pembimbing" id="dosen_pembimbing" class="inp-custom select2-basic">
+                                            <option value="">-- Pilih Dosen Pembimbing --</option>
+                                            <?php if (!empty($data['list_dosen'])): ?>
+                                                <?php foreach ($data['list_dosen'] as $dsn): ?>
+                                                    <option value="<?= $dsn['nama_user']; ?>" <?= ($val_dosen == $dsn['nama_user']) ? 'selected' : ''; ?>>
+                                                        <?= $dsn['nama_user']; ?> (<?= $dsn['nim_nip']; ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                    </div>
                                 </div>
                             <?php else: ?>
                                 <label class="lbl">Judul kegiatan</label>
@@ -227,7 +321,7 @@ $val_dosen = $data['val_dosen'] ?? '';
                                         <div class="col-md-5">
                                             <label class="lbl">Pilih Spesifikasi</label>
                                             <div class="icon-wrap">
-                                                <select name="unit_selected[]" class="inp-custom" required>
+                                                <select name="unit_selected[]" class="inp-custom select2-basic" required>
                                                     <option value="">-- Pilih Spesifikasi --</option>
 
                                                     <?php if (!empty($item['list_unit'])): ?>
@@ -243,7 +337,6 @@ $val_dosen = $data['val_dosen'] ?? '';
                                                         <option value="" disabled>Tidak ada spesifikasi tersedia</option>
                                                     <?php endif; ?>
                                                 </select>
-                                                <i class="fa-solid fa-caret-down icon-inside" style="color: #1e293b;"></i>
                                             </div>
                                         </div>
 
@@ -296,32 +389,100 @@ $val_dosen = $data['val_dosen'] ?? '';
     </div>
 </div>
 
+<!-- Select2 JS -->
+<script>
+    // Robust Select2 Initialization (Waiting for jQuery if loaded in footer)
+    (function() {
+        var attempts = 0;
+        var maxAttempts = 50; // 5 seconds max
+
+        function tryInitSelect2() {
+            if (window.jQuery) {
+                // jQuery is available, now load Select2 if not already there
+                if (!$.fn.select2) {
+                    var script = document.createElement('script');
+                    script.src = "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js";
+                    script.onload = startSelect2;
+                    document.head.appendChild(script);
+                } else {
+                    startSelect2();
+                }
+            } else {
+                attempts++;
+                if (attempts < maxAttempts) {
+                    setTimeout(tryInitSelect2, 100);
+                } else {
+                    console.error("Select2: jQuery not found after 5 seconds.");
+                }
+            }
+        }
+
+        function startSelect2() {
+            $(document).ready(function() {
+                $('.select2-basic').select2({
+                    width: '100%',
+                    minimumResultsForSearch: Infinity, // HIDE SEARCH BOX
+                    placeholder: function() {
+                        return $(this).attr('placeholder') || "-- Pilih --";
+                    },
+                    allowClear: false,
+                    language: {
+                        noResults: function() {
+                            return "Tidak ditemukan hasil";
+                        }
+                    }
+                });
+
+                // Robust event listener for Select2 and Tujuan Peminjaman
+                $('#judul_kegiatan').on('change', function() {
+                    toggleTujuanDetail($(this).val());
+                });
+                
+                // Ensure correct state on page load (for edit/restored data)
+                const currentVal = $('#judul_kegiatan').val();
+                if(currentVal) {
+                    toggleTujuanDetail(currentVal);
+                }
+            });
+        }
+
+        tryInitSelect2();
+    })();
+</script>
+
 <script>
     function toggleTujuanDetail(value) {
-        // Reset all
-        document.getElementById('wrap_tujuan_ta').style.display = 'none';
-        document.getElementById('tujuan_ta').removeAttribute('required');
-        document.getElementById('wrap_tujuan_riset').style.display = 'none';
-        document.getElementById('tujuan_riset').removeAttribute('required');
-        document.getElementById('wrap_tujuan_lain').style.display = 'none';
-        document.getElementById('tujuan_lain').removeAttribute('required');
-        document.getElementById('wrap_dosen').style.display = 'none';
-        document.getElementById('dosen_pembimbing').removeAttribute('required');
+        // Elements to show/hide
+        const wrapTA = document.getElementById('wrap_tujuan_ta');
+        const wrapRiset = document.getElementById('wrap_tujuan_riset');
+        const wrapLain = document.getElementById('wrap_tujuan_lain');
+        const wrapDosen = document.getElementById('wrap_dosen');
+        
+        if (!wrapTA || !wrapRiset || !wrapLain || !wrapDosen) return;
 
+        // Reset all Visibility & Requirements
+        [wrapTA, wrapRiset, wrapLain, wrapDosen].forEach(el => el.style.display = 'none');
+        
+        ['tujuan_ta', 'tujuan_riset', 'tujuan_lain', 'dosen_pembimbing'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.removeAttribute('required');
+        });
+
+        // Set state based on value
         if (value === 'Tugas Akhir') {
-            document.getElementById('wrap_tujuan_ta').style.display = 'block';
+            wrapTA.style.display = 'block';
             document.getElementById('tujuan_ta').setAttribute('required', 'required');
-            document.getElementById('wrap_dosen').style.display = 'block';
+            wrapDosen.style.display = 'block';
             document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         } else if (value === 'Riset') {
-            document.getElementById('wrap_tujuan_riset').style.display = 'block';
+            wrapRiset.style.display = 'block';
             document.getElementById('tujuan_riset').setAttribute('required', 'required');
-            document.getElementById('wrap_dosen').style.display = 'block';
+            wrapDosen.style.display = 'block';
             document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         } else if (value === 'Lain-lain') {
-            document.getElementById('wrap_tujuan_lain').style.display = 'block';
+            wrapLain.style.display = 'block';
             document.getElementById('tujuan_lain').setAttribute('required', 'required');
-            document.getElementById('wrap_dosen').style.display = 'block';
+            wrapDosen.style.display = 'block';
             document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         }
     }
