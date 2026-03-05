@@ -118,10 +118,14 @@
                     <br><br><br><br>
                     <?php
                     $pembimbing = !empty($peminjaman['dosen_pembimbing']) ? $peminjaman['dosen_pembimbing'] : '...........................................';
+                    $nidn = (!empty($supervisor) && !empty($supervisor['nim_nip'])) ? $supervisor['nim_nip'] : '';
                     ?>
                     ( <span
                         class="<?= $pembimbing != '...........................................' ? 'underline-name' : '' ?>"><?= $pembimbing; ?></span>
                     )
+                    <?php if ($nidn): ?>
+                        <br>NIDN : <?= $nidn; ?>
+                    <?php endif; ?>
                 </td>
 
                 <td class="ttd-col" style="text-align: center;">
