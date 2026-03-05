@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>401 - Unauthorized</title>
-    <link rel="shortcut icon" href="/Inventaris_Lab/public/img/logo.svg" />
+    <link rel="shortcut icon" href="<?= BASEURL; ?>img/logo.svg" />
 
     <!-- Fonts -->
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Error CSS -->
-    <link rel="stylesheet" href="/Inventaris_Lab/public/css/error.css?v=<?= time(); ?>">
+    <link rel="stylesheet" href="<?= BASEURL; ?>css/error.css?v=<?= time(); ?>">
 </head>
 
 <body>
@@ -25,27 +25,27 @@
         <div class="error-container">
             <!-- Error Icon -->
             <div class="error-animation">
-                <i class="fas fa-user-lock" style="font-size: 180px; color: #ff9800;"></i>
+                <i class="fas fa-lock" style="font-size: 150px; color: #f59e0b;"></i>
             </div>
 
             <!-- Error Code -->
             <div class="error-code">401</div>
 
             <!-- Error Title -->
-            <h1 class="error-title">Unauthorized - Belum Login</h1>
+            <h1 class="error-title">Sesi Tidak Valid</h1>
 
             <!-- Error Message -->
             <p class="error-message">
-                <?= isset($data['error_message']) ? htmlspecialchars($data['error_message']) : 'Anda harus login terlebih dahulu untuk mengakses halaman ini.'; ?>
+                Anda harus login terlebih dahulu untuk mengakses halaman ini.
             </p>
 
-            <!-- Action Buttons -->
+                <!-- Action Buttons -->
             <div class="error-actions">
-                <a href="/Inventaris_Lab/public/Login" class="btn-error btn-error-primary">
+                <a href="<?= BASEURL; ?>Login" class="btn-error btn-error-primary">
                     <i class="fas fa-sign-in-alt"></i>
-                    Login
+                    Login Sekarang
                 </a>
-                <a href="/Inventaris_Lab/public/Beranda" class="btn-error btn-error-secondary">
+                <a href="<?= BASEURL; ?>Beranda" class="btn-error btn-error-secondary">
                     <i class="fas fa-home"></i>
                     Kembali ke Beranda
                 </a>
