@@ -56,7 +56,7 @@
                 </a>
             <?php endif; ?>
 
-            <?php if (isset($_SESSION['login']) && (in_array($role, ['4', '5', '6', '7']))): ?>
+            <?php if (isset($_SESSION['login']) && (in_array($role, ['4', '5', '6']))): ?>
                 <a href="<?= BASEURL; ?>Peminjaman"
                     class="menu-item <?= ($data['judul'] == 'Peminjaman') ? 'active' : ''; ?>">
                     <i class="fa-solid fa-receipt"></i>
