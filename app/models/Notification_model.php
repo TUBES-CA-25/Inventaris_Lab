@@ -64,14 +64,16 @@ class Notification_model
         // Cari yang selisih tanggal pengembalian dengan hari ini = 0 s.d 3 hari
         // 0 = Hari ini (Jatuh Tempo), 1 = Besok, dst.
         $today = date('Y-m-d');
-        $query = "SELECT p.*, d.nama_user, u.email 
+        $query = "SELECT p.*, d.nama_user, d.email 
                   FROM trx_peminjaman p
                   JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
-                  AND DATEDIFF(p.tanggal_pengembalian, '$today') BETWEEN 0 AND 3
-                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
+                  AND DATEDIFF(p.tanggal_pengembalian, :today1) BETWEEN 0 AND 3
+                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != :today2)";
 
         $this->db->query($query);
+        $this->db->bind('today1', $today);
+        $this->db->bind('today2', $today);
         return $this->db->resultSet();
     }
 
@@ -83,13 +85,15 @@ class Notification_model
     public function cekTerlambat()
     {
         $today = date('Y-m-d');
-        $query = "SELECT p.*, d.nama_user, u.email 
+        $query = "SELECT p.*, d.nama_user, d.email 
+                  FROM trx_peminjaman p
                   JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
                   AND p.tanggal_pengembalian < CURDATE()
-                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != '$today')";
+                  AND (p.last_notification_sent IS NULL OR DATE(p.last_notification_sent) != :today)";
 
         $this->db->query($query);
+        $this->db->bind('today', $today);
         return $this->db->resultSet();
     }
 

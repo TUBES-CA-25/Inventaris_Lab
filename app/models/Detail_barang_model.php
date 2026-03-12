@@ -197,10 +197,23 @@ class Detail_barang_model
         }
 
         // 2. UPLOAD FOTO & PREPARE VARIABEL NAMA
+        $namaFile = $_FILES['foto_barang']['name'];
         $ukuranFile = $_FILES['foto_barang']['size'];
-        $limit = 2 * 1024 * 1024;
+        $tmpName = $_FILES['foto_barang']['tmp_name'];
+        $error = $_FILES['foto_barang']['error'];
 
-        if ($ukuranFile <= $limit) {
+        $limit = 2 * 1024 * 1024;
+        $ekstensiValid = ['jpg', 'jpeg', 'png'];
+        $ekstensi = explode('.', $namaFile);
+        $ekstensi = strtolower(end($ekstensi));
+
+        if ($error === 0) {
+            if (!in_array($ekstensi, $ekstensiValid)) {
+                return 0; // Invalid extension
+            }
+            if ($ukuranFile > $limit) {
+                return 0; // Too large
+            }
 
             // Ambil Nama-nama untuk Label QR
             $this->db->query("SELECT sub_barang, kode_jenis_barang FROM mst_jenis_barang WHERE id_jenis_barang = :id");
@@ -226,10 +239,9 @@ class Detail_barang_model
 
             // Upload
             $uploadDirectory = '../public/img/foto-barang/';
-            $uploadedFile = $_FILES['foto_barang']['tmp_name'];
-            $namaFileUnik = uniqid() . '_' . $_FILES['foto_barang']['name'];
+            $namaFileUnik = uniqid() . '_' . $namaFile;
             $fotoBarang = $uploadDirectory . $namaFileUnik;
-            move_uploaded_file($uploadedFile, $fotoBarang);
+            move_uploaded_file($tmpName, $fotoBarang);
 
             // 3. INSERT HEADER (MST_SPESIFIKASI)
             $bulanAngka = date('m', strtotime($data['tgl_pengadaan_barang']));
@@ -500,9 +512,25 @@ class Detail_barang_model
 
         $fotoBarang = $data['foto_lama'];
         if ($_FILES['foto_barang']['error'] === 0) {
+            $namaFile = $_FILES['foto_barang']['name'];
+            $ukuranFile = $_FILES['foto_barang']['size'];
+            $tmpName = $_FILES['foto_barang']['tmp_name'];
+
+            $ekstensiValid = ['jpg', 'jpeg', 'png'];
+            $ekstensi = explode('.', $namaFile);
+            $ekstensi = strtolower(end($ekstensi));
+
+            if (!in_array($ekstensi, $ekstensiValid)) {
+                return 0; // Prevent upload
+            }
+
+            if ($ukuranFile > 2 * 1024 * 1024) {
+                return 0;
+            }
+
             $path = '../public/img/foto-barang/';
-            $fotoBarang = $path . uniqid() . '_' . $_FILES['foto_barang']['name'];
-            move_uploaded_file($_FILES['foto_barang']['tmp_name'], $fotoBarang);
+            $fotoBarang = $path . uniqid() . '_' . $namaFile;
+            move_uploaded_file($tmpName, $fotoBarang);
 
             if (!empty($data['foto_lama']) && file_exists($data['foto_lama'])) {
                 @unlink($data['foto_lama']);

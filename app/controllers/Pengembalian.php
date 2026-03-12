@@ -28,6 +28,10 @@ class Pengembalian extends Controller
 
         $data['riwayat'] = $this->model('Pengembalian_model')->getAllRiwayatForPetugas();
 
+        if ($_SESSION['id_role'] == 3) {
+            $data['log_aktivitas'] = $this->model('Pengembalian_model')->getAllLogActivity();
+        }
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Pengembalian/index', $data);
@@ -192,7 +196,6 @@ class Pengembalian extends Controller
 
     public function simpan()
     {
-        $this->auth();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASEURL . 'Pengembalian');

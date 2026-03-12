@@ -320,4 +320,21 @@ class Pengembalian_model
             return 0;
         }
     }
+
+    public function getAllLogActivity()
+    {
+        $query = "SELECT 
+                    tpp.waktu_periksa,
+                    tdu.nama_user as nama_asisten,
+                    tp.judul_kegiatan as nama_peminjaman,
+                    tp.id_peminjaman
+                  FROM trx_pemeriksa_pengembalian tpp
+                  LEFT JOIN trx_user tdu ON tpp.id_user = tdu.id_user
+                  JOIN trx_pengembalian pen ON tpp.id_pengembalian = pen.id_pengembalian
+                  JOIN trx_peminjaman tp ON pen.id_peminjaman = tp.id_peminjaman
+                  ORDER BY tpp.waktu_periksa DESC";
+
+        $this->db->query($query);
+        return $this->db->resultSet();
+    }
 }

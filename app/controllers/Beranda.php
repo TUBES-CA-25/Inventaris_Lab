@@ -74,6 +74,16 @@ class Beranda extends Controller
             $data['verified_returns'] = $berandaModel->getPengembalianVerified(5);
 
             $viewContent = 'Beranda/Laboran';
+        } elseif ($data['id_role'] == 5) {
+            // Data khusus Dosen
+            $lecturerName = $data['profile']['nama_user'];
+
+            $statusDosen = $berandaModel->getLecturerStats($lecturerName);
+            $data['total_supervised_loans'] = $statusDosen['total_loans'] ?? 0;
+            $data['pending_validations'] = $statusDosen['pending_validations'] ?? 0;
+            $data['recent_requests'] = $berandaModel->getRecentStudentRequests($lecturerName, 3);
+
+            $viewContent = 'Beranda/Dosen';
         } else {
             // Data untuk Admin/Petugas
             $stats = $berandaModel->getAllCounts();
@@ -99,13 +109,22 @@ class Beranda extends Controller
         $input = json_decode($json, true);
 
         $mode = $input['mode'] ?? 'bulanan';
-        $tahun = $input['tahun'] ?? date('Y');
-        $bulan = $input['bulan'] ?? date('m');
+        if (!in_array($mode, ['harian', 'bulanan', 'tahunan'])) {
+            $mode = 'bulanan';
+        }
+
+        $tahun = isset($input['tahun']) ? (int) $input['tahun'] : (int) date('Y');
+        $bulan = isset($input['bulan']) ? (int) $input['bulan'] : (int) date('m');
         $id_user = $_SESSION['id_user'];
         $id_role = $_SESSION['id_role'];
 
         if ($id_role == 6) {
             $data = $this->model('Beranda_model')->getStudentChartData($id_user, $mode, $tahun, $bulan);
+        } elseif ($id_role == 5) {
+            // Dosen chart data depends on profile name
+            $profile = $this->model("User_model")->profile(['id_user' => $id_user]);
+            $lecturerName = $profile['nama_user'] ?? '';
+            $data = $this->model('Beranda_model')->getLecturerChartData($lecturerName, $mode, $tahun, $bulan);
         } else {
             $data = $this->model('Beranda_model')->getChartDataFiltered($mode, $tahun, $bulan);
         }

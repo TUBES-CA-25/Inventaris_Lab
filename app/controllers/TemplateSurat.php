@@ -104,11 +104,11 @@ class TemplateSurat extends Controller
         }
 
         ob_start();
-        // Cek Role untuk memilih Template
-        if ($user['id_role'] == '6') {
+        // Route PDF based on Category
+        if ($peminjaman['id_jenis_peminjaman'] == 1) {
             require_once '../app/views/Peminjaman/suratPdfMHS.php';
         } else {
-            require_once '../app/views/peminjaman/surat_pdf.php';
+            require_once '../app/views/Peminjaman/surat_pdf.php';
         }
         $htmlContent = ob_get_clean();
 

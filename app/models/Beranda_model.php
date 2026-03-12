@@ -71,15 +71,25 @@ class Beranda_model
                 FROM trx_peminjaman WHERE 1=1 ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tanggal_peminjaman) = '$bulan' AND YEAR(tanggal_peminjaman) = '$tahun' ";
+            $sql .= "AND MONTH(tanggal_peminjaman) = :bulan AND YEAR(tanggal_peminjaman) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tanggal_peminjaman) = '$tahun' ";
+            $sql .= "AND YEAR(tanggal_peminjaman) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tanggal_peminjaman)";
 
         $this->db->query($sql);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
+
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['peminjaman'][$idx]))
@@ -87,20 +97,29 @@ class Beranda_model
         }
 
         // --- QUERY 2: Pengembalian (trx_pengembalian) ---
-        // Menggunakan tgl_pengembalian_aktual dari tabel trx_pengembalian
         $sql = "SELECT $groupBy(tgl_pengembalian_aktual) as waktu, COUNT(*) as total 
                 FROM trx_pengembalian WHERE tgl_pengembalian_aktual IS NOT NULL ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengembalian_aktual) = '$bulan' AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
+            $sql .= "AND MONTH(tgl_pengembalian_aktual) = :bulan AND YEAR(tgl_pengembalian_aktual) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tgl_pengembalian_aktual) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengembalian_aktual)";
 
         $this->db->query($sql);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
+
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['pengembalian'][$idx]))
@@ -108,21 +127,30 @@ class Beranda_model
         }
 
         // --- QUERY 3: Barang Bagus (trx_barang) ---
-        // Menggunakan COUNT(*) karena 1 baris = 1 barang
         $sql = "SELECT $groupBy(tgl_pengadaan_barang) as waktu, COUNT(*) as total 
                 FROM trx_barang 
                 WHERE id_kondisi_barang = 1 ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengadaan_barang) = '$bulan' AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
+            $sql .= "AND MONTH(tgl_pengadaan_barang) = :bulan AND YEAR(tgl_pengadaan_barang) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengadaan_barang)";
 
         $this->db->query($sql);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
+
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['bagus'][$idx]))
@@ -135,13 +163,24 @@ class Beranda_model
                 WHERE id_kondisi_barang != 1 ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengadaan_barang) = '$bulan' AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
+            $sql .= "AND MONTH(tgl_pengadaan_barang) = :bulan AND YEAR(tgl_pengadaan_barang) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) = '$tahun' ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tgl_pengadaan_barang) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengadaan_barang)";
+
+        $this->db->query($sql);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
 
         $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
@@ -272,16 +311,26 @@ class Beranda_model
                 FROM trx_peminjaman WHERE id_user = :id_user ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tanggal_peminjaman) = '$bulan' AND YEAR(tanggal_peminjaman) = '$tahun' ";
+            $sql .= "AND MONTH(tanggal_peminjaman) = :bulan AND YEAR(tanggal_peminjaman) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tanggal_peminjaman) = '$tahun' ";
+            $sql .= "AND YEAR(tanggal_peminjaman) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tanggal_peminjaman) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tanggal_peminjaman)";
 
         $this->db->query($sql);
         $this->db->bind('id_user', $id_user);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
+
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['peminjaman'][$idx]))
@@ -295,13 +344,25 @@ class Beranda_model
                 WHERE p.id_user = :id_user AND tgl_pengembalian_aktual IS NOT NULL ";
 
         if ($mode == 'harian') {
-            $sql .= "AND MONTH(tgl_pengembalian_aktual) = '$bulan' AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
+            $sql .= "AND MONTH(tgl_pengembalian_aktual) = :bulan AND YEAR(tgl_pengembalian_aktual) = :tahun ";
         } elseif ($mode == 'bulanan') {
-            $sql .= "AND YEAR(tgl_pengembalian_aktual) = '$tahun' ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) = :tahun ";
         } else {
-            $sql .= "AND YEAR(tgl_pengembalian_aktual) BETWEEN '$loopStart' AND '$loopEnd' ";
+            $sql .= "AND YEAR(tgl_pengembalian_aktual) BETWEEN :loopStart AND :loopEnd ";
         }
         $sql .= "GROUP BY $groupBy(tgl_pengembalian_aktual)";
+
+        $this->db->query($sql);
+        $this->db->bind('id_user', $id_user);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
 
         $this->db->query($sql);
         $this->db->bind('id_user', $id_user);
@@ -397,5 +458,121 @@ class Beranda_model
         $this->db->query($query);
         $this->db->bind('limit', $limit);
         return $this->db->resultSet();
+    }
+    // --- DOSEN (LECTURER) DASHBOARD METHODS ---
+
+    /**
+     * Get stats for lecturer: total loans overseen and count of pending student validations
+     */
+    public function getLecturerStats($nama_dosen)
+    {
+        $query = "SELECT 
+                    SUM(CASE WHEN tpa.dosen_pembimbing = :dosen1 THEN 1 ELSE 0 END) as total_loans,
+                    SUM(CASE WHEN tpa.dosen_pembimbing = :dosen2 AND tp.id_status_peminjaman = 1 AND tp.validasi_kalab = 0 THEN 1 ELSE 0 END) as pending_validations
+                  FROM trx_peminjaman tp
+                  JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman";
+
+        $this->db->query($query);
+        $this->db->bind('dosen1', $nama_dosen);
+        $this->db->bind('dosen2', $nama_dosen);
+        return $this->db->single();
+    }
+
+    /**
+     * Get the most recent requests awaiting validation from supervised students
+     */
+    public function getRecentStudentRequests($nama_dosen, $limit = 3)
+    {
+        $query = "SELECT tp.id_peminjaman, tp.judul_kegiatan, tp.tanggal_pengajuan, tu.nama_user as mahasiswa
+                  FROM trx_peminjaman tp
+                  JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                  JOIN trx_user tu ON tp.id_user = tu.id_user
+                  WHERE tpa.dosen_pembimbing = :dosen
+                  AND tp.id_status_peminjaman = 1
+                  AND tp.validasi_kalab = 0
+                  ORDER BY tp.tanggal_pengajuan DESC
+                  LIMIT :limit";
+
+        $this->db->query($query);
+        $this->db->bind('dosen', $nama_dosen);
+        $this->db->bind('limit', $limit);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Get chart data for supervised student loans
+     */
+    public function getLecturerChartData($nama_dosen, $mode, $tahun, $bulan = null)
+    {
+        $data = [
+            'peminjaman' => []
+        ];
+
+        if ($mode == 'harian') {
+            $jmlHari = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+            $loopStart = 1;
+            $loopEnd = $jmlHari;
+            $groupBy = "DAY";
+        } elseif ($mode == 'bulanan') {
+            $loopStart = 1;
+            $loopEnd = 12;
+            $groupBy = "MONTH";
+        } else {
+            $loopStart = $tahun - 4;
+            $loopEnd = $tahun;
+            $groupBy = "YEAR";
+        }
+
+        $labels = [];
+        $monthNames = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+
+        for ($i = $loopStart; $i <= $loopEnd; $i++) {
+            if ($mode == 'bulanan') {
+                $labels[] = $monthNames[$i];
+            } else {
+                $labels[] = $i;
+            }
+            $data['peminjaman'][$i] = 0;
+        }
+
+        $sql = "SELECT $groupBy(tp.tanggal_peminjaman) as waktu, COUNT(*) as total 
+                FROM trx_peminjaman tp
+                JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                WHERE tpa.dosen_pembimbing = :dosen ";
+
+        if ($mode == 'harian') {
+            $sql .= "AND MONTH(tp.tanggal_peminjaman) = :bulan AND YEAR(tp.tanggal_peminjaman) = :tahun ";
+        } elseif ($mode == 'bulanan') {
+            $sql .= "AND YEAR(tp.tanggal_peminjaman) = :tahun ";
+        } else {
+            $sql .= "AND YEAR(tp.tanggal_peminjaman) BETWEEN :loopStart AND :loopEnd ";
+        }
+        $sql .= "GROUP BY $groupBy(tp.tanggal_peminjaman)";
+
+        $this->db->query($sql);
+        $this->db->bind('dosen', $nama_dosen);
+        if ($mode == 'harian') {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif ($mode == 'bulanan') {
+            $this->db->bind('tahun', $tahun);
+        } else {
+            $this->db->bind('loopStart', $loopStart);
+            $this->db->bind('loopEnd', $loopEnd);
+        }
+
+        $this->db->query($sql);
+        $this->db->bind('dosen', $nama_dosen);
+        foreach ($this->db->resultSet() as $row) {
+            $idx = intval($row['waktu']);
+            if (isset($data['peminjaman'][$idx]))
+                $data['peminjaman'][$idx] = intval($row['total']);
+        }
+
+        return [
+            'labels' => $labels,
+            'peminjaman' => array_values($data['peminjaman']),
+            'pengembalian' => array_fill(0, count($labels), 0)
+        ];
     }
 }

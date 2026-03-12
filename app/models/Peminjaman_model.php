@@ -22,9 +22,22 @@ class Peminjaman_model
         }
 
         try {
-            // Determine Loan Type based on Role
-            $id_role = $_SESSION['id_role'] ?? 7; // Default to USER if missing
-            $jenisId = ($id_role == 6) ? 1 : 2; // 1=Akademik, 2=Internal (Map from mst_jenis_peminjaman)
+            // Determine Loan Type based on Choice & Role
+            $id_role = $_SESSION['id_role'] ?? 7;
+
+            // Logic: 
+            // - Roles 4/6 choosing TA/Riset/Lain-lain -> Akademik (1)
+            // - Roles 4/5 choosing Peminjaman Biasa -> Internal (2)
+            // - Fallback: Mahasiswa (6) is usually Akademik, Others usually Internal
+
+            $guided_academic = ['Tugas Akhir', 'Riset', 'Lain-lain'];
+            if ($id_role == 6) {
+                $jenisId = 1;
+            } elseif ($id_role == 4 && in_array($data['judul_kegiatan'], $guided_academic)) {
+                $jenisId = 1;
+            } else {
+                $jenisId = 2;
+            }
 
             $query = "INSERT INTO trx_peminjaman 
                       (id_user, id_jenis_peminjaman, judul_kegiatan, tanggal_pengajuan, tanggal_peminjaman, tanggal_pengembalian, keterangan_peminjaman, id_status_peminjaman) 
@@ -33,8 +46,9 @@ class Peminjaman_model
 
             $judul = $data['judul_kegiatan'];
 
-            // Clean up titles (don't inject category prefix anymore)
-            if ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
+            if ($data['judul_kegiatan'] === 'Peminjaman Biasa' && !empty($data['judul_biasa'])) {
+                $judul = 'Peminjaman Biasa: ' . $data['judul_biasa'];
+            } elseif ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
                 $judul = $data['tujuan_ta'];
             } elseif ($data['judul_kegiatan'] === 'Riset' && !empty($data['tujuan_riset'])) {
                 $judul = $data['tujuan_riset'];
@@ -266,8 +280,9 @@ class Peminjaman_model
 
         $judul = $data['judul_kegiatan'];
 
-        // Clean up titles (don't inject category prefix anymore)
-        if ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
+        if ($data['judul_kegiatan'] === 'Peminjaman Biasa' && !empty($data['judul_biasa'])) {
+            $judul = 'Peminjaman Biasa: ' . $data['judul_biasa'];
+        } elseif ($data['judul_kegiatan'] === 'Tugas Akhir' && !empty($data['tujuan_ta'])) {
             $judul = $data['tujuan_ta'];
         } elseif ($data['judul_kegiatan'] === 'Riset' && !empty($data['tujuan_riset'])) {
             $judul = $data['tujuan_riset'];
