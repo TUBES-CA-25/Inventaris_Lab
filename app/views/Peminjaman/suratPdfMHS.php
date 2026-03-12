@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Form Peminjaman Alat Khusus Mahasiswa</title>
+    <title>Form Peminjaman Alat Khusus <?= ($user['id_role'] == '6') ? 'Mahasiswa' : 'Asisten'; ?></title>
     <link rel="stylesheet" href="<?= BASEURL; ?>/css/SuratPDF.css?v=<?= time(); ?>">
 </head>
 
@@ -18,7 +18,8 @@
         <?php endif; ?>
     </div>
 
-    <div class="judul-surat">FORM PEMINJAMAN ALAT KHUSUS MAHASISWA</div>
+    <div class="judul-surat">FORM PEMINJAMAN ALAT KHUSUS <?= ($user['id_role'] == '6') ? 'MAHASISWA' : 'ASISTEN'; ?>
+    </div>
 
     <div class="paragraph">
         Assalamu’alaikum Warahmatullahi Wabarakatuh.<br>
@@ -28,7 +29,7 @@
 
     <table class="table-info">
         <tr>
-            <td class="col-label">Nama Mahasiswa</td>
+            <td class="col-label">Nama <?= ($user['id_role'] == '6') ? 'Mahasiswa' : 'Asisten'; ?></td>
             <td class="col-sep">:</td>
             <td><?= isset($user['nama_user']) ? $user['nama_user'] : '-'; ?></td>
         </tr>
@@ -130,7 +131,7 @@
 
                 <td class="ttd-col" style="text-align: center;">
                     Makassar, <?= date('d F Y'); ?><br>
-                    <b>Mahasiswa,</b>
+                    <b><?= ($user['id_role'] == '6') ? 'Mahasiswa' : 'Asisten'; ?>,</b>
                     <br><br><br><br>
                     <span class="underline-name"><?= $user['nama_user'] ?? '-'; ?></span>
                 </td>

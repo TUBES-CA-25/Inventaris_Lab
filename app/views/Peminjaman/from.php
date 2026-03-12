@@ -8,7 +8,8 @@ $detailMap = $isEdit ? $_SESSION['edit_details_map'] : [];
 $formAction = $isEdit ? BASEURL . 'Peminjaman/prosesUpdatePeminjaman' : BASEURL . 'Peminjaman/prosesTambahPeminjaman';
 
 // --- DATA RESTORATION (PRIORITIZE CONTROLLER DATA) ---
-$val_judul = !empty($data['val_judul']) ? $data['val_judul'] : ($isEdit ? $headerData['judul_kegiatan'] : '');
+$val_judul = !empty($data['val_judul']) ? $data['val_judul'] : 
+             ($isEdit ? ($headerData['kategori_kegiatan'] ?? $headerData['judul_kegiatan']) : '');
 $val_tgl_aju = !empty($data['val_tgl_aju']) ? $data['val_tgl_aju'] : ($isEdit ? $headerData['tanggal_pengajuan'] : date('Y-m-d'));
 $val_tgl_mulai = !empty($data['val_tgl_mulai']) ? $data['val_tgl_mulai'] : ($isEdit ? $headerData['tanggal_peminjaman'] : '');
 $val_tgl_akhir = !empty($data['val_tgl_akhir']) ? $data['val_tgl_akhir'] : ($isEdit ? $headerData['tanggal_pengembalian'] : '');
@@ -117,18 +118,41 @@ $val_dosen = $data['val_dosen'] ?? '';
                         </div>
 
                         <div class="gap-row">
-                            <?php if ($_SESSION['id_role'] == '6'): ?>
+                            <?php if (in_array($_SESSION['id_role'], ['4', '5', '6'])): ?>
                                 <label class="lbl">Tujuan Peminjaman</label>
                                 <div class="icon-wrap">
                                     <select name="judul_kegiatan" id="judul_kegiatan" class="inp-custom select2-basic" required
                                         onchange="toggleTujuanDetail(this.value)">
                                         <option value="">-- Pilih Tujuan --</option>
-                                        <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir' || strpos($val_judul, 'Tugas Akhir:') !== false) ? 'selected' : ''; ?>>
-                                            Tugas Akhir</option>
-                                        <option value="Riset" <?= ($val_judul == 'Riset' || strpos($val_judul, 'Riset:') !== false) ? 'selected' : ''; ?>>Riset</option>
+                                        
+                                        <?php if (in_array($_SESSION['id_role'], ['4', '5'])): ?>
+                                            <option value="Peminjaman Biasa" <?= ($val_judul == 'Peminjaman Biasa' || strpos($val_judul, 'Peminjaman Biasa:') !== false) ? 'selected' : ''; ?>>
+                                                Peminjaman Biasa
+                                            </option>
+                                        <?php endif; ?>
+
+                                        <?php if (in_array($_SESSION['id_role'], ['4', '6'])): ?>
+                                            <option value="Tugas Akhir" <?= ($val_judul == 'Tugas Akhir' || strpos($val_judul, 'Tugas Akhir:') !== false) ? 'selected' : ''; ?>>
+                                                Tugas Akhir
+                                            </option>
+                                            <option value="Riset" <?= ($val_judul == 'Riset' || strpos($val_judul, 'Riset:') !== false) ? 'selected' : ''; ?>>
+                                                Riset
+                                            </option>
+                                        <?php endif; ?>
+
                                         <option value="Lain-lain" <?= ($val_judul == 'Lain-lain' || strpos($val_judul, 'Lain-lain:') !== false) ? 'selected' : ''; ?>>
-                                            Lain-lain</option>
+                                            Lain-lain
+                                        </option>
                                     </select>
+                                </div>
+
+                                <!-- Field Khusus Peminjaman Biasa -->
+                                <div id="wrap_peminjaman_biasa"
+                                    style="display: <?= ($val_judul == 'Peminjaman Biasa' || strpos($val_judul, 'Peminjaman Biasa:') !== false) ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    <label class="lbl">Judul Kegiatan</label>
+                                    <input type="text" name="judul_biasa" id="judul_biasa" class="inp-custom"
+                                        value="<?= ($isEdit && strpos($headerData['judul_kegiatan'], 'Peminjaman Biasa:') !== false) ? str_replace('Peminjaman Biasa: ', '', $headerData['judul_kegiatan']) : ($headerData['judul_kegiatan'] ?? ''); ?>" 
+                                        placeholder="Contoh: Praktikum Pemrograman Web...">
                                 </div>
 
                                 <div id="wrap_tujuan_ta"
@@ -153,7 +177,7 @@ $val_dosen = $data['val_dosen'] ?? '';
                                 </div>
 
                                 <div id="wrap_dosen"
-                                    style="display: <?= ($val_judul && $val_judul != 'Peminjaman Biasa') ? 'block' : 'none'; ?>; margin-top: 10px;">
+                                    style="display: <?= ($val_judul && !in_array($val_judul, ['Peminjaman Biasa', 'Peminjaman Biasa:'])) ? 'block' : 'none'; ?>; margin-top: 10px;">
                                     <label class="lbl">Nama Dosen Pembimbing</label>
                                     <div class="icon-wrap">
                                         <select name="dosen_pembimbing" id="dosen_pembimbing" class="inp-custom select2-basic">
@@ -453,6 +477,7 @@ $val_dosen = $data['val_dosen'] ?? '';
 <script>
     function toggleTujuanDetail(value) {
         // Elements to show/hide
+        const wrapBiasa = document.getElementById('wrap_peminjaman_biasa');
         const wrapTA = document.getElementById('wrap_tujuan_ta');
         const wrapRiset = document.getElementById('wrap_tujuan_riset');
         const wrapLain = document.getElementById('wrap_tujuan_lain');
@@ -461,15 +486,21 @@ $val_dosen = $data['val_dosen'] ?? '';
         if (!wrapTA || !wrapRiset || !wrapLain || !wrapDosen) return;
 
         // Reset all Visibility & Requirements
-        [wrapTA, wrapRiset, wrapLain, wrapDosen].forEach(el => el.style.display = 'none');
+        [wrapBiasa, wrapTA, wrapRiset, wrapLain, wrapDosen].forEach(el => {
+            if(el) el.style.display = 'none';
+        });
         
-        ['tujuan_ta', 'tujuan_riset', 'tujuan_lain', 'dosen_pembimbing'].forEach(id => {
+        ['judul_biasa', 'tujuan_ta', 'tujuan_riset', 'tujuan_lain', 'dosen_pembimbing'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.removeAttribute('required');
         });
 
         // Set state based on value
-        if (value === 'Tugas Akhir') {
+        if (value === 'Peminjaman Biasa') {
+            if(wrapBiasa) wrapBiasa.style.display = 'block';
+            const inpBiasa = document.getElementById('judul_biasa');
+            if(inpBiasa) inpBiasa.setAttribute('required', 'required');
+        } else if (value === 'Tugas Akhir') {
             wrapTA.style.display = 'block';
             document.getElementById('tujuan_ta').setAttribute('required', 'required');
             wrapDosen.style.display = 'block';
