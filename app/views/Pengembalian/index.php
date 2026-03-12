@@ -19,7 +19,8 @@ if (!isset($_SESSION['login'])) {
 
                 <!-- Search Box -->
                 <div class="search-box position-relative" style="min-width: 320px;">
-                    <i class="fa-solid fa-magnifying-glass position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
+                    <i class="fa-solid fa-magnifying-glass position-absolute"
+                        style="left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
                     <input type="text" id="searchInput" class="search-input" placeholder="Cari Judul / Status..." style="
                 padding-left: 38px;
                 height: 38px;
@@ -33,7 +34,8 @@ if (!isset($_SESSION['login'])) {
             <i class="fa-solid fa-filter me-1"></i> Filter
         </button>
 
-        <div id="filterSection" class="card p-3 my-4" style="border-radius: 10px; display: none; border: 1px solid #e0e0e0; background: #fff;">
+        <div id="filterSection" class="card p-3 my-4"
+            style="border-radius: 10px; display: none; border: 1px solid #e0e0e0; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 style="color: var(--primary-blue, #0d1b3e); margin: 0; font-weight: 600;">
                     <i class="fa-solid fa-filter me-2" style="font-size: 0.9rem;"></i> Filter Data
@@ -111,9 +113,8 @@ if (!isset($_SESSION['login'])) {
                             }
                             // Format Tanggal untuk JS Filtering (YYYY-MM-DD)
                             $data_tgl_kembali = date('Y-m-d', strtotime($r['tanggal_pengembalian']));
-                    ?>
-                            <tr class="data-row"
-                                data-status="<?= strtolower($status_display); ?>"
+                            ?>
+                            <tr class="data-row" data-status="<?= strtolower($status_display); ?>"
                                 data-date="<?= $data_tgl_kembali; ?>"
                                 style="cursor: pointer; transition: background-color 0.2s ease;">
 
@@ -144,7 +145,7 @@ if (!isset($_SESSION['login'])) {
                                     </div>
                                 </td>
                             </tr>
-                        <?php
+                            <?php
                         endforeach;
                     else:
                         ?>
@@ -164,11 +165,134 @@ if (!isset($_SESSION['login'])) {
                 </tbody>
             </table>
         </div>
+
+        <?php if ($_SESSION['id_role'] == 3): ?>
+            <!-- Recent Activity Log Section -->
+            <div class="card shadow-lg border-0 mt-5 mb-5" style="border-radius: 16px; overflow: hidden; background: #fff;">
+                <div class="card-header py-4 px-4" style="background: linear-gradient(135deg, #0d1b3e 0%, #1a2a6c 100%); border-bottom: none;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0 fw-bold d-flex align-items-center" style="color: #ffffff; letter-spacing: 0.5px;">
+                            <div class="bg-white bg-opacity-10 p-2 rounded-lg me-3">
+                                <i class="fa-solid fa-clock-rotate-left" style="color: #ffffff;"></i>
+                            </div>
+                            Log Aktivitas Pengembalian
+                        </h5>
+                        <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 rounded-pill" style="font-size: 0.8rem; font-weight: 500;">
+                            Terbaru
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                                <tr style="background-color: #f8fafc;">
+                                    <th class="ps-4 py-3 text-uppercase small fw-bold" style="color: #64748b; width: 80px; border-bottom: 2px solid #f1f5f9;">No</th>
+                                    <th class="py-3 text-uppercase small fw-bold" style="color: #64748b; border-bottom: 2px solid #f1f5f9;">Nama Asisten</th>
+                                    <th class="py-3 text-uppercase small fw-bold" style="color: #64748b; border-bottom: 2px solid #f1f5f9;">Peminjaman</th>
+                                    <th class="py-3 text-uppercase small fw-bold" style="color: #64748b; border-bottom: 2px solid #f1f5f9;">Waktu Periksa</th>
+                                    <th class="text-center py-3 text-uppercase small fw-bold" style="color: #64748b; width: 150px; border-bottom: 2px solid #f1f5f9;">Kontrol</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $j = 1;
+                                if (!empty($data['log_aktivitas'])):
+                                    foreach ($data['log_aktivitas'] as $log):
+                                ?>
+                                        <tr class="activity-row" style="transition: all 0.2s ease;">
+                                            <td class="ps-4 fw-medium text-muted"><?= $j++; ?></td>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="avatar-circle d-flex align-items-center justify-content-center text-white shadow-sm" 
+                                                         style="width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-weight: 700; font-size: 16px;">
+                                                        <?= strtoupper(substr($log['nama_asisten'], 0, 1)); ?>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark" style="font-size: 0.95rem;"><?= htmlspecialchars($log['nama_asisten']); ?></div>
+                                                        <div class="small text-muted">Petugas Verifikasi</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="fw-medium text-dark"><?= htmlspecialchars($log['nama_peminjaman']); ?></div>
+                                                <div class="small text-muted mt-1">
+                                                    <i class="fa-solid fa-hashtag me-1 opacity-50"></i>ID: <?= $log['id_peminjaman']; ?>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span class="text-dark fw-medium"><?= date('d M Y', strtotime($log['waktu_periksa'])); ?></span>
+                                                    <span class="small text-muted">
+                                                        <i class="fa-regular fa-clock me-1 opacity-50"></i><?= date('H:i', strtotime($log['waktu_periksa'])); ?> WIB
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="<?= BASEURL; ?>Pengembalian/detail/<?= $log['id_peminjaman']; ?>" 
+                                                   class="btn btn-action-view"
+                                                   style="
+                                                        padding: 8px 16px; 
+                                                        border-radius: 10px; 
+                                                        background-color: #eff6ff; 
+                                                        color: #2563eb; 
+                                                        font-weight: 600; 
+                                                        font-size: 13px;
+                                                        border: none;
+                                                        transition: all 0.2s;
+                                                        display: inline-flex;
+                                                        align-items: center;
+                                                        gap: 8px;
+                                                        text-decoration: none;
+                                                   ">
+                                                    <i class="fa-solid fa-circle-info"></i> Detail
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php
+                                    endforeach;
+                                else:
+                                    ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <div class="py-4">
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                                    <i class="fa-solid fa-clipboard-list fa-2x text-muted opacity-50"></i>
+                                                </div>
+                                                <h6 class="text-dark fw-bold mb-1">Belum Ada Aktivitas</h6>
+                                                <p class="text-muted small mb-0">Semua aktivitas pemeriksaan pengembalian akan muncul di sini.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .activity-row:hover {
+                    background-color: #f8fafc !important;
+                }
+                .btn-action-view:hover {
+                    background-color: #dbeafe !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+                }
+                .avatar-circle {
+                    transition: transform 0.2s ease;
+                }
+                .activity-row:hover .avatar-circle {
+                    transform: scale(1.05);
+                }
+            </style>
+        <?php endif; ?>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Definisi Elemen
         const btnFilterToggle = document.getElementById('btnFilterToggle');
         const filterSection = document.getElementById('filterSection');
@@ -183,7 +307,7 @@ if (!isset($_SESSION['login'])) {
         const noDataRow = document.getElementById('noDataRow');
 
         // 1. Fungsi Toggle Tampilan Filter
-        window.toggleFilter = function() { // Dijadikan window function agar onclick di HTML jalan
+        window.toggleFilter = function () { // Dijadikan window function agar onclick di HTML jalan
             if (filterSection.style.display === 'none' || filterSection.style.display === '') {
                 filterSection.style.display = 'block';
             } else {
@@ -255,7 +379,7 @@ if (!isset($_SESSION['login'])) {
 
         // Reset Button
         if (btnReset) {
-            btnReset.addEventListener('click', function() {
+            btnReset.addEventListener('click', function () {
                 filterStatus.value = '';
                 startDate.value = '';
                 endDate.value = '';
