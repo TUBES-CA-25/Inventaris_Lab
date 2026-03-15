@@ -59,6 +59,198 @@ class TemplateSurat extends Controller
         $this->view('templates/footer');
     }
 
+    public function tandaTangan($id_peminjaman)
+    {
+        $id_peminjaman_dec = IdObfuscator::decode($id_peminjaman);
+        if (!$id_peminjaman_dec) {
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
+
+        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman_dec);
+        $user = $this->peminjamanModel->getUserProfile($_SESSION['id_user']);
+
+        if (!$peminjaman || $peminjaman['id_user'] != $_SESSION['id_user']) {
+            Flasher::setFlash('Akses Ditolak', 'Data tidak ditemukan atau bukan milik Anda', '', 'danger');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
+
+        if (empty($user['file_ttd'])) {
+            Flasher::setFlash('Tanda Tangan Belum Ada', 'Silakan upload tanda tangan di profil Anda terlebih dahulu.', '', 'warning');
+            header('Location: ' . BASEURL . 'Profil');
+            exit;
+        }
+
+        if (empty($peminjaman['file_surat']) || !file_exists(__DIR__ . '/../../public/files/surat-peminjaman/' . $peminjaman['file_surat'])) {
+            $this->generateUnsignedPDF($id_peminjaman_dec);
+            $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman_dec);
+        }
+
+        $data['id_peminjaman'] = $id_peminjaman_dec;
+        $data['file_surat'] = $peminjaman['file_surat'];
+        $data['user'] = $user;
+
+        $this->view('Peminjaman/TandaTanganMHS', $data);
+    }
+
+    private function generateUnsignedPDF($id)
+    {
+        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id);
+        $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id);
+        $id_user = $peminjaman['id_user'];
+        $user = $this->peminjamanModel->getUserProfile($id_user);
+
+        $supervisor = null;
+        if (!empty($peminjaman['dosen_pembimbing'])) {
+            $supervisor = $this->model('User_model')->getUserByName($peminjaman['dosen_pembimbing']);
+        }
+
+        $pathKop = __DIR__ . '/../../public/img/kop_surat.png';
+        $gambar_kop = '';
+        if (file_exists($pathKop)) {
+            $type = pathinfo($pathKop, PATHINFO_EXTENSION);
+            $dataImg = file_get_contents($pathKop);
+            $gambar_kop = 'data:image/' . $type . ';base64,' . base64_encode($dataImg);
+        }
+
+        ob_start();
+        if ($peminjaman['id_jenis_peminjaman'] == 1) {
+            require_once '../app/views/Peminjaman/suratPdfMHS.php';
+        } else {
+            require_once '../app/views/Peminjaman/surat_pdf.php';
+        }
+        $htmlContent = ob_get_clean();
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($htmlContent);
+        $dompdf->setPaper('legal', 'portrait');
+        $dompdf->render();
+
+        $pdfOutput = $dompdf->output();
+        $namaFile = 'UNSIGNED_' . uniqid() . '.pdf';
+        $tujuan = __DIR__ . '/../../public/files/surat-peminjaman/';
+        if (!file_exists($tujuan))
+            mkdir($tujuan, 0777, true);
+
+        file_put_contents($tujuan . $namaFile, $pdfOutput);
+        $this->peminjamanModel->updateSuratPeminjaman($id, $namaFile);
+    }
+
+    public function prosesSignature()
+    {
+        $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
+        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
+        $user = $this->peminjamanModel->getUserProfile($_SESSION['id_user']);
+
+        $mhs_page = $_POST['mhs_page'];
+        $mhs_x = $_POST['mhs_x'];
+        $mhs_y = $_POST['mhs_y'];
+        $mhs_w = $_POST['mhs_w'];
+        $mhs_h = $_POST['mhs_h'];
+
+        $sourceFile = __DIR__ . '/../../public/files/surat-peminjaman/' . $peminjaman['file_surat'];
+        $ttdPath = __DIR__ . '/../../public/img/ttd/' . $user['file_ttd'];
+
+        // Use a PREVIEW prefix for temporary viewing
+        $outputName = 'PREVIEW_MHS_' . uniqid() . '.pdf';
+        $outputPath = __DIR__ . '/../../public/files/surat-peminjaman/' . $outputName;
+
+        $pathAutoload = __DIR__ . '/../../vendor/autoload.php';
+        if (file_exists($pathAutoload)) {
+            require_once $pathAutoload;
+        } else {
+            require_once __DIR__ . '/../vendor/setasign/fpdf/fpdf.php';
+            require_once __DIR__ . '/../vendor/setasign/fpdi/src/autoload.php';
+        }
+
+        $pdf = new \setasign\Fpdi\Fpdi();
+        $pageCount = $pdf->setSourceFile($sourceFile);
+
+        for ($i = 1; $i <= $pageCount; $i++) {
+            $tplIdx = $pdf->importPage($i);
+            $size = $pdf->getTemplatesize($tplIdx);
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+            $pdf->useTemplate($tplIdx);
+
+            if ($i == $mhs_page) {
+                $paperW = $size['width'];
+                $paperH = $size['height'];
+                $fx = $mhs_x * $paperW;
+                $fy = $mhs_y * $paperH;
+                $fw = $mhs_w * $paperW;
+                $fh = $mhs_h * $paperH;
+
+                if (file_exists($ttdPath)) {
+                    $pdf->Image($ttdPath, $fx, $fy, $fw, $fh);
+                }
+            }
+        }
+
+        $pdf->Output('F', $outputPath);
+
+        // Redirect to preview step instead of finalizing
+        header('Location: ' . BASEURL . 'TemplateSurat/preview/' . IdObfuscator::encode($id_peminjaman) . '/' . $outputName);
+        exit;
+    }
+
+    public function preview($id_peminjaman, $file_preview)
+    {
+        $id_dec = IdObfuscator::decode($id_peminjaman);
+        if (!$id_dec) {
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
+
+        $data['id_peminjaman'] = $id_dec;
+        $data['file_preview'] = $file_preview;
+
+        $this->view('Peminjaman/PreviewTandaTangan', $data);
+    }
+
+    public function kumpulkan($id_peminjaman)
+    {
+        $id_dec = IdObfuscator::decode($id_peminjaman);
+        $file_final = $_POST['file_final'];
+
+        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_dec);
+        $oldFile = $peminjaman['file_surat'];
+
+        // Finalize filename: Rename PREVIEW to SIGNED
+        $newName = str_replace('PREVIEW_', 'SIGNED_', $file_final);
+
+        $oldPath = __DIR__ . '/../../public/files/surat-peminjaman/' . $file_final;
+        $newPath = __DIR__ . '/../../public/files/surat-peminjaman/' . $newName;
+
+        if (file_exists($oldPath)) {
+            rename($oldPath, $newPath);
+        }
+
+        // Delete the original unsigned file
+        $sourcePath = __DIR__ . '/../../public/files/surat-peminjaman/' . $oldFile;
+        if (file_exists($sourcePath)) {
+            unlink($sourcePath);
+        }
+
+        if ($this->peminjamanModel->updateSuratPeminjaman($id_dec, $newName) > 0) {
+            Flasher::setFlash('Berhasil', 'Peminjaman berhasil ditandatangani dan dikumpulkan.', '', 'success');
+        } else {
+            Flasher::setFlash('Gagal', 'Terjadi kesalahan sistem.', '', 'danger');
+        }
+
+        header('Location: ' . BASEURL . 'Riwayat');
+        exit;
+    }
+
+    public function batal($id_peminjaman)
+    {
+        // Discard result and return to positioning
+        header('Location: ' . BASEURL . 'TemplateSurat/tandaTangan/' . $id_peminjaman);
+        exit;
+    }
+
     public function generatePDF($id_peminjaman)
     {
         $id_peminjaman = IdObfuscator::decode($id_peminjaman);

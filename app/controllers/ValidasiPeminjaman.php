@@ -6,7 +6,7 @@ class ValidasiPeminjaman extends Controller
         if (!isset($_SESSION))
             session_start();
 
-        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
+        if (!isset($_SESSION['id_user']) || !in_array($_SESSION['id_role'], ['1', '2', '5'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
         }
@@ -18,12 +18,12 @@ class ValidasiPeminjaman extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        $data['peminjaman'] = $this->model('ValidasiPeminjaman_model')->getValidasiGabungan();
+        $data['peminjaman'] = $this->model('ValidasiPeminjaman_model')->getValidasiGabungan($_SESSION['id_role'], $_SESSION['nama_user']);
 
-        $data['total_disetujui'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('disetujui');
-        $data['total_diproses'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('diproses');
-        $data['total_ditolak'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('ditolak');
-        $data['total_kembali'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('dikembalikan');
+        $data['total_disetujui'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('disetujui', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_diproses'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('diproses', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_ditolak'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('ditolak', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_kembali'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('dikembalikan', $_SESSION['id_role'], $_SESSION['nama_user']);
 
         foreach ($data['peminjaman'] as &$peminjaman) {
             $peminjaman['tanggal_pengajuan'] = date('d-m-Y', strtotime($peminjaman['tanggal_pengajuan']));
@@ -109,6 +109,10 @@ class ValidasiPeminjaman extends Controller
             $label_box = "TTD Kepala Lab (Huzain)";
             $warna_box = "rgba(78, 115, 223, 0.6)";
             $border_box = "#4e73df";
+        } elseif ($role == '5') {
+            $label_box = "TTD Dosen Pembimbing (" . $_SESSION['nama_user'] . ")";
+            $warna_box = "rgba(255, 193, 7, 0.6)";
+            $border_box = "#ffc107";
         } else {
             $label_box = "TTD Laboran (Fatimah)";
             $warna_box = "rgba(28, 200, 138, 0.6)";
