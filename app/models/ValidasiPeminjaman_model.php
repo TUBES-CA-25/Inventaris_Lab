@@ -93,7 +93,7 @@ class ValidasiPeminjaman_model
         return $this->db->rowCount();
     }
 
-    public function getValidasiGabungan()
+    public function getValidasiGabungan($role = null, $nama_user = null)
     {
         $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
@@ -105,11 +105,18 @@ class ValidasiPeminjaman_model
                 JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
+                LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
                 
                 WHERE 
-                    tp.id_status_peminjaman IN (2, 3, 6) 
-                
-                GROUP BY tp.id_peminjaman, tdu.nama_user, msp.nama_status
+                    tp.id_status_peminjaman IN (2, 3, 6) ";
+
+        if ($role == '5') {
+            $query .= " AND tpa.dosen_pembimbing = :dosen ";
+        } elseif ($role == '2') {
+            $query .= " AND tp.id_jenis_peminjaman = 2 ";
+        }
+
+        $query .= " GROUP BY tp.id_peminjaman, tdu.nama_user, msp.nama_status
                 
                 ORDER BY 
                     CASE 
@@ -120,10 +127,13 @@ class ValidasiPeminjaman_model
                     tp.tanggal_pengajuan DESC";
 
         $this->db->query($query);
+        if ($role == '5') {
+            $this->db->bind('dosen', $nama_user);
+        }
         return $this->db->resultSet();
     }
 
-    public function hitungStatus($status)
+    public function hitungStatus($status, $role = null, $nama_user = null)
     {
         $statusMap = [
             'melengkapi surat' => 1,
@@ -136,8 +146,22 @@ class ValidasiPeminjaman_model
         ];
         $statusId = $statusMap[strtolower($status)] ?? 0;
 
-        $this->db->query("SELECT COUNT(*) as total FROM trx_peminjaman WHERE id_status_peminjaman = :sid");
+        $query = "SELECT COUNT(DISTINCT tp.id_peminjaman) as total 
+                  FROM trx_peminjaman tp
+                  LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                  WHERE tp.id_status_peminjaman = :sid";
+
+        if ($role == '5') {
+            $query .= " AND tpa.dosen_pembimbing = :dosen ";
+        } elseif ($role == '2') {
+            $query .= " AND tp.id_jenis_peminjaman = 2 ";
+        }
+
+        $this->db->query($query);
         $this->db->bind('sid', $statusId);
+        if ($role == '5') {
+            $this->db->bind('dosen', $nama_user);
+        }
 
         $result = $this->db->single();
 
@@ -317,6 +341,18 @@ class ValidasiPeminjaman_model
         $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
         $pathHuzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
 
+        // Check if role is Dosen (Role 5)
+        $isDosen = isset($_SESSION['id_role']) && $_SESSION['id_role'] == '5';
+        $pathDosen = '';
+        if ($isDosen) {
+            $this->db->query("SELECT file_ttd FROM trx_user WHERE id_user = :id");
+            $this->db->bind('id', $_SESSION['id_user']);
+            $userTTD = $this->db->single();
+            if ($userTTD && !empty($userTTD['file_ttd'])) {
+                $pathDosen = __DIR__ . '/../../public/img/ttd/' . $userTTD['file_ttd'];
+            }
+        }
+
         for ($i = 1; $i <= $pageCount; $i++) {
             $tplIdx = $pdf->importPage($i);
             $size = $pdf->getTemplateSize($tplIdx);
@@ -330,8 +366,15 @@ class ValidasiPeminjaman_model
             if ($i == $data['fatimah_page']) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
-                if (file_exists($pathFatimah)) {
-                    $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
+
+                if ($isDosen) {
+                    if (!empty($pathDosen) && file_exists($pathDosen)) {
+                        $pdf->Image($pathDosen, $fx, $fy, $ttdWidth);
+                    }
+                } else {
+                    if (file_exists($pathFatimah)) {
+                        $pdf->Image($pathFatimah, $fx, $fy, $ttdWidth);
+                    }
                 }
             }
 
@@ -345,6 +388,13 @@ class ValidasiPeminjaman_model
         }
 
         $pdf->Output($pathAsli, 'F');
+
+        // Update validasi_dosen if it was a Dosen validating
+        if ($isDosen) {
+            $this->db->query("UPDATE trx_peminjaman_akademik SET validasi_dosen = '1' WHERE id_peminjaman = :id");
+            $this->db->bind('id', $id);
+            $this->db->execute();
+        }
 
         return 1;
     }
