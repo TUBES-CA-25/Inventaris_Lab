@@ -14,10 +14,13 @@ $val_tgl_aju = !empty($data['val_tgl_aju']) ? $data['val_tgl_aju'] : ($isEdit ? 
 $val_tgl_mulai = !empty($data['val_tgl_mulai']) ? $data['val_tgl_mulai'] : ($isEdit ? $headerData['tanggal_peminjaman'] : '');
 $val_tgl_akhir = !empty($data['val_tgl_akhir']) ? $data['val_tgl_akhir'] : ($isEdit ? $headerData['tanggal_pengembalian'] : '');
 $val_ket = !empty($data['val_ket']) ? $data['val_ket'] : ($isEdit && isset($headerData['keterangan_peminjaman']) ? $headerData['keterangan_peminjaman'] : '');
-$val_tujuan_lain = $data['val_tujuan_lain'] ?? '';
-$val_tujuan_ta = $data['val_tujuan_ta'] ?? '';
-$val_tujuan_riset = $data['val_tujuan_riset'] ?? '';
-$val_dosen = $data['val_dosen'] ?? '';
+$val_tujuan_lain = !empty($data['val_tujuan_lain']) ? $data['val_tujuan_lain'] : 
+                   ($isEdit && strpos($headerData['judul_kegiatan'] ?? '', 'Lain-lain:') !== false ? trim(str_replace('Lain-lain:', '', $headerData['judul_kegiatan'])) : '');
+$val_tujuan_ta = !empty($data['val_tujuan_ta']) ? $data['val_tujuan_ta'] : 
+                 ($isEdit && strpos($headerData['judul_kegiatan'] ?? '', 'Tugas Akhir:') !== false ? trim(str_replace('Tugas Akhir:', '', $headerData['judul_kegiatan'])) : '');
+$val_tujuan_riset = !empty($data['val_tujuan_riset']) ? $data['val_tujuan_riset'] : 
+                    ($isEdit && strpos($headerData['judul_kegiatan'] ?? '', 'Riset:') !== false ? trim(str_replace('Riset:', '', $headerData['judul_kegiatan'])) : '');
+$val_dosen = !empty($data['val_dosen']) ? $data['val_dosen'] : ($isEdit ? ($headerData['dosen_pembimbing'] ?? '') : '');
 // ------------------------------------------------------
 ?>
 
