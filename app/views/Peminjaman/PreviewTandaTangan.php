@@ -8,79 +8,17 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="shortcut icon" href="<?= BASEURL; ?>img/logo.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
 
-    <style>
-        body {
-            background-color: #f4f7fc;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .preview-container {
-            max-width: 900px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        #pdf-preview {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
-        .btn-kumpulkan {
-            background: #4e73df;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-kumpulkan:hover {
-            background: #2e59d9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
-            color: white;
-        }
-
-        .btn-ulangi {
-            background: #fff;
-            color: #e74a3b;
-            border: 2px solid #e74a3b;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-ulangi:hover {
-            background: #e74a3b;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(231, 74, 59, 0.3);
-        }
-    </style>
+    <link rel="stylesheet" href="<?= BASEURL; ?>css/signature_styles.css?v=<?= time(); ?>">
 </head>
 
 <body>
 
-    <nav class="navbar navbar-light bg-white shadow-sm mb-4">
-        <div class="container-fluid text-center">
-            <span class="navbar-brand mb-0 h1 mx-auto font-weight-bold text-primary">Preview Dokumen Ter-Tanda
-                Tangan</span>
-        </div>
+    <nav class="premium-nav text-center">
+        <div class="nav-title">Tanda tangan berkas peminjaman</div>
     </nav>
 
     <div class="container">
