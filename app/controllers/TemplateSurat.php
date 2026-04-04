@@ -98,16 +98,16 @@ class TemplateSurat extends Controller
     {
         $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id);
         $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id);
-        $id_user = $peminjaman['id_user'];
-        $user = $this->peminjamanModel->getUserProfile($id_user);
+        $user = $this->peminjamanModel->getUserProfile($peminjaman['id_user']);
 
         $supervisor = null;
         if (!empty($peminjaman['dosen_pembimbing'])) {
             $supervisor = $this->model('User_model')->getUserByName($peminjaman['dosen_pembimbing']);
         }
 
-        $pathKop = __DIR__ . '/../../public/img/kop_surat.png';
+        $pathKop = '../public/img/kop_surat.png'; 
         $gambar_kop = '';
+
         if (file_exists($pathKop)) {
             $type = pathinfo($pathKop, PATHINFO_EXTENSION);
             $dataImg = file_get_contents($pathKop);
@@ -115,28 +115,27 @@ class TemplateSurat extends Controller
         }
 
         ob_start();
-        if ($peminjaman['id_jenis_peminjaman'] == 1) {
-            require_once '../app/views/Peminjaman/suratPdfMHS.php';
-        } else {
-            require_once '../app/views/Peminjaman/surat_pdf.php';
-        }
+        $viewPath = ($peminjaman['id_jenis_peminjaman'] == 1)
+            ? '../app/views/Peminjaman/suratPdfMHS.php'
+            : '../app/views/Peminjaman/surat_pdf.php';
+
+        require_once $viewPath;
         $htmlContent = ob_get_clean();
 
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $dompdf = new Dompdf($options);
+        $dompdf = $this->initDompdf();
         $dompdf->loadHtml($htmlContent);
         $dompdf->setPaper('legal', 'portrait');
         $dompdf->render();
 
-        $pdfOutput = $dompdf->output();
-        $namaFile = 'UNSIGNED_' . uniqid() . '.pdf';
-        $tujuan = __DIR__ . '/../../public/files/surat-peminjaman/';
-        if (!file_exists($tujuan))
-            mkdir($tujuan, 0777, true);
+        $fileName = 'UNSIGNED_' . uniqid() . '.pdf';
+        $storageDir = __DIR__ . '/../../public/files/surat-peminjaman/';
 
-        file_put_contents($tujuan . $namaFile, $pdfOutput);
-        $this->peminjamanModel->updateSuratPeminjaman($id, $namaFile);
+        if (!file_exists($storageDir)) {
+            mkdir($storageDir, 0777, true);
+        }
+
+        file_put_contents($storageDir . $fileName, $dompdf->output());
+        $this->peminjamanModel->updateSuratPeminjaman($id, $fileName);
     }
 
     public function prosesSignature()
@@ -253,40 +252,30 @@ class TemplateSurat extends Controller
 
     public function generatePDF($id_peminjaman)
     {
-        $id_peminjaman = IdObfuscator::decode($id_peminjaman);
-        if (!$id_peminjaman) {
+        $idDec = IdObfuscator::decode($id_peminjaman);
+        if (!$idDec) {
             echo "ID tidak valid.";
             exit;
         }
 
-        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($id_peminjaman);
-        $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($id_peminjaman);
-        // $data['barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
-
+        $peminjaman = $this->peminjamanModel->getDetailPeminjaman($idDec);
         if (!$peminjaman) {
             echo "Data tidak ditemukan.";
             exit;
         }
 
-        // --- SECURITY CHECK: Restricted user can only access their own ---
-        $id_user_login = $_SESSION['id_user'];
-        $id_role_login = $_SESSION['id_role']; // Assuming this is set in session
+        // Security Check
+        $this->checkOwnership($peminjaman);
 
-        if (($id_role_login == 4 || $id_role_login == 6 || $id_role_login == 7) && $peminjaman['id_user'] != $id_user_login) {
-            echo "Akses Ditolak: Anda tidak memiliki hak akses untuk dokumen ini.";
-            exit;
-        }
+        $details = $this->peminjamanModel->getDetailBarangByPeminjamanId($idDec);
+        $user = $this->peminjamanModel->getUserProfile($peminjaman['id_user']);
 
-        $id_user = $peminjaman['id_user'];
-        $user = $this->peminjamanModel->getUserProfile($id_user);
-
-        // Fetch Supervisor Profile (for NIDN/NIP)
         $supervisor = null;
         if (!empty($peminjaman['dosen_pembimbing'])) {
             $supervisor = $this->model('User_model')->getUserByName($peminjaman['dosen_pembimbing']);
         }
 
-        $pathKop = '../public/img/kop_surat.png';
+        $pathKop = '../public/img/kop_surat.png'; 
         $gambar_kop = '';
 
         if (file_exists($pathKop)) {
@@ -296,32 +285,64 @@ class TemplateSurat extends Controller
         }
 
         ob_start();
-        // Route PDF based on Category
-        if ($peminjaman['id_jenis_peminjaman'] == 1) {
-            require_once '../app/views/Peminjaman/suratPdfMHS.php';
-        } else {
-            require_once '../app/views/Peminjaman/surat_pdf.php';
-        }
+        $viewPath = ($peminjaman['id_jenis_peminjaman'] == 1)
+            ? '../app/views/Peminjaman/suratPdfMHS.php'
+            : '../app/views/Peminjaman/surat_pdf.php';
+
+        require_once $viewPath;
         $htmlContent = ob_get_clean();
 
-        $options = new Options();
-        $options->set('isRemoteEnabled', true);
-        $options->set('defaultFont', 'Times-Roman');
-        $options->set('isHtml5ParserEnabled', true);
-
-        $dompdf = new Dompdf($options);
+        $dompdf = $this->initDompdf();
         $dompdf->loadHtml($htmlContent);
         $dompdf->setPaper('legal', 'portrait');
-
         $dompdf->render();
 
         if (ob_get_length()) {
             ob_end_clean();
         }
 
-        $filename = 'Surat_Peminjaman_' . '.pdf';
-        $dompdf->stream($filename, ["Attachment" => 1]);
+        $dompdf->stream('Surat_Peminjaman.pdf', ["Attachment" => 1]);
         exit;
+    }
+
+    /**
+     * Helper: Initialize Dompdf with standard options
+     */
+    private function initDompdf()
+    {
+        $options = new Options();
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'Times-Roman');
+        $options->set('isHtml5ParserEnabled', true);
+        return new Dompdf($options);
+    }
+
+    /**
+     * Helper: Convert image to Base64 for PDF embedding
+     */
+    private function getBase64Image($path)
+    {
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+        return '';
+    }
+
+    /**
+     * Helper: Security ownership check
+     */
+    private function checkOwnership($peminjaman)
+    {
+        $idUser = $_SESSION['id_user'];
+        $idRole = $_SESSION['id_role'];
+
+        $restrictedRoles = [4, 6, 7];
+        if (in_array($idRole, $restrictedRoles) && $peminjaman['id_user'] != $idUser) {
+            echo "Akses Ditolak: Anda tidak memiliki hak akses untuk dokumen ini.";
+            exit;
+        }
     }
 
     public function prosesUpload()
