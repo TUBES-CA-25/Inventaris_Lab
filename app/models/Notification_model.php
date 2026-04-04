@@ -64,7 +64,7 @@ class Notification_model
         // Cari yang selisih tanggal pengembalian dengan hari ini = 0 s.d 3 hari
         // 0 = Hari ini (Jatuh Tempo), 1 = Besok, dst.
         $today = date('Y-m-d');
-        $query = "SELECT p.*, d.nama_user, d.email 
+        $query = "SELECT p.*, d.nama_user, d.email, d.no_hp_user 
                   FROM trx_peminjaman p
                   JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
@@ -85,7 +85,7 @@ class Notification_model
     public function cekTerlambat()
     {
         $today = date('Y-m-d');
-        $query = "SELECT p.*, d.nama_user, d.email 
+        $query = "SELECT p.*, d.nama_user, d.email, d.no_hp_user 
                   FROM trx_peminjaman p
                   JOIN trx_user d ON p.id_user = d.id_user
                   WHERE p.id_status_peminjaman = 3 
@@ -214,6 +214,14 @@ class Notification_model
             $body = $this->getHtmlTemplate("Peringatan Pengembalian", $message, $details, false);
 
             if ($this->sendEmail($item['email'], $subject, $body)) {
+                // WA Mahasiswa
+                if (!empty($item['no_hp_user'])) {
+                    require_once __DIR__ . '/WhatsApp_model.php';
+                    $wa = new WhatsApp_model();
+                    $waMsg = "⚠️ *PERINGATAN PENGEMBALIAN*\n\nHalo *{$item['nama_user']}*,\nIni adalah pengingat bahwa masa peminjaman barang Anda untuk kegiatan *{$item['judul_kegiatan']}* akan segera berakhir ({$statusWaktu}).\n\nMohon persiapkan pengembalian barang tepat waktu. Terima kasih.";
+                    $wa->send($item['no_hp_user'], $waMsg);
+                }
+
                 // Update Timestamp
                 $this->updateLastNotification($item['id_peminjaman']);
                 $countSent++;
@@ -241,6 +249,29 @@ class Notification_model
             $body = $this->getHtmlTemplate("Terlambat Mengembalikan", $message, $details, true);
 
             if ($this->sendEmail($item['email'], $subject, $body)) {
+                // WA Mahasiswa
+                if (!empty($item['no_hp_user'])) {
+                    require_once __DIR__ . '/WhatsApp_model.php';
+                    $wa = new WhatsApp_model();
+                    $waMsg = "🚨 *KETERLAMBATAN PENGEMBALIAN*\n\nHalo *{$item['nama_user']}*,\nMasa peminjaman barang Anda untuk kegiatan *{$item['judul_kegiatan']}* telah *BERAKHIR* (Telat {$hari_telat} hari).\n\nMohon SEGERA kembalikan barang ke laboratorium. Terima kasih.";
+                    $wa->send($item['no_hp_user'], $waMsg);
+                }
+                
+                // WA Admin (from database numbers)
+                require_once __DIR__ . '/User_model.php';
+                $userModel = new User_model();
+                $admins = $userModel->getAdminPhoneNumbers();
+                
+                if (!empty($admins)) {
+                    $adminNumbers = array_column($admins, 'no_hp_user');
+                    $targetPhones = implode(',', $adminNumbers);
+                    
+                    require_once __DIR__ . '/WhatsApp_model.php';
+                    $waAdmin = new WhatsApp_model();
+                    $waMsgAdmin = "🚨 *INFO KETERLAMBATAN PENGEMBALIAN*\n\nMahasiswa: *{$item['nama_user']}*\nKegiatan: *{$item['judul_kegiatan']}*\nTelat: {$hari_telat} Hari\n\nMohon ditindaklanjuti.";
+                    $waAdmin->send($targetPhones, $waMsgAdmin);
+                }
+
                 // Update Timestamp
                 $this->updateLastNotification($item['id_peminjaman']);
                 $countSent++;
