@@ -130,34 +130,7 @@ class Peminjaman_model
 
             $this->db->commit();
 
-            // --- NOTIFIKASI WHATSAPP KE GROUP ADMIN ---
-            try {
-                // 1. Ambil data Peminjam (untuk info nama)
-                require_once __DIR__ . '/User_model.php';
-                $userModel = new User_model();
-                $peminjam = $userModel->profile(['id_user' => $data['id_user']]);
 
-                // 2. Cek Konfigurasi Group ID
-                if (defined('FONNTE_GROUP_ID') && FONNTE_GROUP_ID != 'ID_GRUP_WHATSAPP_DISINI') {
-                    require_once __DIR__ . '/WhatsApp_model.php';
-                    $wa = new WhatsApp_model();
-
-                    // 3. Susun Pesan
-                    $message = "*PENGAJUAN PEMINJAMAN BARU*\n\n";
-                    $message .= "Halo Tim Admin, ada pengajuan barang baru.\n\n";
-                    $message .= "Nama Peminjam: " . $peminjam['nama_user'] . "\n";
-                    $message .= "Tanggal: " . date('d-m-Y', strtotime($data['tanggal_peminjaman'])) . "\n";
-                    $message .= "Kegiatan: " . $data['judul_kegiatan'] . "\n\n";
-                    $message .= "Mohon dicek di website: " . BASEURL . "\n";
-                    $message .= "Terima Kasih.";
-
-                    // 4. Kirim ke Group
-                    $wa->send(FONNTE_GROUP_ID, $message);
-                }
-            } catch (Exception $e) {
-                // Silent fail agar transaksi tidak batal
-            }
-            // ------------------------------------
 
             return $this->db->rowCount();
         } catch (Exception $e) {
@@ -353,15 +326,17 @@ class Peminjaman_model
                 }
             }
 
-            $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah) 
-                            VALUES (:id_p, :id_b, :id_unit, :jml)";
+            $queryDetail = "INSERT INTO trx_detail_peminjaman (id_peminjaman, id_jenis_barang, id_barang, jumlah, keterangan_barang) 
+                            VALUES (:id_p, :id_b, NULL, :jml, :ket)";
 
             foreach ($merged_items as $item) {
+                $keterangan_simpan = $item['id_unit'] ? "REQ_SPEC:" . $item['id_unit'] : NULL;
+
                 $this->db->query($queryDetail);
                 $this->db->bind('id_p', $data['id_peminjaman']);
                 $this->db->bind('id_b', $item['id_jenis']);
-                $this->db->bind('id_unit', $item['id_unit']);
                 $this->db->bind('jml', $item['jumlah']);
+                $this->db->bind('ket', $keterangan_simpan);
 
                 $this->db->execute();
                 $detail_inserted++;
@@ -515,7 +490,41 @@ class Peminjaman_model
         $this->db->bind('id', $id);
 
         $this->db->execute();
-        return $this->db->rowCount();
+        $rowCount = $this->db->rowCount();
+
+        // --- NOTIFIKASI WHATSAPP KE ADMIN & LABORAN ---
+        if ($rowCount > 0) {
+            try {
+                $pjn = $this->getPeminjamanById($id);
+
+                require_once __DIR__ . '/User_model.php';
+                require_once __DIR__ . '/WhatsApp_model.php';
+                
+                $userModel = new User_model();
+                $wa = new WhatsApp_model();
+                
+                $admins = $userModel->getAdminPhoneNumbers();
+                
+                if (!empty($admins) && $pjn) {
+                    $adminNumbers = array_column($admins, 'no_hp_user');
+                    $targetPhones = implode(',', $adminNumbers);
+
+                    $message = "*PENGAJUAN PEMINJAMAN PERLU DIPROSES*\n\n";
+                    $message .= "Halo Tim Admin, ada pengajuan barang yang telah melengkapi surat dan siap diproses.\n\n";
+                    $message .= "Nama Peminjam: " . $pjn['nama_peminjam'] . "\n";
+                    $message .= "Tanggal: " . date('d-m-Y', strtotime($pjn['tanggal_peminjaman'])) . "\n";
+                    $message .= "Kegiatan: " . $pjn['judul_kegiatan'] . "\n\n";
+                    $message .= "Mohon dicek di website: " . BASEURL . "\n";
+                    $message .= "Terima Kasih.";
+
+                    $wa->send($targetPhones, $message);
+                }
+            } catch (Exception $e) {
+                // Silent fail agar upload tidak batal
+            }
+        }
+
+        return $rowCount;
     }
 
     public function getDetailBarangByPeminjamanId($id)
@@ -634,8 +643,6 @@ class Peminjaman_model
         $this->db->bind('id', $id_peminjaman);
         $request_details = $this->db->resultSet();
 
-        $berhasil = 0;
-
         foreach ($request_details as $row) {
 
             if (empty($row['id_barang']) && strpos($row['keterangan_barang'], 'REQ_SPEC:') !== false) {
@@ -653,10 +660,10 @@ class Peminjaman_model
 
                 $this->db->query($queryCari);
                 $this->db->bind('spec', $id_spesifikasi);
-                $kandidat_barang = $this->db->resultSet();
+                $kandidat_barang = $this->db->resultset();
 
                 if (count($kandidat_barang) < $jumlah_diminta) {
-                    return 0;
+                    return 0; // Gagal: Stok tidak mencukupi
                 }
 
                 foreach ($kandidat_barang as $index => $brg) {
@@ -693,12 +700,10 @@ class Peminjaman_model
                     $this->db->bind('id', $id_barang_fisik);
                     $this->db->execute();
                 }
-
-                $berhasil++;
             }
         }
 
-        return ($berhasil > 0) ? 1 : 0;
+        return 1; // Berhasil (atau tidak ada barang yang perlu dialokasikan otomatis)
     }
 
     public function getHistoryUser($id_user)
