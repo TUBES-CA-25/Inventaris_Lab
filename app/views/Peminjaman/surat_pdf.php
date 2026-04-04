@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -10,7 +12,7 @@
 <body>
 
     <div class="header-kop">
-        <?php if (!empty($gambar_kop)): ?>
+        <?php if (!empty($gambar_kop)): ?>  
             <img src="<?= $gambar_kop; ?>" alt="Kop Surat">
         <?php else: ?>
             <h3 style="margin:0;">LABORATORIUM TERPADU</h3>
