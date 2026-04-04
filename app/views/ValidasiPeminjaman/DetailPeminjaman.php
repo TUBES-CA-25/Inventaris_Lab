@@ -6,7 +6,7 @@
 // }
 
 $p = $data['peminjaman'];
-$status_sekarang = strtolower($p['status']);
+$status_sekarang = strtolower($p['status'] ?? '');
 $role_login = $_SESSION['id_role']; // 1=Huzain, 2=Fatimah
 $status_Kembali = $data['status_Kembali'];
 
@@ -53,6 +53,12 @@ if (!in_array($status_sekarang, ['dikembalikan', 'ditolak', 'tolak peminjaman'])
                 <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
                 <?= ucfirst($status_sekarang); ?>
             </span>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mt-2">
+                <?php Flasher::flash(); ?>
+            </div>
         </div>
 
         <div class="row">
@@ -176,7 +182,7 @@ if (!in_array($status_sekarang, ['dikembalikan', 'ditolak', 'tolak peminjaman'])
                                     <i class="fas fa-file-pdf text-white" style="font-size: 40px;"></i>
                                 </div>
                             </div>
-                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>" target="_blank"
+                            <a href="<?= BASEURL; ?>files/surat-peminjaman/<?= $p['file_surat']; ?>?t=<?= time(); ?>" target="_blank"
                                 class="btn btn-navy btn-block">
                                 <i class="fas fa-cloud-download-alt mr-2"></i>Download Surat
                             </a>
@@ -196,67 +202,151 @@ if (!in_array($status_sekarang, ['dikembalikan', 'ditolak', 'tolak peminjaman'])
                         </div>
                         <div class="card-body p-4">
 
-                            <!-- Step 1: Kepala Lab -->
-                            <div class="step-card">
-                                <div
-                                    class="step-icon <?= ($p['validasi_kalab'] == '1') ? 'step-success' : 'step-pending'; ?>">
-                                    <?= ($p['validasi_kalab'] == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Kepala Lab</h6>
-                                    <small class="text-muted">Huzain Aziz</small>
-                                </div>
-                                <div>
-                                    <?php if ($role_login == '1' && $p['validasi_kalab'] == '0'): ?>
-                                        <form id="formAccKalab" action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab"
-                                            method="post" class="d-inline">
-                                            <input type="hidden" name="id_peminjaman"
-                                                value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
-                                            <button type="button" class="btn btn-navy btn-sm"
-                                                onclick="konfirmasiAksi('formAccKalab', 'Setujui Peminjaman?', 'Yakin setujui?', 'question')">
-                                                <i class="fas fa-check mr-1"></i> Setujui
-                                            </button>
-                                        </form>
-                                    <?php elseif ($p['validasi_kalab'] == '1'): ?>
-                                        <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
-                                            <i class="fas fa-check"></i> Selesai
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge badge-light text-muted">Menunggu</span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
+                            <?php
+                            $isAcademic = ($p['id_jenis_peminjaman'] == 1);
+                            ?>
 
-                            <!-- Step 2: Laboran -->
-                            <div class="step-card">
-                                <div
-                                    class="step-icon <?= ($p['validasi_laboran'] == '1') ? 'step-success' : (($p['validasi_kalab'] == '1') ? 'step-active' : 'step-pending'); ?>">
-                                    <?= ($p['validasi_laboran'] == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Laboran</h6>
-                                    <small class="text-muted">Fatimah Azzahrah</small>
-                                </div>
-                                <div>
-                                    <?php if ($role_login == '2' && $p['validasi_laboran'] == '0'): ?>
-                                        <?php if ($p['validasi_kalab'] == '1'): ?>
+                            <?php if ($isAcademic): ?>
+                                <!-- ACADEMIC FLOW: Dosen -> Kalab -->
+                                <?php
+                                $v1_done = $p['validasi_dosen'] ?? '0';
+                                $v1_name = 'Dosen Pembimbing';
+                                $v1_person = $p['dosen_pembimbing'];
+                                $canV1 = ($role_login == '5' && $_SESSION['nama_user'] == $p['dosen_pembimbing']);
+
+                                $v2_done = $p['validasi_kalab'] ?? '0';
+                                $v2_locked = ($v1_done == '0');
+                                $canV2 = ($role_login == '1');
+                                ?>
+                                
+                                <!-- Step 1: Dosen -->
+                                <div class="step-card">
+                                    <div class="step-icon <?= ($v1_done == '1') ? 'step-success' : 'step-active'; ?>">
+                                        <?= ($v1_done == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);"><?= $v1_name; ?></h6>
+                                        <small class="text-muted"><?= $v1_person; ?></small>
+                                    </div>
+                                    <div>
+                                        <?php if ($canV1 && $v1_done == '0'): ?>
                                             <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
                                                 class="btn btn-navy btn-sm">
                                                 <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
                                             </a>
+                                        <?php elseif ($v1_done == '1'): ?>
+                                            <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                                <i class="fas fa-check"></i> Selesai
+                                            </span>
                                         <?php else: ?>
-                                            <button class="btn btn-secondary btn-sm" disabled
-                                                style="cursor: not-allowed; opacity: 0.6;">
-                                                <i class="fas fa-lock"></i> Terkunci
-                                            </button>
+                                            <span class="badge badge-light text-muted">Menunggu</span>
                                         <?php endif; ?>
-                                    <?php elseif ($p['validasi_laboran'] == '1'): ?>
-                                        <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
-                                            <i class="fas fa-check"></i> Selesai
-                                        </span>
-                                    <?php endif; ?>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <!-- Step 2: Kalab -->
+                                <div class="step-card">
+                                    <div class="step-icon <?= ($v2_done == '1') ? 'step-success' : ($v2_locked ? 'step-pending' : 'step-active'); ?>">
+                                        <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Kepala Lab</h6>
+                                        <small class="text-muted">Huzain Aziz</small>
+                                    </div>
+                                    <div>
+                                        <?php if ($canV2 && $v2_done == '0'): ?>
+                                            <?php if (!$v2_locked): ?>
+                                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
+                                                    class="btn btn-navy btn-sm">
+                                                    <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="btn btn-secondary btn-sm" disabled style="cursor: not-allowed; opacity: 0.6;">
+                                                    <i class="fas fa-lock"></i> Terkunci
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php elseif ($v2_done == '1'): ?>
+                                            <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                                <i class="fas fa-check"></i> Selesai
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge badge-light text-muted">Menunggu</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                            <?php else: ?>
+                                <!-- INTERNAL FLOW: Kalab Approve -> Laboran Sign Both -->
+                                <?php
+                                $v1_done = $p['validasi_kalab'] ?? '0';
+                                $v1_name = 'Kepala Lab';
+                                $v1_person = 'Huzain Aziz';
+                                $canV1 = ($role_login == '1');
+
+                                $v2_done = $p['validasi_laboran'] ?? '0';
+                                $v2_locked = ($v1_done == '0');
+                                $canV2 = ($role_login == '2');
+                                ?>
+
+                                <!-- Step 1: Kalab (Approve Only) -->
+                                <div class="step-card">
+                                    <div class="step-icon <?= ($v1_done == '1') ? 'step-success' : 'step-active'; ?>">
+                                        <?= ($v1_done == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);"><?= $v1_name; ?></h6>
+                                        <small class="text-muted"><?= $v1_person; ?></small>
+                                    </div>
+                                    <div>
+                                        <?php if ($canV1 && $v1_done == '0'): ?>
+                                            <form id="formAccKalab" action="<?= BASEURL; ?>ValidasiPeminjaman/accKalab" method="post" class="d-inline">
+                                                <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($p['id_peminjaman']); ?>">
+                                                <button type="button" class="btn btn-navy btn-sm"
+                                                    onclick="konfirmasiAksi('formAccKalab', 'Setujui Peminjaman?', 'Yakin setujui?', 'question')">
+                                                    <i class="fas fa-check mr-1"></i> Setujui
+                                                </button>
+                                            </form>
+                                        <?php elseif ($v1_done == '1'): ?>
+                                            <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                                <i class="fas fa-check"></i> Disetujui
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge badge-light text-muted">Menunggu</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Laboran (Sign Both) -->
+                                <div class="step-card">
+                                    <div class="step-icon <?= ($v2_done == '1') ? 'step-success' : ($v2_locked ? 'step-pending' : 'step-active'); ?>">
+                                        <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Laboran</h6>
+                                        <small class="text-muted">Fatimah Azzahrah</small>
+                                    </div>
+                                    <div>
+                                        <?php if ($canV2 && $v2_done == '0'): ?>
+                                            <?php if (!$v2_locked): ?>
+                                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
+                                                    class="btn btn-navy btn-sm">
+                                                    <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="btn btn-secondary btn-sm" disabled style="cursor: not-allowed; opacity: 0.6;">
+                                                    <i class="fas fa-lock"></i> Terkunci
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php elseif ($v2_done == '1'): ?>
+                                            <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
+                                                <i class="fas fa-check"></i> Selesai
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="badge badge-light text-muted">Menunggu</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
 
                             <hr style="border-color: #e2e8f0; margin: 20px 0;">
                             <button type="button" class="btn btn-outline-danger btn-block btn-sm mt-3"
