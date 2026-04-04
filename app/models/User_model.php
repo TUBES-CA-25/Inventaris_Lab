@@ -314,7 +314,7 @@ class User_model
 
     public function getUser($email, $password)
     {
-        $this->db->query("SELECT id_user, email, password, id_role, email_verified FROM trx_user WHERE email = :email");
+        $this->db->query("SELECT id_user, email, password, id_role, email_verified, nama_user FROM trx_user WHERE email = :email");
         $this->db->bind("email", $email);
         $user = $this->db->single();
 
