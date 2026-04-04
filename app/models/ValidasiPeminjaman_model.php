@@ -14,23 +14,27 @@ class ValidasiPeminjaman_model
                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
                         tp.keterangan_peminjaman, tp.keterangan_tolak, tp.id_status_peminjaman, 
                         tp.file_surat, tp.validasi_kalab,
+                        tpi.validasi_laboran,
                         tdu.nama_user, 
                         tdu.nim_nip,
-                        tpa.dosen_pembimbing, tpa.kategori_kegiatan,
+                        tpa.dosen_pembimbing, tpa.kategori_kegiatan, tpa.validasi_dosen,
                         GROUP_CONCAT(mjb.sub_barang SEPARATOR ', ') as sub_barang,
                         SUM(tdp.jumlah) as jumlah_peminjaman,
                         tp.keterangan_peminjaman as alasan_penolakan,
-                        mspg.nama_status_pengembalian AS status_pengembalian
+                        mspg.nama_status_pengembalian AS status_pengembalian,
+                        msp.nama_status as status
                 FROM trx_peminjaman tp
                 JOIN trx_user tdu ON tp.id_user = tdu.id_user  
+                LEFT JOIN mst_status_peminjaman msp ON tp.id_status_peminjaman = msp.id_status_peminjaman
                 LEFT JOIN trx_peminjaman_akademik tpa ON tp.id_peminjaman = tpa.id_peminjaman
+                LEFT JOIN trx_peminjaman_internal tpi ON tp.id_peminjaman = tpi.id_peminjaman
                 LEFT JOIN trx_detail_peminjaman tdp ON tp.id_peminjaman = tdp.id_peminjaman
                 LEFT JOIN mst_jenis_barang mjb ON tdp.id_jenis_barang = mjb.id_jenis_barang
                 LEFT JOIN trx_pengembalian peng ON tp.id_peminjaman = peng.id_peminjaman
                 LEFT JOIN mst_status_pengembalian mspg ON peng.id_status_pengembalian = mspg.id_status_pengembalian
                 
                 WHERE tp.id_peminjaman = :id_peminjaman
-                GROUP BY tp.id_peminjaman, tdu.nama_user, tdu.nim_nip, mspg.nama_status_pengembalian, tpa.dosen_pembimbing, tpa.kategori_kegiatan";
+                GROUP BY tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, tp.keterangan_peminjaman, tp.keterangan_tolak, tp.id_status_peminjaman, tp.file_surat, tp.validasi_kalab, tpi.validasi_laboran, tdu.nama_user, tdu.nim_nip, mspg.nama_status_pengembalian, msp.nama_status, tpa.dosen_pembimbing, tpa.kategori_kegiatan, tpa.validasi_dosen";
 
         $this->db->query($query);
         $this->db->bind("id_peminjaman", $id_peminjaman);
@@ -69,6 +73,26 @@ class ValidasiPeminjaman_model
 
         $this->db->execute();
 
+        // --- NOTIFIKASI WA MAHASISWA (DITOLAK) ---
+        if ($statusId == 4 || $statusId == 6) {
+            try {
+                $this->db->query("SELECT u.no_hp_user, u.nama_user, p.judul_kegiatan 
+                                  FROM trx_peminjaman p 
+                                  JOIN trx_user u ON p.id_user = u.id_user 
+                                  WHERE p.id_peminjaman = :id");
+                $this->db->bind('id', $id_peminjaman);
+                $info = $this->db->single();
+
+                if ($info && !empty($info['no_hp_user'])) {
+                    require_once __DIR__ . '/WhatsApp_model.php';
+                    $wa = new WhatsApp_model();
+                    $alasan = empty($catatan) ? 'Tidak ada alasan.' : $catatan;
+                    $msg = "Halo *{$info['nama_user']}*,\n\nMohon maaf, pengajuan peminjaman Anda untuk kegiatan *{$info['judul_kegiatan']}* telah *DITOLAK*.\nAlasan: {$alasan}\n\nTerima kasih.";
+                    $wa->send($info['no_hp_user'], $msg);
+                }
+            } catch (Exception $e) {}
+        }
+
         if ($status == 'dikembalikan' || $status == 'tolak peminjaman') {
 
             $this->db->query("SELECT id_barang FROM trx_detail_peminjaman WHERE id_peminjaman = :id");
@@ -93,8 +117,52 @@ class ValidasiPeminjaman_model
         return $this->db->rowCount();
     }
 
+    public function autoCancelExpiredLoans()
+    {
+        $today = date('Y-m-d');
+        
+        // Find loans with status 1 (Melengkapi Surat) or 2 (Diproses) where tanggal_peminjaman < today (H+1)
+        $query = "SELECT id_peminjaman FROM trx_peminjaman 
+                  WHERE id_status_peminjaman IN (1, 2) 
+                  AND tanggal_peminjaman < :today";
+        $this->db->query($query);
+        $this->db->bind('today', $today);
+        $expired = $this->db->resultSet();
+        
+        if (empty($expired)) return 0;
+        
+        $count = 0;
+        foreach ($expired as $loan) {
+            $id = $loan['id_peminjaman'];
+            
+            // 1. Restore items if any were locked (Status 1/2 shouldn't usually have items, but safety first)
+            $this->db->query("SELECT id_barang FROM trx_detail_peminjaman WHERE id_peminjaman = :id AND id_barang IS NOT NULL");
+            $this->db->bind('id', $id);
+            $items = $this->db->resultSet();
+            
+            foreach ($items as $item) {
+                $this->db->query("UPDATE trx_barang SET status_peminjaman = 'Bisa', id_status = 3 WHERE id_barang = :idb");
+                $this->db->bind('idb', $item['id_barang']);
+                $this->db->execute();
+            }
+            
+            // 2. Update status to Tolak Peminjaman (4)
+            $this->db->query("UPDATE trx_peminjaman SET 
+                              id_status_peminjaman = 4, 
+                              keterangan_tolak = 'Otomatis dibatalkan: Melewati batas waktu validasi (H+1 dari tanggal peminjaman).' 
+                              WHERE id_peminjaman = :id");
+            $this->db->bind('id', $id);
+            $this->db->execute();
+            $count++;
+        }
+        
+        return $count;
+    }
+
     public function getValidasiGabungan($role = null, $nama_user = null)
     {
+        $this->autoCancelExpiredLoans(); // Run cleanup every time list is fetched
+
         $query = "SELECT tp.id_peminjaman, tp.id_user, tp.id_jenis_peminjaman, tp.judul_kegiatan, 
                         tp.tanggal_pengajuan, tp.tanggal_peminjaman, tp.tanggal_pengembalian, 
                         tdu.nama_user, 
@@ -241,14 +309,33 @@ class ValidasiPeminjaman_model
                 $data['page']
             );
 
-            $query = "UPDATE trx_peminjaman SET 
-                      validasi_laboran = '1', 
-                      id_status_peminjaman = 3 
-                      WHERE id_peminjaman = :id";
+            // Fetch loan data to check type
+            $loan = $this->getDetailValidasiDataPeminjaman($id_peminjaman);
+            $role = $_SESSION['id_role'];
 
-            $this->db->query($query);
-            $this->db->bind('id', $id_peminjaman);
-            $this->db->execute();
+            // Update flags based on role
+            if ($role == '2') { // Laboran
+                $this->db->query("UPDATE trx_peminjaman_internal SET validasi_laboran = '1' WHERE id_peminjaman = :id");
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+            } elseif ($role == '1') { // Kalab
+                $this->db->query("UPDATE trx_peminjaman SET validasi_kalab = '1' WHERE id_peminjaman = :id");
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+            }
+
+            // Determine if final status update is needed
+            // Academic (1): needs Dosen (Role 5) AND Kalab (Role 1). Kalab is final.
+            // Internal (2): needs Laboran (Role 2). Laboran is final.
+            $isFinal = false;
+            if ($loan['id_jenis_peminjaman'] == 2 && $role == '2') $isFinal = true;
+            if ($loan['id_jenis_peminjaman'] == 1 && $role == '1') $isFinal = true;
+
+            if ($isFinal) {
+                $this->db->query("UPDATE trx_peminjaman SET id_status_peminjaman = 3 WHERE id_peminjaman = :id");
+                $this->db->bind('id', $id_peminjaman);
+                $this->db->execute();
+            }
 
             return 1;
         } catch (Exception $e) {
@@ -335,13 +422,21 @@ class ValidasiPeminjaman_model
             }
         }
 
-        // Use Loop for Manual Positioning
-        list($pdf, $pageCount) = $this->loadFpdi($pathBackup);
+        // Use pathAsli as source so existing signatures (from sequential steps) are preserved.
+        // pathBackup is kept as a reference to the original clean document.
+        list($pdf, $pageCount) = $this->loadFpdi($pathAsli);
 
         $pathFatimah = __DIR__ . '/../../public/img/ttd/ttd_fatimah.png';
         $pathHuzain = __DIR__ . '/../../public/img/ttd/ttd_huzain.png';
 
-        // Check if role is Dosen (Role 5)
+        // Determine which box(es) to process based on role and type
+        $loanData = $this->getDetailValidasiDataPeminjaman($id);
+        $role = $_SESSION['id_role'];
+        $id_jenis = $loanData['id_jenis_peminjaman'];
+
+        $shouldPlaceFatimah = false;
+        $shouldPlaceHuzain = false;
+
         $isDosen = isset($_SESSION['id_role']) && $_SESSION['id_role'] == '5';
         $pathDosen = '';
         if ($isDosen) {
@@ -350,6 +445,16 @@ class ValidasiPeminjaman_model
             $userTTD = $this->db->single();
             if ($userTTD && !empty($userTTD['file_ttd'])) {
                 $pathDosen = __DIR__ . '/../../public/img/ttd/' . $userTTD['file_ttd'];
+            }
+        }
+
+        if ($id_jenis == 1) { // Academic
+            if ($role == '5') $shouldPlaceFatimah = true;
+            if ($role == '1') $shouldPlaceHuzain = true;
+        } else { // Internal
+            if ($role == '2') {
+                $shouldPlaceFatimah = true;
+                $shouldPlaceHuzain = true;
             }
         }
 
@@ -363,7 +468,8 @@ class ValidasiPeminjaman_model
             $heightMM = $size['height'];
             $ttdWidth = 35;
 
-            if ($i == $data['fatimah_page']) {
+            // Place Fatimah/Dosenbox if enabled and page matches
+            if ($shouldPlaceFatimah && $i == $data['fatimah_page'] && $data['fatimah_x'] > 0) {
                 $fx = $widthMM * $data['fatimah_x'];
                 $fy = $heightMM * $data['fatimah_y'];
 
@@ -378,7 +484,8 @@ class ValidasiPeminjaman_model
                 }
             }
 
-            if ($i == $data['huzain_page']) {
+            // Place Huzain/Kalab box if enabled and page matches
+            if ($shouldPlaceHuzain && $i == $data['huzain_page'] && $data['huzain_x'] > 0) {
                 $hx = $widthMM * $data['huzain_x'];
                 $hy = $heightMM * $data['huzain_y'];
                 if (file_exists($pathHuzain)) {
@@ -389,27 +496,66 @@ class ValidasiPeminjaman_model
 
         $pdf->Output($pathAsli, 'F');
 
-        // Update validasi_dosen if it was a Dosen validating
-        if ($isDosen) {
-            $this->db->query("UPDATE trx_peminjaman_akademik SET validasi_dosen = '1' WHERE id_peminjaman = :id");
-            $this->db->bind('id', $id);
-            $this->db->execute();
+        // Identify current signer and loan type
+        $loanData = $this->getDetailValidasiDataPeminjaman($id);
+        $role = $_SESSION['id_role'];
+        $id_jenis = $loanData['id_jenis_peminjaman'];
+
+        // Update validation flags based on role and type
+        if ($id_jenis == 1) { // Academic
+            if ($role == '5') { // Dosen
+                $this->db->query("UPDATE trx_peminjaman_akademik SET validasi_dosen = '1' WHERE id_peminjaman = :id");
+            } elseif ($role == '1') { // Kalab
+                $this->db->query("UPDATE trx_peminjaman SET validasi_kalab = '1' WHERE id_peminjaman = :id");
+            }
+        } else { // Internal
+            if ($role == '2') { // Laboran (Signs both)
+                $this->db->query("UPDATE trx_peminjaman_internal SET validasi_laboran = '1' WHERE id_peminjaman = :id");
+                // In internal loans, Kalab validation is already '1' from Step 1 (Button)
+            }
         }
+        $this->db->bind('id', $id);
+        $this->db->execute();
 
         return 1;
     }
 
     public function finalisasiValidasi($id_peminjaman)
     {
-        $query = "UPDATE trx_peminjaman SET 
+        $this->db->query("UPDATE trx_peminjaman SET 
                     validasi_kalab = '1', 
-                    validasi_laboran = '1', 
                     id_status_peminjaman = 3 
-                    WHERE id_peminjaman = :id";
-
-        $this->db->query($query);
+                    WHERE id_peminjaman = :id");
         $this->db->bind('id', $id_peminjaman);
         $this->db->execute();
+
+        // Fetch loan type
+        $p = $this->getDetailValidasiDataPeminjaman($id_peminjaman);
+        
+        if ($p['id_jenis_peminjaman'] == 1) {
+            $this->db->query("UPDATE trx_peminjaman_akademik SET validasi_dosen = '1' WHERE id_peminjaman = :id");
+        } else {
+            $this->db->query("UPDATE trx_peminjaman_internal SET validasi_laboran = '1' WHERE id_peminjaman = :id");
+        }
+        $this->db->bind('id', $id_peminjaman);
+        $this->db->execute();
+
+        // --- NOTIFIKASI WA MAHASISWA (DISETUJUI) ---
+        try {
+            $this->db->query("SELECT u.no_hp_user, u.nama_user, p.judul_kegiatan 
+                              FROM trx_peminjaman p 
+                              JOIN trx_user u ON p.id_user = u.id_user 
+                              WHERE p.id_peminjaman = :id");
+            $this->db->bind('id', $id_peminjaman);
+            $info = $this->db->single();
+
+            if ($info && !empty($info['no_hp_user'])) {
+                require_once __DIR__ . '/WhatsApp_model.php';
+                $wa = new WhatsApp_model();
+                $msg = "Halo *{$info['nama_user']}*,\n\nPengajuan peminjaman Anda untuk kegiatan *{$info['judul_kegiatan']}* telah *DISETUJUI*.\n\nSilakan ambil barang di laboratorium sesuai jadwal.\nTerima kasih.";
+                $wa->send($info['no_hp_user'], $msg);
+            }
+        } catch (Exception $e) {}
 
         return $this->db->rowCount();
     }
