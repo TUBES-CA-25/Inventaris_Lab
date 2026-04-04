@@ -1,6 +1,6 @@
 <?php
 // Cek sesi login & role
-if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
+if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '5'])) {
     header("Location:" . BASEURL . "Login");
     exit;
 }
@@ -10,9 +10,11 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2'])) {
     <div class="content-beranda">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="page-title mb-0">Validasi Peminjaman</h1>
-            <a href="<?= BASEURL; ?>ValidasiPeminjaman/kirimNotifikasi" class="btn btn-navy">
-                <i class="fas fa-envelope mr-2"></i>Kirim Notifikasi Email
-            </a>
+            <?php if (in_array($_SESSION['id_role'], ['1', '2'])): ?>
+                <a href="<?= BASEURL; ?>ValidasiPeminjaman/kirimNotifikasi" class="btn btn-navy">
+                    <i class="fas fa-envelope mr-2"></i>Kirim Notifikasi Email
+                </a>
+            <?php endif; ?>
         </div>
 
         <section class="stats-overview row g-4">
