@@ -182,7 +182,6 @@ class Beranda_model
             $this->db->bind('loopEnd', $loopEnd);
         }
 
-        $this->db->query($sql);
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['rusak'][$idx]))
@@ -364,8 +363,6 @@ class Beranda_model
             $this->db->bind('loopEnd', $loopEnd);
         }
 
-        $this->db->query($sql);
-        $this->db->bind('id_user', $id_user);
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['pengembalian'][$idx]))
@@ -561,8 +558,6 @@ class Beranda_model
             $this->db->bind('loopEnd', $loopEnd);
         }
 
-        $this->db->query($sql);
-        $this->db->bind('dosen', $nama_dosen);
         foreach ($this->db->resultSet() as $row) {
             $idx = intval($row['waktu']);
             if (isset($data['peminjaman'][$idx]))
