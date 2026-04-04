@@ -30,7 +30,7 @@
 <script src="<?= BASEURL; ?>js/upload.js?v=<?= APP_VERSION; ?>"></script>
 <script src="<?= BASEURL; ?>js/DetailDetailBarang.js?v=<?= APP_VERSION; ?>"></script>
 <script src="<?= BASEURL; ?>js/ValidasiPeminjaman.js?v=<?= APP_VERSION; ?>"></script>
-\
+
 <script src="<?= BASEURL; ?>js/IndexPengembalian.js?v=<?= APP_VERSION; ?>"></script>
 <script src="<?= BASEURL; ?>js/DashboardChartsPremium.js?v=<?= APP_VERSION; ?>"></script>
 
