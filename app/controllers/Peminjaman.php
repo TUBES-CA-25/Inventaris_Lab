@@ -265,7 +265,7 @@ class Peminjaman extends Controller
 
             $edit_details_map[$item['id_jenis_barang']][] = [
                 'jumlah' => $item['jumlah'],
-                'keterangan' => $item['id_barang']
+                'keterangan' => $item['id_spesifikasi'] ?? ''
             ];
         }
 
