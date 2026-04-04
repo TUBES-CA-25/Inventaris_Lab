@@ -22,15 +22,19 @@
             .then(res => res.json())
             .then(data => {
                 if (chartLoan) {
+                    const maxLoan = Math.max(...data.peminjaman, ...data.pengembalian, 0);
                     chartLoan.data.labels = data.labels;
                     chartLoan.data.datasets[0].data = data.peminjaman;
                     chartLoan.data.datasets[1].data = data.pengembalian;
+                    chartLoan.options.scales.y.max = maxLoan + 5;
                     chartLoan.update();
                 }
 
                 if (chartItems) {
+                    const maxItems = Math.max(...data.total_barang_baru, 0);
                     chartItems.data.labels = data.labels;
                     chartItems.data.datasets[0].data = data.total_barang_baru;
+                    chartItems.options.scales.y.max = maxItems + 5;
                     chartItems.update();
                 }
             })
@@ -69,6 +73,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
                     plugins: {
                         legend: { position: 'top', labels: { usePointStyle: true, font: { weight: '600' } } }
                     },
@@ -105,6 +113,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
                     plugins: {
                         legend: { display: false }
                     },
