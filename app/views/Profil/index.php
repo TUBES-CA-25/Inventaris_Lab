@@ -101,7 +101,7 @@
                                     style="background: #f8f9fc; border: 2px dashed #4e73df; border-radius: 8px;">
                                     <img src="<?= BASEURL; ?>img/ttd/ttd_huzain.png?t=<?= time(); ?>" alt="TTD Huzain"
                                         class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                        onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
+                                        onerror="this.outerHTML='<span style=&quot;color: #858796; font-style: italic; font-weight: bold;&quot;>Tidak ada TTD</span>';">
                                 </div>
                                 <div class="form-group">
                                     <label class="small font-weight-bold">Ganti TTD Kepala Lab (.png)</label>
@@ -115,7 +115,7 @@
                                     style="background: #f0fdf4; border: 2px dashed #1cc88a; border-radius: 8px;">
                                     <img src="<?= BASEURL; ?>img/ttd/ttd_fatimah.png?t=<?= time(); ?>" alt="TTD Fatimah"
                                         class="img-fluid" style="max-height: 100px; object-fit: contain;"
-                                        onerror="this.outerHTML='<span style=\'color: #858796; font-style: italic; font-weight: bold;\'>Tidak ada TTD</span>';">
+                                        onerror="this.outerHTML='<span style=&quot;color: #858796; font-style: italic; font-weight: bold;&quot;>Tidak ada TTD</span>';">
                                 </div>
                                 <div class="form-group">
                                     <label class="small font-weight-bold">Ganti TTD Laboran (.png)</label>
