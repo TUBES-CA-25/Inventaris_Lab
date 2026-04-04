@@ -145,7 +145,7 @@ if (!isset($_SESSION['login'])) {
                     </div>
                     <div class="sop-step">
                         <div class="step-num">5</div>
-                        <div class="step-text">Tunggu <strong>Validasi Laboran</strong> dan ambil barang di ruang
+                        <div class="step-text">Tunggu <strong>Validasi Laboran / Dosen Pembimbing</strong> dan ambil barang di ruang
                             Laboratorium.</div>
                     </div>
                 </div>
@@ -213,11 +213,21 @@ if (!isset($_SESSION['login'])) {
 
     function toggleFilterBulan() {
         const mode = document.getElementById('filterMode').value;
-        const wrapper = document.getElementById('filterBulanWrapper');
+        const bulanWrapper = document.getElementById('filterBulanWrapper');
+        const tahunWrapper = document.getElementById('filterTahun').parentElement;
+
+        // Toggle Bulan
         if (mode === 'harian') {
-            wrapper.classList.remove('d-none');
+            bulanWrapper.classList.remove('d-none');
         } else {
-            wrapper.classList.add('d-none');
+            bulanWrapper.classList.add('d-none');
+        }
+
+        // Toggle Tahun
+        if (mode === 'tahunan') {
+            tahunWrapper.classList.add('d-none');
+        } else {
+            tahunWrapper.classList.remove('d-none');
         }
     }
 
@@ -233,55 +243,71 @@ if (!isset($_SESSION['login'])) {
         })
             .then(res => res.json())
             .then(data => {
-                const ctx = document.getElementById('studentLoanChart').getContext('2d');
+                const maxVal = Math.max(...data.peminjaman, ...data.pengembalian, 0);
 
-                if (studentChart) studentChart.destroy();
-
-                studentChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [
-                            {
-                                label: 'Peminjaman',
-                                data: data.peminjaman,
-                                borderColor: '#2563eb',
-                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                                fill: true,
-                                tension: 0.4,
-                                borderWidth: 3,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#fff',
-                                pointHoverRadius: 6
+                if (!studentChart) {
+                    const ctx = document.getElementById('studentLoanChart').getContext('2d');
+                    studentChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [
+                                {
+                                    label: 'Peminjaman',
+                                    data: data.peminjaman,
+                                    borderColor: '#2563eb',
+                                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderWidth: 3,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#fff',
+                                    pointHoverRadius: 6
+                                },
+                                {
+                                    label: 'Pengembalian',
+                                    data: data.pengembalian,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderWidth: 3,
+                                    pointRadius: 4,
+                                    pointBackgroundColor: '#fff',
+                                    pointHoverRadius: 6
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 1000,
+                                easing: 'easeInOutQuart'
                             },
-                            {
-                                label: 'Pengembalian',
-                                data: data.pengembalian,
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                fill: true,
-                                tension: 0.4,
-                                borderWidth: 3,
-                                pointRadius: 4,
-                                pointBackgroundColor: '#fff',
-                                pointHoverRadius: 6
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } },
-                            tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10 }
-                        },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' }, grid: { borderDash: [5, 5] } },
-                            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-                        },
-                        interaction: { intersect: false, mode: 'index' }
-                    }
-                });
+                            plugins: {
+                                legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } },
+                                tooltip: { backgroundColor: '#1e293b', padding: 12, cornerRadius: 10 }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true, 
+                                    max: maxVal + 5,
+                                    ticks: { stepSize: 1, color: '#94a3b8' }, 
+                                    grid: { borderDash: [5, 5] } 
+                                },
+                                x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                            },
+                            interaction: { intersect: false, mode: 'index' }
+                        }
+                    });
+                } else {
+                    studentChart.data.labels = data.labels;
+                    studentChart.data.datasets[0].data = data.peminjaman;
+                    studentChart.data.datasets[1].data = data.pengembalian;
+                    studentChart.options.scales.y.max = maxVal + 5;
+                    studentChart.update();
+                }
             });
     }
 </script>

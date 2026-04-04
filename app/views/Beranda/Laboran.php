@@ -263,9 +263,20 @@
                     const event = new Event('change', { bubbles: true });
                     hiddenSelect.dispatchEvent(event);
 
-                    // If it's the mode selector, toggle year/month visibility (keeping consistency with existing logic)
+                    // If it's the mode selector, toggle year/month visibility
                     if (hiddenSelect.id === 'filterMode') {
-                        if (typeof toggleFilterBulan === 'function') toggleFilterBulan();
+                        const bulanWrapper = document.getElementById('filterBulanWrapper');
+                        const tahunWrapper = document.getElementById('filterTahunWrapper');
+
+                        if (bulanWrapper) {
+                            if (value === 'harian') bulanWrapper.classList.remove('d-none');
+                            else bulanWrapper.classList.add('d-none');
+                        }
+
+                        if (tahunWrapper) {
+                            if (value === 'tahunan') tahunWrapper.classList.add('d-none');
+                            else tahunWrapper.classList.remove('d-none');
+                        }
                     }
                 });
             });
