@@ -64,8 +64,6 @@
             }
         });
 
-        // PERBAIKAN: Jangan trigger loader pada klik pagination
-        // Karena pagination akan navigate ke halaman yang sama dengan parameter berbeda
         $(document).on('click', '.page-link', function (e) {
             // Cegah event bubbling yang bisa memicu loader
             e.stopPropagation();
