@@ -237,7 +237,7 @@
 
         }).catch(function(error) {
             console.error(error);
-            alert('Gagal memuat PDF: ' + error.message);
+            Swal.fire('Error', 'Gagal memuat PDF: ' + error.message, 'error');
         });
 
         // --- Fungsi Helper: Set Posisi di Halaman Tertentu ---
