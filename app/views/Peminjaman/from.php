@@ -179,6 +179,7 @@ $val_dosen = !empty($data['val_dosen']) ? $data['val_dosen'] : ($isEdit ? ($head
                                         value="<?= $val_tujuan_lain; ?>" placeholder="Masukkan tujuan lainnya...">
                                 </div>
 
+                                <?php if (in_array($_SESSION['id_role'], ['4', '6'])): ?>
                                 <div id="wrap_dosen"
                                     style="display: <?= ($val_judul && !in_array($val_judul, ['Peminjaman Biasa', 'Peminjaman Biasa:'])) ? 'block' : 'none'; ?>; margin-top: 10px;">
                                     <label class="lbl">Nama Dosen Pembimbing</label>
@@ -195,6 +196,7 @@ $val_dosen = !empty($data['val_dosen']) ? $data['val_dosen'] : ($isEdit ? ($head
                                         </select>
                                     </div>
                                 </div>
+                                <?php endif; ?>
                             <?php else: ?>
                                 <label class="lbl">Judul kegiatan</label>
                                 <input type="text" name="judul_kegiatan" class="inp-custom" value="<?= $val_judul; ?>"
@@ -486,7 +488,7 @@ $val_dosen = !empty($data['val_dosen']) ? $data['val_dosen'] : ($isEdit ? ($head
         const wrapLain = document.getElementById('wrap_tujuan_lain');
         const wrapDosen = document.getElementById('wrap_dosen');
         
-        if (!wrapTA || !wrapRiset || !wrapLain || !wrapDosen) return;
+        if (!wrapTA || !wrapRiset || !wrapLain) return;
 
         // Reset all Visibility & Requirements
         [wrapBiasa, wrapTA, wrapRiset, wrapLain, wrapDosen].forEach(el => {
@@ -506,18 +508,18 @@ $val_dosen = !empty($data['val_dosen']) ? $data['val_dosen'] : ($isEdit ? ($head
         } else if (value === 'Tugas Akhir') {
             wrapTA.style.display = 'block';
             document.getElementById('tujuan_ta').setAttribute('required', 'required');
-            wrapDosen.style.display = 'block';
-            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
+            if(wrapDosen) wrapDosen.style.display = 'block';
+            if(document.getElementById('dosen_pembimbing')) document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         } else if (value === 'Riset') {
             wrapRiset.style.display = 'block';
             document.getElementById('tujuan_riset').setAttribute('required', 'required');
-            wrapDosen.style.display = 'block';
-            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
+            if(wrapDosen) wrapDosen.style.display = 'block';
+            if(document.getElementById('dosen_pembimbing')) document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         } else if (value === 'Lain-lain') {
             wrapLain.style.display = 'block';
             document.getElementById('tujuan_lain').setAttribute('required', 'required');
-            wrapDosen.style.display = 'block';
-            document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
+            if(wrapDosen) wrapDosen.style.display = 'block';
+            if(document.getElementById('dosen_pembimbing')) document.getElementById('dosen_pembimbing').setAttribute('required', 'required');
         }
     }
 
