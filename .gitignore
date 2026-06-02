@@ -1,3 +1,4 @@
 /vendor/
 composer.lock
-/public/img/ttd
+/public/img
+/app/config/config.php
