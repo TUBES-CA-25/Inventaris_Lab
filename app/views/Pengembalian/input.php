@@ -360,7 +360,7 @@ document.getElementById('formPengembalian').addEventListener('submit', function(
     
     if (!status || !keterangan) {
         e.preventDefault();
-        alert('Mohon lengkapi Status Kondisi Barang dan Keterangan Waktu!');
+        Swal.fire('Peringatan', 'Mohon lengkapi Status Kondisi Barang dan Keterangan Waktu!', 'warning');
         return false;
     }
 });
