@@ -24,9 +24,9 @@ include 'header.php'; ?>
         <i class="fas fa-sign-in-alt"></i>
         Login Sekarang
     </a>
-    <a href="<?= BASEURL; ?>Beranda" class="btn-error btn-error-secondary">
-        <i class="fas fa-home"></i>
-        Kembali ke Beranda
+    <a href="javascript:history.back()" class="btn-error btn-error-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Halaman Sebelumnya
     </a>
 </div>
 

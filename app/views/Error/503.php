@@ -24,9 +24,9 @@ include 'header.php'; ?>
         <i class="fas fa-home"></i>
         Kembali ke Beranda
     </a>
-    <a href="javascript:location.reload()" class="btn-error btn-error-secondary">
-        <i class="fas fa-clock"></i>
-        Tunggu Sebentar
+    <a href="javascript:history.back()" class="btn-error btn-error-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Halaman Sebelumnya
     </a>
 </div>
 

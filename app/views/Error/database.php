@@ -25,9 +25,9 @@ include 'header.php'; ?>
         <i class="fas fa-sync-alt"></i>
         Coba Lagi
     </a>
-    <a href="<?= BASEURL; ?>Login" class="btn-error btn-error-secondary">
-        <i class="fas fa-sign-in-alt"></i>
-        Halaman Login
+    <a href="javascript:history.back()" class="btn-error btn-error-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Halaman Sebelumnya
     </a>
 </div>
 
