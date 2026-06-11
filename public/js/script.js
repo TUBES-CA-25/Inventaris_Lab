@@ -44,7 +44,7 @@ $(function () {
     const id_peminjaman = $(this).data('id');
     console.log(id_peminjaman);
     if (!id_peminjaman) {
-      alert('ID peminjaman tidak ditemukan');
+      Swal.fire('Error', 'ID peminjaman tidak ditemukan', 'error');
       return;
     }
 
@@ -84,7 +84,7 @@ $(document).ready(function () {
 
     const id_pengembalian = $(this).data('id');
     if (!id_pengembalian) {
-      alert('ID pengembalian tidak ditemukan');
+      Swal.fire('Error', 'ID pengembalian tidak ditemukan', 'error');
       return;
     }
 
@@ -105,7 +105,7 @@ $(document).ready(function () {
       },
       error: function (xhr, status, error) {
         console.error("AJAX Error:", status, error);
-        alert("Terjadi kesalahan saat mengambil data pengembalian.");
+        Swal.fire('Error', 'Terjadi kesalahan saat mengambil data pengembalian.', 'error');
       }
     });
   });
@@ -157,7 +157,7 @@ $(document).ready(function () {
     console.log("ID Peminjaman:", id_peminjaman);
 
     if (!id_peminjaman) {
-      alert('ID peminjaman tidak ditemukan');
+      Swal.fire('Error', 'ID peminjaman tidak ditemukan', 'error');
       return;
     }
 
@@ -182,7 +182,7 @@ $(document).ready(function () {
       },
       error: function (xhr, status, error) {
         console.error("AJAX Error:", status, error);
-        alert("Terjadi kesalahan saat mengambil data peminjaman.");
+        Swal.fire('Error', 'Terjadi kesalahan saat mengambil data peminjaman.', 'error');
       }
     });
   });
