@@ -28,6 +28,10 @@ class Pengembalian extends Controller
 
         $data['riwayat'] = $this->model('Pengembalian_model')->getAllRiwayatForPetugas();
 
+        if ($_SESSION['id_role'] == 3) {
+            $data['log_aktivitas'] = $this->model('Pengembalian_model')->getAllLogActivity();
+        }
+
         $this->view('templates/header', $data);
         $this->view('templates/sidebar', $data);
         $this->view('Pengembalian/index', $data);
@@ -174,6 +178,13 @@ class Pengembalian extends Controller
         $result = $this->model('Pengembalian_model')->updateOrInsertPengembalian($_POST);
 
         if ($result > 0) {
+            // Log Activity for Assistant
+            $this->model('Beranda_model')->logActivity(
+                $_SESSION['id_user'],
+                'VERIFIKASI_PENGEMBALIAN',
+                'Memverifikasi pengembalian untuk ID Peminjaman: ' . $_POST['id_peminjaman']
+            );
+
             Flasher::setFlash('Status Pengembalian', 'berhasil', ' diperbarui', 'success');
         } else {
             Flasher::setFlash('Status Pengembalian', 'gagal', ' diperbarui', 'danger');
@@ -185,7 +196,6 @@ class Pengembalian extends Controller
 
     public function simpan()
     {
-        $this->auth();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASEURL . 'Pengembalian');

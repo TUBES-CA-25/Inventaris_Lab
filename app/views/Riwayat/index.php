@@ -7,6 +7,36 @@ $id_role = $_SESSION['id_role'];
 $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
 ?>
 
+<style>
+    /* Custom Status Badges */
+    .badge-status-processing {
+        background-color: #facc15 !important; /* Yellow */
+        color: #854d0e !important;
+    }
+    .badge-status-incomplete {
+        background-color: #fb923c !important; /* Orange */
+        color: #fff !important;
+    }
+    .badge-status-returned {
+        background-color: #0c1740 !important; /* Navy */
+        color: #fff !important;
+    }
+    .badge-status-approved {
+        background-color: #22c55e !important; /* Green */
+        color: #fff !important;
+    }
+    .badge-status-rejected {
+        background-color: #ef4444 !important; /* Red */
+        color: #fff !important;
+    }
+    
+    /* Stat Card Text Refinement */
+    .stat-label-black {
+        color: #1e293b !important;
+        font-weight: 600 !important;
+    }
+</style>
+
 <div class="content">
     <div class="container-fluid p-4 content-beranda">
 
@@ -15,22 +45,22 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
         </div>
 
         <div class="row g-4 mb-4">
-            <div class="col-12 col-md-6 col-xl-3">
-                <div class="stat-card bg-navy">
+            <div class="col-12 col-md-6 col-xl">
+                <div class="stat-card bg-white">
                     <div>
-                        <div class="stat-label">Total Diterima</div>
-                        <div class="stat-value"><?= isset($data['total_disetujui']) ? $data['total_disetujui'] : 0; ?></div>
+                        <div class="stat-label stat-label-black">Total Diterima</div>
+                        <div class="stat-value stat-value-navy"><?= isset($data['total_disetujui']) ? $data['total_disetujui'] : 0; ?></div>
                     </div>
-                    <div class="stat-icon">
+                    <div class="stat-icon icon-dark">
                         <i class="fas fa-check"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl">
                 <div class="stat-card bg-white">
                     <div>
-                        <div class="stat-label">Total Diproses</div>
+                        <div class="stat-label stat-label-black">Total Diproses</div>
                         <div class="stat-value stat-value-navy"><?= isset($data['total_diproses']) ? $data['total_diproses'] : 0; ?></div>
                     </div>
                     <div class="stat-icon icon-dark">
@@ -39,10 +69,22 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl">
                 <div class="stat-card bg-white">
                     <div>
-                        <div class="stat-label">Total Ditolak</div>
+                        <div class="stat-label stat-label-black">Melengkapi Surat</div>
+                        <div class="stat-value stat-value-navy"><?= isset($data['total_surat']) ? $data['total_surat'] : 0; ?></div>
+                    </div>
+                    <div class="stat-icon icon-dark">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl">
+                <div class="stat-card bg-white">
+                    <div>
+                        <div class="stat-label stat-label-black">Total Ditolak</div>
                         <div class="stat-value stat-value-red"><?= isset($data['total_ditolak']) ? $data['total_ditolak'] : 0; ?></div>
                     </div>
                     <div class="stat-icon icon-dark stat-icon-danger-soft">
@@ -51,13 +93,13 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                 </div>
             </div>
 
-            <div class="col-12 col-md-6 col-xl-3">
+            <div class="col-12 col-md-6 col-xl">
                 <div class="stat-card bg-white">
                     <div>
-                        <div class="stat-label">Total Pengembalian</div>
+                        <div class="stat-label stat-label-black">Total Pengembalian</div>
                         <div class="stat-value stat-value-navy"><?= isset($data['total_kembali']) ? $data['total_kembali'] : 0; ?></div>
                     </div>
-                    <div class="stat-icon">
+                    <div class="stat-icon icon-dark">
                         <i class="fas fa-box-open"></i>
                     </div>
                 </div>
@@ -128,13 +170,14 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                     <td class="text-center">
                                         <?php
                                         $st = strtolower($row['status']);
-                                        $badgeColor = 'secondary';
-                                        if ($st == 'disetujui' || $st == 'diterima') $badgeColor = 'success';
-                                        elseif (strpos($st, 'tolak') !== false) $badgeColor = 'danger';
-                                        elseif ($st == 'melengkapi surat') $badgeColor = 'warning';
-                                        elseif ($st == 'diproses') $badgeColor = 'info';
+                                        $badgeClass = 'badge-secondary';
+                                        if ($st == 'disetujui' || $st == 'diterima') $badgeClass = 'badge-status-approved';
+                                        elseif (strpos($st, 'tolak') !== false) $badgeClass = 'badge-status-rejected';
+                                        elseif ($st == 'melengkapi surat') $badgeClass = 'badge-status-incomplete';
+                                        elseif ($st == 'diproses') $badgeClass = 'badge-status-processing';
+                                        elseif ($st == 'dikembalikan' || $st == 'selesai') $badgeClass = 'badge-status-returned';
                                         ?>
-                                        <span class="badge badge-<?= $badgeColor; ?> badge-status">
+                                        <span class="badge <?= $badgeClass; ?> badge-status">
                                             <?= ucfirst($st); ?>
                                         </span>
                                     </td>
@@ -166,7 +209,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                                             </a>
                                         <?php endif; ?>
                                     </td>
-                                    
+
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -179,7 +222,7 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
 
 <script>
     $.fn.dataTable.ext.errMode = 'none';
-    $.fn.dataTable.ext.errMode = function(settings, helpPage, message) {
+    $.fn.dataTable.ext.errMode = function (settings, helpPage, message) {
         console.log("DataTables Error: ", message);
     };
 </script>

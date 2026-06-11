@@ -36,6 +36,7 @@ class Login extends Controller
             $_SESSION['id_user'] = $user['id_user'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['id_role'] = $user['id_role'];
+            $_SESSION['nama_user'] = $user['nama_user'];
             $_SESSION['login'] = true;
 
             header("Location:" . BASEURL . "Beranda");

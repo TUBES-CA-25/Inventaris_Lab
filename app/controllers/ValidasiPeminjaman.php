@@ -3,11 +3,18 @@ class ValidasiPeminjaman extends Controller
 {
     public function __construct()
     {
-        if (!isset($_SESSION)) session_start();
+        if (!isset($_SESSION))
+            session_start();
 
-        if (!isset($_SESSION['id_user']) && in_array($_SESSION['id_role'], ['1', '2'])) {
+        if (!isset($_SESSION['id_user']) || !in_array($_SESSION['id_role'], ['1', '2', '5'])) {
             header('Location: ' . BASEURL . 'Login');
             exit;
+        }
+
+        // Hydrate nama_user for active sessions that logged in before this patch
+        if (!isset($_SESSION['nama_user'])) {
+            $userModel = $this->model('User_model');
+            $_SESSION['nama_user'] = $userModel->profile(['id_user' => $_SESSION['id_user']])['nama_user'] ?? 'Unknown User';
         }
     }
 
@@ -17,12 +24,12 @@ class ValidasiPeminjaman extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        $data['peminjaman'] = $this->model('Peminjaman_model')->getValidasiGabungan();
+        $data['peminjaman'] = $this->model('ValidasiPeminjaman_model')->getValidasiGabungan($_SESSION['id_role'], $_SESSION['nama_user']);
 
-        $data['total_disetujui'] = $this->model('Peminjaman_model')->hitungStatus('disetujui');
-        $data['total_diproses']  = $this->model('Peminjaman_model')->hitungStatus('diproses');
-        $data['total_ditolak']   = $this->model('Peminjaman_model')->hitungStatus('ditolak');
-        $data['total_kembali']   = $this->model('Peminjaman_model')->hitungStatus('dikembalikan');
+        $data['total_disetujui'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('disetujui', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_diproses'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('diproses', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_ditolak'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('ditolak', $_SESSION['id_role'], $_SESSION['nama_user']);
+        $data['total_kembali'] = $this->model('ValidasiPeminjaman_model')->hitungStatus('dikembalikan', $_SESSION['id_role'], $_SESSION['nama_user']);
 
         foreach ($data['peminjaman'] as &$peminjaman) {
             $peminjaman['tanggal_pengajuan'] = date('d-m-Y', strtotime($peminjaman['tanggal_pengajuan']));
@@ -47,7 +54,7 @@ class ValidasiPeminjaman extends Controller
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $this->model("User_model")->profile($data);
 
-        $data['peminjaman'] = $this->model('Peminjaman_model')->getDetailValidasiDataPeminjaman($id);
+        $data['peminjaman'] = $this->model('ValidasiPeminjaman_model')->getDetailValidasiDataPeminjaman($id);
         $data['detail_barang'] = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id);
         if (!$data['peminjaman']) {
             Flasher::setFlash('Gagal', 'Data peminjaman tidak ditemukan', '', 'danger');
@@ -76,7 +83,7 @@ class ValidasiPeminjaman extends Controller
             $id_encoded = $_POST['id_peminjaman'];
             $id_decoded = IdObfuscator::decode($id_encoded);
 
-            if ($this->model('Peminjaman_model')->validasiKalab($id_decoded) > 0) {
+            if ($this->model('ValidasiPeminjaman_model')->validasiKalab($id_decoded) > 0) {
                 Flasher::setFlash('Berhasil', 'Validasi Tahap 1 (Kepala Lab) disetujui.', '', 'success');
             } else {
                 Flasher::setFlash('Info', 'Data sudah disetujui sebelumnya atau tidak ada perubahan.', '', 'info');
@@ -96,18 +103,22 @@ class ValidasiPeminjaman extends Controller
         }
         $role = $_SESSION['id_role'];
 
-        if ($role != '1' && $role != '2') {
+        if ($role != '1' && $role != '2' && $role != '5') {
             Flasher::setFlash('Akses Ditolak', 'Anda tidak memiliki wewenang tanda tangan.', '', 'danger');
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
             exit;
         }
 
-        $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman);
+        $peminjaman = $this->model('ValidasiPeminjaman_model')->getDetailValidasiDataPeminjaman($id_peminjaman);
 
         if ($role == '1') {
             $label_box = "TTD Kepala Lab (Huzain)";
             $warna_box = "rgba(78, 115, 223, 0.6)";
             $border_box = "#4e73df";
+        } elseif ($role == '5') {
+            $label_box = "TTD Dosen Pembimbing (" . $_SESSION['nama_user'] . ")";
+            $warna_box = "rgba(255, 193, 7, 0.6)";
+            $border_box = "#ffc107";
         } else {
             $label_box = "TTD Laboran (Fatimah)";
             $warna_box = "rgba(28, 200, 138, 0.6)";
@@ -116,13 +127,24 @@ class ValidasiPeminjaman extends Controller
 
         $data['judul'] = 'Atur Posisi Tanda Tangan';
         $data['id_peminjaman'] = $id_peminjaman;
+        $data['id_jenis_peminjaman'] = $peminjaman['id_jenis_peminjaman'];
         $data['file_surat'] = $peminjaman['file_surat'];
+
+        $user_data = $this->model('User_model')->profile(['id_user' => $_SESSION['id_user']]);
+        $data['file_ttd_user'] = $user_data['file_ttd'] ?? '';
+
+        // Enforce unique signature for Dosen
+        if ($role == '5' && empty($data['file_ttd_user'])) {
+            Flasher::setFlash('Tanda Tangan', 'belum diupload.', 'Silakan upload di profil.', 'danger');
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . IdObfuscator::encode($id_peminjaman));
+            exit;
+        }
 
         $data['ui'] = [
             'label' => $label_box,
             'color' => $warna_box,
             'border' => $border_box,
-            'role'  => $role
+            'role' => $role
         ];
 
         $this->view('ValidasiPeminjaman/TandaTangan', $data);
@@ -133,15 +155,15 @@ class ValidasiPeminjaman extends Controller
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $dataPost = [
                 'id_peminjaman' => IdObfuscator::decode($_POST['id_peminjaman']),
-                'fatimah_page'  => $_POST['fatimah_page'],
-                'huzain_page'   => $_POST['huzain_page'],
-                'fatimah_x'     => $_POST['fatimah_x'],
-                'fatimah_y'     => $_POST['fatimah_y'],
-                'huzain_x'      => $_POST['huzain_x'],
-                'huzain_y'      => $_POST['huzain_y']
+                'fatimah_page' => $_POST['fatimah_page'],
+                'huzain_page' => $_POST['huzain_page'],
+                'fatimah_x' => $_POST['fatimah_x'],
+                'fatimah_y' => $_POST['fatimah_y'],
+                'huzain_x' => $_POST['huzain_x'],
+                'huzain_y' => $_POST['huzain_y']
             ];
 
-            $this->model('Peminjaman_model')->validasiLaboranDouble($dataPost);
+            $this->model('ValidasiPeminjaman_model')->validasiLaboranDouble($dataPost);
 
             header('Location: ' . BASEURL . 'ValidasiPeminjaman/previewHasil/' . IdObfuscator::encode($dataPost['id_peminjaman']));
             exit;
@@ -155,7 +177,7 @@ class ValidasiPeminjaman extends Controller
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
-        if (!in_array($_SESSION['id_role'], ['1', '2'])) {
+        if (!in_array($_SESSION['id_role'], ['1', '2', '5'])) {
             header('Location: ' . BASEURL . 'ValidasiPeminjaman');
             exit;
         }
@@ -180,9 +202,9 @@ class ValidasiPeminjaman extends Controller
             $id_decoded = IdObfuscator::decode($id_encoded);
 
             $status = $_POST['status'];
-            $pesan  = $_POST['pesan_penolakan'] ?? '';
+            $pesan = $_POST['pesan_penolakan'] ?? '';
 
-            if ($this->model('Peminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
+            if ($this->model('ValidasiPeminjaman_model')->updateStatusValidasi($id_decoded, $status, $pesan) > 0) {
                 Flasher::setFlash('Berhasil', 'Status peminjaman berhasil diubah menjadi ' . ucfirst($status), '', 'success');
             } else {
                 Flasher::setFlash('Info', 'Status diperbarui.', '', 'info');
@@ -202,9 +224,9 @@ class ValidasiPeminjaman extends Controller
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $id_peminjaman = IdObfuscator::decode($_POST['id_peminjaman']);
-            $alasan        = $_POST['alasan_penolakan'];
+            $alasan = $_POST['alasan_penolakan'];
 
-            if ($this->model('Peminjaman_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
+            if ($this->model('Pengembalian_model')->simpanTolakPengembalian($id_peminjaman, $alasan) > 0) {
                 Flasher::setFlash('Berhasil', 'Pengembalian ditolak. Status diubah menjadi Ditolak.', '', 'warning');
             } else {
                 Flasher::setFlash('Gagal', 'Gagal menyimpan penolakan.', '', 'danger');
@@ -231,7 +253,7 @@ class ValidasiPeminjaman extends Controller
             exit;
         }
 
-        $this->model('Peminjaman_model')->finalisasiValidasi($id_peminjaman_decoded);
+        $this->model('ValidasiPeminjaman_model')->finalisasiValidasi($id_peminjaman_decoded);
 
         $peminjaman = $this->model('Peminjaman_model')->getDetailPeminjaman($id_peminjaman_decoded);
         if ($peminjaman) {
@@ -245,6 +267,24 @@ class ValidasiPeminjaman extends Controller
 
         Flasher::setFlash('Berhasil', 'Peminjaman disetujui. Barang telah dialokasikan otomatis.', '', 'success');
         header('Location: ' . BASEURL . 'ValidasiPeminjaman/detail/' . $id_peminjaman);
+        exit;
+    }
+    public function kirimNotifikasi()
+    {
+        if (!in_array($_SESSION['id_role'], ['1', '2'])) {
+            header('Location: ' . BASEURL . 'ValidasiPeminjaman');
+            exit;
+        }
+
+        $jumlahTerikirm = $this->model('Notification_model')->prosesNotifikasiOtomatis();
+
+        if ($jumlahTerikirm > 0) {
+            Flasher::setFlash('Berhasil', "Total $jumlahTerikirm email notifikasi berhasil dikirim.", '', 'success');
+        } else {
+            Flasher::setFlash('Info', 'Tidak ada peminjaman yang perlu dinotifikasi saat ini.', '', 'info');
+        }
+
+        header('Location: ' . BASEURL . 'ValidasiPeminjaman');
         exit;
     }
 }

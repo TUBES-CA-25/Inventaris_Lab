@@ -46,6 +46,22 @@
                         </div>
                     </div>
 
+                    <?php if (!empty($data['peminjaman']['kategori_kegiatan'])): ?>
+                        <div class="info-box">
+                            <div class="info-box-header">
+                                <div class="info-icon-circle">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div>
+                                    <div class="info-label">Kategori Kegiatan</div>
+                                </div>
+                            </div>
+                            <div class="info-value">
+                                <?= htmlspecialchars($data['peminjaman']['kategori_kegiatan']); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="info-box">
                         <div class="info-box-header">
                             <div class="info-icon-circle">
@@ -59,6 +75,7 @@
                             <?= isset($data['peminjaman']['judul_kegiatan']) ? $data['peminjaman']['judul_kegiatan'] : '-'; ?>
                         </div>
                     </div>
+
 
                     <div class="info-box">
                         <div class="info-box-header">
@@ -74,7 +91,21 @@
                             <i class="fas fa-arrow-right mx-2 text-muted date-arrow"></i>
                             <?= isset($data['peminjaman']['tanggal_pengembalian']) ? date('d M Y', strtotime($data['peminjaman']['tanggal_pengembalian'])) : '-'; ?>
                         </div>
-                    </div>
+                    </div> <?php if (!empty($data['peminjaman']['dosen_pembimbing'])): ?>
+                        <div class="info-box">
+                            <div class="info-box-header">
+                                <div class="info-icon-circle">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div>
+                                    <div class="info-label">Dosen Pembimbing</div>
+                                </div>
+                            </div>
+                            <div class="info-value">
+                                <?= htmlspecialchars($data['peminjaman']['dosen_pembimbing']); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
 
                     <div class="info-box">
                         <div class="info-box-header">
@@ -102,7 +133,7 @@
 
                         <div class="info-value p-0 d-flex flex-column w-100">
 
-                            <?php if (!empty($data['detail_barang'])) : ?>
+                            <?php if (!empty($data['detail_barang'])): ?>
                                 <div class="item-list-header">
                                     <div style="width: 30%;">NAMA BARANG</div>
                                     <div style="width: 55%;">SPESIFIKASI</div>
@@ -110,14 +141,15 @@
                                 </div>
 
                                 <ul class="item-list-ul">
-                                    <?php foreach ($data['detail_barang'] as $item) : ?>
+                                    <?php foreach ($data['detail_barang'] as $item): ?>
                                         <li class="item-list-row">
                                             <div class="item-content-wrapper">
 
                                                 <div class="col-item-name">
                                                     <?= $item['nama_barang']; ?>
                                                     <?php if (!empty($item['urutan_unit'])): ?>
-                                                        <br><small class="text-primary font-weight-bold">Unit: <?= $item['urutan_unit']; ?></small>
+                                                        <br><small class="text-primary font-weight-bold">Unit:
+                                                            <?= $item['urutan_unit']; ?></small>
                                                     <?php endif; ?>
                                                 </div>
 
@@ -138,7 +170,7 @@
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
-                            <?php else : ?>
+                            <?php else: ?>
                                 <div class="text-center text-muted font-italic py-4 w-100">
                                     <i class="fas fa-box-open mb-2 empty-state-icon"></i><br>
                                     - Tidak ada data barang -
@@ -158,9 +190,18 @@
                     <p class="download-desc">
                         Pastikan semua data di atas sudah benar sebelum mengunduh surat
                     </p>
-                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>" class="btn-download">
+                    <a href="<?= BASEURL; ?>TemplateSurat/generatePDF/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
+                        class="btn-download">
                         <i class="fas fa-download mr-2"></i>Download Surat PDF
                     </a>
+
+                    <div class="mt-4">
+                        <p class="text-muted small mb-2">- atau -</p>
+                        <a href="<?= BASEURL; ?>TemplateSurat/tandaTangan/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
+                            class="btn-back d-inline-block">
+                            <i class="fas fa-signature mr-2"></i>Tanda Tangan Digital
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,49 +225,47 @@
                 </div>
 
                 <form action="<?= BASEURL; ?>TemplateSurat/prosesUpload" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="id_peminjaman" value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
-    
-    <input type="file"
-           id="file_surat"
-           name="file_surat"
-           required
-           accept=".pdf"
-           onchange="updateFileName(this)"
-           style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; z-index: -1;">
+                    <input type="hidden" name="id_peminjaman"
+                        value="<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>">
 
-    <div class="upload-section" id="drop-zone" onclick="triggerUpload()" style="cursor: pointer;">
-        
-        <div id="view-default">
-            <div class="upload-icon-wrapper">
-                <i class="fas fa-cloud-upload-alt"></i>
-            </div>
-            <h5 class="upload-title">Klik atau Seret File ke Sini</h5>
-            <p class="upload-subtitle">Pilih file surat yang sudah ditandatangani</p>
-            <div class="file-types">
-                <span class="file-type-badge">📄 PDF</span>
-            </div>
-            <small class="d-block mt-3 text-muted">
-                <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
-            </small>
-        </div>
+                    <input type="file" id="file_surat" name="file_surat" required accept=".pdf"
+                        onchange="updateFileName(this)"
+                        style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; z-index: -1;">
 
-        <div id="view-preview" class="upload-preview-wrapper" style="display: none;">
-            <div class="upload-icon-wrapper upload-icon-success">
-                <i class="fas fa-file-alt text-white"></i>
-            </div>
-            <h5 class="upload-title upload-title-success">File Siap Dikirim!</h5>
-            <p id="filename-display" class="filename-text">nama_file.pdf</p>
-            
-            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="resetUpload(event)" style="border-radius: 50px;">
-                <i class="fas fa-sync-alt mr-1"></i> Ganti File
-            </button>
-        </div>
-    </div>
+                    <div class="upload-section" id="drop-zone" onclick="triggerUpload()" style="cursor: pointer;">
 
-    <button type="submit" name="submit_upload" class="btn-submit mt-3" id="btn-submit" disabled>
-        <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
-    </button>
-</form>
+                        <div id="view-default">
+                            <div class="upload-icon-wrapper">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h5 class="upload-title">Klik atau Seret File ke Sini</h5>
+                            <p class="upload-subtitle">Pilih file surat yang sudah ditandatangani</p>
+                            <div class="file-types">
+                                <span class="file-type-badge">📄 PDF</span>
+                            </div>
+                            <small class="d-block mt-3 text-muted">
+                                <i class="fas fa-info-circle mr-1"></i>Ukuran maksimal: 2MB
+                            </small>
+                        </div>
+
+                        <div id="view-preview" class="upload-preview-wrapper" style="display: none;">
+                            <div class="upload-icon-wrapper upload-icon-success">
+                                <i class="fas fa-file-alt text-white"></i>
+                            </div>
+                            <h5 class="upload-title upload-title-success">File Siap Dikirim!</h5>
+                            <p id="filename-display" class="filename-text">nama_file.pdf</p>
+
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2"
+                                onclick="resetUpload(event)" style="border-radius: 50px;">
+                                <i class="fas fa-sync-alt mr-1"></i> Ganti File
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" name="submit_upload" class="btn-submit mt-3" id="btn-submit" disabled>
+                        <i class="fas fa-paper-plane mr-2"></i>Kirim Berkas Peminjaman
+                    </button>
+                </form>
             </div>
         </div>
 

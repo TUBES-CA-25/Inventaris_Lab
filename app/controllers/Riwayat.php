@@ -21,15 +21,14 @@ class Riwayat extends Controller
 
         $id_user_login = $_SESSION['id_user'];
         $id_role_login = $currentUser['id_role'];
-
-        $is_mahasiswa = ($id_role_login == 7);
+        $is_restricted = ($id_role_login == 4 || $id_role_login == 6 || $id_role_login == 7);
 
         $stats = [];
 
-        if ($is_mahasiswa) {
+        if ($is_restricted) {
             $data['riwayat'] = $riwayatModel->getRiwayatByUser($id_user_login);
             $stats = $riwayatModel->getStatistik($id_user_login);
-            
+
             $data['is_admin'] = false;
             $data['active_tab'] = 'me';
         } else {
@@ -47,9 +46,10 @@ class Riwayat extends Controller
         }
 
         $data['total_disetujui'] = $stats['total_disetujui'] ?? 0;
-        $data['total_diproses']  = $stats['total_diproses'] ?? 0;
-        $data['total_ditolak']   = $stats['total_ditolak'] ?? 0;
-        $data['total_kembali']   = $stats['total_kembali'] ?? 0;
+        $data['total_diproses'] = $stats['total_diproses'] ?? 0;
+        $data['total_surat'] = $stats['total_surat'] ?? 0;
+        $data['total_ditolak'] = $stats['total_ditolak'] ?? 0;
+        $data['total_kembali'] = $stats['total_kembali'] ?? 0;
 
         $data['id_user'] = $_SESSION['id_user'];
         $data['profile'] = $currentUser;
@@ -68,6 +68,25 @@ class Riwayat extends Controller
             exit;
         }
         $data['info_peminjaman'] = $this->model('Peminjaman_model')->getPeminjamanById($id_peminjaman);
+
+        if (!$data['info_peminjaman']) {
+            Flasher::setFlash('Error', 'Data tidak ditemukan.', '', 'danger');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
+
+        // --- SECURITY CHECK: Restricted user can only view their own ---
+        $id_user_login = $_SESSION['id_user'];
+        $userModel = $this->model('User_model');
+        $currentUser = $userModel->profile(['id_user' => $id_user_login]);
+        $id_role_login = $currentUser['id_role'];
+
+        if (($id_role_login == 4 || $id_role_login == 6 || $id_role_login == 7) && $data['info_peminjaman']['id_user'] != $id_user_login) {
+            Flasher::setFlash('Akses Ditolak', 'Anda tidak memiliki hak akses untuk melihat data ini.', '', 'danger');
+            header('Location: ' . BASEURL . 'Riwayat');
+            exit;
+        }
+
         $rawDetailBarang = $this->model('Peminjaman_model')->getDetailBarangByPeminjamanId($id_peminjaman);
 
         foreach ($rawDetailBarang as &$item) {
@@ -95,10 +114,27 @@ class Riwayat extends Controller
     {
         $id_peminjaman = IdObfuscator::decode($id_peminjaman);
         if (!$id_peminjaman) {
-             echo "ID tidak valid."; exit;
+            echo "ID tidak valid.";
+            exit;
         }
         $model = $this->model('Peminjaman_model');
         $info = $model->getPeminjamanById($id_peminjaman);
+
+        if (!$info) {
+            echo "ID tidak valid.";
+            exit;
+        }
+
+        // --- SECURITY CHECK: Restricted user can only access their own ---
+        $id_user_login = $_SESSION['id_user'];
+        $userModel = $this->model('User_model');
+        $currentUser = $userModel->profile(['id_user' => $id_user_login]);
+        $id_role_login = $currentUser['id_role'];
+
+        if (($id_role_login == 4 || $id_role_login == 6 || $id_role_login == 7) && $info['id_user'] != $id_user_login) {
+            echo "Akses Ditolak: Anda tidak memiliki hak akses untuk dokumen ini.";
+            exit;
+        }
 
         $fileName = $info['file_surat'] ?? null;
         $folderPath = __DIR__ . '/../../public/files/surat-peminjaman/';
@@ -110,7 +146,7 @@ class Riwayat extends Controller
             header('Content-Transfer-Encoding: binary');
             header('Content-Length: ' . filesize($fullPath));
             header('Accept-Ranges: bytes');
-            
+
             readfile($fullPath);
             exit;
         } else {

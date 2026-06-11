@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -10,7 +12,7 @@
 <body>
 
     <div class="header-kop">
-        <?php if (!empty($gambar_kop)): ?>
+        <?php if (!empty($gambar_kop)): ?>  
             <img src="<?= $gambar_kop; ?>" alt="Kop Surat">
         <?php else: ?>
             <h3 style="margin:0;">LABORATORIUM TERPADU</h3>
@@ -80,11 +82,11 @@
                 <tr>
                     <td class="text-center"><?= $no++ ?></td>
                     <td style="text-align: left;"><?= $item['nama_barang'] ?></td>
-                    
+
                     <td style="text-align: left;">
                         <?= !empty($item['spesifikasi_barang']) ? $item['spesifikasi_barang'] : '-'; ?>
                     </td>
-                    
+
                     <td class="text-center"><?= $item['jumlah'] ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -111,7 +113,7 @@
 
             <td class="ttd-col">
                 Makassar, <?= date('d F Y'); ?><br>
-                <b>Yang Menyatakan,</b>
+                <b><?= ($user['id_role'] == '4') ? 'Asisten' : (($user['id_role'] == '5') ? 'Dosen' : 'Yang Menyatakan'); ?>,</b>
                 <br><br><br><br> <span class="underline-name"><?= $user['nama_user']; ?></span>
             </td>
         </tr>
@@ -125,4 +127,5 @@
     </div>
 
 </body>
+
 </html>

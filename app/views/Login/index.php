@@ -34,7 +34,7 @@
                     </div>
                     
                     <div class="forgot-password-wrapper">
-                        <a href="<?=BASEURL;?>LupaKataSandi" class="forgot-password-link">Lupa kata sandi?</a>
+                        <a href="<?=BASEURL;?>LupaPassword" class="forgot-password-link">Lupa kata sandi?</a>
                     </div>
                 </div>
 

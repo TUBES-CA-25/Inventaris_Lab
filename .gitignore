@@ -1,2 +1,4 @@
 /vendor/
 composer.lock
+/public/img
+/app/config/config.php

@@ -20,6 +20,7 @@ class EmailHelper
         $this->mailer->Password = MAIL_PASSWORD;
         $this->mailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $this->mailer->Port = MAIL_PORT;
+        $this->mailer->Timeout = 10; // Prevent indefinite hang on blocked ports
 
         // Sender Info
         $this->mailer->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
@@ -179,6 +180,84 @@ class EmailHelper
                 <div class='footer'>
                     <p>Email ini dikirim secara otomatis, mohon tidak membalas email ini.</p>
                     <p>&copy; " . date('Y') . " Inventaris Lab. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        ";
+    }
+
+    public function sendPasswordResetEmail($email, $name, $resetLink)
+    {
+        try {
+            $this->mailer->clearAddresses();
+            $this->mailer->addAddress($email, $name);
+            $this->mailer->Subject = 'Lupa Kata Sandi - Inventaris Lab';
+            $this->mailer->Body = $this->getPasswordResetTemplate($name, $resetLink);
+
+            $this->mailer->AltBody = "Halo $name,\n\n"
+                . "Kami menerima permintaan reset kata sandi untuk akun Anda.\n\n"
+                . "Klik tautan berikut untuk memulihkan akses Anda:\n"
+                . "$resetLink\n\n"
+                . "Tautan ini akan expired dalam 5 menit.\n\n"
+                . "Jika Anda tidak meminta permohonan ini, abaikan email ini.\n\n"
+                . "Salam,\nTim Inventaris Lab";
+
+            $this->mailer->send();
+            return true;
+
+        } catch (Exception $e) {
+            error_log("Password reset email failed: {$this->mailer->ErrorInfo}");
+            return false;
+        }
+    }
+
+    private function getPasswordResetTemplate($name, $link)
+    {
+        return "
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='UTF-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 0; }
+                .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #1250ba 0%, #0c1740 100%); color: #ffffff; padding: 30px 20px; text-align: center; }
+                .header h1 { margin: 0; font-size: 24px; }
+                .content { padding: 30px 20px; }
+                .content h2 { color: #1250ba; font-size: 20px; margin-top: 0; }
+                .button { display: inline-block; padding: 14px 30px; margin: 20px 0; background: linear-gradient(135deg, #1250ba 0%, #0c1740 100%); color: #ffffff; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; }
+                .button:hover { opacity: 0.9; }
+                .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+                .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 20px 0; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>🔒 Reset Kata Sandi</h1>
+                </div>
+                <div class='content'>
+                    <h2>Halo, $name!</h2>
+                    <p>Kami menerima permohonan untuk mereset kata sandi akun Anda di <strong>Sistem Inventaris Lab</strong>.</p>
+                    <p>Silakan klik tombol di bawah ini untuk membuat kata sandi baru:</p>
+                    
+                    <div style='text-align: center;'>
+                        <a href='$link' class='button'>Reset Kata Sandi</a>
+                    </div>
+                    
+                    <p>Atau salin tautan berikut ke browser Anda:</p>
+                    <p style='word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 4px; font-size: 13px;'>
+                        $link
+                    </p>
+                    
+                    <div class='warning'>
+                        <strong>⚠️ Penting:</strong> Tautan ini hanya berlaku <strong>selama 5 menit</strong>!
+                    </div>
+                </div>
+                <div class='footer'>
+                    <p>Email ini dikirim secara otomatis, permohonan Anda bersifat rahasia.</p>
                 </div>
             </div>
         </body>

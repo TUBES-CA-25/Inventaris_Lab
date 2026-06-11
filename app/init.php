@@ -1,21 +1,19 @@
 <?php
 
-require_once 'core/App.php';
-require_once 'core/Controller.php';
-require_once 'core/Database.php';
-require_once 'core/Flasher.php';
+require_once __DIR__ . '/core/App.php';
+require_once __DIR__ . '/core/Controller.php';
+require_once __DIR__ . '/core/Database.php';
+require_once __DIR__ . '/core/Flasher.php';
 
-require_once 'core/ErrorHelper.php';
-require_once 'core/EmailHelper.php';
-require_once 'vendor/phpqrcode/qrlib.php';
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/core/ErrorHelper.php';
+require_once __DIR__ . '/core/EmailHelper.php';
+require_once __DIR__ . '/vendor/phpqrcode/qrlib.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-require_once 'config/config.php';
-require_once 'core/IdObfuscator.php';
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/core/IdObfuscator.php';
 
-// ================= GLOBAL ERROR HANDLERS =================
 
-// Set error reporting based on environment
 if (defined('DEVELOPMENT_MODE') && DEVELOPMENT_MODE === true) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
@@ -36,7 +34,9 @@ set_exception_handler(function ($exception) {
     $_SESSION['error_trace'] = $exception->getTraceAsString();
 
     // Redirect ke 500 error page
-    header("Location: " . BASEURL . "ErrorPage/serverError");
+    if (!headers_sent()) {
+        header("Location: " . BASEURL . "ErrorPage/serverError");
+    }
     exit;
 });
 
@@ -80,7 +80,9 @@ register_shutdown_function(function () {
         $_SESSION['error_file'] = $error['file'];
         $_SESSION['error_line'] = $error['line'];
 
-        header("Location: " . BASEURL . "ErrorPage/serverError");
+        if (!headers_sent()) {
+            header("Location: " . BASEURL . "ErrorPage/serverError");
+        }
         exit;
     }
 });

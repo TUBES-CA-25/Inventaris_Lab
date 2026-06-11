@@ -49,17 +49,36 @@
 
                 <div class="card-footer bg-white py-4">
                     <div class="row justify-content-center">
+                        <?php 
+                        $role = $_SESSION['id_role'];
+                        $id_jenis = $data['peminjaman']['id_jenis_peminjaman'];
+                        
+                        $isFinalStep = false;
+                        if ($id_jenis == 1 && $role == '1') $isFinalStep = true; // Kalab is final for Academic
+                        if ($id_jenis == 2 && $role == '2') $isFinalStep = true; // Laboran is final for Internal
+                        ?>
+
                         <div class="col-md-4 mb-2">
                             <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
                                 class="btn btn-warning btn-block font-weight-bold shadow-sm">
                                 <i class="fas fa-undo-alt mr-2"></i> Edit Posisi Lagi
                             </a>
                         </div>
-                        <div class="col-md-4 mb-2">
-                            <a href="<?= BASEURL; ?>ValidasiPeminjaman/selesaiValidasi/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
-                                class="btn btn-success btn-block font-weight-bold shadow py-2">
-                                <i class="fas fa-check-circle mr-2"></i> Selesai
-                            </a>
+                        
+                        <div class="col-md-4 mb-3">
+                            <?php if ($isFinalStep): ?>
+                                <!-- Final step: Finish the loan and check stock -->
+                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/selesaiValidasi/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
+                                    class="btn btn-success btn-block font-weight-bold shadow py-2">
+                                    <i class="fas fa-check-circle mr-2"></i> Selesaikan & Berikan Barang
+                                </a>
+                            <?php else: ?>
+                                <!-- Intermediate step: Just go back to detail -->
+                                <a href="<?= BASEURL; ?>ValidasiPeminjaman/detail/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
+                                    class="btn btn-primary btn-block font-weight-bold shadow py-2">
+                                    <i class="fas fa-arrow-right mr-2"></i> Lanjut ke Detail
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

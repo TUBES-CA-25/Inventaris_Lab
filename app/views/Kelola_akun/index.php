@@ -84,6 +84,11 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
                             <td><?= $row['no_hp_user']; ?></td>
                             <td><?= $row['alamat']; ?></td>
                             <td style="text-align: center;">
+                                <a href="<?= BASEURL; ?>KelolaAkun/profilUser/<?= IdObfuscator::encode($row['id_user']); ?>"
+                                    class="btn-action" title="Lihat Profil">
+                                    <i class="fa-regular fa-eye" style="color: #4e73df;"></i>
+                                </a>
+
                                 <button class="btn-action btnUbahRole" data-bs-toggle="modal" data-bs-target="#modalRole"
                                     onclick="setModalData('<?= IdObfuscator::encode($row['id_user']) ?>', '<?= $row['id_role'] //Asumsi ada id_role di row ?>')">
                                     <i class="fa-regular fa-pen-to-square" style="color: #30cc30;"></i>
@@ -140,24 +145,14 @@ if (!isset($_SESSION['login']) || !in_array($_SESSION['id_role'], ['1', '2', '3'
 
                 <div class="modal-body-layout">
                     <div class="role-list">
-                        <?php
-                        // Daftar Role Lengkap Anda
-                        $roles = [
-                            1 => 'Kepala Lab',
-                            2 => 'Laboran',
-                            3 => 'Koordinator Lab',
-                            4 => 'Asisten',
-                            5 => 'Calon Asisten',
-                            6 => 'Calon Calon Asisten',
-                            7 => 'Mahasiswa'
-                        ];
-                        ?>
-                        <?php foreach ($roles as $val => $label): ?>
-                            <label class="radio-item">
-                                <input type="radio" name="id_role" value="<?= $val ?>" required>
-                                <?= $label ?>
-                            </label>
-                        <?php endforeach; ?>
+                        <?php if (!empty($data['roles'])): ?>
+                            <?php foreach ($data['roles'] as $role): ?>
+                                <label class="radio-item">
+                                    <input type="radio" name="id_role" value="<?= $role['id_role'] ?>" required>
+                                    <?= $role['role'] ?>
+                                </label>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
 
                     <div class="illustration-container">

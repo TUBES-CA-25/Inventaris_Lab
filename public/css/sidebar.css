@@ -7,17 +7,26 @@
     z-index: 1000;
     background-color: #0c1740;
     color: white;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-    border-right: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease;
 }
 
-.side-bar::-webkit-scrollbar { width: 5px; }
-.side-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-.side-bar::-webkit-scrollbar-track { background: transparent; }
+.side-bar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.side-bar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.side-bar::-webkit-scrollbar-track {
+    background: transparent;
+}
 
 .logo-header {
     padding: 25px 20px;
@@ -31,15 +40,15 @@
     max-height: 60px;
     width: auto;
     margin-right: 10px;
-    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25));
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
 }
 
 .profil {
     padding: 0 20px 30px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 20px;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     align-items: center;
     text-align: center;
 }
@@ -56,7 +65,7 @@
     height: 90px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid rgba(255,255,255,0.2);
+    border: 3px solid rgba(255, 255, 255, 0.2);
     padding: 3px;
     transition: transform 0.3s ease;
     display: block;
@@ -74,7 +83,7 @@
 .text-muted-light {
     color: #cbd5e1;
     font-size: 13px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     padding: 2px 12px;
     border-radius: 12px;
     margin-top: 5px;
@@ -124,7 +133,7 @@
     background-color: #bfdbfe;
     color: #0c1740;
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .menu-item.active i {
@@ -160,7 +169,7 @@
     padding: 12px 15px;
     border-radius: 10px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
 }
 
@@ -190,20 +199,20 @@
     .side-bar {
         transform: translateX(-100%);
     }
-    
+
     .hamburger-menu {
         display: block;
     }
-    
+
     .side-bar.active {
         transform: translateX(0);
     }
-    
+
     .sidebar-overlay.active {
         display: block;
         opacity: 1;
     }
-    
+
     .body-beranda {
         padding-left: 0;
     }
@@ -213,35 +222,35 @@
     .side-bar {
         width: 280px;
     }
-    
+
     .hamburger-menu {
         top: 15px;
         left: 15px;
         padding: 10px 13px;
     }
-    
+
     .hamburger-menu i {
         font-size: 20px;
     }
-    
+
     .logo-header {
         padding: 20px 15px;
     }
-    
+
     .logo-header img {
         max-height: 50px;
     }
-    
+
     .profile-img {
         width: 80px;
         height: 80px;
     }
-    
+
     .menu-item {
         padding: 10px 15px;
         font-size: 13px;
     }
-    
+
     .menu-item i {
         font-size: 16px;
         margin-right: 10px;
@@ -252,58 +261,58 @@
     .side-bar {
         width: 260px;
     }
-    
+
     .hamburger-menu {
         top: 12px;
         left: 12px;
         padding: 8px 11px;
     }
-    
+
     .hamburger-menu i {
         font-size: 18px;
     }
-    
+
     .logo-header {
         padding: 15px 10px;
     }
-    
+
     .logo-header img {
         max-height: 45px;
     }
-    
+
     .profil {
         padding: 0 15px 20px 15px;
     }
-    
+
     .profile-img {
         width: 70px;
         height: 70px;
     }
-    
+
     .profile-info h6 {
         font-size: 14px;
     }
-    
+
     .text-muted-light {
         font-size: 11px;
         padding: 2px 10px;
     }
-    
+
     .menu-list {
         padding: 0 10px;
     }
-    
+
     .menu-item {
         padding: 10px 12px;
         font-size: 12px;
     }
-    
+
     .menu-item i {
         width: 22px;
         font-size: 15px;
         margin-right: 8px;
     }
-    
+
     .menu-footer {
         padding: 15px 10px;
     }

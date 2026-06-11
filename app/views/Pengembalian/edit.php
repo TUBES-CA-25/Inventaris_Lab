@@ -273,7 +273,7 @@ if (!isset($_SESSION['login'])) {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
-                alert('Ukuran file terlalu besar! Maksimal 5MB');
+                Swal.fire('Peringatan', 'Ukuran file terlalu besar! Maksimal 5MB', 'warning');
                 this.value = '';
                 return;
             }

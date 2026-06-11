@@ -7,9 +7,42 @@ if (!isset($_SESSION['login'])) {
 
 <div class="content">
     <div class="">
-        
+
         <div class="beranda-header">
             <h2>Beranda</h2>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Barang Terdaftar</span>
+                    <span class="stat-value"><?= $data['jumlah_detail_barang']; ?></span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Barang Rusak</span>
+                    <span class="stat-value"><?= $data['total_damaged']; ?></span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Merek Barang</span>
+                    <span class="stat-value"><?= $data['jumlah_merek_barang']; ?></span>
+                </div>
+            </div>
         </div>
 
         <div class="card mb-4" style="border-radius: 15px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
@@ -18,9 +51,9 @@ if (!isset($_SESSION['login'])) {
                     <div class="col-auto">
                         <h5 class="mb-0">Filter Grafik:</h5>
                     </div>
-                    
+
                     <div class="col-12 col-sm-auto">
-                        <select id="filterMode" class="form-select">
+                        <select id="filterMode" class="filter-select">
                             <option value="harian">Harian</option>
                             <option value="bulanan" selected>Bulanan</option>
                             <option value="tahunan">Tahunan</option>
@@ -28,17 +61,17 @@ if (!isset($_SESSION['login'])) {
                     </div>
 
                     <div class="col-12 col-sm-auto">
-                        <select id="filterTahun" class="form-select">
-                            <?php 
+                        <select id="filterTahun" class="filter-select">
+                            <?php
                             $currentYear = date('Y');
-                            for($i = $currentYear; $i >= $currentYear - 4; $i--): ?>
+                            for ($i = $currentYear; $i >= $currentYear - 4; $i--): ?>
                                 <option value="<?= $i; ?>"><?= $i; ?></option>
                             <?php endfor; ?>
                         </select>
                     </div>
 
                     <div class="col-12 col-sm-auto d-none" id="filterBulanWrapper">
-                        <select id="filterBulan" class="form-select">
+                        <select id="filterBulan" class="filter-select">
                             <option value="1">Januari</option>
                             <option value="2">Februari</option>
                             <option value="3">Maret</option>
@@ -55,34 +88,44 @@ if (!isset($_SESSION['login'])) {
                     </div>
 
                     <div class="col-12 col-sm-auto">
-                        <button class="btn-back w-100" onclick="updateCharts()">Tampilkan</button>
+                        <button class="btn-filter-action w-100" onclick="updateCharts()">
+                            <i class="fas fa-sync-alt mr-2"></i> Tampilkan
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="row g-4 mb-4">
             <div class="col-12 col-md-6 col-lg-6 mb-4">
                 <div class="chart-card">
-                    <div class="chart-header"><h3>Total Peminjaman</h3></div>
+                    <div class="chart-header">
+                        <h3>Total Peminjaman</h3>
+                    </div>
                     <div class="chart-container"><canvas id="chartPeminjaman"></canvas></div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-6">
                 <div class="chart-card">
-                    <div class="chart-header"><h3>Total Pengembalian</h3></div>
+                    <div class="chart-header">
+                        <h3>Total Pengembalian</h3>
+                    </div>
                     <div class="chart-container"><canvas id="chartPengembalian"></canvas></div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-6">
                 <div class="chart-card">
-                    <div class="chart-header"><h3>Total Barang Bagus</h3></div>
+                    <div class="chart-header">
+                        <h3>Total Barang Bagus</h3>
+                    </div>
                     <div class="chart-container"><canvas id="chartBarangBagus"></canvas></div>
                 </div>
             </div>
             <div class="col-12 col-md-6 col-lg-6">
                 <div class="chart-card">
-                    <div class="chart-header"><h3>Total Barang Rusak</h3></div>
+                    <div class="chart-header">
+                        <h3>Total Barang Rusak</h3>
+                    </div>
                     <div class="chart-container"><canvas id="chartBarangRusak"></canvas></div>
                 </div>
             </div>

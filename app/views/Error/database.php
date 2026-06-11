@@ -1,73 +1,44 @@
-<!DOCTYPE html>
-<html lang="id">
+<?php $data['title'] = 'Kesalahan Database';
+include 'header.php'; ?>
+<link rel="stylesheet" href="<?= BASEURL; ?>css/error.css?v=<?= time(); ?>">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kesalahan Database</title>
-    <link rel="shortcut icon" href="/Inventaris_Lab/public/img/logo.svg" />
+<!-- Error Icon -->
+<div class="error-animation">
+    <i class="fas fa-database" style="font-size: 150px; color: #334155;"></i>
+</div>
 
-    <!-- Fonts -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
+<!-- Error Code -->
+<div class="error-code">DB</div>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Error Title -->
+<h1 class="error-title">Koneksi Database Terputus</h1>
 
-    <!-- Error CSS -->
-    <link rel="stylesheet" href="/Inventaris_Lab/public/css/error.css?v=<?= time(); ?>">
-</head>
+<!-- Error Message -->
+<p class="error-message">
+    Kami mohon maaf, sistem tidak dapat terhubung ke database saat ini. Silakan hubungi administrator atau
+    coba segarkan halaman.
+</p>
 
-<body>
-    <div class="error-page">
-        <div class="error-decoration"></div>
+<!-- Action Buttons -->
+<div class="error-actions">
+    <a href="javascript:location.reload()" class="btn-error btn-error-primary">
+        <i class="fas fa-sync-alt"></i>
+        Coba Lagi
+    </a>
+    <a href="javascript:history.back()" class="btn-error btn-error-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Halaman Sebelumnya
+    </a>
+</div>
 
-        <div class="error-container">
-            <!-- Error Icon -->
-            <div class="error-animation">
-                <i class="fas fa-exclamation-triangle" style="font-size: 180px; color: #ff9800;"></i>
-            </div>
-
-            <!-- Error Icon -->
-            <div class="error-code">
-                <i class="fas fa-database"></i>
-            </div>
-
-            <!-- Error Title -->
-            <h1 class="error-title">Kesalahan Koneksi Database</h1>
-
-            <!-- Error Message -->
-            <p class="error-message">
-                Tidak dapat terhubung ke database. Mohon periksa koneksi database Anda atau hubungi administrator
-                sistem.
-            </p>
-
-            <!-- Action Buttons -->
-            <div class="error-actions">
-                <a href="javascript:location.reload()" class="btn-error btn-error-primary">
-                    <i class="fas fa-sync-alt"></i>
-                    Coba Lagi
-                </a>
-                <a href="/Inventaris_Lab/public/Login" class="btn-error btn-error-secondary">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Ke Halaman Login
-                </a>
-            </div>
-
-            <?php if (isset($data['db_error']) && !empty($data['db_error'])): ?>
-                <!-- Database Error Details -->
-                <div class="error-details">
-                    <h6><i class="fas fa-exclamation-triangle"></i> Detail Kesalahan Database:</h6>
-                    <p>
-                        <?= htmlspecialchars($data['db_error']); ?>
-                    </p>
-                </div>
-            <?php endif; ?>
-        </div>
+<?php if (DEVELOPMENT_MODE && isset($data['db_error']) && !empty($data['db_error'])): ?>
+    <!-- Database Error Details -->
+    <div class="error-details">
+        <h6><i class="fas fa-exclamation-triangle"></i> Detail Kesalahan Database:</h6>
+        <p>
+            <?= htmlspecialchars($data['db_error']); ?>
+        </p>
     </div>
+<?php endif; ?>
 
-    <!-- Lottie Player Script -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-</body>
-
-</html>
+<?php include 'footer.php'; ?>

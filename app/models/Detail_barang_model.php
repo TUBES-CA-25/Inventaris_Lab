@@ -11,32 +11,32 @@ class Detail_barang_model
     // --- GET DATA MASTER ---
     public function getSubBarang()
     {
-        $this->db->query("SELECT * FROM mst_jenis_barang ORDER BY sub_barang");
+        $this->db->query("SELECT id_jenis_barang, sub_barang, grup_sub, kode_sub, kode_jenis_barang FROM mst_jenis_barang ORDER BY sub_barang");
         return $this->db->resultSet();
     }
     public function getMerekBarang()
     {
-        $this->db->query("SELECT * FROM mst_merek_barang ORDER BY nama_merek_barang");
+        $this->db->query("SELECT id_merek_barang, nama_merek_barang, kode_merek_barang FROM mst_merek_barang ORDER BY nama_merek_barang");
         return $this->db->resultSet();
     }
     public function getKondisiBarang()
     {
-        $this->db->query("SELECT * FROM mst_kondisi_barang ORDER BY kondisi_barang");
+        $this->db->query("SELECT id_kondisi_barang, kondisi_barang FROM mst_kondisi_barang ORDER BY kondisi_barang");
         return $this->db->resultSet();
     }
     public function getSatuan()
     {
-        $this->db->query("SELECT * FROM mst_satuan ORDER BY nama_satuan");
+        $this->db->query("SELECT id_satuan, nama_satuan FROM mst_satuan ORDER BY nama_satuan");
         return $this->db->resultSet();
     }
     public function getStatus()
     {
-        $this->db->query("SELECT * FROM mst_status ORDER BY status");
+        $this->db->query("SELECT id_status, status FROM mst_status ORDER BY status");
         return $this->db->resultSet();
     }
     public function getLokasiPenyimpanan()
     {
-        $this->db->query("SELECT * FROM mst_lokasi_penyimpanan ORDER BY nama_lokasi_penyimpanan");
+        $this->db->query("SELECT id_lokasi_penyimpanan, nama_lokasi_penyimpanan FROM mst_lokasi_penyimpanan ORDER BY nama_lokasi_penyimpanan");
         return $this->db->resultSet();
     }
 
@@ -116,7 +116,8 @@ class Detail_barang_model
     private function insertNewMasterData($table, $column, $value, $extraInput = null)
     {
         // 1. Cek Data Ganda
-        $check = "SELECT * FROM $table WHERE $column = :value";
+        $pk = "id_" . str_replace("mst_", "", $table);
+        $check = "SELECT $pk FROM $table WHERE $column = :value";
         $this->db->query($check);
         $this->db->bind('value', $value);
         $existing = $this->db->single();
@@ -127,18 +128,14 @@ class Detail_barang_model
         } else {
             $query = "";
 
-            // Logic Insert Berdasarkan Tabel
             if ($table == 'mst_jenis_barang') {
                 // Bersihkan input (Hanya huruf a-z, jadikan kapital)
                 $cleanVal = strtoupper(preg_replace("/[^A-Za-z]/", '', $value));
 
                 $grup = !empty($extraInput) ? strtoupper($extraInput) : 'C';
 
-                // [PERUBAHAN DI SINI]
-                // Mengambil 3 huruf pertama dari nama barang
                 $shortCode = substr($cleanVal, 0, 3);
 
-                // Penanganan jika nama barang kurang dari 3 huruf (Misal: "PC" -> "PCX")
                 if (strlen($shortCode) < 3) {
                     $shortCode = str_pad($shortCode, 3, 'X');
                 }
@@ -200,19 +197,32 @@ class Detail_barang_model
         }
 
         // 2. UPLOAD FOTO & PREPARE VARIABEL NAMA
+        $namaFile = $_FILES['foto_barang']['name'];
         $ukuranFile = $_FILES['foto_barang']['size'];
-        $limit = 2 * 1024 * 1024;
+        $tmpName = $_FILES['foto_barang']['tmp_name'];
+        $error = $_FILES['foto_barang']['error'];
 
-        if ($ukuranFile <= $limit) {
+        $limit = 2 * 1024 * 1024;
+        $ekstensiValid = ['jpg', 'jpeg', 'png'];
+        $ekstensi = explode('.', $namaFile);
+        $ekstensi = strtolower(end($ekstensi));
+
+        if ($error === 0) {
+            if (!in_array($ekstensi, $ekstensiValid)) {
+                return 0; // Invalid extension
+            }
+            if ($ukuranFile > $limit) {
+                return 0; // Too large
+            }
 
             // Ambil Nama-nama untuk Label QR
-            $this->db->query("SELECT * FROM mst_jenis_barang WHERE id_jenis_barang = :id");
+            $this->db->query("SELECT sub_barang, kode_jenis_barang FROM mst_jenis_barang WHERE id_jenis_barang = :id");
             $this->db->bind('id', $data['sub_barang']);
             $rowJenis = $this->db->single();
             $namaJenis = $rowJenis['sub_barang'];
             $kodeJenisString = $rowJenis['kode_jenis_barang'] ?? 'XXX';
 
-            $this->db->query("SELECT * FROM mst_merek_barang WHERE id_merek_barang = :id");
+            $this->db->query("SELECT nama_merek_barang, kode_merek_barang FROM mst_merek_barang WHERE id_merek_barang = :id");
             $this->db->bind('id', $data['nama_merek_barang']);
             $rowMerek = $this->db->single();
             $namaMerek = $rowMerek['nama_merek_barang'];
@@ -229,10 +239,9 @@ class Detail_barang_model
 
             // Upload
             $uploadDirectory = '../public/img/foto-barang/';
-            $uploadedFile = $_FILES['foto_barang']['tmp_name'];
-            $namaFileUnik = uniqid() . '_' . $_FILES['foto_barang']['name'];
+            $namaFileUnik = uniqid() . '_' . $namaFile;
             $fotoBarang = $uploadDirectory . $namaFileUnik;
-            move_uploaded_file($uploadedFile, $fotoBarang);
+            move_uploaded_file($tmpName, $fotoBarang);
 
             // 3. INSERT HEADER (MST_SPESIFIKASI)
             $bulanAngka = date('m', strtotime($data['tgl_pengadaan_barang']));
@@ -321,7 +330,7 @@ class Detail_barang_model
                 "Total: " . $totalInput . " Unit\n" .
                 "------------------------\n" .
                 "RINCIAN UNIT:\n" .
-                $listDetailString; 
+                $listDetailString;
 
             $qrMasterName = "MASTER_" . uniqid() . ".png";
             QRcode::png($qrContentMaster, $pathQr . $qrMasterName, "M", 4, 4);
@@ -380,7 +389,9 @@ class Detail_barang_model
     public function getDetailDataBarang($id_barang)
     {
         $query = "SELECT 
-                    b.*,
+                    b.id_barang, b.id_spesifikasi, b.id_kondisi_barang, b.urutan_unit,
+                    b.tgl_pengadaan_barang, b.keterangan_label, b.id_lokasi_penyimpanan,
+                    b.deskripsi_detail_lokasi, b.id_status, b.status_peminjaman, b.qr_code,
                     spek.id_jenis_barang, 
                     spek.id_merek_barang, 
                     spek.id_satuan,
@@ -411,11 +422,9 @@ class Detail_barang_model
         return $this->db->single();
     }
 
-    // --- HAPUS SATU BATCH (SPESIFIKASI + SEMUA UNITNYA) ---
     public function hapusBarang($id_barang)
     {
         try {
-            // 1. Cari ID Spesifikasi dari barang yang dipilih
             $this->db->query("SELECT id_spesifikasi FROM trx_barang WHERE id_barang = :id");
             $this->db->bind("id", $id_barang);
             $row = $this->db->single();
@@ -426,19 +435,14 @@ class Detail_barang_model
 
             $idSpesifikasi = $row['id_spesifikasi'];
 
-            // 2. Ambil Data File yang Harus Dihapus (Foto Barang & QR Master)
             $this->db->query("SELECT foto_barang, qr_code_spesifikasi FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataSpek = $this->db->single();
 
-            // 3. Ambil Semua QR Code Unit (Anak-anaknya)
             $this->db->query("SELECT qr_code FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $dataUnit = $this->db->resultSet();
 
-            // --- PROSES HAPUS FILE FISIK ---
-
-            // Hapus Foto Utama
             if (!empty($dataSpek['foto_barang']) && file_exists($dataSpek['foto_barang'])) {
                 @unlink($dataSpek['foto_barang']);
             }
@@ -453,14 +457,9 @@ class Detail_barang_model
                 }
             }
 
-            // --- PROSES HAPUS DATABASE ---
-
-            // 4. Hapus Semua Unit di trx_barang (Anak)
             $this->db->query("DELETE FROM trx_barang WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
-
-            // 5. Hapus Header di mst_spesifikasi (Induk)
             $this->db->query("DELETE FROM mst_spesifikasi WHERE id_spesifikasi = :id");
             $this->db->bind("id", $idSpesifikasi);
             $this->db->execute();
@@ -476,7 +475,9 @@ class Detail_barang_model
     public function getUbah($id_barang)
     {
         $query = "SELECT 
-                    b.*, 
+                    b.id_barang, b.id_spesifikasi, b.id_kondisi_barang, b.urutan_unit,
+                    b.tgl_pengadaan_barang, b.keterangan_label, b.id_lokasi_penyimpanan,
+                    b.deskripsi_detail_lokasi, b.id_status, b.status_peminjaman, b.qr_code, 
                     spek.id_jenis_barang, 
                     spek.id_merek_barang, 
                     spek.id_satuan,
@@ -511,9 +512,25 @@ class Detail_barang_model
 
         $fotoBarang = $data['foto_lama'];
         if ($_FILES['foto_barang']['error'] === 0) {
+            $namaFile = $_FILES['foto_barang']['name'];
+            $ukuranFile = $_FILES['foto_barang']['size'];
+            $tmpName = $_FILES['foto_barang']['tmp_name'];
+
+            $ekstensiValid = ['jpg', 'jpeg', 'png'];
+            $ekstensi = explode('.', $namaFile);
+            $ekstensi = strtolower(end($ekstensi));
+
+            if (!in_array($ekstensi, $ekstensiValid)) {
+                return 0; // Prevent upload
+            }
+
+            if ($ukuranFile > 2 * 1024 * 1024) {
+                return 0;
+            }
+
             $path = '../public/img/foto-barang/';
-            $fotoBarang = $path . uniqid() . '_' . $_FILES['foto_barang']['name'];
-            move_uploaded_file($_FILES['foto_barang']['tmp_name'], $fotoBarang);
+            $fotoBarang = $path . uniqid() . '_' . $namaFile;
+            move_uploaded_file($tmpName, $fotoBarang);
 
             if (!empty($data['foto_lama']) && file_exists($data['foto_lama'])) {
                 @unlink($data['foto_lama']);
@@ -686,9 +703,9 @@ class Detail_barang_model
     }
 
     public function cariDataBarang()
-{
-    $keyword = $_POST['keyword'];
-    $query = "SELECT 
+    {
+        $keyword = $_POST['keyword'];
+        $query = "SELECT 
                 MAX(b.id_barang) as id_barang, 
                 spek.kode_barang, 
                 j.sub_barang, 
@@ -708,12 +725,12 @@ class Detail_barang_model
                 OR m.nama_merek_barang LIKE :keyword
                 OR spek.spesifikasi_barang LIKE :keyword
                 OR spek.kode_barang LIKE :keyword
-              GROUP BY spek.id_spesifikasi"; 
+              GROUP BY spek.id_spesifikasi";
 
-    $this->db->query($query);
-    $this->db->bind('keyword', "%$keyword%");
-    return $this->db->resultSet();
-}
+        $this->db->query($query);
+        $this->db->bind('keyword', "%$keyword%");
+        return $this->db->resultSet();
+    }
 
     public function cetak($data)
     {

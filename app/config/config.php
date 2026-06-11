@@ -1,10 +1,20 @@
 <?php
-define('BASEURL', 'http://' . $_SERVER['HTTP_HOST'] . '/Inventaris_Lab1/public/');
+// Check if running in CLI or Web Server
+if (php_sapi_name() === 'cli') {
+    $httpHost = 'localhost'; // Fallback for CLI
+} else {
+    $httpHost = $_SERVER['HTTP_HOST'];
+}
+define('BASEURL', 'http://' . $httpHost . '/Inventaris_Lab1/public/');
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'inventori_db13');
+
+// User Roles (Direct IDs)
+// 1: KEPLAB, 2: LABORAN, 3: KORLAB, 4: ASISTEN, 5: DOSEN, 6: MHS, 7: USER
+
 
 // ID Encryption Keys
 define('ID_ENCRYPTION_KEY', 'InventarisLabSecreetKey2024!!'); // 32 chars recommended for AES-256
@@ -25,4 +35,11 @@ define('MAIL_USERNAME', 'andiahsanashuri@gmail.com'); // TODO: Ganti dengan emai
 define('MAIL_PASSWORD', 'jkdm otvp mwul jhbt');    // TODO: Ganti dengan App Password dari Google
 define('MAIL_FROM_NAME', 'InventarisLab_Email');
 define('VERIFICATION_LINK_EXPIRY', 24); // Durasi expired token dalam jam
+
+// WhatsApp Gateway (Fonnte) Configuration
+define('FONNTE_API_TOKEN', 'TOKEN_FONNTE_ANDA_DISINI'); // TODO: Ganti dengan Token dari https://fonnte.com
+define('FONNTE_GROUP_ID', 'ID_GRUP_WHATSAPP_DISINI'); // TODO: Ganti dengan ID Grup (biasanya diakhiri @g.us)
+
+// Application Versioning (for asset caching)
+define('APP_VERSION', '1.0.1');
 

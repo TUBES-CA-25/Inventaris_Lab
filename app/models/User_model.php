@@ -13,11 +13,10 @@ class User_model
     {
         $query = "SELECT 
                     u.id_user, u.email, u.id_role, mr.role,
-                    d.foto, d.nama_user, d.no_hp_user, d.jenis_kelamin, d.alamat
+                    u.foto, u.nama_user, u.no_hp_user, u.jenis_kelamin, u.alamat
                   FROM trx_user u
-                  JOIN trx_data_user d ON u.id_user = d.id_user 
                   JOIN mst_role mr ON u.id_role = mr.id_role
-                  ORDER BY d.nama_user ASC";
+                  ORDER BY u.nama_user ASC";
 
         $this->db->query($query);
         return $this->db->resultSet();
@@ -28,13 +27,12 @@ class User_model
         $keyword = $_POST['keyword'];
         $query = "SELECT 
                     u.id_user, u.email, u.id_role, mr.role,
-                    d.foto, d.nama_user, d.no_hp_user, d.jenis_kelamin, d.alamat
+                    u.foto, u.nama_user, u.no_hp_user, u.jenis_kelamin, u.alamat
                   FROM trx_user u
-                  JOIN trx_data_user d ON u.id_user = d.id_user 
                   JOIN mst_role mr ON u.id_role = mr.id_role 
-                  WHERE d.nama_user LIKE :keyword
+                  WHERE u.nama_user LIKE :keyword
                       OR u.email LIKE :keyword
-                      OR d.no_hp_user LIKE :keyword
+                      OR u.no_hp_user LIKE :keyword
                       OR mr.role LIKE :keyword";
 
         $this->db->query($query);
@@ -44,6 +42,7 @@ class User_model
 
     public function tambahUser($data)
     {
+        // 1. Cek duplikasi email
         $this->db->query("SELECT id_user FROM trx_user WHERE email = :email");
         $this->db->bind('email', $data['email']);
         $this->db->execute();
@@ -51,50 +50,76 @@ class User_model
             return -1;
         }
 
+        // 2. Cek password
         if ($data['password'] !== $data['konfirmasi-password']) {
             return -2;
         }
 
-        $fotoPath = $this->uploadFoto();
-        if (!$fotoPath) {
-            return -3;
+        // 3. Validasi Berdasarkan Asal Instansi & Tentukan Role Otomatis
+        $asal = $data['asal_instansi'] ?? '';
+        $nim_nip = $data['nim_nip'] ?? '';
+        $id_role = null;
+
+        if ($asal === 'fikom') {
+            // Mahasiswa (130/131, 11 digit)
+            if ((strpos($nim_nip, '130') === 0 || strpos($nim_nip, '131') === 0) && strlen($nim_nip) === 11) {
+                $id_role = '6'; // MHS
+            }
+            // Dosen (09, 10 digit)
+            elseif (strpos($nim_nip, '09') === 0 && strlen($nim_nip) === 10) {
+                $id_role = '5'; // DOSEN
+            } else {
+                // Input FIKOM tidak valid
+                return -4;
+            }
+        } else {
+            // Luar FIKOM tidak lagi diizinkan mendaftar mandiri
+            return -5;
         }
 
-        // Generate verification token
+        if (!$id_role) {
+            return -5;
+        }
+
+        // 4. Handle Foto (Optional, Base64 from Cropper)
+        $fotoPath = '../public/img/foto-profile/user.svg'; // Default
+        if (!empty($data['cropped_foto'])) {
+            $fotoPath = $this->saveBase64Image($data['cropped_foto']);
+            if (!$fotoPath) {
+                return -3; // Upload error
+            }
+        }
+
         $verificationToken = bin2hex(random_bytes(32));
-        $tokenExpiry = date('Y-m-d H:i:s', strtotime('+' . VERIFICATION_LINK_EXPIRY . ' hours'));
 
         try {
             $this->db->query('START TRANSACTION');
 
-            $queryUser = "INSERT INTO trx_user (email, password, id_role, email_verified, verification_token, token_expiry) 
-                          VALUES (:email, :password, :id_role, 0, :token, :expiry)";
+            $queryUser = "INSERT INTO trx_user (email, password, id_role, email_verified, foto, nama_user, nim_nip, no_hp_user, jenis_kelamin, alamat) 
+                          VALUES (:email, :password, :id_role, 0, :foto, :nama_user, :nim_nip, :no_hp_user, :jenis_kelamin, :alamat)";
             $this->db->query($queryUser);
             $this->db->bind('email', $data['email']);
             $this->db->bind('password', password_hash($data['password'], PASSWORD_BCRYPT));
-            $this->db->bind('id_role', $data['id_role'] ?? 7);
-            $this->db->bind('token', $verificationToken);
-            $this->db->bind('expiry', $tokenExpiry);
-            $this->db->execute();
-
-            $newUserId = $this->db->lastInsertId();
-
-            $queryData = "INSERT INTO trx_data_user (id_user, foto, nama_user, nim_nip, no_hp_user, jenis_kelamin, alamat) 
-                          VALUES (:id_user, :foto, :nama_user, :nim_nip, :no_hp_user, :jenis_kelamin, :alamat)";
-
-            $this->db->query($queryData);
-            $this->db->bind('id_user', $newUserId);
+            $this->db->bind('id_role', $id_role);
             $this->db->bind('foto', $fotoPath);
             $this->db->bind('nama_user', $data['nama_user']);
-            $this->db->bind('nim_nip', $data['nim_nip']);
+            $this->db->bind('nim_nip', $nim_nip);
             $this->db->bind('no_hp_user', $data['no_hp_user']);
             $this->db->bind('jenis_kelamin', $data['jenis_kelamin']);
             $this->db->bind('alamat', $data['alamat']);
             $this->db->execute();
 
+            $newUserId = $this->db->lastInsertId();
+
+            $queryVerifikasi = "INSERT INTO trx_verifikasi (email, token, tipe_verifikasi, created_at, is_used) 
+                                VALUES (:email, :token, 'register', NOW(), 0)";
+            $this->db->query($queryVerifikasi);
+            $this->db->bind('email', $data['email']);
+            $this->db->bind('token', $verificationToken);
+            $this->db->execute();
+
             $this->db->query('COMMIT');
 
-            // Return success with token for email verification
             return [
                 'status' => 1,
                 'user_id' => $newUserId,
@@ -108,42 +133,35 @@ class User_model
 
     public function hapusUser($id_user)
     {
-        $this->db->query("SELECT foto FROM trx_data_user WHERE id_user = :id_user");
+        $this->db->query("SELECT foto FROM trx_user WHERE id_user = :id_user");
         $this->db->bind("id_user", $id_user);
         $user = $this->db->single();
 
         try {
-            $this->db->query('START TRANSACTION');
-
-            $this->db->query("DELETE FROM trx_data_user WHERE id_user = :id_user");
-            $this->db->bind("id_user", $id_user);
-            $this->db->execute();
-
             $this->db->query("DELETE FROM trx_user WHERE id_user = :id_user");
             $this->db->bind("id_user", $id_user);
             $this->db->execute();
 
-            $this->db->query('COMMIT');
-
-            if ($user && file_exists($user['foto'])) {
+            if ($user && file_exists($user['foto']) && $user['foto'] != '../public/img/foto-profile/user.svg') {
                 unlink($user['foto']);
             }
             return 1;
         } catch (Exception $e) {
-            $this->db->query('ROLLBACK');
             return 0;
         }
     }
 
     public function updateUser($data)
     {
-        if ($_FILES['foto']['error'] === 4) {
+        if (isset($_FILES['foto']) && $_FILES['foto']['error'] === 4) {
             $fotoPath = $data['fotoLama'];
-        } else {
+        } elseif (isset($_FILES['foto'])) {
             $fotoPath = $this->uploadFoto();
             if ($data['fotoLama'] && file_exists($data['fotoLama']) && $data['fotoLama'] != '../public/img/foto-profile/user.svg') {
                 unlink($data['fotoLama']);
             }
+        } else {
+            $fotoPath = $data['fotoLama'];
         }
 
         $ttdName = $data['file_ttdLama'];
@@ -161,7 +179,7 @@ class User_model
             }
         }
 
-        $query = "UPDATE trx_data_user SET 
+        $query = "UPDATE trx_user SET 
                     foto = :foto, 
                     nama_user = :nama_user, 
                     nim_nip = :nim_nip,
@@ -210,16 +228,97 @@ class User_model
             return false;
         }
 
-        $namaFileBaru = uniqid() . '.' . $ekstensiGambar;
+        $namaFileBaru = uniqid() . '.webp'; // Convert to webp
         $targetDir = '../public/img/foto-profile/';
-        move_uploaded_file($tmpName, $targetDir . $namaFileBaru);
 
-        return $targetDir . $namaFileBaru;
+        // Convert to WebP using GD
+        if ($ekstensiGambar === 'png') {
+            $img = imagecreatefrompng($tmpName);
+        } else {
+            $img = imagecreatefromjpeg($tmpName);
+        }
+
+        if ($img) {
+            // Keep transparency if needed, but for profile usually not
+            imagewebp($img, $targetDir . $namaFileBaru, 80);
+            imagedestroy($img);
+            return $targetDir . $namaFileBaru;
+        }
+
+        return false;
+    }
+
+    private function uploadTTD()
+    {
+        $namaFile = $_FILES['file_ttd']['name'];
+        $ukuranFile = $_FILES['file_ttd']['size'];
+        $error = $_FILES['file_ttd']['error'];
+        $tmpName = $_FILES['file_ttd']['tmp_name'];
+
+        if ($error === 4) {
+            return false;
+        }
+
+        $ekstensiValid = ['png'];
+        $ekstensi = explode('.', $namaFile);
+        $ekstensi = strtolower(end($ekstensi));
+        if (!in_array($ekstensi, $ekstensiValid)) {
+            return false;
+        }
+
+        if ($ukuranFile > 1000000) { // Max 1MB
+            return false;
+        }
+
+        $namaFileBaru = uniqid() . '.png';
+        $targetDir = '../public/img/ttd/';
+
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        if (move_uploaded_file($tmpName, $targetDir . $namaFileBaru)) {
+            return $namaFileBaru;
+        }
+
+        return false;
+    }
+
+    /**
+     * Save Base64 Cropped Image as WebP
+     */
+    private function saveBase64Image($base64Data)
+    {
+        try {
+            // data:image/png;base64,xxxx
+            list($type, $data) = explode(';', $base64Data);
+            list(, $data) = explode(',', $data);
+            $data = base64_decode($data);
+
+            $targetDir = '../public/img/foto-profile/';
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0777, true);
+            }
+
+            $fileName = uniqid() . '.webp';
+            $filePath = $targetDir . $fileName;
+
+            $img = imagecreatefromstring($data);
+            if ($img) {
+                // Save as WebP
+                imagewebp($img, $filePath, 80);
+                imagedestroy($img);
+                return $filePath;
+            }
+            return false;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public function getUser($email, $password)
     {
-        $this->db->query("SELECT * FROM trx_user WHERE email = :email");
+        $this->db->query("SELECT id_user, email, password, id_role, email_verified, nama_user FROM trx_user WHERE email = :email");
         $this->db->bind("email", $email);
         $user = $this->db->single();
 
@@ -237,9 +336,8 @@ class User_model
     {
         $this->db->query("SELECT 
                             u.id_user, u.email, u.id_role, mr.role,
-                            d.foto, d.nama_user, d.nim_nip, d.no_hp_user, d.jenis_kelamin, d.alamat, d.file_ttd
+                            u.foto, u.nama_user, u.nim_nip, u.no_hp_user, u.jenis_kelamin, u.alamat, u.file_ttd
                           FROM trx_user u 
-                          JOIN trx_data_user d ON u.id_user = d.id_user 
                           JOIN mst_role mr ON u.id_role = mr.id_role 
                           WHERE u.id_user = :id_user");
         $this->db->bind('id_user', $data['id_user']);
@@ -249,7 +347,7 @@ class User_model
     public function getUbah($id_user)
     {
         $this->db->query("SELECT foto, nama_user, nim_nip, no_hp_user, alamat, id_user 
-                          FROM trx_data_user 
+                          FROM trx_user 
                           WHERE id_user = :id_user");
         $this->db->bind("id_user", $id_user);
         return $this->db->single();
@@ -257,7 +355,7 @@ class User_model
 
     public function getRole($id_user)
     {
-        $this->db->query("SELECT * FROM trx_user WHERE id_user = :id_user");
+        $this->db->query("SELECT id_user, id_role FROM trx_user WHERE id_user = :id_user");
         $this->db->bind("id_user", $id_user);
         return $this->db->single();
     }
@@ -276,10 +374,9 @@ class User_model
      */
     public function getUserEmailAndName($userId)
     {
-        $this->db->query("SELECT u.email, d.nama_user 
-                          FROM trx_user u
-                          JOIN trx_data_user d ON u.id_user = d.id_user
-                          WHERE u.id_user = :id_user");
+        $this->db->query("SELECT email, nama_user 
+                          FROM trx_user
+                          WHERE id_user = :id_user");
         $this->db->bind('id_user', $userId);
         return $this->db->single();
     }
@@ -289,9 +386,13 @@ class User_model
      */
     public function verifyEmailToken($token)
     {
-        $this->db->query("SELECT * FROM trx_user 
-                          WHERE verification_token = :token 
-                          AND token_expiry > NOW()");
+        $this->db->query("SELECT u.id_user, u.email, u.id_role 
+                          FROM trx_verifikasi v 
+                          JOIN trx_user u ON v.email = u.email 
+                          WHERE v.token = :token 
+                          AND v.tipe_verifikasi = 'register' 
+                          AND v.is_used = 0 
+                          AND v.created_at >= (NOW() - INTERVAL " . VERIFICATION_LINK_EXPIRY . " HOUR)");
         $this->db->bind('token', $token);
         return $this->db->single();
     }
@@ -301,14 +402,22 @@ class User_model
      */
     public function markEmailAsVerified($userId)
     {
-        $this->db->query("UPDATE trx_user 
-                          SET email_verified = 1, 
-                              verification_token = NULL, 
-                              token_expiry = NULL 
-                          WHERE id_user = :id_user");
+        $this->db->query("SELECT email FROM trx_user WHERE id_user = :id_user");
         $this->db->bind('id_user', $userId);
-        $this->db->execute();
-        return $this->db->rowCount();
+        $user = $this->db->single();
+
+        if ($user) {
+            $this->db->query("UPDATE trx_user SET email_verified = 1 WHERE id_user = :id_user");
+            $this->db->bind('id_user', $userId);
+            $this->db->execute();
+
+            $this->db->query("UPDATE trx_verifikasi SET is_used = 1 WHERE email = :email AND tipe_verifikasi = 'register'");
+            $this->db->bind('email', $user['email']);
+            $this->db->execute();
+
+            return 1;
+        }
+        return 0;
     }
 
     public function updateTTDSpesifik($files)
@@ -365,34 +474,71 @@ class User_model
         return $countSuccess;
     }
 
-        public function gantiPasswordUser($data) {
-            $id_user = $_SESSION['id_user'];
-            $currentPassword = $data['currentPassword'];
-            $newPassword = $data['newPassword'];
-            $confirmPassword = $data['confirmPassword'];
+    public function gantiPasswordUser($data)
+    {
+        $id_user = $_SESSION['id_user'];
+        $currentPassword = $data['currentPassword'];
+        $newPassword = $data['newPassword'];
+        $confirmPassword = $data['confirmPassword'];
 
-            // 1. Ambil password lama dari DB
-            $this->db->query("SELECT password FROM trx_user WHERE id_user = :id");
-            $this->db->bind('id', $id_user);
-            $user = $this->db->single();
+        // 1. Ambil password lama dari DB
+        $this->db->query("SELECT password FROM trx_user WHERE id_user = :id");
+        $this->db->bind('id', $id_user);
+        $user = $this->db->single();
 
-            // 2. Verifikasi password lama
-            if (!password_verify($currentPassword, $user['password'])) {
-                return 0; // Password lama salah
-            }
+        // 2. Verifikasi password lama
+        if (!password_verify($currentPassword, $user['password'])) {
+            return 0; // Password lama salah
+        }
 
-            // 3. Cek konfirmasi password baru
-            if ($newPassword !== $confirmPassword) {
-                return 0; // Password tidak cocok
-            }
+        // 3. Cek konfirmasi password baru
+        if ($newPassword !== $confirmPassword) {
+            return 0; // Password tidak cocok
+        }
 
-            // 4. Update password baru
-            $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
-            $this->db->query("UPDATE trx_user SET password = :pass WHERE id_user = :id");
-            $this->db->bind('pass', $passwordHash);
-            $this->db->bind('id', $id_user);
-            $this->db->execute();
+        // 4. Update password baru
+        $passwordHash = password_hash($newPassword, PASSWORD_BCRYPT);
+        $this->db->query("UPDATE trx_user SET password = :password WHERE id_user = :id");
+        $this->db->bind('password', $passwordHash);
+        $this->db->bind('id', $id_user);
+        $this->db->execute();
 
-            return $this->db->rowCount();
+        return $this->db->rowCount();
+    }
+
+    public function getAdminPhoneNumbers()
+    {
+        // Ambil No HP dari Role KALAB (1) dan LABORAN (2)
+        $query = "SELECT no_hp_user, nama_user 
+                  FROM trx_user
+                  WHERE id_role IN (:role_kalab, :role_laboran) 
+                  AND no_hp_user IS NOT NULL 
+                  AND no_hp_user != ''";
+
+        $this->db->query($query);
+        $this->db->bind('role_kalab', '1');
+        $this->db->bind('role_laboran', '2');
+
+        return $this->db->resultSet();
+    }
+
+    public function getUsersByRole($id_role)
+    {
+        $this->db->query("SELECT id_user, nama_user, nim_nip FROM trx_user WHERE id_role = :id_role ORDER BY nama_user ASC");
+        $this->db->bind('id_role', $id_role);
+        return $this->db->resultSet();
+    }
+
+    public function getAllRoles()
+    {
+        $this->db->query("SELECT * FROM mst_role ORDER BY id_role ASC");
+        return $this->db->resultSet();
+    }
+
+    public function getUserByName($nama)
+    {
+        $this->db->query("SELECT * FROM trx_user WHERE nama_user = :nama");
+        $this->db->bind('nama', $nama);
+        return $this->db->single();
     }
 }
