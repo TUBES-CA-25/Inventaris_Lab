@@ -43,10 +43,12 @@
             $role = $_SESSION['id_role'] ?? '';
             ?>
 
-            <a href="<?= BASEURL; ?>Beranda" class="menu-item <?= ($data['judul'] == 'Beranda') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-house"></i>
-                <span>Beranda</span>
-            </a>
+            <?php if (isset($_SESSION['login']) && !in_array($role, ['6'])): ?>
+                <a href="<?= BASEURL; ?>Beranda" class="menu-item <?= ($data['judul'] == 'Beranda') ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Beranda</span>
+                </a>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['login']) && (in_array($role, ['1', '2', '3', '4']))): ?>
                 <a href="<?= BASEURL; ?>DetailBarang"

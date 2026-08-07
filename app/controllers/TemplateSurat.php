@@ -379,7 +379,7 @@ class TemplateSurat extends Controller
 
             if (move_uploaded_file($tmpName, $tujuan . $namaBaru)) {
                 if ($this->peminjamanModel->updateSuratPeminjaman($id_peminjaman, $namaBaru) > 0) {
-                    Flasher::setFlash('Berhasil', 'Surat berhasil diupload. Menunggu verifikasi.', '', 'success');
+                    Flasher::setFlash('Berhasil', 'Surat berhasil diupload. Menunggu verifikasi Kepala Laboratorium.', '', 'success');
                     header('Location: ' . BASEURL . 'Riwayat');
                 } else {
                     Flasher::setFlash('Gagal', 'Terjadi kesalahan sistem saat menyimpan data', '', 'danger');

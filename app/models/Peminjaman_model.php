@@ -510,7 +510,7 @@ class Peminjaman_model
                     $targetPhones = implode(',', $adminNumbers);
 
                     $message = "*PENGAJUAN PEMINJAMAN PERLU DIPROSES*\n\n";
-                    $message .= "Halo Tim Admin, ada pengajuan barang yang telah melengkapi surat dan siap diproses.\n\n";
+                    $message .="Halo Tim Admin, terdapat pengajuan peminjaman yang telah mengunggah surat bertanda tangan dan siap diverifikasi Kepala Laboratorium.\n\n";
                     $message .= "Nama Peminjam: " . $pjn['nama_peminjam'] . "\n";
                     $message .= "Tanggal: " . date('d-m-Y', strtotime($pjn['tanggal_peminjaman'])) . "\n";
                     $message .= "Kegiatan: " . $pjn['judul_kegiatan'] . "\n\n";

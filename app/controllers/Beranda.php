@@ -13,6 +13,11 @@ class Beranda extends Controller
 
     public function index()
     {
+        if ($_SESSION['id_role'] == 6) {
+            header('Location: ' . BASEURL . 'Peminjaman');
+            exit;
+        }
+
         $data['judul'] = 'Beranda';
         $berandaModel = $this->model('Beranda_model');
 

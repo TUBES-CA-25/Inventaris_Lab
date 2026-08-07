@@ -6,7 +6,7 @@ class ValidasiPeminjaman extends Controller
         if (!isset($_SESSION))
             session_start();
 
-        if (!isset($_SESSION['id_user']) || !in_array($_SESSION['id_role'], ['1', '2', '5'])) {
+        if (!isset($_SESSION['id_user']) || !in_array($_SESSION['id_role'], ['1', '2'])) { 
             header('Location: ' . BASEURL . 'Login');
             exit;
         }

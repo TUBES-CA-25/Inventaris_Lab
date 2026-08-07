@@ -608,36 +608,32 @@ function toggleFormTolak() {
 }
 
 $(document).ready(function () {
-    // 1. Hancurkan inisialisasi lama jika ada untuk mencegah alert "reinitialise"
-    if ($.fn.DataTable.isDataTable('#tableRiwayat')) {
-        $('#tableRiwayat').DataTable().destroy();
+
+    if ($('#tableRiwayat').length) {
+
+        $('#tableRiwayat').DataTable({
+            "dom": 'rtp',
+            "pageLength": 10,
+            "ordering": true,
+            "responsive": true,
+            "columnDefs": [
+                {
+                    "orderable": false,
+                    "targets": [0, 5]
+                }
+            ],
+            "language": {
+                "emptyTable": "Tidak ada data tersedia",
+                "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                "paginate": {
+                    "next": "Berikutnya",
+                    "previous": "Sebelumnya"
+                }
+            }
+        });
+
     }
 
-    // 2. Inisialisasi satu kali saja dengan konfigurasi yang benar
-    var table = $('#tableRiwayat').DataTable({
-        "dom": 'rtp', // 'f' dihilangkan karena pakai customSearch
-        "pageLength": 10,
-        "ordering": true,
-        "responsive": true,
-        "columnDefs": [
-            // Target adalah index kolom (dimulai dari 0). 
-            // Karena total 6 kolom, maka indexnya 0, 1, 2, 3, 4, 5.
-            { "orderable": false, "targets": [0, 5] } 
-        ],
-        "language": {
-            "emptyTable": "Tidak ada data tersedia",
-            "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-            "paginate": {
-                "next": "Berikutnya",
-                "previous": "Sebelumnya"
-            }
-        }
-    });
-
-    // 3. Hubungkan input search custom Anda (jika ada)
-    $('#customSearch').on('keyup', function () {
-        table.search(this.value).draw();
-    });
 });
 
 // $(document).ready(function () {

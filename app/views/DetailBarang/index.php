@@ -90,7 +90,7 @@ if (!isset($_SESSION['login'])) {
                             <th class="p-3">Jenis</th>
                             <th class="p-3">Merek</th>
                             <th class="p-3">Spesifikasi</th>
-                            <th class="p-3 text-center">Jml</th>
+                            <th class="p-3 text-center">Jumlah</th>
                             <th class="p-3 text-center">Satuan</th>
                             <th class="p-3 text-center">Status</th>
                             <th class="p-3 text-center">Aksi</th>

@@ -207,48 +207,35 @@ if (!in_array($status_sekarang, ['dikembalikan', 'ditolak', 'tolak peminjaman'])
                             ?>
 
                             <?php if ($isAcademic): ?>
-                                <!-- ACADEMIC FLOW: Dosen -> Kalab -->
+                                <!-- ACADEMIC FLOW: Upload Surat Dosen -> Kepala Lab -->
                                 <?php
-                                $v1_done = $p['validasi_dosen'] ?? '0';
-                                $v1_name = 'Dosen Pembimbing';
-                                $v1_person = $p['dosen_pembimbing'];
-                                $canV1 = ($role_login == '5' && $_SESSION['nama_user'] == $p['dosen_pembimbing']);
+                                $v1_done = !empty($p['file_surat']) ? '1' : '0';
+                                $v1_name = 'Surat Bertanda Tangan Dosen';
+                                $v1_person = 'Dokumen telah diunggah oleh peminjam';
+
+                                $canV1 = false;
 
                                 $v2_done = $p['validasi_kalab'] ?? '0';
-                                $v2_locked = ($v1_done == '0');
+                                $v2_locked = false;
                                 $canV2 = ($role_login == '1');
                                 ?>
                                 
                                 <!-- Step 1: Dosen -->
-                                <div class="step-card">
-                                    <div class="step-icon <?= ($v1_done == '1') ? 'step-success' : 'step-active'; ?>">
-                                        <?= ($v1_done == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);"><?= $v1_name; ?></h6>
-                                        <small class="text-muted"><?= $v1_person; ?></small>
-                                    </div>
-                                    <div>
-                                        <?php if ($canV1 && $v1_done == '0'): ?>
-                                            <a href="<?= BASEURL; ?>ValidasiPeminjaman/viewValidasiPosisi/<?= IdObfuscator::encode($p['id_peminjaman']); ?>"
-                                                class="btn btn-navy btn-sm">
-                                                <i class="fas fa-pen-nib mr-1"></i> Tanda Tangan
-                                            </a>
-                                        <?php elseif ($v1_done == '1'): ?>
-                                            <span class="status-badge disetujui" style="font-size: 0.75rem; padding: 4px 12px;">
-                                                <i class="fas fa-check"></i> Selesai
-                                            </span>
-                                        <?php else: ?>
-                                            <span class="badge badge-light text-muted">Menunggu</span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
+                                <?php if ($v1_done == '1'): ?>
+                                <span class="status-badge disetujui" style="font-size:0.75rem;padding:4px 12px;">
+                                   <i class="fas fa-check"></i> Surat Lengkap
+                                </span>
+                                <?php else: ?>
+                                    <span class="badge badge-light text-muted">
+                                        Belum Upload
+                                    </span>
+                                <?php endif; ?>
 
                                 <!-- Step 2: Kalab -->
                                 <div class="step-card">
-                                    <div class="step-icon <?= ($v2_done == '1') ? 'step-success' : ($v2_locked ? 'step-pending' : 'step-active'); ?>">
-                                        <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
-                                    </div>
+                                <div class="step-icon <?= ($v2_done == '1') ? 'step-success' : ($v2_locked ? 'step-pending' : 'step-active'); ?>">
+                                    <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
+                                </div>
                                     <div class="flex-grow-1">
                                         <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Kepala Lab</h6>
                                         <small class="text-muted">Huzain Aziz</small>
@@ -319,7 +306,7 @@ if (!in_array($status_sekarang, ['dikembalikan', 'ditolak', 'tolak peminjaman'])
                                 <!-- Step 2: Laboran (Sign Both) -->
                                 <div class="step-card">
                                     <div class="step-icon <?= ($v2_done == '1') ? 'step-success' : ($v2_locked ? 'step-pending' : 'step-active'); ?>">
-                                        <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '2'; ?>
+                                        <?= ($v2_done == '1') ? '<i class="fas fa-check"></i>' : '1'; ?>
                                     </div>
                                     <div class="flex-grow-1">
                                         <h6 class="font-weight-bold mb-0" style="color: var(--text-dark);">Laboran</h6>

@@ -90,45 +90,84 @@ class User_model
             }
         }
 
-        $verificationToken = bin2hex(random_bytes(32));
+            $verificationToken = bin2hex(random_bytes(32));
 
-        try {
-            $this->db->query('START TRANSACTION');
+            try {
 
-            $queryUser = "INSERT INTO trx_user (email, password, id_role, email_verified, foto, nama_user, nim_nip, no_hp_user, jenis_kelamin, alamat) 
-                          VALUES (:email, :password, :id_role, 0, :foto, :nama_user, :nim_nip, :no_hp_user, :jenis_kelamin, :alamat)";
-            $this->db->query($queryUser);
-            $this->db->bind('email', $data['email']);
-            $this->db->bind('password', password_hash($data['password'], PASSWORD_BCRYPT));
-            $this->db->bind('id_role', $id_role);
-            $this->db->bind('foto', $fotoPath);
-            $this->db->bind('nama_user', $data['nama_user']);
-            $this->db->bind('nim_nip', $nim_nip);
-            $this->db->bind('no_hp_user', $data['no_hp_user']);
-            $this->db->bind('jenis_kelamin', $data['jenis_kelamin']);
-            $this->db->bind('alamat', $data['alamat']);
-            $this->db->execute();
+                $this->db->query('START TRANSACTION');
 
-            $newUserId = $this->db->lastInsertId();
+                $queryUser = "
+                    INSERT INTO trx_user 
+                    (
+                        email, 
+                        password, 
+                        id_role, 
+                        email_verified,
+                        verification_token,
+                        token_expiry,
+                        foto,
+                        nama_user,
+                        nim_nip,
+                        no_hp_user,
+                        jenis_kelamin,
+                        alamat
+                    )
+                    VALUES
+                    (
+                        :email,
+                        :password,
+                        :id_role,
+                        0,
+                        :token,
+                        DATE_ADD(NOW(), INTERVAL 24 HOUR),
+                        :foto,
+                        :nama_user,
+                        :nim_nip,
+                        :no_hp_user,
+                        :jenis_kelamin,
+                        :alamat
+                    )
+                ";
 
-            $queryVerifikasi = "INSERT INTO trx_verifikasi (email, token, tipe_verifikasi, created_at, is_used) 
-                                VALUES (:email, :token, 'register', NOW(), 0)";
-            $this->db->query($queryVerifikasi);
-            $this->db->bind('email', $data['email']);
-            $this->db->bind('token', $verificationToken);
-            $this->db->execute();
+                $this->db->query($queryUser);
 
-            $this->db->query('COMMIT');
+                $this->db->bind('email', $data['email']);
+                $this->db->bind(
+                    'password',
+                    password_hash($data['password'], PASSWORD_BCRYPT)
+                );
+                $this->db->bind('id_role', $id_role);
+                $this->db->bind('token', $verificationToken);
+                $this->db->bind('foto', $fotoPath);
+                $this->db->bind('nama_user', $data['nama_user']);
+                $this->db->bind('nim_nip', $nim_nip);
+                $this->db->bind('no_hp_user', $data['no_hp_user']);
+                $this->db->bind('jenis_kelamin', $data['jenis_kelamin']);
+                $this->db->bind('alamat', $data['alamat']);
 
-            return [
-                'status' => 1,
-                'user_id' => $newUserId,
-                'token' => $verificationToken
-            ];
-        } catch (Exception $e) {
-            $this->db->query('ROLLBACK');
-            return 0;
-        }
+                $this->db->execute();
+
+
+                $newUserId = $this->db->lastInsertId();
+
+
+                $this->db->query('COMMIT');
+
+
+                return [
+                    'status' => 1,
+                    'user_id' => $newUserId,
+                    'token' => $verificationToken
+                ];
+
+
+            } catch (Exception $e) {
+
+                $this->db->query('ROLLBACK');
+
+                return 0;
+
+            }
     }
 
     public function hapusUser($id_user)
@@ -386,14 +425,19 @@ class User_model
      */
     public function verifyEmailToken($token)
     {
-        $this->db->query("SELECT u.id_user, u.email, u.id_role 
-                          FROM trx_verifikasi v 
-                          JOIN trx_user u ON v.email = u.email 
-                          WHERE v.token = :token 
-                          AND v.tipe_verifikasi = 'register' 
-                          AND v.is_used = 0 
-                          AND v.created_at >= (NOW() - INTERVAL " . VERIFICATION_LINK_EXPIRY . " HOUR)");
+        $this->db->query("
+            SELECT 
+                id_user,
+                email,
+                id_role
+            FROM trx_user
+            WHERE verification_token = :token
+            AND email_verified = 0
+            AND token_expiry >= NOW()
+        ");
+
         $this->db->bind('token', $token);
+
         return $this->db->single();
     }
 
@@ -402,22 +446,20 @@ class User_model
      */
     public function markEmailAsVerified($userId)
     {
-        $this->db->query("SELECT email FROM trx_user WHERE id_user = :id_user");
+        $this->db->query("
+            UPDATE trx_user
+            SET 
+                email_verified = 1,
+                verification_token = NULL,
+                token_expiry = NULL
+            WHERE id_user = :id_user
+        ");
+
         $this->db->bind('id_user', $userId);
-        $user = $this->db->single();
 
-        if ($user) {
-            $this->db->query("UPDATE trx_user SET email_verified = 1 WHERE id_user = :id_user");
-            $this->db->bind('id_user', $userId);
-            $this->db->execute();
+        $this->db->execute();
 
-            $this->db->query("UPDATE trx_verifikasi SET is_used = 1 WHERE email = :email AND tipe_verifikasi = 'register'");
-            $this->db->bind('email', $user['email']);
-            $this->db->execute();
-
-            return 1;
-        }
-        return 0;
+        return $this->db->rowCount() > 0 ? 1 : 0;
     }
 
     public function updateTTDSpesifik($files)

@@ -195,13 +195,6 @@
                         <i class="fas fa-download mr-2"></i>Download Surat PDF
                     </a>
 
-                    <div class="mt-4">
-                        <p class="text-muted small mb-2">- atau -</p>
-                        <a href="<?= BASEURL; ?>TemplateSurat/tandaTangan/<?= IdObfuscator::encode($data['peminjaman']['id_peminjaman']); ?>"
-                            class="btn-back d-inline-block">
-                            <i class="fas fa-signature mr-2"></i>Tanda Tangan Digital
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>

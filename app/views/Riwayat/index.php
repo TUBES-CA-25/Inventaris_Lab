@@ -144,76 +144,83 @@ $isAdmin = in_array($id_role, ['1', '2', '3', '4']);
                             <th class="text-center py-3 border-0 col-action">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php $no = 1; ?>
-                        <?php if (empty($data['riwayat'])): ?>
-                            <tr>
-                                <td colspan="6" class="text-center py-5 text-muted">
-                                    <p class="mb-0">Belum ada riwayat peminjaman.</p>
-                                </td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($data['riwayat'] as $row): ?>
-                                <tr>
-                                    <td class="pl-4 font-weight-bold text-muted"><?= $no++; ?></td>
+                   <tbody>
+                    <?php $no = 1; ?>
 
-                                    <td>
-                                        <h6 class="row-title-text">
-                                            <?= ($data['active_tab'] == 'all') ? $row['nama_user'] : 'Saya'; ?>
-                                        </h6>
-                                    </td>
+                    <?php foreach ($data['riwayat'] as $row): ?>
+                        <tr>
+                            <td class="pl-4 font-weight-bold text-muted"><?= $no++; ?></td>
 
-                                    <td><?= $row['judul_kegiatan']; ?></td>
+                            <td>
+                                <h6 class="row-title-text">
+                                    <?= ($data['active_tab'] == 'all') ? $row['nama_user'] : 'Saya'; ?>
+                                </h6>
+                            </td>
 
-                                    <td><?= date('d M Y', strtotime($row['tanggal_pengajuan'])); ?></td>
+                            <td><?= $row['judul_kegiatan']; ?></td>
 
-                                    <td class="text-center">
-                                        <?php
-                                        $st = strtolower($row['status']);
-                                        $badgeClass = 'badge-secondary';
-                                        if ($st == 'disetujui' || $st == 'diterima') $badgeClass = 'badge-status-approved';
-                                        elseif (strpos($st, 'tolak') !== false) $badgeClass = 'badge-status-rejected';
-                                        elseif ($st == 'melengkapi surat') $badgeClass = 'badge-status-incomplete';
-                                        elseif ($st == 'diproses') $badgeClass = 'badge-status-processing';
-                                        elseif ($st == 'dikembalikan' || $st == 'selesai') $badgeClass = 'badge-status-returned';
-                                        ?>
-                                        <span class="badge <?= $badgeClass; ?> badge-status">
-                                            <?= ucfirst($st); ?>
-                                        </span>
-                                    </td>
+                            <td><?= date('d M Y', strtotime($row['tanggal_pengajuan'])); ?></td>
 
-                                    <td class="text-center">
-                                        <?php if ($st == 'melengkapi surat'): ?>
-                                            <div class="action-buttons-group">
-                                                <a href="<?= BASEURL; ?>TemplateSurat/lengkapi/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
-                                                    class="btn-action btn-upload" data-toggle="tooltip" data-placement="top"
-                                                    title="Upload Bukti Surat">
-                                                    <i class="fas fa-file-upload"></i>
-                                                    <span class="btn-text">Upload Surat</span>
-                                                </a>
+                            <td class="text-center">
+                                <?php
+                                $st = strtolower($row['status']);
+                                $badgeClass = 'badge-secondary';
 
-                                                <a href="<?= BASEURL; ?>Peminjaman/tambahBarang/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
-                                                    class="btn-action btn-add" data-toggle="tooltip" data-placement="top"
-                                                    title="Tambah Barang Peminjaman">
-                                                    <i class="fas fa-plus-circle"></i>
-                                                    <span class="btn-text">Tambah Barang</span>
-                                                </a>
-                                            </div>
+                                if ($st == 'disetujui' || $st == 'diterima') {
+                                    $badgeClass = 'badge-status-approved';
+                                } elseif (strpos($st, 'tolak') !== false) {
+                                    $badgeClass = 'badge-status-rejected';
+                                } elseif ($st == 'melengkapi surat') {
+                                    $badgeClass = 'badge-status-incomplete';
+                                } elseif ($st == 'diproses') {
+                                    $badgeClass = 'badge-status-processing';
+                                } elseif ($st == 'dikembalikan' || $st == 'selesai') {
+                                    $badgeClass = 'badge-status-returned';
+                                }
+                                ?>
 
-                                        <?php else: ?>
-                                            <a href="<?= BASEURL; ?>Riwayat/detail/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
-                                                class="btn-action btn-detail" data-toggle="tooltip" data-placement="top"
-                                                title="Lihat Detail Peminjaman">
-                                                <i class="fas fa-eye"></i>
-                                                <span class="btn-text">Lihat Detail</span>
-                                            </a>
-                                        <?php endif; ?>
-                                    </td>
+                                <span class="badge <?= $badgeClass; ?> badge-status">
+                                    <?= ucfirst($st); ?>
+                                </span>
+                            </td>
 
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </tbody>
+                            <td class="text-center">
+                                <?php if ($st == 'melengkapi surat'): ?>
+
+                                    <div class="action-buttons-group">
+                                        <a href="<?= BASEURL; ?>TemplateSurat/lengkapi/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
+                                            class="btn-action btn-upload"
+                                            data-toggle="tooltip"
+                                            title="Upload Bukti Surat">
+                                            <i class="fas fa-file-upload"></i>
+                                            <span class="btn-text">Upload Surat</span>
+                                        </a>
+
+                                        <a href="<?= BASEURL; ?>Peminjaman/tambahBarang/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
+                                            class="btn-action btn-add"
+                                            data-toggle="tooltip"
+                                            title="Tambah Barang Peminjaman">
+                                            <i class="fas fa-plus-circle"></i>
+                                            <span class="btn-text">Tambah Barang</span>
+                                        </a>
+                                    </div>
+
+                                <?php else: ?>
+
+                                    <a href="<?= BASEURL; ?>Riwayat/detail/<?= IdObfuscator::encode($row['id_peminjaman']); ?>"
+                                        class="btn-action btn-detail"
+                                        data-toggle="tooltip"
+                                        title="Lihat Detail Peminjaman">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="btn-text">Lihat Detail</span>
+                                    </a>
+
+                                <?php endif; ?>
+                            </td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
                 </table>
             </div>
         </div>
